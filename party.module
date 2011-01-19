@@ -1,0 +1,358 @@
+<?php
+// $Id$
+/**
+ * @file party.module
+ *
+ * A party is a collection of profile2 objects.
+ * What this means in practical terms is all the data that you can store
+ * about a user, but without the actual user account.
+ 
+ builds on:
+ 
+ - profile_multiple, possibly
+ - entity_relationship to connect parties to users
+ - 
+ 
+ 
+ Ecosystem modules to follow:
+ - party_user: connects a party to a user. (bundled in this project!)
+ - something to allow several users to control a party
+  (eg, for employees of an organization to all change its records)
+ - genus: create hierarchical type templates.
+ */
+
+/*
+
+todo:
+
+- UI list of contacts
+  - hook_action_links to add a contact
+- UI view contact (same as tabs for user account)
+- UI edit/add contact (same as tabs for user edit)
+- relationship API hook to define relationships types:
+  - profile <-> contact 
+  - contact <-> user
+- hook_user_insert to create relationships
+
+
+TROUBLE WITH ENTITY
+*/
+
+/**
+ * Implements hook_entity_info().
+ */
+function party_entity_info() {
+  $return = array(
+    'party' => array(
+      'label' => t('Party'),
+      'entity class' => 'EntityDB',
+      'controller class' => 'PartyAPIController',
+      'base table' => 'party',
+      'uri callback' => 'party_uri',
+      'fieldable' => FALSE, // for now!
+      'entity keys' => array(
+        'id' => 'pid',
+        'uid' => 'uid',
+      ),
+      'view modes' => array(
+        'full' => array(
+          'label' => t('Party'),
+          'custom settings' => FALSE,
+        ),
+      ),
+      'label callback' => 'party_label',
+      'access callback' => 'party_access',
+      'admin ui' => array(
+        'path' => 'admin/content/party',
+        'controller class' => 'PartyUIController',
+      ),
+    ),
+  );
+  return $return;
+}
+
+/**
+ * Implementation of hook_permission().
+ */
+function party_permission() {
+  return array(
+    'view all parties' => array(
+      'title' => t('View all parties'),
+    ),
+    'edit all parties' => array(
+      'title' => t('Edit all parties'),
+    ),
+  );
+}
+
+/**
+ * Show either the username or a profile field as the label.
+ *
+ * Label callback for parties.
+ */
+function party_label($party) {
+  dsm($party);
+  if (is_null($party->uid)) {
+    $label = "Anonymous";
+  }
+  else {
+    $label = $party->user_name;
+  }
+  return $label;
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function Xparty_menu() { 
+  // This is the minimum information you can provide for a menu item.
+  $items['admin/content/partyold'] = array(
+    'title' => 'Parties',
+    'page callback' => 'party_profiles',
+    'access arguments' => array('view all parties'),
+  );
+
+  return $items;
+}
+
+/**
+ * Access callback for parties.
+ */
+function party_access($op, $party = NULL, $user = NULL) {
+  // TODO!!!
+  return TRUE;
+}
+
+/**
+ * Load a party. Wrapper around entity_load() for convenience.
+ *
+ * @param $party
+ *  Either an array or object.
+ */
+function party_load($id = FALSE, $conditions = array(), $reset = FALSE) {
+  dsm($id);
+  $parties = entity_load('party', array($id), $conditions, $reset);
+  dsm($parties);
+  return $parties;
+}
+
+
+/**
+ * Save a party. Adds defaults to new party objects.
+ *
+ * @param $party
+ *  Either an array or object.
+ */
+function party_save($party) {
+  if (is_array($party)) {
+    $party = (object)$party;
+  }
+  
+  // Set defaults.
+  if (!isset($party->uid)) {
+    $party->uid = NULL;
+  }
+  if (!isset($party->status)) {
+    $party->status = TRUE;
+  }
+  
+  return entity_save('party', $party);
+}
+
+/**
+ * Form callback.
+ */
+function party_form($form, &$form_state, $party) {
+  dsm($party);
+
+  $form = array();
+  
+  $form['test'] = array(
+    '#markup' => 'Party form',
+  );
+ 
+  $form['weight'] = array('#type' => 'weight', '#delta' => 10, '#default_value' => 0);  
+  $form['fooedit'] = array(
+    '#value' => l(t('edit vocabulary'), "admin/content/taxonomy/edit/vocabulary/vid")
+  );  
+  
+  $form['yy'] = array('#type' => 'link', '#title' => t('link title'), '#href' => 'path/to/location');  
+  $form['xx'] = array('data' => array('#type' => 'link', '#title' => t('link title'), '#href' => 'path/to/location'));  
+  
+  return $form;
+  
+}
+
+// ========================== party - user interaction
+
+/**
+ * Implementation of hook_user_cancel().
+ */
+function party_user_cancel($edit, $account, $method) {
+
+}
+
+
+/**
+ * Implementation of hook_user_insert().
+ */
+function party_user_insert(&$edit, $account, $category) {
+
+}
+
+/**
+ * Menu callback: shows an admin list of profile sets.
+ */
+function party_profiles() {
+  $categories = _user_categories();
+  dsm($categories);
+  
+  return 'yay';
+}
+
+// ========================== controller classes
+
+/**
+ * Default controller for providing UI.
+ */
+class PartyUIController extends EntityDefaultUIController {
+  /**
+   * Overrides the default description of the top level menu item.
+   * @see EntityDefaultUIController::hook_menu()
+   */
+  public function hook_menu() {
+    $items = parent::hook_menu();
+
+    $items[$this->path]['title'] = 'Parties';
+    $items[$this->path]['description'] = 'Manage parties.';
+    $items[$this->path]['type'] = MENU_LOCAL_TASK | MENU_NORMAL_ITEM;
+    
+    dsm($items);
+    
+    return $items;
+  }
+  
+  /**
+   * Generates the render array for a overview table for arbitrary entities
+   * matching the given conditions.
+   *
+   * @param $conditions
+   *   An array of conditions as needed by entity_load().
+
+   * @return Array
+   *   A renderable array.
+   */
+  public function XoverviewTable($conditions = array()) {
+    $entities = entity_load($this->entityType);
+    ksort($entities);
+
+    $rows = array();
+    foreach ($entities as $id => $entity) {
+      $rows[] = $this->overviewTableRow($conditions, $id, $entity);
+    }
+    // Assemble the right table header.
+    $header = array(t('Label'));
+    if (!empty($this->entityInfo['exportable'])) {
+      $header[] = t('Status');
+    }
+    // Add operations with the right colspan.
+    $field_ui = !empty($this->entityInfo['bundle of']) && module_exists('field_ui');
+    $header[] = array('data' => t('Operations'), 'colspan' => $field_ui ? 5 : 3);
+
+    $render = array(
+      '#theme' => 'table',
+      '#header' => $header,
+      '#rows' => $rows,
+      '#empty' => t('None.'),
+    );
+    return $render;
+  }
+  
+  /**
+   * Generates the row for the passed entity and may be overridden in order to
+   * customize the rows.
+   *
+   * @param $additional_cols
+   *   Additional columns to be added after the entity label column.
+   */
+  protected function overviewTableRow($conditions, $id, $entity, $additional_cols = array()) {
+    $entity_uri = entity_uri($this->entityType, $entity);
+
+    $row[] = array('data' => array(
+      '#theme' => 'entity_ui_overview_item',
+      '#label' => entity_label($this->entityType, $entity),
+      '#name' => !empty($this->entityInfo['exportable']) ? entity_id($this->entityType, $entity) : FALSE,
+      '#url' => $entity_uri ? $entity_uri : FALSE,
+      '#entity_type' => $this->entityType),
+    );
+
+    // Add in any passed additional cols.
+    foreach ($additional_cols as $col) {
+      $row[] = $col;
+    }
+
+    // Add a row for the exportable status.
+    if (!empty($this->entityInfo['exportable'])) {
+      $row[] = array('data' => array(
+        '#theme' => 'entity_status',
+        '#status' => $entity->{$this->statusKey},
+      ));
+    }
+    // In case this is a bundle, we add links to the field ui tabs.
+    $field_ui = !empty($this->entityInfo['bundle of']) && module_exists('field_ui');
+
+    // Add operations depending on the status.
+    if (entity_has_status($this->entityType, $entity, ENTITY_FIXED)) {
+      $row[] = array('data' => l(t('clone'), $this->path . '/manage/' . $id . '/clone'), 'colspan' => $field_ui ? 5 : 3);
+    }
+    else {
+      $row[] = l(t('edit'), $this->path . '/manage/' . $id);
+
+      if ($field_ui) {
+        $row[] = l(t('manage fields'), $this->path . '/manage/' . $id . '/fields');
+        $row[] = l(t('manage display'), $this->path . '/manage/' . $id . '/display');
+      }
+
+      $row[] = l(t('clone'), $this->path . '/manage/' . $id . '/clone');
+      if (empty($this->entityInfo['exportable']) || !entity_has_status($this->entityType, $entity, ENTITY_IN_CODE)) {
+        $row[] = l(t('delete'), $this->path . '/manage/' . $id . '/delete', array('query' => drupal_get_destination()));
+      }
+      elseif (entity_has_status($this->entityType, $entity, ENTITY_OVERRIDDEN)) {
+        $row[] = l(t('revert'), $this->path . '/manage/' . $id . '/revert', array('query' => drupal_get_destination()));
+      }
+      else {
+        $row[] = '';
+      }
+    }
+    return $row;
+  }
+}
+
+/**
+ * A controller implementing EntityAPIControllerInterface and being able to
+ * deal with exportable entities.
+ */
+class PartyAPIController extends EntityAPIController implements EntityAPIControllerInterface {
+  /**
+   * Add data from users to parties.
+   */
+  protected function buildQuery($ids, $conditions = array(), $revision_id = FALSE) {
+    $query = parent::buildQuery(array(), $conditions, $revision_id);
+    
+    // Add the {users} table with a left join as our uid may be NULL.
+    $query->leftJoin('users', 'u', 'base.uid = u.uid');
+    $query->addField('u', 'status', 'user_status');
+    $query->addField('u', 'name', 'user_name');
+      
+    return $query;
+  }
+
+  public function load($ids = array(), $conditions = array()) {
+    $entities = parent::load($ids, $conditions);
+    
+    dsm($entities);
+    
+    return $entities;
+  }
+}
+

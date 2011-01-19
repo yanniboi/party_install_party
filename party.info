@@ -1,0 +1,6 @@
+; $Id$
+name = Party
+description = Allows the creation of profiles that are not related to a user.
+dependencies[] = profile2
+core = 7.x
+files[] = party.module

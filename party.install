@@ -1,0 +1,38 @@
+<?php
+// $Id$
+/**
+ * @file party.install
+ * TODO: Enter file description here.
+ */
+
+/**
+ * Implementation of hook_schema().
+ */
+function party_schema() {
+  $schema['party'] = array(
+    'description' => 'Stores party data.',
+    'fields' => array(
+      'pid' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique party ID.',
+      ),
+      'uid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+        'default' => NULL,
+        'description' => "The {users}.uid of the associated user, if any.",
+      ),
+    ),
+    'indexes' => array(
+      'pid' => array('pid'),
+    ),
+    'foreign keys' => array(
+      'uid' => array('users' => 'uid'),
+    ),
+    'primary key' => array('pid'),
+  );
+  return $schema;
+}
+
