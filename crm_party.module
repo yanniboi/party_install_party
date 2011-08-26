@@ -52,6 +52,7 @@ function crm_party_entity_info() {
       'entity keys' => array(
         'id' => 'pid',
         'uid' => 'uid',
+        'bundle' => 'type',
       ),
       'bundles' => array(
         'person'=> array(
