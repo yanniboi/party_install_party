@@ -42,16 +42,20 @@ TROUBLE WITH ENTITY
  */
 function crm_party_entity_info() {
   $return = array(
-    'party' => array(
+    'crm_party' => array(
       'label' => t('Party'),
-      'entity class' => 'EntityDB',
-      'controller class' => 'CRMPartyAPIController',
+      'entity class' => 'CRMParty',
+      'controller class' => 'CRMPartyController',
       'base table' => 'crm_party',
       'uri callback' => 'crm_party_uri',
       'fieldable' => TRUE, // for now!
       'entity keys' => array(
         'id' => 'pid',
         'uid' => 'uid',
+      ),
+      'bundles' => array(),
+      'bundle keys' => array(
+        'bundle' => 'type',
       ),
       'view modes' => array(
         'full' => array(
@@ -142,7 +146,7 @@ function crm_party_load($id = FALSE, $conditions = array(), $reset = FALSE) {
  * @param $party
  *  Either an array or object.
  */
-function crm_party_save($party) {
+function crm_party_save(CRMParty $party) {
   if (is_array($party)) {
     $party = (object)$party;
   }
@@ -150,12 +154,9 @@ function crm_party_save($party) {
   // Set defaults.
   if (!isset($party->uid)) {
     $party->uid = NULL;
-  }
-  if (!isset($party->status)) {
-    $party->status = TRUE;
-  }
+  } 
   
-  return entity_save('party', $party);
+  return $party->save();
 }
 
 /**
@@ -210,6 +211,24 @@ function crm_party_profiles() {
 }
 
 // ========================== controller classes
+/**
+ * The class for A party entity
+ */
+class CRMParty extends Entity {
+  
+  public function __construct($values = array()) {
+    parent::__construct($values, 'crm_party');
+  }
+
+  protected function defaultLabel() {
+    return $this->pid;
+  }
+
+  protected function defaultUri() {
+    return array('path' => 'party/' . $this->pid);
+  }  
+}
+
 
 /**
  * Default controller for providing UI.
@@ -331,7 +350,7 @@ class CRMPartyUIController extends EntityDefaultUIController {
  * A controller implementing EntityAPIControllerInterface and being able to
  * deal with exportable entities.
  */
-class CRMPartyAPIController extends EntityAPIController implements EntityAPIControllerInterface {
+class CRMPartyController extends EntityAPIController implements EntityAPIControllerInterface {
   /**
    * Add data from users to parties.
    */
