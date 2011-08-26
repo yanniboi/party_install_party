@@ -80,7 +80,7 @@ function crm_party_entity_info() {
 }
 
 /**
- * Define some pages
+ * Implements hook_menu().
  */
 function crm_party_menu() {
   $items['admin/community/party/manage'] = array(
@@ -141,16 +141,20 @@ function crm_party_permission() {
 }
 
 /**
- * URI callback for contacts
+ * URI callback for contacts.
+ *
+ * @param $party
+ *  A party object
  */
 function crm_party_uri($party) {
   return array('path' => 'party/'.$party->pid , );
 }
 
 /**
- * Show either the username or a profile field as the label.
+ * Label callback for parties. Show either the username or a profile field as the label.
  *
- * Label callback for parties.
+ * @param $party
+ *  A part object
  */
 function crm_party_label($party) {
   dsm($party);
@@ -171,17 +175,24 @@ function crm_party_access($op, $party = NULL, $user = NULL) {
   return TRUE;
 }
 
+// TODO: pages - to be moved to a different file
 /**
- * pages - to be moved to a different file
- */
+ * Page callback for admin page.
+ */ 
 function crm_party_info() {
   return "Welcome to the contact info administration page";
 }
 
+/**
+ * Title callback fro a party page.
+ */ 
 function crm_party_page_title($party) {
   return $party->pid;
 }
 
+/**
+ * View page callback for a party.
+ */
 function crm_party_page_view($party, $view_mode = 'full') {
   $party->content = array();
   
@@ -192,27 +203,15 @@ function crm_party_page_view($party, $view_mode = 'full') {
   
 }
 
-/*function tribes_contact_field_extra_fields() {
-  $return = array();
-  $return['tribes_contact']['tribes_contact'] = array(
-    'display' => array(
-      'email' => array(
-        'label' => t('Email'),
-        'description' => t('Contacts Email'),
-        'weight' => 1,
-      ),
-    ),
-  );
-
-  return $return;
-}*/
-
+/**
+ * Title callback far an edit party page.
+ */ 
 function crm_party_edit_page_title($party) {
   return "Edit Party" . $party->pid;
 } 
 
 /**
- * Add Contact Page
+ * Add Contact Page callback
  */
 function crm_party_add() {
   $party = (object) array(
@@ -222,6 +221,9 @@ function crm_party_add() {
   return drupal_get_form('crm_party_edit_form', $party);
 }
 
+/**
+ * Define party edit form
+ */
 function crm_party_edit_form($form, &$form_state, $party) {
   if(isset($party->pid)) {
     $form['pid'] = array(
@@ -271,7 +273,7 @@ function crm_party_load($id = FALSE, $conditions = array(), $reset = FALSE) {
  * Save a party. Adds defaults to new party objects.
  *
  * @param $party
- *  Either an array or object.
+ *  A CRMParty Object
  */
 function crm_party_save(CRMParty $party) {
   if (is_array($party)) {
@@ -287,7 +289,7 @@ function crm_party_save(CRMParty $party) {
 }
 
 /**
- * Form callback.
+ * Form callback. - Should be Depreciated
  */
 function crm_party_form($form, &$form_state, $party) {
   dsm($party);
