@@ -1,7 +1,5 @@
-name = Party
-description = Allows the creation of profiles that are not related to a user.
-dependencies[] = profile2
-dependencies[] = entity
-package = CRM
+name = CRM Party
+description = An Entity that helps to manage Contacts
 core = 7.x
-files[] = party.module
+package = Cloud CRM
+files[] = includes/contact.entity.inc
