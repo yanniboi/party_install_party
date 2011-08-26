@@ -204,14 +204,14 @@ function crm_party_page_view($party, $view_mode = 'full') {
 }
 
 /**
- * Title callback far an edit party page.
+ * Title callback for an edit party page.
  */ 
 function crm_party_edit_page_title($party) {
   return "Edit Party" . $party->pid;
 } 
 
 /**
- * Add Contact Page callback
+ * Page callback for adding a party.
  */
 function crm_party_add() {
   $party = (object) array(
@@ -223,10 +223,10 @@ function crm_party_add() {
 }
 
 /**
- * Define party edit form
+ * Form builder for the party edit form.
  */
 function crm_party_edit_form($form, &$form_state, $party) {
-  if(isset($party->pid)) {
+  if (isset($party->pid)) {
     $form['pid'] = array(
       '#type' => 'value',
       '#value' => $party->pid,
