@@ -215,7 +215,8 @@ function crm_party_edit_page_title($party) {
  */
 function crm_party_add() {
   $party = (object) array(
-    'type' => 'person',
+    'type' => 'person'
+    'pid' => '',
     );
     
   return drupal_get_form('crm_party_edit_form', $party);
@@ -232,7 +233,7 @@ function crm_party_edit_form($form, &$form_state, $party) {
     );
   }
   
-  field_attach_form('crm_party', $party, $form, $form_state);
+  field_attach_form('person', $party, $form, $form_state);
   
   $form['submit'] = array(
     '#type' => 'submit',
@@ -249,9 +250,9 @@ function crm_party_edit_form_validate($form, &$form_state) {
 }
 
 function crm_party_edit_form_submit($form, &$form_state) {
-  $party = (object) $form_state['values'];
-  field_attach_submit('tribes_contact', $party, $form, $form_state);
-  $party = crm_party_save($party);
+  $party = entity_ui_controller('crm_party')->entityFormSubmitBuildEntity($form, $form_state);
+  $party->save();
+  
   $form_state['redirect'] = 'party/' . $party->pid;
 }
 
