@@ -8,8 +8,8 @@
 /**
  * Implementation of hook_schema().
  */
-function party_schema() {
-  $schema['party'] = array(
+function crm_party_schema() {
+  $schema['crm_party'] = array(
     'description' => 'Stores party data.',
     'fields' => array(
       'pid' => array(
@@ -23,6 +23,13 @@ function party_schema() {
         'not null' => FALSE,
         'default' => NULL,
         'description' => "The {users}.uid of the associated user, if any.",
+      ),
+      'type' => array(
+        'description' => 'The party type.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
       ),
     ),
     'indexes' => array(

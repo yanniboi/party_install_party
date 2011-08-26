@@ -41,15 +41,15 @@ TROUBLE WITH ENTITY
 /**
  * Implements hook_entity_info().
  */
-function party_entity_info() {
+function crm_party_entity_info() {
   $return = array(
     'party' => array(
       'label' => t('Party'),
       'entity class' => 'EntityDB',
-      'controller class' => 'PartyAPIController',
-      'base table' => 'party',
-      'uri callback' => 'party_uri',
-      'fieldable' => FALSE, // for now!
+      'controller class' => 'CRMPartyAPIController',
+      'base table' => 'crm_party',
+      'uri callback' => 'crm_party_uri',
+      'fieldable' => TRUE, // for now!
       'entity keys' => array(
         'id' => 'pid',
         'uid' => 'uid',
@@ -64,7 +64,7 @@ function party_entity_info() {
       'access callback' => 'party_access',
       'admin ui' => array(
         'path' => 'admin/content/party',
-        'controller class' => 'PartyUIController',
+        'controller class' => 'CRMPartyUIController',
       ),
     ),
   );
@@ -74,7 +74,7 @@ function party_entity_info() {
 /**
  * Implementation of hook_permission().
  */
-function party_permission() {
+function crm_party_permission() {
   return array(
     'view all parties' => array(
       'title' => t('View all parties'),
@@ -90,7 +90,7 @@ function party_permission() {
  *
  * Label callback for parties.
  */
-function party_label($party) {
+function crm_party_label($party) {
   dsm($party);
   if (is_null($party->uid)) {
     $label = "Anonymous";
@@ -104,7 +104,7 @@ function party_label($party) {
 /**
  * Implementation of hook_menu().
  */
-function Xparty_menu() { 
+function crm_party_menu() { 
   // This is the minimum information you can provide for a menu item.
   $items['admin/content/partyold'] = array(
     'title' => 'Parties',
@@ -118,7 +118,7 @@ function Xparty_menu() {
 /**
  * Access callback for parties.
  */
-function party_access($op, $party = NULL, $user = NULL) {
+function crm_party_access($op, $party = NULL, $user = NULL) {
   // TODO!!!
   return TRUE;
 }
@@ -129,7 +129,7 @@ function party_access($op, $party = NULL, $user = NULL) {
  * @param $party
  *  Either an array or object.
  */
-function party_load($id = FALSE, $conditions = array(), $reset = FALSE) {
+function crm_party_load($id = FALSE, $conditions = array(), $reset = FALSE) {
   dsm($id);
   $parties = entity_load('party', array($id), $conditions, $reset);
   dsm($parties);
@@ -143,7 +143,7 @@ function party_load($id = FALSE, $conditions = array(), $reset = FALSE) {
  * @param $party
  *  Either an array or object.
  */
-function party_save($party) {
+function crm_party_save($party) {
   if (is_array($party)) {
     $party = (object)$party;
   }
@@ -162,7 +162,7 @@ function party_save($party) {
 /**
  * Form callback.
  */
-function party_form($form, &$form_state, $party) {
+function crm_party_form($form, &$form_state, $party) {
   dsm($party);
 
   $form = array();
@@ -188,7 +188,7 @@ function party_form($form, &$form_state, $party) {
 /**
  * Implementation of hook_user_cancel().
  */
-function party_user_cancel($edit, $account, $method) {
+function crm_party_user_cancel($edit, $account, $method) {
 
 }
 
@@ -196,14 +196,14 @@ function party_user_cancel($edit, $account, $method) {
 /**
  * Implementation of hook_user_insert().
  */
-function party_user_insert(&$edit, $account, $category) {
+function crm_party_user_insert(&$edit, $account, $category) {
 
 }
 
 /**
  * Menu callback: shows an admin list of profile sets.
  */
-function party_profiles() {
+function crm_party_profiles() {
   $categories = _user_categories();
   dsm($categories);
   
@@ -215,7 +215,7 @@ function party_profiles() {
 /**
  * Default controller for providing UI.
  */
-class PartyUIController extends EntityDefaultUIController {
+class CRMPartyUIController extends EntityDefaultUIController {
   /**
    * Overrides the default description of the top level menu item.
    * @see EntityDefaultUIController::hook_menu()
@@ -332,7 +332,7 @@ class PartyUIController extends EntityDefaultUIController {
  * A controller implementing EntityAPIControllerInterface and being able to
  * deal with exportable entities.
  */
-class PartyAPIController extends EntityAPIController implements EntityAPIControllerInterface {
+class CRMPartyAPIController extends EntityAPIController implements EntityAPIControllerInterface {
   /**
    * Add data from users to parties.
    */
