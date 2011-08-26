@@ -216,7 +216,7 @@ function crm_party_edit_page_title($party) {
 function crm_party_add() {
   $party = (object) array(
     'type' => 'person',
-    'pid' => '',
+    'pid' => NULL,
   );
     
   return drupal_get_form('crm_party_edit_form', $party);
