@@ -68,8 +68,8 @@ function crm_party_entity_info() {
           'custom settings' => FALSE,
         ),
       ),
-      'label callback' => 'party_label',
-      'access callback' => 'party_access',
+      'label callback' => 'crm_party_label',
+      'access callback' => 'crm_party_access',
       'admin ui' => array(
         'path' => 'admin/content/party',
         'controller class' => 'CRMPartyUIController',
