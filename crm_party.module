@@ -54,11 +54,12 @@ function crm_party_entity_info() {
         'uid' => 'uid',
       ),
       'bundles' => array(
-       'person'=> array(
-        'label' => 'Personal Contact',
-        'admin' => array(
-          'path' => 'admin/community/party/manage',
-          'access arguments' => array('administer parties'),
+        'person'=> array(
+          'label' => 'Personal Contact',
+          'admin' => array(
+            'path' => 'admin/community/party/manage',
+            'access arguments' => array('administer parties'),
+          ),
         ),
       ),
       'view modes' => array(
