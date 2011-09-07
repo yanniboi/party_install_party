@@ -4,3 +4,6 @@ name = CRM Profile
 description = A Description
 package = CRM
 core = 7.x
+
+dependencies[] = profile2
+dependencies[] = crm_party
