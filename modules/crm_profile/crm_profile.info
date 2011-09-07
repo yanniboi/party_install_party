@@ -1,7 +1,7 @@
 ;$Id$
 
 name = CRM Profile
-description = A Description
+description = Integrates profile2 with the crm_party module
 package = CRM
 core = 7.x
 
