@@ -42,6 +42,8 @@ function crm_profile_profile2_form($form, &$form_state, $profile)
     }
   }
   
+  $form['#submit'][] = 'crm_profile_profile2_form_submit';
+  
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Save',
@@ -53,7 +55,39 @@ function crm_profile_profile2_form($form, &$form_state, $profile)
 
 function crm_profile_profile2_form_submit($form, &$form_state)
 {
-  drupal_set_message("called");
+  if(module_exists('devel')) {
+    dsm(print_r($form_state, TRUE));
+  }
+  
+  //create a party to go with this profile
+  $party_info = array(
+    'type' => 'individual', //temporary
+    'label' => $form_state['profiles']['main']->pid,
+  );
+  
+  $party = crm_party_create($party_info);
+  $party = crm_party_save($party);
+  
+  //Get endpoints
+  $endpoints = array();
+  
+  $endpoints[] = array(
+    'entity_type' => 'crm_party',
+    'entity_id' => $party->pid,
+  );
+  
+  foreach($form_state['profiles'] as $type => $profile) {
+    $endpoints[] = array(
+      'entity_type' => 'profile2',
+      'entity_bundle' => $type,
+      'entity_id' => $profile->pid,
+    );
+  }
+  
+  $relation = relation_create('party_to_profile2', $endpoints);
+  $rid = relation_save($relation);
+  
+  dsm($rid);
 }
 
 /**
