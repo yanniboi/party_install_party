@@ -1,0 +1,9 @@
+;$Id$
+
+name = CRM User
+description = Provides things to attach users to parties
+package = CRM
+core = 7.x
+
+dependencies[] = profile2
+dependencies[] = crm_party

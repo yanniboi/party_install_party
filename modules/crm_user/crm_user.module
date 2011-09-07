@@ -1,0 +1,46 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Support for linking users to parties
+ */
+ 
+/**
+ * Implements hook_form_FORM_ID_alter()
+ *
+ * Alter Party forms to do things
+ */
+function crm_user_form_crm_party_edit_form_alter(&$form, &$form_state, $form_id) {
+  // Make sure the uid is null. 
+  $form['uid'] = array(
+    '#type' => 'textfield',
+    '#title' => 'User ID',
+    '#default_value' => 'null',
+  );
+  
+  $form['#submit'][] = 'crm_user_post_form_submit_relate';
+}
+
+/**
+ * Relate the user entities to the crm_party in form_state
+ */
+function crm_user_post_form_submit_relate($form, &$form_state) {
+  $party = $form_state['crm_party'];
+    
+  $endpoints = array();
+  $endpoints[] = array(
+    'entity_type' => 'crm_party',
+    'entity_id' => $party->pid,
+  );
+  $endpoints[] = array(
+    'entity_type' => 'user',
+    'entity_id' => $form_state['values']['uid'],
+  );
+  
+  //create a relation for each party profile2 which is created.
+  $relation = relation_create('party_to_user', $endpoints);
+  $rid = relation_save($relation);
+  
+  dsm($rid);
+}

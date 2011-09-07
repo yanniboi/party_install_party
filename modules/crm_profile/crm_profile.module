@@ -16,18 +16,16 @@ function crm_profile_profile2_form($form, &$form_state, $profile)
     '#value' => 'null',
   );
   
-  foreach (profile2_get_types() as $type_name => $profile_type) {
-    if (!empty($profile_type->data['registration'])) {
-      if (empty($form_state['profiles'][$type_name])) {
-        $form_state['profiles'][$type_name] = profile_create(array('type' => $type_name));
-      }
-      profile2_attach_form($form, $form_state);
-      // Wrap each profile form in a fieldset.
-      $form['profile_' . $type_name] += array(
-        '#type' => 'fieldset',
-        '#title' => check_plain($profile_type->label),
-      );
+  foreach (profile2_get_types() as $type_name => $profile_type) {    
+    if (empty($form_state['profiles'][$type_name])) {
+      $form_state['profiles'][$type_name] = profile_create(array('type' => $type_name));
     }
+    profile2_attach_form($form, $form_state);
+    // Wrap each profile form in a fieldset.
+    $form['profile_' . $type_name] += array(
+      '#type' => 'fieldset',
+      '#title' => check_plain($profile_type->label),
+    );    
   }
   
   $form['#submit'][] = 'crm_profile_profile2_form_submit';
