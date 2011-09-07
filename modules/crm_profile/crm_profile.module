@@ -1,0 +1,116 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Support for configurable user profiles which are not attached to users.
+ */
+ 
+/**
+ * Define a form that creates NULL user profiles and attaches them to new parties
+ */
+function crm_profile_profile2_form($form, &$form_state, $profile)
+{
+  $form['uid'] = array(
+    '#type' => 'hidden',
+    '#value' => 'null',
+  );
+  
+  foreach (profile2_get_types() as $type_name => $profile_type) {
+    if (!empty($profile_type->data['registration'])) {
+      if (empty($form_state['profiles'][$type_name])) {
+        $form_state['profiles'][$type_name] = profile_create(array('type' => $type_name));
+      }
+      profile2_attach_form($form, $form_state);
+      // Wrap each profile form in a fieldset.
+      $form['profile_' . $type_name] += array(
+        '#type' => 'fieldset',
+        '#title' => check_plain($profile_type->label),
+      );
+    }
+  }
+  
+  $form['#submit'][] = 'crm_profile_profile2_form_submit';
+  $form['#submit'][] = 'crm_profile_post_form_submit_relate';
+  
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Save',
+    '#weight' => 99,
+  );
+  
+  return $form;
+}
+
+/**
+ * Here we save the party to link the profile to.
+ */
+function crm_profile_profile2_form_submit($form, &$form_state)
+{
+  //create a party to go with this profile
+  $party_info = array(
+    'type' => 'individual', //temporary
+    'label' => $form_state['profiles']['main']->pid,
+  );
+  
+  $party = crm_party_create($party_info);
+  $form_state['crm_party'] = crm_party_save($party);  
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter()
+ *
+ * Alter Party forms to do things
+ */
+function crm_profile_form_crm_party_edit_form_alter(&$form, &$form_state, $form_id) {
+  // Make sure the uid is null. 
+  $form['uid'] = array(
+    '#type' => 'hidden',
+    '#value' => 'null',
+  );
+  
+  // Load appropriate profile2s and attach them to the party form
+  foreach (profile2_get_types() as $type_name => $profile_type) {
+    if (!empty($profile_type->data['registration'])) {
+      if (empty($form_state['profiles'][$type_name])) {
+        $form_state['profiles'][$type_name] = profile_create(array('type' => $type_name));
+      }
+      profile2_attach_form($form, $form_state);
+      // Wrap each profile form in a fieldset.
+      $form['profile_' . $type_name] += array(
+        '#type' => 'fieldset',
+        '#title' => check_plain($profile_type->label),
+      );
+    }
+  }
+  
+  $form['#submit'][] = 'crm_profile_post_form_submit_relate';
+}
+
+/**
+ * Relate the profile2 entities to the crm_party in form_state
+ */
+function crm_profile_post_form_submit_relate($form, &$form_state) {
+  $party = $form_state['crm_party'];
+  
+  // Foreach profile2 in the form state add a binary relation linking it
+  // to the party
+  foreach($form_state['profiles'] as $type => $profile) {
+    $endpoints = array();
+    $endpoints[] = array(
+      'entity_type' => 'crm_party',
+      'entity_id' => $party->pid,
+    );
+    $endpoints[] = array(
+      'entity_type' => 'profile2',
+      'entity_bundle' => $type,
+      'entity_id' => $profile->pid,
+    );
+    
+    //create a relation for each party profile2 which is created.
+    $relation = relation_create('party_to_profile2', $endpoints);
+    $rid = relation_save($relation);
+    
+    dsm($rid);
+  }
+}
