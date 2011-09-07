@@ -1,0 +1,6 @@
+;$Id$
+
+name = CRM Profile
+description = A Description
+package = CRM
+core = 7.x

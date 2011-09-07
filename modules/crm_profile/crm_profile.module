@@ -1,0 +1,67 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Support for configurable user profiles which are not attached to users.
+ */
+ 
+/**
+ * Implements hook_menu().
+ */
+function crm_profile_menu() {
+  $items['people/add'] = array(
+    'title' => 'Add Profile',
+    'page callback' => 'add_profile',
+    'access arguments' => 'administer profiles',
+  );
+  return $items;
+}
+ 
+/**
+ * Define a form that creates NULL user profiles
+ */
+function crm_profile_profile2_form($form, &$form_state, $profile)
+{
+  $form['uid'] = array(
+    '#type' => 'hidden',
+    '#value' => 'null',
+  );
+  
+  foreach (profile2_get_types() as $type_name => $profile_type) {
+    if (!empty($profile_type->data['registration'])) {
+      if (empty($form_state['profiles'][$type_name])) {
+        $form_state['profiles'][$type_name] = profile_create(array('type' => $type_name));
+      }
+      profile2_attach_form($form, $form_state);
+      // Wrap each profile form in a fieldset.
+      $form['profile_' . $type_name] += array(
+        '#type' => 'fieldset',
+        '#title' => check_plain($profile_type->label),
+      );
+    }
+  }
+  
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Save',
+    '#weight' => 99,
+  );
+  
+  return $form;
+}
+
+function crm_profile_profile2_form_submit($form, &$form_state)
+{
+  drupal_set_message("called");
+}
+
+/**
+ * Page callback  for add profile
+ */
+function add_profile() {
+  $profile = (object) array();
+  $profile->uid = null;
+  
+  return drupal_get_form('crm_profile_profile2_form', $profile);
+}
