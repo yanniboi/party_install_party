@@ -103,7 +103,7 @@ function crm_profile_post_form_submit_relate($form, &$form_state) {
  * @param $profile
  *   A profile2 object
  */
-_crm_party_profile_relate($party, $profile) {
+function _crm_party_profile_relate($party, $profile) {
   $endpoints = array();
   $endpoints[] = array(
     'entity_type' => 'crm_party',

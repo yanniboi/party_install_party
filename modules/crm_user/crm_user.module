@@ -49,7 +49,7 @@ function crm_user_post_form_submit_relate($form, &$form_state) {
  * @param $user
  *   A user object from user_load();
  */
-_crm_party_user_relate($party, $user) {
+function _crm_party_user_relate($party, $user) {
   $endpoints = array();
   $endpoints[] = array(
     'entity_type' => 'crm_party',
