@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * @file
@@ -41,6 +40,4 @@ function crm_user_post_form_submit_relate($form, &$form_state) {
   //create a relation for each party profile2 which is created.
   $relation = relation_create('party_to_user', $endpoints);
   $rid = relation_save($relation);
-  
-  dsm($rid);
 }

@@ -1,5 +1,3 @@
-;$Id$
-
 name = CRM Profile
 description = Integrates profile2 with the crm_party module
 package = CRM
@@ -7,3 +5,4 @@ core = 7.x
 
 dependencies[] = profile2
 dependencies[] = crm_party
+dependencies[] = relation
