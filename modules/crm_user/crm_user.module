@@ -25,8 +25,31 @@ function crm_user_form_crm_party_edit_form_alter(&$form, &$form_state, $form_id)
  * Relate the user entities to the crm_party in form_state
  */
 function crm_user_post_form_submit_relate($form, &$form_state) {
+  //Make sure the user input is an actual user.
+  if (!is_numeric($form_state['values']['uid'])) {
+    return;
+  }
+  
+  $user = user_load($form_state['values']['uid']);
+  if ($user === FALSE) {
+    drupal_set_message(t('The user id specified does not exist'));
+    return;
+  }
+  
   $party = $form_state['crm_party'];
-    
+  _crm_user_relate($party, $user);  
+  
+}
+
+/**
+ * Relate a party entity to a user entity
+ *
+ * @param $party
+ *   A fully loaded party object, from crm_party_load(). Whats important is that the pid is correct.
+ * @param $user
+ *   A user object from user_load();
+ */
+_crm_user_relate($party, $user) {
   $endpoints = array();
   $endpoints[] = array(
     'entity_type' => 'crm_party',
@@ -34,10 +57,13 @@ function crm_user_post_form_submit_relate($form, &$form_state) {
   );
   $endpoints[] = array(
     'entity_type' => 'user',
-    'entity_id' => $form_state['values']['uid'],
+    'entity_id' => $user->uid,
   );
   
   //create a relation for each party profile2 which is created.
   $relation = relation_create('party_to_user', $endpoints);
   $rid = relation_save($relation);
+  
+  //set some nice messages - change
+  drupal_set_message('Party: ' . $party->label . ' has been related to User: ' . $user->name);
 }
