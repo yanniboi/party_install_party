@@ -12,10 +12,14 @@
  */
 function crm_user_form_crm_party_edit_form_alter(&$form, &$form_state, $form_id) {
   // Make sure the uid is null. 
-  $form['uid'] = array(
+  $form['user'] = array(
     '#type' => 'textfield',
-    '#title' => 'User ID',
-    '#default_value' => 'null',
+    '#title' => t('User'), 
+    '#maxlength' => 60, 
+    '#autocomplete_path' => 'user/autocomplete', 
+    '#default_value' => '', 
+    '#weight' => -1, 
+    '#description' => t('Leave blank for %anonymous.', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
   );
   
   $form['#submit'][] = 'crm_user_post_form_submit_relate';
@@ -26,14 +30,11 @@ function crm_user_form_crm_party_edit_form_alter(&$form, &$form_state, $form_id)
  */
 function crm_user_post_form_submit_relate($form, &$form_state) {
   //Make sure the user input is an actual user.
-  if (!is_numeric($form_state['values']['uid'])) {
-    return;
+  if($account = user_load_by_name($form_state['values']['user'])) {
+    $user = $account;
   }
-  
-  $user = user_load($form_state['values']['uid']);
-  if ($user === FALSE) {
-    drupal_set_message(t('The user id specified does not exist'));
-    return;
+  else {
+    $user = user_load(0);
   }
   
   $party = $form_state['crm_party'];
