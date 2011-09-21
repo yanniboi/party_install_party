@@ -111,7 +111,6 @@ function _crm_party_profile_relate($party, $profile) {
   );
   $endpoints[] = array(
     'entity_type' => 'profile2',
-    'entity_bundle' => $type,
     'entity_id' => $profile->pid,
   );
   
