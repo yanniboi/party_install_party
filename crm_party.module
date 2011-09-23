@@ -28,6 +28,7 @@ function crm_party_entity_info() {
       'id' => 'pid',
       'bundle' => 'type',
     ),
+    'exportable' => TRUE,
     //'static cache' => TRUE,
     'bundles' => array(
       'individual' => array(
