@@ -5,6 +5,9 @@
  * CRM Party type editing UI.
  */
 
+// @todo: move non-class functions elsewhere; then this file no longer needs
+// to be included as it can autoload.
+
 /**
  * The Controller for Model entities
  */
@@ -13,7 +16,7 @@ class CRMPartyTypeController extends EntityAPIControllerExportable {
     parent::__construct($entityType);
   }
   
-   /**
+  /**
    * Create a model type - we first set up the values that are specific
    * to our model type schema but then also go through the EntityAPIController
    * function.

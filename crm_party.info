@@ -1,6 +1,5 @@
 name = CRM Party
 description = An Entity that helps to manage Contacts
-version = 7.x-0.1
 core = 7.x
 package = Cloud CRM
 
@@ -8,3 +7,4 @@ files[] = includes/contact.entity.inc
 files[] = crm_party.admin.inc
 
 dependencies[] = entity
+
