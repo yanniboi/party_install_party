@@ -6,3 +6,5 @@ package = Cloud CRM
 
 files[] = includes/contact.entity.inc
 files[] = crm_party.admin.inc
+
+dependencies[] = entity
