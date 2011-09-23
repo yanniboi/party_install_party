@@ -4,53 +4,7 @@
  * @file
  * Support for configurable user profiles which are not attached to users.
  */
- 
-/**
- * Define a form that creates NULL user profiles and attaches them to new parties
- */
-function crm_profile_profile2_form($form, &$form_state, $profile) {
-  $form['uid'] = array(
-    '#type' => 'hidden',
-    '#value' => 'null',
-  );
-  
-  foreach (profile2_get_types() as $type_name => $profile_type) {    
-    if (empty($form_state['profiles'][$type_name])) {
-      $form_state['profiles'][$type_name] = profile_create(array('type' => $type_name));
-    }
-    profile2_attach_form($form, $form_state);
-    // Wrap each profile form in a fieldset.
-    $form['profile_' . $type_name] += array(
-      '#type' => 'fieldset',
-      '#title' => check_plain($profile_type->label),
-    );    
-  }
-  
-  $form['#submit'][] = 'crm_profile_profile2_form_submit';
-  $form['#submit'][] = 'crm_profile_post_form_submit_relate';
-  
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => 'Save',
-    '#weight' => 99,
-  );
-  
-  return $form;
-}
 
-/**
- * Here we save the party to link the profile to.
- */
-function crm_profile_profile2_form_submit($form, &$form_state) {
-  //create a party to go with this profile
-  $party_info = array(
-    'type' => 'individual', //temporary
-    'label' => $form_state['profiles']['main']->pid,
-  );
-  
-  $party = crm_party_create($party_info);
-  $form_state['crm_party'] = crm_party_save($party);  
-}
 
 /**
  * Implements hook_form_FORM_ID_alter()
@@ -61,22 +15,32 @@ function crm_profile_form_crm_party_edit_form_alter(&$form, &$form_state, $form_
   // Make sure the uid is null. 
   $form['uid'] = array(
     '#type' => 'hidden',
-    '#value' => 'null',
+    '#value' => null,
   );
+  
+  dsm($form_state);
+  dsm($form);
+  
+  $profiles = array();
+  if (isset($form['pid'])) {
+    $profiles = _crm_profile_load_by_party($form['pid']['#value']);
+  }  
   
   // Load appropriate profile2s and attach them to the party form
   foreach (profile2_get_types() as $type_name => $profile_type) {
-    if (!empty($profile_type->data['registration'])) {
-      if (empty($form_state['profiles'][$type_name])) {
-        $form_state['profiles'][$type_name] = profile_create(array('type' => $type_name));
-      }
-      profile2_attach_form($form, $form_state);
-      // Wrap each profile form in a fieldset.
-      $form['profile_' . $type_name] += array(
-        '#type' => 'fieldset',
-        '#title' => check_plain($profile_type->label),
-      );
+    if (isset($profiles[$type_name])) {
+      $form_state['profiles'][$type_name] = $profiles[$type_name];
     }
+    
+    if (empty($form_state['profiles'][$type_name])) {
+      $form_state['profiles'][$type_name] = profile_create(array('type' => $type_name));
+    }
+    profile2_attach_form($form, $form_state);
+    // Wrap each profile form in a fieldset.
+    $form['profile_' . $type_name] += array(
+      '#type' => 'fieldset',
+      '#title' => check_plain($profile_type->label),
+    );
   }
   
   $form['#submit'][] = 'crm_profile_post_form_submit_relate';
@@ -87,10 +51,22 @@ function crm_profile_form_crm_party_edit_form_alter(&$form, &$form_state, $form_
  */
 function crm_profile_post_form_submit_relate($form, &$form_state) {
   $party = $form_state['crm_party'];
+  $profiles = array();
+  
+  foreach (profile2_get_types() as $type_name => $profile_type) {
+    if(isset($form_state['profiles'][$type_name])) {
+      $profiles[] = $form_state['profiles'][$type_name];
+    } 
+    else {
+      $thisProfile = profile_create(array('type' => $type_name, 'uid' => null));
+      profile2_save($thisProfile);
+      $profiles[] =  $thisProfile;
+    } 
+  }
   
   // Foreach profile2 in the form state add a binary relation linking it
   // to the party
-  foreach($form_state['profiles'] as $type => $profile) {
+  foreach($profiles as $profile) {
     _crm_party_profile_relate($party, $profile);
   }
 }
@@ -115,9 +91,36 @@ function _crm_party_profile_relate($party, $profile) {
   );
   
   //create a relation for each party profile2 which is created.
-  $relation = relation_create('party_to_profile2', $endpoints);
+  $relation = relation_create('party_to_profile2_'.$profile->type, $endpoints);
   $rid = relation_save($relation);
 
   //set some nice messages - change
   drupal_set_message('Party: ' . $party->label . ' has been related to Profile: ' . $profile->pid);
+}
+
+/**
+ * Load all the profiles 
+ *
+ * @param $party
+ *   The Id of the party
+ *
+ * @return An array of profiles attached to this party of the for ['type'][] = $profile;
+ */
+function _crm_profile_load_by_party($party) {
+  //Get the pid from whatever is passed.
+  $pid = is_object($party) ? $party->pid : $party;
+  $profiles = array();
+  
+  foreach (profile2_get_types() as $type_name => $profile_type) {
+    $raw = relation_get_related_entities('crm_party', $pid, 'party_to_profile2_'.$type_name);
+    foreach($raw as $relation) {
+      foreach($relation as $profile) {
+        if(count($relation) == 1)
+          $profiles[$type_name] = $profile;
+        else
+          $profiles[$type_name][] = $profile;
+      }
+    }   
+  } 
+  return $profiles;
 }
