@@ -122,15 +122,21 @@ function crm_party_menu() {
     'page callback' => 'crm_party_page_view',
     'page arguments' => array(1),
     'access arguments' => array('view contacts'),
-    'type' => MENU_CALLBACK,
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['party/%crm_party/view'] = array(
+    'title' => t('view'),
+    'page callback' => 'crm_party_page_view',
+    'page arguments' => array(1),
+    'access arguments' => array('view contacts'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
   );
   $items['party/%crm_party/edit'] = array(
-    'title callback' => 'crm_party_edit_page_title',
-    'title arguments' => array(1),
+    'title' => t('edit'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('crm_party_edit_form', 1),
     'access arguments' => array('edit contacts'),
-    'type' => MENU_CALLBACK,
+    'type' => MENU_LOCAL_TASK,
   );
   
   $items['party/add'] = array(
@@ -287,12 +293,13 @@ function crm_party_page_title($party) {
 
 function crm_party_page_view($party, $view_mode = 'full') {
   $party->content = array();
+  $build = array();
+
+  $build = module_invoke_all('crm_party_page_view_alter', $party); 
   
   $controller = entity_get_controller('crm_party');  
-  $content = $controller->view(array($party->pid => $party));
-  drupal_set_title($party->label);
-  return $content;  
-  
+  $build['party'] = $controller->view(array($party->pid => $party));
+  return $build;   
 }
 
 function crm_party_edit_page_title($party) {
@@ -325,6 +332,8 @@ function crm_party_edit_form($form, &$form_state, $party) {
       '#type' => 'value',
       '#value' => $party->pid,
     );
+    
+    drupal_set_title("Edit ".$party->label);
   }
   
   $form['type'] = array(

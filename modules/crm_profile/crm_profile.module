@@ -99,6 +99,39 @@ function _crm_party_profile_relate($party, $profile) {
 }
 
 /**
+ * Change the Party Details Page
+ *
+ * @param $party
+ *   A party object.
+ *
+ * @return 
+ *   An array
+ */
+function crm_profile_crm_party_page_view_alter($party) {
+  $build = array();
+  $allProfiles = _crm_profile_load_by_party($party);
+  foreach($allProfiles as $type => $profiles) {
+    //as $profiles could be a list of profiles we need to standardise what we're dealing with.
+    if (is_object($profiles)) {
+      $temp = $profiles;
+      $profiles = array();
+      $profiles[] = $temp;
+    }
+    foreach($profiles as $profile) {
+      if (profile2_access('view', $profile)) {
+        $build['profile_' . $profile->pid] = array(
+          '#type' => 'user_profile_category',
+          '#title' => $profile->label,
+        );
+        $build['profile_' . $profile->pid]['view'] = $profile->view('account');
+      }
+    }
+  }
+  
+  return $build;
+}
+
+/**
  * Load all the profiles 
  *
  * @param $party
