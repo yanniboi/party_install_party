@@ -28,17 +28,20 @@
  * @see template_process()
  */
 ?>
-<div class="<?php print $classes; ?> clearfix"<?php print $attributes; ?>>
-Hello!
-  <?php if (!$page): ?>
-    <h2<?php print $title_attributes; ?>>
-        <a href="<?php print $url; ?>"><?php print $title; ?></a>
-    </h2>
-  <?php endif; ?>
-
+<div class="<?php print $classes; ?> clearfix"<?php print $attributes; ?>>  
   <div class="content"<?php print $content_attributes; ?>>
-    <?php
-      print render($content);
-    ?>
+    <?php if($profile2->is_null): ?>
+      This is a null profile.
+      <div class="crm_profile_ops">
+        <?php l("Add ".$profile2->label, 'party/7/add/'.$profile2->type); ?>
+      </div>
+    <?php else: ?>  
+      <?php
+        print render($content);
+      ?>
+      <div class="crm_profile_ops" style="float: right;">
+        <?php print l("Edit", 'profile/'.$profile2->pid.'/edit'); ?>
+      </div>
+    <?php endif; ?>
   </div>
 </div>

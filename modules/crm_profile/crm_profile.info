@@ -3,6 +3,8 @@ description = Integrates profile2 with the crm_party module
 package = CRM
 core = 7.x
 
+files[] = crm_profile.pages.inc
+
 dependencies[] = profile2
 dependencies[] = crm_party
 dependencies[] = relation

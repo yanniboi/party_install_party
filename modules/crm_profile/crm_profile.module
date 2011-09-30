@@ -4,6 +4,23 @@
  * @file
  * Support for configurable user profiles which are not attached to users.
  */
+ 
+/**
+ * Implements hook_menu()
+ *
+ * Define a page to edit a profile in place.
+ */
+function crm_profile_menu() {
+  $items['profile/%profile2/edit'] = array(
+    'title' => 'Edit Profile',
+    'page callback' => 'profile_page_edit',
+    'page arguments' => array(1),
+    'access callback' => 'profile2_access',
+    'access arguments' => array('update', 1),
+    'file' => 'crm_profile.pages.inc',
+  );
+  return $items;
+}
 
 /**
  * Implements hook_enitity_info_alter()
@@ -22,7 +39,7 @@ function crm_profile_entity_info_alter(&$entity_info) {
  * 
  * Lets add a new tpl for party display
  */
-function crm_profile_preprocess_profile2(&$vars) {
+function crm_profile_preprocess_entity(&$vars) {
   //Add a new profile view tpl.
   if($vars['view_mode'] == 'party') {
     $vars['theme_hook_suggestions'][] = 'profile2__all__party';
@@ -138,9 +155,10 @@ function crm_profile_crm_party_page_view_alter($party) {
       $profiles[] = $temp;
     }
     foreach($profiles as $profile) {
-      if (profile2_access('view', $profile)) {
+      _crm_profile_is_null($profile);
+      if (!$profile->is_null && profile2_access('view', $profile)) {
         $build['profile_' . $profile->pid] = array(
-          '#type' => 'user_profile_category',
+          '#type' => 'fieldset',
           '#title' => $profile->label,
         );
         $build['profile_' . $profile->pid]['view'] = $profile->view('party');
@@ -150,6 +168,55 @@ function crm_profile_crm_party_page_view_alter($party) {
   
   return $build;
 }
+
+/**
+ * Implements hook_entity_insert().
+ *
+ * Make the right relation when an profile type is added.
+ */
+function crm_profile_entity_insert($entity, $type) {
+  if ($type == 'profile2_type') {  
+    //Create the null profile
+    $profile = profile_create(array('type' => $entity->type, 'uid' => null));
+    profile2_save($profile);
+      
+    $data = array(
+      'type' => $entity->type,
+      'pid' => $profile->pid,
+    );
+    drupal_write_record('crm_profile_null', $data);
+
+    //Create a relation type
+    $relation_type = array(
+      'relation_type' => 'party_to_profile2_'.$entity->type,
+      'label' => 'Party to Profile '.$entity->label,
+      'max_arity' => 2,
+      'source_bundles' => array(
+        'crm_party:*',
+        'profile2:'.$entity->type,
+      ),
+    );
+    
+    relation_type_save($relation_type); 
+    drupal_set_message("Contact to Profile ".$entity->label." Created");
+    
+    //TODO: Relate every existing party to this null profile;
+    $query = db_select('crm_party');
+    $query->fields('pid');
+    $query->fields('pid');
+    $result = $query->execute();
+    
+    while($record = $result->fetchAssoc()) {
+      //this is cheating so we can use another function, probably the function needs to be fixed
+      $party = new stdClass();
+      $party->pid = $record['pid'];
+      $party->label = $record['label'];
+      
+      _crm_party_profile_relate($party, $profile);
+    }
+  }
+}
+
 
 /**
  * Load all the profiles 
@@ -168,12 +235,50 @@ function _crm_profile_load_by_party($party) {
     $raw = relation_get_related_entities('crm_party', $pid, 'party_to_profile2_'.$type_name);
     foreach($raw as $relation) {
       foreach($relation as $profile) {
-        if(count($relation) == 1)
-          $profiles[$type_name] = $profile;
-        else
-          $profiles[$type_name][] = $profile;
+        $profiles[$type_name][] = $profile;
       }
-    }   
+    }
+
+    if(isset($profiles[$type_name]) && count($profiles[$type_name]) == 1) {
+      $profiles[$type_name] = reset($profiles[$type_name]);
+    }
   } 
   return $profiles;
 }
+
+/**
+ * Load all parties related to this profile
+ */
+function _crm_profile_load_parties($profile) {
+  $pid = is_object($profile) ? $profile->pid : $profile;
+  $parties = array();
+  
+  $raw = relation_get_related_entities('profile2', $pid, 'party_to_profile2_'.$profile->type);
+  foreach($raw as $relation) {
+    foreach($relation as $party) {
+      $parties[$party->pid] = $party;
+    }
+  }
+  
+  return($parties);
+}
+
+/**
+ * Find out if a profile is a null profile;
+ */
+function _crm_profile_is_null(&$profile) {
+  $query = db_select('crm_profile_null');
+  $query->condition('pid',$profile->pid, '=');
+  $query = $query->countQuery();
+  $result = $query->execute();
+  $record = $result->fetchAssoc();
+  
+  if($record['expression'] == '1') {
+    $profile->is_null = true;
+  }
+  else {
+    $profile->is_null = false;
+  }
+}
+
+
