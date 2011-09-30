@@ -201,9 +201,8 @@ function crm_profile_entity_insert($entity, $type) {
     drupal_set_message("Contact to Profile ".$entity->label." Created");
     
     //TODO: Relate every existing party to this null profile;
-    $query = db_select('crm_party');
-    $query->fields('pid');
-    $query->fields('pid');
+    $query = db_select('crm_party', 'cp');
+    $query->fields('cp');
     $result = $query->execute();
     
     while($record = $result->fetchAssoc()) {
