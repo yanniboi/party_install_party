@@ -19,6 +19,14 @@ function crm_profile_menu() {
     'access arguments' => array('update', 1),
     'file' => 'crm_profile.pages.inc',
   );
+  $items['party/%crm_party/add/%profile2_type'] = array(
+    'title' => 'Add Profile',
+    'page callback' => 'profile_page_add',
+    'page arguments' => array(1,3),
+    'access callback' => 'profile2_access',
+    'access arguments' => array('create',3),
+    'file' => 'crm_profile.pages.inc',
+  );
   return $items;
 }
 
@@ -157,6 +165,8 @@ function crm_profile_crm_party_page_view_alter($party) {
     foreach($profiles as $profile) {
       _crm_profile_is_null($profile);
       if (!$profile->is_null && profile2_access('view', $profile)) {
+        $profile->this_party = $party;
+        
         $build['profile_' . $profile->pid] = array(
           '#type' => 'fieldset',
           '#title' => $profile->label,
@@ -164,6 +174,10 @@ function crm_profile_crm_party_page_view_alter($party) {
         $build['profile_' . $profile->pid]['view'] = $profile->view('party');
       }
     }
+    $build['profile_'.$type.'_add']['#markup'] = "<div class=\"clearfix\">
+      <div class=\"crm_profile_ops\" style=\"float: right\">".l("Add ".reset($profiles)->label, 'party/'.$party->pid.'/add/'.$type)."
+        </div>
+      </div>";
   }
   
   return $build;

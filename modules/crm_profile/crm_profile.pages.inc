@@ -21,6 +21,7 @@ function profile_page_edit($profile) {
 function profile_page_add($party,$profile_type) {
   //TODO: do some magic and work out the page title. 
   //This works for now but will break once parties share the same profile
+  print_r($profile_type);
   $profile = profile_create(array('type' => $profile_type->type));
   drupal_set_title(t("Add @profile to @party", array('@party' => $party->label, '@profile' => $profile_type->label)), PASS_THROUGH);
   return drupal_get_form("profile_edit_form", $profile, $party);
@@ -44,7 +45,7 @@ function profile_edit_form($form, &$form_state, $profile, $party) {
   
   dsm($profile);
   
-  if(isset($profile->pid)) {
+  if(!isset($profile->pid)) {
     $form['#submit'][] = "profile_add_form_submit";
   }
   
@@ -66,7 +67,12 @@ function profile_edit_form_submit($form, &$form_state) {
  *
  */
 function profile_add_form_submit($form, &$form_state) {
-  //relate the two
+  //relate the party to the new profile
+  $party = $form_state['party'];
   
-  //break the relation to the null profile for this type.
+  foreach($form_state['profiles'] as $type => $profile) {
+    _crm_party_profile_relate($party, $profile);
+  }
+  
+  //TODO: break the relation to the null profile for this type.
 }
