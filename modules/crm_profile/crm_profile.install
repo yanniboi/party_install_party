@@ -1,1 +1,96 @@
-<?php// $Id$/** * @file * * The install file for CRM profile module *//** * Implements hook_schema(). */function crm_profile_schema() {  $schema['crm_profile_null'] = array(    'description' => 'This stores the id id of the null profile for each type',    'fields' => array(      'type' => array(        'description' => 'The profile type',        'type' => 'varchar',        'length' => 32,        'not null' => TRUE,        'default' => '',      ),      'pid' => array(        'type' => 'int',        'unsigned' => TRUE,        'not null' => TRUE,        'description' => "the profile id of the null profile",      ),    ),    'foreign keys' => array(      'pid' => array(        'table' => 'profile',        'columns' => array('pid' => 'pid'),      ),    ),  );    return $schema;} /** * Implements hook_install(). */function crm_profile_install() {  //array of all parties already in the system - this is here so we don't end up doing the same query loads of times  $parties = array();    //make a different relationship for every profile type and make a null version of that profile type;  foreach (profile2_get_types() as $type_name => $profile_type) {    //Create the null profile    $profile = profile_create(array('type' => $type_name, 'uid' => null));    profile2_save($profile);        dsm($profile);        $data = array(      'type' => $type_name,      'pid' => $profile->pid,    );    drupal_write_record('crm_profile_null', $data);        //Create a relation type    $relation_type = array(      'relation_type' => 'party_to_profile2_'.$type_name,      'label' => 'Party to Profile '.$profile_type->label,      'max_arity' => 2,      'source_bundles' => array(        'crm_party:*',        'profile2:'.$type_name,      ),    );        relation_type_save($relation_type);     drupal_set_message("Contact to Profile ".$profile_type->label." Created");         if(is_empty($parties)) {      //TODO: Relate every existing party to this null profile;      $query = db_select('crm_party', 'cp');      $query->fields('cp');      $result = $query->execute();            while($record = $result->fetchAssoc()) {        //this is cheating so we can use another function, probably the function needs to be fixed        $party = new stdClass();        $party->pid = $record['pid'];        $party->label = $record['label'];                $parties[] = $party;      }    }          foreach($parties as $party) {      _crm_party_profile_relate($party, $profile);    }  }}
+<?php
+// $Id$
+
+/**
+ * @file
+ *
+ * The install file for CRM profile module
+ */
+/**
+ * Implements hook_schema().
+ */
+function crm_profile_schema() {
+  $schema['crm_profile_null'] = array(
+    'description' => 'This stores the id id of the null profile for each type',
+    'fields' => array(
+      'type' => array(
+        'description' => 'The profile type',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'pid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => "the profile id of the null profile",
+      ),
+    ),
+    'foreign keys' => array(
+      'pid' => array(
+        'table' => 'profile',
+        'columns' => array('pid' => 'pid'),
+      ),
+    ),
+  );
+  
+  return $schema;
+}
+ 
+/**
+ * Implements hook_install().
+ */
+function crm_profile_install() {
+  //array of all parties already in the system - this is here so we don't end up doing the same query loads of times
+  $parties = array();
+  
+  //make a different relationship for every profile type and make a null version of that profile type;
+  foreach (profile2_get_types() as $type_name => $profile_type) {
+    //Create the null profile
+    $profile = profile_create(array('type' => $type_name, 'uid' => null));
+    profile2_save($profile);
+    
+    dsm($profile);
+    
+    $data = array(
+      'type' => $type_name,
+      'pid' => $profile->pid,
+    );
+    drupal_write_record('crm_profile_null', $data);
+    
+    //Create a relation type
+    $relation_type = array(
+      'relation_type' => 'party_to_profile2_'.$type_name,
+      'label' => 'Party to Profile '.$profile_type->label,
+      'max_arity' => 2,
+      'source_bundles' => array(
+        'crm_party:*',
+        'profile2:'.$type_name,
+      ),
+    );
+    
+    relation_type_save($relation_type); 
+    drupal_set_message("Contact to Profile ".$profile_type->label." Created"); 
+    
+    if(is_empty($parties)) {
+      //TODO: Relate every existing party to this null profile;
+      $query = db_select('crm_party', 'cp');
+      $query->fields('cp');
+      $result = $query->execute();
+      
+      while($record = $result->fetchAssoc()) {
+        //this is cheating so we can use another function, probably the function needs to be fixed
+        $party = new stdClass();
+        $party->pid = $record['pid'];
+        $party->label = $record['label'];
+        
+        $parties[] = $party;
+      }
+    }
+      
+    foreach($parties as $party) {
+      _crm_party_profile_relate($party, $profile);
+    }
+  }
+}
