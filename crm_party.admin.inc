@@ -25,9 +25,10 @@ function crm_party_admin($callback_arg = '') {
  * @see party_admin_form_submit()
  */
 function party_admin_form() {
-  // To start of with we will just load the id.
+  // Header for the tableselect element.
   $header = array(
-    'pid' => array('data' => t('Party Id'), 'field' => 'cp.pid'),
+    'pid' => array('data' => t('Party id'), 'field' => 'cp.pid'),
+    'type' => array('data' => t('Party type'), 'field' => 'cp.type'),
   );
   
   $query = db_select('crm_party','cp');
@@ -38,7 +39,7 @@ function party_admin_form() {
 
   $query = $query->extend('PagerDefault')->extend('TableSort');
   $query
-    ->fields('cp', array('pid'))
+    ->fields('cp', array('pid', 'type'))
     ->limit(50)
     ->orderByHeader($header)
     ->setCountQuery($count_query);
@@ -68,9 +69,13 @@ function party_admin_form() {
     '#value' => t('Update'),
   );
   
-  // Builds the table list
+  // Builds the table list.
   $destination = drupal_get_destination();
-  
+
+  // Get the party info for the type labels.
+  $entity_info = crm_party_entity_info();
+  $party_entity_info = $entity_info['crm_party'];
+
   $parties = array();
   foreach ($result as $party) {
     $options[$party->pid] = array(
@@ -81,10 +86,11 @@ function party_admin_form() {
           '#href' => 'party/' . $party->pid,
         ),
       ),
+      'type' => $party_entity_info['bundles'][$party->type]['label'],
     );
     //implement making this hookable
   }
-  
+
   $form['parties'] = array(
     '#type' => 'tableselect',
     '#header' => $header,
