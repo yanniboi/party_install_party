@@ -49,7 +49,7 @@ function crm_profile_entity_info_alter(&$entity_info) {
  */
 function crm_profile_preprocess_entity(&$vars) {
   //Add a new profile view tpl.
-  if($vars['view_mode'] == 'party') {
+  if ($vars['view_mode'] == 'party') {
     $vars['theme_hook_suggestions'][] = 'profile2__all__party';
   }
 }
@@ -99,7 +99,7 @@ function crm_profile_post_form_submit_relate($form, &$form_state) {
   $profiles = array();
   
   foreach (profile2_get_types() as $type_name => $profile_type) {
-    if(isset($form_state['profiles'][$type_name])) {
+    if (isset($form_state['profiles'][$type_name])) {
       $profiles[] = $form_state['profiles'][$type_name];
     } 
     else {
@@ -111,7 +111,7 @@ function crm_profile_post_form_submit_relate($form, &$form_state) {
   
   // Foreach profile2 in the form state add a binary relation linking it
   // to the party
-  foreach($profiles as $profile) {
+  foreach ($profiles as $profile) {
     _crm_party_profile_relate($party, $profile);
   }
 }
@@ -155,14 +155,14 @@ function _crm_party_profile_relate($party, $profile) {
 function crm_profile_crm_party_page_view_alter($party) {
   $build = array();
   $allProfiles = _crm_profile_load_by_party($party);
-  foreach($allProfiles as $type => $profiles) {
+  foreach ($allProfiles as $type => $profiles) {
     //as $profiles could be a list of profiles we need to standardise what we're dealing with.
     if (is_object($profiles)) {
       $temp = $profiles;
       $profiles = array();
       $profiles[] = $temp;
     }
-    foreach($profiles as $profile) {
+    foreach ($profiles as $profile) {
       _crm_profile_is_null($profile);
       if (!$profile->is_null && profile2_access('view', $profile)) {
         $profile->this_party = $party;
@@ -174,8 +174,8 @@ function crm_profile_crm_party_page_view_alter($party) {
         $build['profile_' . $profile->pid]['view'] = $profile->view('party');
       }
     }
-    $build['profile_'.$type.'_add']['#markup'] = "<div class=\"clearfix\">
-      <div class=\"crm_profile_ops\" style=\"float: right\">".l("Add ".reset($profiles)->label, 'party/'.$party->pid.'/add/'.$type)."
+    $build['profile_' . $type . '_add']['#markup'] = "<div class=\"clearfix\">
+      <div class=\"crm_profile_ops\" style=\"float: right\">".l("Add " . reset($profiles)->label, 'party/' . $party->pid . '/add/' . $type)."
         </div>
       </div>";
   }
@@ -186,11 +186,11 @@ function crm_profile_crm_party_page_view_alter($party) {
 /**
  * Implements hook_entity_insert().
  *
- * Make the right relation when an profile type is added.
+ * Make the right relation when a profile type is added.
  */
 function crm_profile_entity_insert($entity, $type) {
   if ($type == 'profile2_type') {  
-    //Create the null profile
+    // Create the null profile.
     $profile = profile_create(array('type' => $entity->type, 'uid' => null));
     profile2_save($profile);
       
@@ -232,27 +232,28 @@ function crm_profile_entity_insert($entity, $type) {
 
 
 /**
- * Load all the profiles 
+ * Load all the profiles for a given party. 
  *
  * @param $party
- *   The Id of the party
+ *   Either a party object or the id of a party.
  *
- * @return An array of profiles attached to this party of the for ['type'][] = $profile;
+ * @return 
+ *  An array of profiles attached to this party of the for ['type'][] = $profile;
  */
 function _crm_profile_load_by_party($party) {
-  //Get the pid from whatever is passed.
+  // Get the pid from whatever is passed.
   $pid = is_object($party) ? $party->pid : $party;
   $profiles = array();
   
   foreach (profile2_get_types() as $type_name => $profile_type) {
-    $raw = relation_get_related_entities('crm_party', $pid, 'party_to_profile2_'.$type_name);
-    foreach($raw as $relation) {
-      foreach($relation as $profile) {
+    $raw = relation_get_related_entities('crm_party', $pid, 'party_to_profile2_' . $type_name);
+    foreach ($raw as $relation) {
+      foreach ($relation as $profile) {
         $profiles[$type_name][] = $profile;
       }
     }
 
-    if(isset($profiles[$type_name]) && count($profiles[$type_name]) == 1) {
+    if (isset($profiles[$type_name]) && count($profiles[$type_name]) == 1) {
       $profiles[$type_name] = reset($profiles[$type_name]);
     }
   } 
@@ -260,15 +261,18 @@ function _crm_profile_load_by_party($party) {
 }
 
 /**
- * Load all parties related to this profile
+ * Load all parties related to a given profile.
+ *
+ * @param $profile
+ *   Either a profile2 object or the id of a profile.
  */
 function _crm_profile_load_parties($profile) {
   $pid = is_object($profile) ? $profile->pid : $profile;
   $parties = array();
   
-  $raw = relation_get_related_entities('profile2', $pid, 'party_to_profile2_'.$profile->type);
-  foreach($raw as $relation) {
-    foreach($relation as $party) {
+  $raw = relation_get_related_entities('profile2', $pid, 'party_to_profile2_' . $profile->type);
+  foreach ($raw as $relation) {
+    foreach ($relation as $party) {
       $parties[$party->pid] = $party;
     }
   }
@@ -277,20 +281,20 @@ function _crm_profile_load_parties($profile) {
 }
 
 /**
- * Find out if a profile is a null profile;
+ * Find out if a profile is a null profile.
  */
 function _crm_profile_is_null(&$profile) {
   $query = db_select('crm_profile_null');
-  $query->condition('pid',$profile->pid, '=');
+  $query->condition('pid', $profile->pid, '=');
   $query = $query->countQuery();
   $result = $query->execute();
   $record = $result->fetchAssoc();
   
-  if($record['expression'] == '1') {
-    $profile->is_null = true;
+  if ($record['expression'] == '1') {
+    $profile->is_null = TRUE;
   }
   else {
-    $profile->is_null = false;
+    $profile->is_null = FALSE;
   }
 }
 
