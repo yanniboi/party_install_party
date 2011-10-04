@@ -74,7 +74,13 @@ function party_admin_form() {
   $parties = array();
   foreach ($result as $party) {
     $options[$party->pid] = array(
-      'pid' => $party->pid,
+      'pid' => array(
+        'data' => array(
+          '#type' => 'link',
+          '#title' => $party->pid,
+          '#href' => 'party/' . $party->pid,
+        ),
+      ),
     );
     //implement making this hookable
   }
