@@ -30,7 +30,7 @@ function crm_user_form_crm_party_edit_form_alter(&$form, &$form_state, $form_id)
  */
 function crm_user_post_form_submit_relate($form, &$form_state) {
   // Attempt to load a user from the given input.
-  $account = user_load_by_name($form_state['values']['user'];
+  $account = user_load_by_name($form_state['values']['user']);
   // Fall back to the anonymous user.
   // @todo: why not just not make a relation at this point??
   if (!$account) {
