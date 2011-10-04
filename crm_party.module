@@ -125,14 +125,15 @@ function crm_party_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
   $items['party/%crm_party/view'] = array(
-    'title' => t('view'),
+    'title' => t('View'),
     'page callback' => 'crm_party_page_view',
     'page arguments' => array(1),
     'access arguments' => array('view contacts'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
   );
   $items['party/%crm_party/edit'] = array(
-    'title' => t('edit'),
+    'title' => t('Edit'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('crm_party_edit_form', 1),
     'access arguments' => array('edit contacts'),
