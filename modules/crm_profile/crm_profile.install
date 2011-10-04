@@ -73,7 +73,7 @@ function crm_profile_install() {
     relation_type_save($relation_type); 
     drupal_set_message("Contact to Profile ".$profile_type->label." Created"); 
     
-    if(is_empty($parties)) {
+    if(empty($parties)) {
       //TODO: Relate every existing party to this null profile;
       $query = db_select('crm_party', 'cp');
       $query->fields('cp');
