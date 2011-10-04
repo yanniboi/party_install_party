@@ -415,7 +415,7 @@ function crm_party_create($info) {
 function crm_party_party_operations() {
   $operations = array(
     'merge' => array(
-      'label' => t('Merge Parties'),
+      'label' => t('Merge parties'),
       'callback' => 'crm_party_party_operations_merge',
     ),
   );
