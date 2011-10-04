@@ -427,5 +427,5 @@ function crm_party_party_operations() {
  * Merge multiple users.
  */
 function crm_party_party_operations_merge($parties) {
-
+  // @todo: write me!
 }
