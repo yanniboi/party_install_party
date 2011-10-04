@@ -25,10 +25,9 @@ function crm_party_admin($callback_arg = '') {
  * @see party_admin_form_submit()
  */
 function party_admin_form() {
-  //to start of with we will just load the label and id
+  // To start of with we will just load the id.
   $header = array(
     'pid' => array('data' => t('Party Id'), 'field' => 'cp.pid'),
-    'label' => array('data' => t('Label'), 'field' => 'cp.label'),
   );
   
   $query = db_select('crm_party','cp');
@@ -76,7 +75,6 @@ function party_admin_form() {
   foreach ($result as $party) {
     $options[$party->pid] = array(
       'pid' => $party->pid,
-      'label' => $party->label,
     );
     //implement making this hookable
   }
