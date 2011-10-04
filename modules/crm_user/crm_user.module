@@ -29,28 +29,27 @@ function crm_user_form_crm_party_edit_form_alter(&$form, &$form_state, $form_id)
  * Relate the user entities to the crm_party in form_state
  */
 function crm_user_post_form_submit_relate($form, &$form_state) {
-  //Make sure the user input is an actual user.
-  if($account = user_load_by_name($form_state['values']['user'])) {
-    $user = $account;
-  }
-  else {
-    $user = user_load(0);
+  // Attempt to load a user from the given input.
+  $account = user_load_by_name($form_state['values']['user'];
+  // Fall back to the anonymous user.
+  // @todo: why not just not make a relation at this point??
+  if (!$account) {
+    $account = user_load(0);
   }
   
   $party = $form_state['crm_party'];
-  _crm_party_user_relate($party, $user);  
-  
+  _crm_party_user_relate($party, $account);
 }
 
 /**
- * Relate a party entity to a user entity
+ * Relate a party entity to a user entity.
  *
  * @param $party
  *   A fully loaded party object, from crm_party_load(). Whats important is that the pid is correct.
  * @param $user
  *   A user object from user_load();
  */
-function _crm_party_user_relate($party, $user) {
+function _crm_party_user_relate($party, $account) {
   $endpoints = array();
   $endpoints[] = array(
     'entity_type' => 'crm_party',
@@ -58,7 +57,7 @@ function _crm_party_user_relate($party, $user) {
   );
   $endpoints[] = array(
     'entity_type' => 'user',
-    'entity_id' => $user->uid,
+    'entity_id' => $account->uid,
   );
   
   //create a relation for each party profile2 which is created.
@@ -66,5 +65,5 @@ function _crm_party_user_relate($party, $user) {
   $rid = relation_save($relation);
   
   //set some nice messages - change
-  drupal_set_message('Party: ' . $party->label . ' has been related to User: ' . $user->name);
+  drupal_set_message('Party: ' . $party->label . ' has been related to User: ' . $account->name);
 }
