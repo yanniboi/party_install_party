@@ -82,7 +82,7 @@ function party_admin_form() {
   }
   
   $form['parties'] = array(
-    '#type' = 'tableselect',
+    '#type' => 'tableselect',
     '#header' => $header,
     '#options' => $options,
     '#empty' => t('No parties available.'),
