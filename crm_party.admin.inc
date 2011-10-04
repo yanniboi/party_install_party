@@ -10,7 +10,7 @@ function crm_party_admin($callback_arg = '') {
 
   switch ($op) {
     default: 
-      $build['party_filter_form'] = drupal_get_form('party_filter_form');
+      //$build['party_filter_form'] = drupal_get_form('party_filter_form');
       $build['party_admin_form'] = drupal_get_form('party_admin_form');
   }
   
@@ -39,7 +39,7 @@ function party_admin_form() {
 
   $query = $query->extend('PagerDefault')->extend('TableSort');
   $query
-    ->fields('p', array('pid', 'label'))
+    ->fields('cp', array('pid'))
     ->limit(50)
     ->orderByHeader($header)
     ->setCountQuery($count_query);
