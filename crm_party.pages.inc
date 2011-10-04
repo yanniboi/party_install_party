@@ -3,6 +3,9 @@
  * @file party.pages.inc
  */
 
+/**
+ * Page callback; displays a party.
+ */
 function crm_party_page_view($party, $view_mode = 'full') {
   $party->content = array();
   $build = array();
@@ -14,16 +17,22 @@ function crm_party_page_view($party, $view_mode = 'full') {
   return $build;
 }
 
+/**
+ * Page title callback for party view page.
+ */
 function crm_party_page_title($party) {
   return $party->label;
 }
 
+/**
+ * Page title callback for party edit page.
+ */
 function crm_party_edit_page_title($party) {
   return "Edit " . $party->label;
 }
 
 /**
- * Add Contact Page
+ * Page callback for adding a party.
  */
 function crm_party_add($type = '') {
   if ($type == '') {
@@ -42,8 +51,11 @@ function crm_party_add($type = '') {
   return drupal_get_form('crm_party_edit_form', $party);
 }
 
+/**
+ * Party edit form.
+ */
 function crm_party_edit_form($form, &$form_state, $party) {
-  if(isset($party->pid)) {
+  if (isset($party->pid)) {
     $form['pid'] = array(
       '#type' => 'value',
       '#value' => $party->pid,
