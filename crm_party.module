@@ -116,6 +116,7 @@ function crm_party_menu() {
     'page arguments' => array('organisation'),
     'access arguments' => array('administer parties'),
   );
+
   $items['party/%crm_party'] = array(
     'title callback' => 'crm_party_page_title',
     'title arguments' => array(1),
@@ -125,6 +126,7 @@ function crm_party_menu() {
     'access arguments' => array('view contacts'),
     'type' => MENU_NORMAL_ITEM,
   );
+
   $items['party/%crm_party/view'] = array(
     'title' => t('View'),
     'page callback' => 'crm_party_page_view',
@@ -134,6 +136,22 @@ function crm_party_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
   );
+
+  // Build the party view second-level tabs.
+  // @todo: Consider whether to put edit below this and these at first level.
+  // @todo: Write a contrib module to turn a set of tabs into ajax tabs,
+  // probably using or as part of quicktabs module.
+  $pieces = module_invoke_all('crm_party_party_pieces');
+  foreach ($pieces as $path => $piece) {
+    // Add in some defaults for convenience.
+    // @todo: once these stabilize, document them in the API file.
+    $piece += array(
+      'type' => MENU_LOCAL_TASK,
+      'access arguments' => array('view contacts'),
+    );
+    $items["party/%crm_party/view/$path"] = $piece;
+  }
+
   $items['party/%crm_party/edit'] = array(
     'title' => t('Edit'),
     'page callback' => 'drupal_get_form',
@@ -150,7 +168,7 @@ function crm_party_menu() {
     'access arguments' => array('create contacts'),
   );
   $items['party/add/individual'] = array(
-    'title' => 'Add Individual',
+    'title'=> 'Add Individual',
     'page callback' => 'crm_party_add',
     'page arguments' => array('individual'),
     'file' => 'crm_party.pages.inc',
@@ -165,6 +183,23 @@ function crm_party_menu() {
   );
   
   return $items;
+}
+
+/**
+ * Implements hook_crm_party_party_pieces().
+ */
+function crm_party_crm_party_party_pieces() {
+  return array(
+    'party' => array(
+      'title' => 'Party',
+      'page callback' => 'crm_party_page_view',
+      'page arguments' => array(1),
+      'file' => 'crm_party.pages.inc',
+      'access arguments' => array('view contacts'),
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+      'weight' => -10,
+    ),
+  );
 }
 
 /**

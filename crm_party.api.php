@@ -11,6 +11,28 @@
  */
 
 /**
+ * Defines party pieces, that is, components of the party display.
+ *
+ * @return
+ *  An array of items suitable for hook_menu(), where each key is the subpath
+ *  below 'party/%crm_party/view'.
+ *  A number of defaults will be added by crm_party_menu().
+ */
+function hook_crm_party_party_pieces() {
+  return array(
+    'party' => array(
+      'title' => 'View',
+      'page callback' => 'crm_party_page_view',
+      'page arguments' => array(1),
+      'file' => 'crm_party.pages.inc',
+      'access arguments' => array('view contacts'),
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+      'weight' => -10,
+    ),
+  );
+}
+
+/**
  * Add mass party operations for the Community admin page
  *
  * This hook allows modules to inject custom operations into the Community admin

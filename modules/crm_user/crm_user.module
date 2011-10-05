@@ -4,7 +4,44 @@
  * @file
  * Support for linking users to parties
  */
- 
+
+/**
+ * Implements hook_crm_party_party_pieces().
+ */
+function crm_user_crm_party_party_pieces() {
+  return array(
+    'user' => array(
+      'title' => 'User',
+      'page callback' => 'crm_user_party_view_user',
+      'page arguments' => array(1),
+      'access callback' => 'crm_user_party_view_user_access',
+      'access arguments' => array(1),
+      'weight' => -8,
+    ),
+  );
+}
+
+/**
+ * Menu access callback for the party user piece.
+ */
+function crm_user_party_view_user_access($party) {
+  // @todo:
+  // - check user_access() for viewing user accounts
+  // - check there actually is a user account to show
+  // @todo:
+  // nice touch, maybe: if there is no user account to show, instead offer a 
+  // form to connect one?
+  return TRUE;
+}
+
+/**
+ * Page callback for user party piece.
+ */
+function crm_user_party_view_user($party) {
+  // @todo: display the user here.
+  return 'The user is shown here.';
+}
+
 /**
  * Implements hook_form_FORM_ID_alter()
  *

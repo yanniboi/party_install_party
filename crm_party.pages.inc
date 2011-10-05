@@ -5,19 +5,16 @@
 
 /**
  * Page callback; displays a party.
+ *
+ * @todo: replace this completely now we have party pieces as 2nd level tabs.
+ * this should be... what? basic info about the party like creation date,
+ * label, etc?
  */
 function crm_party_page_view($party, $view_mode = 'full') {
   $party->content = array();
   $build = array();
 
   $build = module_invoke_all('crm_party_page_view_alter', $party);
-  // @todo: break this up with a hook_crm_party_section_info
-  // where the following modules define a tab:
-  // - party defines the first base tab
-  // - user adds a tab if there is a linked user
-  // - crm_profile adds tabs per profile type
-  // - ... further modules here.  
-  // These also need working into hook_menu as 2nd level tabs.
 
   $controller = entity_get_controller('crm_party');
   $build['party'] = $controller->view(array($party->pid => $party));

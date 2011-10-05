@@ -32,6 +32,24 @@ function crm_profile_menu() {
 }
 
 /**
+ * Implements hook_crm_party_party_pieces().
+ */
+function crm_profile_crm_party_party_pieces() {
+  $pieces = array();
+  foreach (profile2_get_types() as $type => $info) {
+    $type_name = check_plain($info->type);
+    $pieces[$type] = array(
+      'title' => $info->label,
+      'page callback' => 'crm_user_party_view_user', // @todo: change this!
+      'page arguments' => array(1),
+      'access arguments' => array("view any $type_name profile"), // @todo: IMCTT.
+    );
+  }
+  
+  return $pieces;
+}
+
+/**
  * Implements hook_entity_info_alter()
  *
  * Add a new view mode to profile2's for parties
@@ -146,6 +164,11 @@ function _crm_party_profile_relate($party, $profile) {
 
 /**
  * Change the Party Details Page
+ *
+ * @todo: see crm_profile_crm_party_party_pieces() -- this function should
+ * be broken up and made into the callback for that. Unless P2 provides us
+ * with something we can use.
+ * Also, next phase is a Views plugin that provides a party piece.
  *
  * @param $party
  *   A party object.
