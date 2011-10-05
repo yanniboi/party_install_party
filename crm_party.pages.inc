@@ -103,3 +103,12 @@ function crm_party_edit_form_submit($form, &$form_state) {
   $form_state['crm_party'] = $party;
   $form_state['redirect'] = 'party/' . $party->pid;
 }
+
+/**
+ * Show a View display plugin as a party piece.
+ */
+function crm_party_page_view_piece_views($party) {
+  // todo: needs to execute the view
+  // which entails knowing which one!
+  return 'this is a view!';
+}

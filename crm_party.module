@@ -189,7 +189,7 @@ function crm_party_menu() {
  * Implements hook_crm_party_party_pieces().
  */
 function crm_party_crm_party_party_pieces() {
-  return array(
+  $pieces = array(
     'party' => array(
       'title' => 'Party',
       'page callback' => 'crm_party_page_view',
@@ -200,6 +200,31 @@ function crm_party_crm_party_party_pieces() {
       'weight' => -10,
     ),
   );
+
+  // Custom pieces can be created as Views plugins.
+  if (module_exists('views')) {
+    // Get all views displays that implement our hook.
+    $views = views_get_all_views();
+    $pieces2 = array(); // temp!
+    foreach ($views as $view) {
+      // Disabled views get nothing.
+      if (!empty($view->disabled)) {
+        continue;
+      }
+
+      $view->init_display();
+      foreach ($view->display as $display_id => $display) {
+        if (isset($display->handler) && !empty($display->handler->definition['uses hook crm_party_party_pieces'])) {
+          $result = $display->handler->execute_hook_crm_party_party_pieces();
+          if (is_array($result)) {
+            $pieces = array_merge($pieces, $result);
+          }
+        }
+      }
+    }
+  }
+
+  return $pieces;
 }
 
 /**
@@ -384,4 +409,14 @@ function crm_party_party_operations() {
  */
 function crm_party_party_operations_merge($parties) {
   // @todo: write me!
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function crm_party_views_api() {
+  return array(
+    'api' => '3.0-alpha1',
+    'path' => drupal_get_path('module', 'crm_party') . '/includes',
+  );
 }
