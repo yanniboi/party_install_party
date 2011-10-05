@@ -32,7 +32,7 @@ function crm_profile_menu() {
 }
 
 /**
- * Implements hook_enitity_info_alter()
+ * Implements hook_entity_info_alter()
  *
  * Add a new view mode to profile2's for parties
  */
