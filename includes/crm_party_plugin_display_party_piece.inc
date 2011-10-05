@@ -48,7 +48,8 @@ class crm_party_plugin_display_party_piece extends views_plugin_display {
       $key => array(
         'title' => 'View', // todo: lift this from the title for the display or an option
         'page callback' => 'crm_party_page_view_piece_views',
-        'page arguments' => array(1),
+        // We need to be able to find this view in the page callback.
+        'page arguments' => array(1, $this->view->name, $this->display->id),
         'file' => 'crm_party.pages.inc',
         'access arguments' => array('view contacts'), // todo.
       ),

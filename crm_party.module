@@ -204,8 +204,8 @@ function crm_party_crm_party_party_pieces() {
   // Custom pieces can be created as Views plugins.
   if (module_exists('views')) {
     // Get all views displays that implement our hook.
+    // There's no need to cache: views_menu() doesn't cache for page displays.
     $views = views_get_all_views();
-    $pieces2 = array(); // temp!
     foreach ($views as $view) {
       // Disabled views get nothing.
       if (!empty($view->disabled)) {

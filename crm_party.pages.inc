@@ -106,9 +106,26 @@ function crm_party_edit_form_submit($form, &$form_state) {
 
 /**
  * Show a View display plugin as a party piece.
+ *
+ * @param $party
+ *  A party entity from the menu loader.
+ * @param $view_name
+ *  The machine name of a view.
+ * @param $view_display_id
+ *  The machine name of a view display.
  */
-function crm_party_page_view_piece_views($party) {
-  // todo: needs to execute the view
-  // which entails knowing which one!
-  return 'this is a view!';
+function crm_party_page_view_piece_views($party, $view_name, $view_display_id) {
+  if ($view = views_get_view($view_name)) {
+    if ($view->access($view_display_id)) {
+      $view->set_display($view_display_id);
+      if (isset($view->display_handler)) {
+        $output = $view->execute_display($view_display_id);
+        // @todo:
+        //views_add_block_contextual_links($output, $view, $display_id);
+        $view->destroy();
+        return $output;
+      }
+    }
+    $view->destroy();
+  }
 }
