@@ -4,6 +4,7 @@ core = 7.x
 package = CRM
 
 files[] = includes/contact.entity.inc
+files[] = crm_party.pages.inc
 files[] = crm_party.admin.inc
 
 dependencies[] = entity
