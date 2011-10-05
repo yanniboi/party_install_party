@@ -11,6 +11,7 @@
  * Define a page to edit a profile in place.
  */
 function crm_profile_menu() {
+  // @todo: not sure we should be fiddling with profile's menu stuff!
   $items['profile/%profile2/edit'] = array(
     'title' => 'Edit Profile',
     'page callback' => 'profile_page_edit',
