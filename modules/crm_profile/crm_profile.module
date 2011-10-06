@@ -270,7 +270,7 @@ function _crm_profile_load_by_party($party) {
   $profiles = array();
   
   foreach (profile2_get_types() as $type_name => $profile_type) {
-    $raw = relation_get_related_entities('crm_party', $pid, 'party_to_profile2_' . $type_name);
+    $raw = _crm_profile_relation_get_related_entities('crm_party', $pid, 'party_to_profile2_' . $type_name);
     foreach ($raw as $relation) {
       foreach ($relation as $profile) {
         $profiles[$type_name][] = $profile;
@@ -294,7 +294,7 @@ function _crm_profile_load_parties($profile) {
   $pid = is_object($profile) ? $profile->pid : $profile;
   $parties = array();
   
-  $raw = relation_get_related_entities('profile2', $pid, 'party_to_profile2_' . $profile->type);
+  $raw = _crm_profile_relation_get_related_entities('profile2', $pid, 'party_to_profile2_' . $profile->type);
   foreach ($raw as $relation) {
     foreach ($relation as $party) {
       $parties[$party->pid] = $party;
@@ -322,4 +322,40 @@ function _crm_profile_is_null(&$profile) {
   }
 }
 
+/**
+ * Helper function to get all related entities via relation API.
+ *
+ * This is just a stand-in until http://drupal.org/node/1288894 gets in, and
+ * make developing CRM require one less patch to contrib modules.
+ */
+function _crm_profile_relation_get_related_entities($entity_type, $entity_id, $relation_type = NULL, $r_index = NULL) {
+  $query = relation_query($entity_type, $entity_id, $r_index);
+  if ($relation_type) {
+    $query->propertyCondition('relation_type', $relation_type);
+  }
+  $results = $query->execute();
+  $relations = array();
+  foreach($results as $result) {
+    if (empty($result)) {
+      return FALSE;
+    }
+    $relation = relation_load($result->rid);
+    $request_key = $entity_type . ':' . $entity_id;
+    $entities = $relation->endpoints[LANGUAGE_NONE];
+    $first_entity_key = $entities[0]['entity_type'] . ':' . $entities[0]['entity_id'];
+    if (isset($r_index)) {
+      $request_key = $request_key . ':' . $r_index;
+      $first_entity_key = $first_entity_key . ':' . $entities[0]['r_index'];
+    }
+    if ($request_key == $first_entity_key) {
+      $other_endpoints = entity_load($entities[1]['entity_type'], array($entities[1]['entity_id']));
+      $relations[$result->rid] = $other_endpoints;
+    }
+    else {
+      $other_endpoints = entity_load($entities[0]['entity_type'], array($entities[0]['entity_id']));
+      $relations[$result->rid] = $other_endpoints;
+    }
+  }
+  return $relations;
+}
 
