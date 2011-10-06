@@ -215,7 +215,7 @@ function crm_profile_crm_party_page_view_alter($party) {
 function crm_profile_entity_insert($entity, $type) {
   if ($type == 'profile2_type') {  
     // Create the null profile.
-    $profile = profile_create(array('type' => $entity->type, 'uid' => null));
+    $profile = profile_create(array('type' => $entity->type, 'uid' => NULL));
     profile2_save($profile);
       
     $data = array(
@@ -226,24 +226,26 @@ function crm_profile_entity_insert($entity, $type) {
 
     //Create a relation type
     $relation_type = array(
-      'relation_type' => 'party_to_profile2_'.$entity->type,
-      'label' => 'Party to Profile '.$entity->label,
+      'relation_type' => 'party_to_profile2_' . $entity->type,
+      'label' => 'Party to Profile ' . $entity->label,
       'max_arity' => 2,
       'source_bundles' => array(
         'crm_party:*',
-        'profile2:'.$entity->type,
+        'profile2:' . $entity->type,
       ),
     );
     
     relation_type_save($relation_type); 
-    drupal_set_message("Contact to Profile ".$entity->label." Created");
+    drupal_set_message(t("Contact to profile @entity-label created", array(
+      '@entity-label' => $entity->label,
+    )));
     
     //TODO: Relate every existing party to this null profile;
     $query = db_select('crm_party', 'cp');
     $query->fields('cp');
     $result = $query->execute();
     
-    while($record = $result->fetchAssoc()) {
+    while ($record = $result->fetchAssoc()) {
       //this is cheating so we can use another function, probably the function needs to be fixed
       $party = new stdClass();
       $party->pid = $record['pid'];
