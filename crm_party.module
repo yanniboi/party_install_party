@@ -137,10 +137,6 @@ function crm_party_menu() {
     'weight' => -10,
   );
   
-  
-  // rlmumford: I think this is Deprecated Now with the Party Piece system at
-  //            http://drupal.org/node/1302682 . But I haven't run this past you 
-  //            yet.  
   // Build the party view second-level tabs.
   // @todo: Consider whether to put edit below this and these at first level.
   // @todo: Write a contrib module to turn a set of tabs into ajax tabs,
@@ -366,7 +362,7 @@ function crm_party_party_piece_display($party, $instance) {
   $function = $pieces[$instance['party_piece']]['display callback'];
   
   if(function_exists($function)) {
-    $result = call_user_func($function, $instance, $instance['title'], $instance['arguments']);
+    $result = call_user_func($function, $party, $instance, $instance['title'], $instance['arguments']);
   }
   else {
     return false;
@@ -386,6 +382,13 @@ function crm_party_party_party_piece_info() {
     'nesting' => true,
   );
   return $pieces;
+}
+
+/**
+ * Display a tab
+ */
+function crm_party_party_piece_tab_display($party, $instance, $instance['title'], $instance['arguments']) {
+  return array();
 }
 
 /**
