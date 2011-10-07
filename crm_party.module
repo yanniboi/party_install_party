@@ -344,6 +344,9 @@ function crm_party_get_party_pieces($parent, $party_type, $party_pieces = null) 
  * @param $party the party object we're looking at
  * @param $instance the instance of a party piece either an id or associative array
  *   (one row from crm_party_get_party_pieces);
+ *
+ * @todo workout something to do with permissions
+ * @todo 
  */
 function crm_party_party_piece_display($party, $instance) {
   if(is_numeric($instance)) {
@@ -366,8 +369,29 @@ function crm_party_party_piece_display($party, $instance) {
   }
   else {
     return false;
-  }  
+  }
+
+  //If the Party Piece can have children, load those children
+  if($pieces[$instance['party_piece']]['nesting']) {
+    $result += crm_party_party_piece_display_children($party, $instance);
+  }
+  
   return $result;   
+}
+
+/**
+ * display the children party pieces
+ *
+ * @param $party The party we're looking at.
+ * @param $instance The instance of the parent.
+ *
+ * @return
+ *    An array of renderable arrays keyed by "child_piece_<child_instance_id>"
+ *
+ * @todo Implement. Use crm_party_get_party_pieces. And crm_party_piece_display.
+ */
+function crm_party_party_piece_display_children($party, $instance) {
+  return array();
 }
 
 /**
@@ -386,6 +410,8 @@ function crm_party_party_party_piece_info() {
 
 /**
  * Display a tab
+ *
+ * @todo Implement. Use crm_party_party_piece_display_children() to get hte children of the tab.
  */
 function crm_party_party_piece_tab_display($party, $instance, $instance['title'], $instance['arguments']) {
   return array();
