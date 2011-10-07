@@ -308,7 +308,7 @@ function crm_party_data_set_detach($party, $set_type, $set_id){
 /**
  * Get all party piece definitions
  *
- * @todo: Can we cache this? Especially to avoid adding database tables
+ * @todo: Can we cache this?
  */
 function crm_party_party_piece_info() {
   $pieces = module_invoke_all('party_party_piece_info');
@@ -340,6 +340,38 @@ function crm_party_get_party_pieces($parent, $party_type, $party_pieces = null) 
     $results[$key]['arguments'] = json_decode($result['arguments'], true);
   }
   return $results;
+}
+
+/**
+ * Display a party piece
+ *
+ * @param $party the party object we're looking at
+ * @param $instance the instance of a party piece either an id or associative array
+ *   (one row from crm_party_get_party_pieces);
+ */
+function crm_party_party_piece_display($party, $instance) {
+  if(is_numeric($instance)) {
+    // Build the query;
+    $query = db_select('crm_party_party_pieces','pp');
+    $query->fields('pp');
+    $query->condition('instance_id', $instance, '=');
+    // Get the row
+    $result = $query->execute()->fetchAssoc();
+    $result['arguments'] = json_decode($result['arguments'], true);
+    $instance = $result;
+  }
+  
+  //Call the display function
+  $pieces = crm_party_party_piece_info();
+  $function = $pieces[$instance['party_piece']]['display callback'];
+  
+  if(function_exists($function)) {
+    $result = call_user_func($function, $instance, $instance['title'], $instance['arguments']);
+  }
+  else {
+    return false;
+  }  
+  return $result;   
 }
 
 /**
