@@ -339,6 +339,40 @@ function crm_party_get_party_piece_instances($parent, $party_type, $party_pieces
 }
 
 /**
+ * Add a new party piece instance
+ * 
+ * @param $instance array of all values needed for this instance
+ */
+function crm_party_save_party_piece_instance($instance = array) {
+  //Do checks to make sure everthing is there
+  
+  //Encode arguments
+  $instance['arguments'] = json_encode($instance['arguments']);
+  
+  //If the $instance['instance_id'] is set, we're updating.
+  if(isset($instance['instance_id'])) {
+    $id = $instance['instance_id'];
+    unset($instance['instance_id']);
+    drupal_write_record('crm_party_party_pieces',$instance,$id);
+  }
+  else {
+    drupal_write_record('crm_party_party_pieces',$instance);
+  }
+}
+
+/**
+ * Delete a party piece instance
+ *
+ * @param $instance integer id of the instance to delete
+ *
+ * @return True on success, False on failure
+ * @todo: implement
+ */
+function crm_party_delete_party_piece_instance($instance) {
+  return true;
+} 
+
+/**
  * Display a party piece
  *
  * @param $party the party object we're looking at
