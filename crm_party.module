@@ -318,7 +318,7 @@ function crm_party_party_piece_info() {
  * @param $party_type The party type we're looking at
  * @param $party_piece (optional) the Piece we're looking for
  */
-function crm_party_get_party_pieces($parent, $party_type, $party_pieces = null) {
+function crm_party_get_party_piece_instances($parent, $party_type, $party_pieces = null) {
   // Build the query;
   $query = db_select('crm_party_party_pieces','pp');
   $query->fields('pp');
