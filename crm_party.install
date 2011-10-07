@@ -89,6 +89,58 @@ function crm_party_schema() {
     ),
     'primary key' => array('pid'),
   );
+  
+  $schema['crm_party_party_pieces'] = array(
+    'description' => 'Stores relationships between party (types) and party pieces',
+    'fields' => array(
+      'instance_id' => array(
+        'description' => 'Primary key for the party piece instance.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'parent_id' => array(
+        'description' => 'The id of the parent party piece instance.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'title' => array(
+        'description' => 'The title of this party piece',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE
+      ),
+      'party_type' => array(
+        'description' => 'The party type.',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'party_piece' => array(
+        'description' => 'The party piece type.',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'arguments' => array(
+        'description' => 'Any extra filters or arguments the party piece should apply. In json format.',
+        'type' => 'text',
+        'not null' => true,
+      ),
+      'weight' => array(
+        'description' => 'The ordering number of the party piece',
+        'type' => 'int',
+        'not null' => true,
+        'default' => 0,
+      );
+    ),
+    'primary key' => array('instance_id'),
+  );
+  
+  //This table is how we link party pieces to party types and weight them etc
 
   /*$schema['crm_party_type'] = array(
     'description' => 'Stores information about defined party types.',

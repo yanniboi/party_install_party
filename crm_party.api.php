@@ -45,7 +45,8 @@ function hook_party_data_set_info() {
  *       $delta, $piece_id, $set_ids. This should return a renderable array.
  *   - "display callback arguments" any extra arguments to supply to the display callback
  *   - "data set" (optional) the data set this is associated with. (If this is set, edit and add links
- *       will appear around the piece linking to the forms laid out in data_set_info;
+ *       will appear around the piece linking to the forms laid out in data_set_info);
+ *   - "nesting" true if the party piece can have children
  */
 function hook_party_party_piece_info() {
   $pieces = array();

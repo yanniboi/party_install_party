@@ -136,7 +136,11 @@ function crm_party_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
   );
-
+  
+  
+  // rlmumford: I think this is Deprecated Now with the Party Piece system at
+  //            http://drupal.org/node/1302682 . But I haven't run this past you 
+  //            yet.  
   // Build the party view second-level tabs.
   // @todo: Consider whether to put edit below this and these at first level.
   // @todo: Write a contrib module to turn a set of tabs into ajax tabs,
@@ -300,8 +304,61 @@ function crm_party_data_set_detach($party, $set_type, $set_id){
   return true;
 } 
 
+
+/**
+ * Get all party piece definitions
+ *
+ * @todo: Can we cache this? Especially to avoid adding database tables
+ */
+function crm_party_party_piece_info() {
+  $pieces = module_invoke_all('party_party_piece_info');
+  return $pieces;
+}
+
+/**
+ * Get party piece instances
+ *
+ * @param $parent Id of the parent party piece
+ * @param $party_type The party type we're looking at
+ * @param $party_piece (optional) the Piece we're looking for
+ */
+function crm_party_get_party_pieces($parent, $party_type, $party_pieces = null) {
+  // Build the query;
+  $query = db_select('crm_party_party_pieces','pp');
+  $query->fields('pp');
+  $query->condition('parent_id', $parent, '=');
+  if(is_array($party_pieces) {
+    $query->condition('party_piece', $party_pieces, 'IN');
+  }
+  $query->condition('party_type', $party_type, '=');
+  $query->orderBy('weight');
+  
+  // Get all the results that fit
+  $results = $query->execute()->fetchAllAssoc('instance_id');
+  foreach($results as $key => $result) {
+    // Decode the arguments into a useable form.
+    $results[$key]['arguments'] = json_decode($result['arguments'], true);
+  }
+  return $results;
+}
+
+/**
+ * Implements hook_party_part_piece_info().
+ */
+function crm_party_party_party_piece_info() {
+  $pieces = array();
+  //Define tabs
+  $pieces['tab'] = array(
+    'label' => 'Party Tab',
+    'display callback' => 'crm_party_party_piece_tab_display',
+    'nesting' => true,
+  );
+  return $pieces;
+}
+
 /**
  * Implements hook_crm_party_party_pieces().
+ * rlmumford: DEPRECATED? http://drupal.org/node/1302682
  */
 function crm_party_crm_party_party_pieces() {
   $pieces = array(
