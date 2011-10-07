@@ -27,11 +27,40 @@ function hook_party_data_set_info() {
   
   //A user data set.
   $sets['user'] = array(
-    'label' = "User Account",
-    'load callback' = "crm_user_load_user",
-    'form callback' = "crm_user_form_user",
+    'label' => "User Account",
+    'load callback' => "crm_user_load_user",
+    'form callback' => "crm_user_form_user",
   );
   return $sets;
+}
+
+/**
+ * Defines party pieces, that is, components of the party display.
+ *
+ * @return
+ *  An array of display pieces (similar to hook_menu) where each key is the unique Id of the display
+ *   - "label" The human readable name of the party piece
+ *   - "display callback" The name of the display function. This is always given$ party_id, 
+ *       $delta, $piece_id, $set_ids. This should return a renderable array.
+ *   - "display callback arguments" any extra arguments to supply to the display callback
+ *   - "data set" (optional) the data set this is associated with. (If this is set, edit and add links
+ *       will appear around the piece linking to the forms laid out in data_set_info;
+ */
+function hook_party_party_piece_info() {
+  $pieces = array();
+  $pieces['user_username'] = array(
+    'label' => "Username only",
+    'display callback' => "crm_user_display_user",
+    'display arguments' => array('username'),
+    'data set' => 'user',
+  );
+  $pieces['user_fullaccount'] = array(
+    'label' => "Username only",
+    'display callback' => "crm_user_display_user",
+    'display arguments' => array('full account'),
+    'data set' => 'user',
+  );
+  return $pieces;
 }
 
 /**
