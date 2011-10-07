@@ -28,13 +28,10 @@
  * @see template_process()
  */
 ?>
-<div class="<?php print $classes; ?> clearfix"<?php print $attributes; ?>>  
+<div class="<?php print $classes; ?> clearfix"<?php print $attributes; ?>>
   <div class="content"<?php print $content_attributes; ?>>
     <?php if($profile2->is_null): ?>
       This is a null profile.
-      <div class="crm_profile_ops">
-        <?php l("Add ".$profile2->label, 'party/7/add/'.$profile2->type); ?>
-      </div>
     <?php else: ?>  
       <?php
         print render($content);

@@ -186,6 +186,121 @@ function crm_party_menu() {
 }
 
 /**
+ * Get all data sets
+ *
+ * @todo: Can we cache this? Especially to avoid adding database tables
+ */
+function crm_party_data_set_info() {
+  $sets = module_invoke_all('party_data_set_info');  
+  
+  //this should probably go somewhere else but I can't think where
+  foreach($sets as $type => $set) {
+    if(!db_table_exists('crm_party_data_set_'.$type)) {
+      crm_party_data_set_type_add($set_type);
+    }
+  }
+  
+  return $sets;  
+}
+
+/**
+ * Add a new data set type to the system
+ *
+ * This adds a table to the database to handle parties relationships to data sets
+ * 
+ * @param $set_type the machine name of the type
+ * 
+ * @todo Make this use a hook to load the schema
+ */
+function crm_party_data_set_type_add($set_type) {
+  module_load_install('crm_party');
+  
+  $schema = crm_party_party_data_set_schema();
+  db_create_table('crm_party_data_set_'.$set_type);
+}
+
+/** 
+ * Load a data set
+ *
+ * @param $party The party object of the party we're concerned with
+ * @param $set_type The set type as defined in hook_data_set_info
+ * @param $set_id The set id as stored in the related table
+ *
+ * @return 
+ *   An object or array representing the data set.
+ */
+function crm_party_data_set_load($party, $set_type, $set_id) {
+  $sets = crm_party_data_set_info();
+  $function = $sets[$set_type]['load callback'];
+  if(function_exists($function)) {
+    $result = call_user_func($function, $party, $set_type, $set_id);
+  }
+  else {
+    return false;
+  }  
+  return $result; 
+}
+
+/** 
+ * Get the form for a data set (more to the point get a set of fields for the data set
+ * might need to work on this).
+ *
+ * @param $party The party object of the party we're concerned with
+ * @param $set_type The set type as defined in hook_data_set_info
+ * @param $set_id The set id as stored in the related table
+ *
+ * @return 
+ *   A form array. 
+ */
+function crm_party_data_set_form($party, $set_type, $set_id = FALSE) {
+  $sets = crm_party_data_set_info();
+  $function = $sets[$set_type]['form callback'];
+  if(function_exists($function)) {
+    $result = call_user_func($function, $party, $set_type, $set_id);
+  }
+  else {
+    return false;
+  }  
+  return $result; 
+}
+
+/**
+ * Attach a data set to a party (or edit the attachment?)
+ *
+ * @param $party the party object
+ * @param $set_type The set type as defined in hook_data_set_info
+ * @param $set_id The set id as stored in the related table
+ * @param $main Is this the main set of this type
+ * @param $hat Not used yet
+ * @param $hat_main Not used yet
+ */
+function crm_party_data_set_attach($party, $set_type, $set_id, $main = false, $hat = '', $hat_main = false, $null = false) {
+  $data = array(
+    'pid' => $party->pid,
+    'sid' => $set_id,
+    'main' => $main,
+    'hat' => $hat,
+    'hat_main' => $hat_main,
+    'null' => $null,
+  );
+  
+  drupal_write_record('crm_party_data_set_'.$set_type, $data);
+}
+
+/**
+ * Unattach a data set from a party
+ *
+ * @param $party the party object
+ * @param $set_type The set type as defined in hook_data_set_info
+ * @param $set_id The set id as stored in the related table
+ *
+ * @todo Implement
+ */
+function crm_party_data_set_detach($party, $set_type, $set_id){
+  return true;
+} 
+
+/**
  * Implements hook_crm_party_party_pieces().
  */
 function crm_party_crm_party_party_pieces() {
