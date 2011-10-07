@@ -9,6 +9,30 @@
  * @addtogroup hooks
  * @{
  */
+ 
+/**
+ * Defines data sets to be used by parties
+ *
+ * @return
+ *  And array of sets (similar to hook_menu()) where each key is the unique
+ *  identifier of that "set type".
+ *   - "label" the human readable name of the data set
+ *   - "load callback" the name of the load function. This always gets given the $party object, set_type and set_id
+ *   - "load callback arguements" any extra args to supply to the load callback //needed?!
+ *   - "form callback" the name of the form function. This function should return a set of form fields (but not 
+ *       the submit button). It gets $party, $set_type, $set_id, $form and $form_state.
+ */
+function hook_party_data_set_info() {
+  $sets = array();
+  
+  //A user data set.
+  $sets['user'] = array(
+    'label' = "User Account",
+    'load callback' = "crm_user_load_user",
+    'form callback' = "crm_user_form_user",
+  );
+  return $sets;
+}
 
 /**
  * Defines party pieces, that is, components of the party display.
