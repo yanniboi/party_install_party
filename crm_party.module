@@ -187,7 +187,7 @@ function crm_party_menu() {
 }
 
 /**
- * Get all data sets
+ * Get all data sets.
  *
  * @todo: Can we cache this? Especially to avoid adding database tables
  */
@@ -195,8 +195,8 @@ function crm_party_data_set_info() {
   $sets = module_invoke_all('party_data_set_info');  
   
   //this should probably go somewhere else but I can't think where
-  foreach($sets as $type => $set) {
-    if(!db_table_exists('crm_party_data_set_'.$type)) {
+  foreach ($sets as $type => $set) {
+    if (!db_table_exists('crm_party_data_set_' . $type)) {
       crm_party_data_set_type_add($set_type);
     }
   }
@@ -233,11 +233,11 @@ function crm_party_data_set_type_add($set_type) {
 function crm_party_data_set_load($party, $set_type, $set_id) {
   $sets = crm_party_data_set_info();
   $function = $sets[$set_type]['load callback'];
-  if(function_exists($function)) {
+  if (function_exists($function)) {
     $result = call_user_func($function, $party, $set_type, $set_id);
   }
   else {
-    return false;
+    return FALSE;
   }  
   return $result; 
 }
@@ -256,11 +256,11 @@ function crm_party_data_set_load($party, $set_type, $set_id) {
 function crm_party_data_set_form($party, $set_type, $set_id = FALSE) {
   $sets = crm_party_data_set_info();
   $function = $sets[$set_type]['form callback'];
-  if(function_exists($function)) {
+  if (function_exists($function)) {
     $result = call_user_func($function, $party, $set_type, $set_id);
   }
   else {
-    return false;
+    return FALSE;
   }  
   return $result; 
 }
@@ -298,7 +298,7 @@ function crm_party_data_set_attach($party, $set_type, $set_id, $main = false, $h
  * @todo Implement
  */
 function crm_party_data_set_detach($party, $set_type, $set_id){
-  return true;
+  return TRUE;
 } 
 
 
@@ -315,16 +315,19 @@ function crm_party_party_piece_info() {
 /**
  * Get party piece instances
  *
- * @param $parent Id of the parent party piece
- * @param $party_type The party type we're looking at
- * @param $party_piece (optional) the Piece we're looking for
+ * @param $parent
+ *  Id of the parent party piece
+ * @param $party_type 
+ *  The party type we're looking at
+ * @param $party_piece
+ *  (optional) the Piece we're looking for
  */
 function crm_party_get_party_piece_instances($parent, $party_type, $party_pieces = null) {
   // Build the query;
   $query = db_select('crm_party_party_pieces','pp');
   $query->fields('pp');
   $query->condition('parent_id', $parent, '=');
-  if(is_array($party_pieces) {
+  if (is_array($party_pieces)) {
     $query->condition('party_piece', $party_pieces, 'IN');
   }
   $query->condition('party_type', $party_type, '=');
@@ -332,7 +335,7 @@ function crm_party_get_party_piece_instances($parent, $party_type, $party_pieces
   
   // Get all the results that fit
   $results = $query->execute()->fetchAllAssoc('instance_id');
-  foreach($results as $key => $result) {
+  foreach ($results as $key => $result) {
     // Decode the arguments into a useable form.
     $results[$key]['arguments'] = json_decode($result['arguments'], true);
   }
@@ -350,7 +353,7 @@ function crm_party_get_party_piece_instances($parent, $party_type, $party_pieces
  * @todo 
  */
 function crm_party_party_piece_display($party, $instance) {
-  if(is_numeric($instance)) {
+  if (is_numeric($instance)) {
     // Build the query;
     $query = db_select('crm_party_party_pieces','pp');
     $query->fields('pp');
@@ -365,7 +368,7 @@ function crm_party_party_piece_display($party, $instance) {
   $pieces = crm_party_party_piece_info();
   $function = $pieces[$instance['party_piece']]['display callback'];
   
-  if(function_exists($function)) {
+  if (function_exists($function)) {
     $result = call_user_func($function, $party, $instance, $instance['title'], $instance['arguments']);
   }
   else {
@@ -373,7 +376,7 @@ function crm_party_party_piece_display($party, $instance) {
   }
 
   //If the Party Piece can have children, load those children
-  if($pieces[$instance['party_piece']]['nesting']) {
+  if ($pieces[$instance['party_piece']]['nesting']) {
     $result += crm_party_party_piece_display_children($party, $instance);
   }
   
@@ -400,7 +403,7 @@ function crm_party_party_piece_display_children($party, $instance) {
  */
 function crm_party_party_party_piece_info() {
   $pieces = array();
-  //Define tabs
+  // Define tabs
   $pieces['tab'] = array(
     'label' => 'Party Tab',
     'display callback' => 'crm_party_party_piece_tab_display',
@@ -414,9 +417,12 @@ function crm_party_party_party_piece_info() {
  *
  * @todo Implement. Use crm_party_party_piece_display_children() to get hte children of the tab.
  */
+/* 
+// Commenting out as the [] in function args don't work and I'm not sure what they ought to be.
 function crm_party_party_piece_tab_display($party, $instance, $instance['title'], $instance['arguments']) {
   return array();
 }
+*/
 
 /**
  * Implements hook_crm_party_party_pieces().
