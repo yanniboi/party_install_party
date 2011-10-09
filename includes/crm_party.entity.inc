@@ -12,13 +12,24 @@ class CRMPartyController extends EntityAPIController {
   
   /**
    * Save a party.
+   *
+   * The party's label is determined by the currently active name label plugin.
    */
   public function save($crmParty) {
+    // Get the label plugin.
+    ctools_include('plugins');
+    // @todo: need a UI to pick one.
+    $label_plugin_name = variable_get('crm_party_name_label_plugin', 'pid');
+    $label_plugin = ctools_get_plugins('crm_party', 'party_name_label', $label_plugin_name);
+
+    // Generate the party label from the plugin.
+    $crmParty->label = $label_plugin['label callback']($party);
+
     if (isset($crmParty->pid)) {
       drupal_write_record('crm_party', $crmParty, 'pid');
       field_attach_update('crm_party', $crmParty);
       module_invoke_all('entity_update', 'crm_party', $crmParty);
-    } 
+    }
     else {
       drupal_write_record('crm_party', $crmParty);
       field_attach_insert('crm_party', $crmParty);
