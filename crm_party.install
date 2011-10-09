@@ -135,7 +135,7 @@ function crm_party_schema() {
         'type' => 'int',
         'not null' => true,
         'default' => 0,
-      );
+      ),
     ),
     'primary key' => array('instance_id'),
   );
