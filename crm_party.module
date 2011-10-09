@@ -12,8 +12,8 @@ include_once("includes/crm_party_type.entity.inc");
 /**
  * Implements hook_entity_info().
  *
- * Define 2 entities here - the actual entity that will hold our domain 
- * specific information and an entity that holds information about the 
+ * Define 2 entities here - the actual entity that will hold our domain
+ * specific information and an entity that holds information about the
  * different types of entities.
  */
 function crm_party_entity_info() {
@@ -57,7 +57,7 @@ function crm_party_entity_info() {
       ),
     )
   );
-  
+
   return $party_info;
 }
 
@@ -95,7 +95,7 @@ function crm_party_menu() {
     'page arguments' => array('list'),
     'access arguments' => array('administer parties'),
     'position' => 'left',
-    'file' => 'crm_party.admin.inc',  
+    'file' => 'crm_party.admin.inc',
   );
   $items['admin/community/party/manage'] = array(
     'title' => 'Party Admin',
@@ -137,7 +137,7 @@ function crm_party_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
   );
-  
+
   // Build the party view second-level tabs.
   // @todo: Consider whether to put edit below this and these at first level.
   // @todo: Write a contrib module to turn a set of tabs into ajax tabs,
@@ -182,7 +182,7 @@ function crm_party_menu() {
     'file' => 'crm_party.pages.inc',
     'access arguments' => array('create contacts'),
   );
-  
+
   return $items;
 }
 
@@ -192,42 +192,42 @@ function crm_party_menu() {
  * @todo: Can we cache this? Especially to avoid adding database tables
  */
 function crm_party_data_set_info() {
-  $sets = module_invoke_all('party_data_set_info');  
-  
+  $sets = module_invoke_all('party_data_set_info');
+
   //this should probably go somewhere else but I can't think where
   foreach ($sets as $type => $set) {
     if (!db_table_exists('crm_party_data_set_' . $type)) {
       crm_party_data_set_type_add($set_type);
     }
   }
-  
-  return $sets;  
+
+  return $sets;
 }
 
 /**
  * Add a new data set type to the system
  *
  * This adds a table to the database to handle parties relationships to data sets
- * 
+ *
  * @param $set_type the machine name of the type
- * 
+ *
  * @todo Make this use a hook to load the schema
  */
 function crm_party_data_set_type_add($set_type) {
   module_load_install('crm_party');
-  
+
   $schema = crm_party_party_data_set_schema();
   db_create_table('crm_party_data_set_'.$set_type);
 }
 
-/** 
+/**
  * Load a data set
  *
  * @param $party The party object of the party we're concerned with
  * @param $set_type The set type as defined in hook_data_set_info
  * @param $set_id The set id as stored in the related table
  *
- * @return 
+ * @return
  *   An object or array representing the data set.
  */
 function crm_party_data_set_load($party, $set_type, $set_id) {
@@ -238,11 +238,11 @@ function crm_party_data_set_load($party, $set_type, $set_id) {
   }
   else {
     return FALSE;
-  }  
-  return $result; 
+  }
+  return $result;
 }
 
-/** 
+/**
  * Get the form for a data set (more to the point get a set of fields for the data set
  * might need to work on this).
  *
@@ -250,8 +250,8 @@ function crm_party_data_set_load($party, $set_type, $set_id) {
  * @param $set_type The set type as defined in hook_data_set_info
  * @param $set_id The set id as stored in the related table
  *
- * @return 
- *   A form array. 
+ * @return
+ *   A form array.
  */
 function crm_party_data_set_form($party, $set_type, $set_id = FALSE) {
   $sets = crm_party_data_set_info();
@@ -261,8 +261,8 @@ function crm_party_data_set_form($party, $set_type, $set_id = FALSE) {
   }
   else {
     return FALSE;
-  }  
-  return $result; 
+  }
+  return $result;
 }
 
 /**
@@ -284,7 +284,7 @@ function crm_party_data_set_attach($party, $set_type, $set_id, $main = false, $h
     'hat_main' => $hat_main,
     'null' => $null,
   );
-  
+
   drupal_write_record('crm_party_data_set_'.$set_type, $data);
 }
 
@@ -299,7 +299,7 @@ function crm_party_data_set_attach($party, $set_type, $set_id, $main = false, $h
  */
 function crm_party_data_set_detach($party, $set_type, $set_id){
   return TRUE;
-} 
+}
 
 
 /**
@@ -317,7 +317,7 @@ function crm_party_party_piece_info() {
  *
  * @param $parent
  *  Id of the parent party piece
- * @param $party_type 
+ * @param $party_type
  *  The party type we're looking at
  * @param $party_piece
  *  (optional) the Piece we're looking for
@@ -332,7 +332,7 @@ function crm_party_get_party_piece_instances($parent, $party_type, $party_pieces
   }
   $query->condition('party_type', $party_type, '=');
   $query->orderBy('weight');
-  
+
   // Get all the results that fit
   $results = $query->execute()->fetchAllAssoc('instance_id');
   foreach ($results as $key => $result) {
@@ -350,7 +350,7 @@ function crm_party_get_party_piece_instances($parent, $party_type, $party_pieces
  *   (one row from crm_party_get_party_pieces);
  *
  * @todo workout something to do with permissions
- * @todo 
+ * @todo
  */
 function crm_party_party_piece_display($party, $instance) {
   if (is_numeric($instance)) {
@@ -363,11 +363,11 @@ function crm_party_party_piece_display($party, $instance) {
     $result['arguments'] = json_decode($result['arguments'], true);
     $instance = $result;
   }
-  
+
   //Call the display function
   $pieces = crm_party_party_piece_info();
   $function = $pieces[$instance['party_piece']]['display callback'];
-  
+
   if (function_exists($function)) {
     $result = call_user_func($function, $party, $instance, $instance['title'], $instance['arguments']);
   }
@@ -379,8 +379,8 @@ function crm_party_party_piece_display($party, $instance) {
   if ($pieces[$instance['party_piece']]['nesting']) {
     $result += crm_party_party_piece_display_children($party, $instance);
   }
-  
-  return $result;   
+
+  return $result;
 }
 
 /**
@@ -417,7 +417,7 @@ function crm_party_party_party_piece_info() {
  *
  * @todo Implement. Use crm_party_party_piece_display_children() to get hte children of the tab.
  */
-/* 
+/*
 // Commenting out as the [] in function args don't work and I'm not sure what they ought to be.
 function crm_party_party_piece_tab_display($party, $instance, $instance['title'], $instance['arguments']) {
   return array();
@@ -522,7 +522,7 @@ function crm_party_load($pid = NULL, $reset = FALSE) {
 
 /**
  * Load many contacts.
- */ 
+ */
 function crm_party_load_multiple($pids = array(), $conditions = array(), $reset = FALSE) {
   return entity_load('crm_party', $pids, $conditions, $reset);
 }
@@ -554,9 +554,9 @@ function crm_party_info() {
       ),
     ),
   );
-  
+
   $rows = array();
-  
+
   foreach($types as $type => $info) {
     $rows[] = array(
       $info['label'] . " <small>(Machine name: ".$type.")</small><div class=\"description\">".$info['description']."</div>",
@@ -574,8 +574,8 @@ function crm_party_info() {
       ),
     );
   }
-  
-  
+
+
   return array(
     'party_table' => array(
       '#theme' => 'table',
@@ -627,8 +627,8 @@ function crm_party_create($info) {
   if (!isset($info['label'])) {
     return FALSE;
   }
-  
-  return (object) $info;  
+
+  return (object) $info;
 }
 
 /**
