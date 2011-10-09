@@ -473,21 +473,21 @@ function crm_party_crm_party_party_pieces() {
 function crm_party_permission() {
     return array(
     'administer party types' => array(
-      'title' => t('Administer Party Types'),
+      'title' => t('Administer party types'),
       'restrict access' => TRUE,
     ),
     'administer parties' =>  array(
-      'title' => t('Administer Parties'),
+      'title' => t('Administer parties'),
       'restrict access' => TRUE,
     ),
     'create parties' => array(
-      'title' => t('Create Parties'),
+      'title' => t('Create parties'),
     ),
     'view parties' => array(
-      'title' => t('View Parties'),
+      'title' => t('View parties'),
     ),
     'edit parties' => array(
-      'title' => t('Edit Parties'),
+      'title' => t('Edit parties'),
     )
   );
 }
