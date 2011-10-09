@@ -13,6 +13,7 @@
  *
  * @todo: document our plugin settings somewhere!
  *  - 'title': The admin name of the plugin.
+ *  - 'description': Description for the admin UI.
  *  - 'label callback': The callback to use for generating a label.
  *    The signature is $callback($party).
  *  - 'options form callback': The callback for the settings form.
@@ -21,6 +22,7 @@
  */
 $plugin = array(
   'title' => t("Pid example"),
+  'description' => t('Form a label from the party id.'),
   'label callback' => 'crm_party_pid_label',
   'options form callback' => 'crm_party_pid_options_form',
 );

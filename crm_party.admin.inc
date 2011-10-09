@@ -109,3 +109,31 @@ function party_admin_form() {
 
   return $form;  
 }
+
+/**
+ * Settings form for choosing the active party label plugin.
+ */
+function crm_party_settings_label_plugin_form($form, &$form_state) {
+  // @todo: hook_help text for this page.
+
+  // Get the label plugin.
+  ctools_include('plugins');
+
+  $label_plugin_name = variable_get('crm_party_name_label_plugin', 'pid');
+  $label_plugins = ctools_get_plugins('crm_party', 'party_name_label');
+  //dsm($label_plugins);
+
+  foreach ($label_plugins as $plugin) {
+    $form[$plugin['name']] = array(
+      '#type' => 'radio',
+      '#title' => $plugin['title'],
+      '#description' => $plugin['description'],
+      '#return_value' => $plugin['name'],
+      '#default_value' => $plugin['name'] == $label_plugin_name,
+    );
+  }
+
+  return $form;
+}
+
+// @todo submit handler for this!

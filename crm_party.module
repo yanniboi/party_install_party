@@ -88,6 +88,29 @@ function crm_party_entity_info_alter(&$entity_info) {
  * Implements hook_menu().
  */
 function crm_party_menu() {
+  // CRM settings.
+  // Making up a new config category.
+  // Alternative is to put this all under top-level admin.
+  // But all this structure is rough anyway.
+  $items['admin/config/crm'] = array(
+    'title' => 'CRM',
+    'description' => 'CRM settings.',
+    'position' => 'left',
+    'weight' => -10,
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+  );
+  $items['admin/config/crm/labels'] = array(
+    'title' => 'Labels',
+    'description' => 'Determine how labels for parties are generated.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('crm_party_settings_label_plugin_form'),
+    'access arguments' => array('administer crm settings'),
+    'file' => 'crm_party.admin.inc',
+  );
+
   $items['admin/community'] = array(
     'title' => 'Community',
     'description' => 'Manage the community',
@@ -471,7 +494,11 @@ function crm_party_crm_party_party_pieces() {
  * Implements hook_permission().
  */
 function crm_party_permission() {
-    return array(
+  return array(
+    'administer crm settings' => array(
+      'title' => t('Administer CRM settings'),
+      'restrict access' => TRUE,
+    ),
     'administer party types' => array(
       'title' => t('Administer party types'),
       'restrict access' => TRUE,
