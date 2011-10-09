@@ -660,3 +660,30 @@ function crm_party_views_api() {
     'path' => drupal_get_path('module', 'crm_party') . '/includes',
   );
 }
+
+// -----------------------------------------------------------------------
+// CTools hook implementations.
+
+/**
+ * Implements hook_ctools_plugin_type().
+ *
+ * Declare the plugin types we invent.
+ */
+function crm_party_ctools_plugin_type() {
+  // Party name label plugins provide ways to generate a party name label
+  // from a party.
+  $plugins['party_name_label'] = array(
+  );
+
+  return $plugins;
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function crm_party_ctools_plugin_directory($owner, $plugin_type) {
+  if ($owner == 'crm_party') {
+    return "plugins/$plugin_type";
+  }
+}
+
