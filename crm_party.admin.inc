@@ -69,6 +69,12 @@ function crm_party_manage($type) {
   return "Welcome to the party type administration page for " . $type;
 }
 
+/**
+ * Page callback for party admin list.
+ *
+ * @param $callback_arg
+ *  @todo write me probably cribbed from node admin ;)
+ */
 function crm_party_admin($callback_arg = '') {
   $op = (isset($_POST['op'])) ? $_POST['op'] : $callback_arg;
 
