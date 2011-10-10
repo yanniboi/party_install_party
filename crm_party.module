@@ -667,9 +667,6 @@ function crm_party_create($info) {
   if (!isset($info['type'])) {
     return FALSE;
   }
-  if (!isset($info['label'])) {
-    return FALSE;
-  }
 
   return (object) $info;
 }
