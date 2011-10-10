@@ -323,7 +323,7 @@ function crm_party_data_set_form($party, $set_type, $set_id = FALSE) {
  * @param $hat Not used yet
  * @param $hat_main Not used yet
  */
-function crm_party_data_set_attach($party, $set_type, $set_id, $main = false, $hat = '', $hat_main = false, $null = false) {
+function crm_party_data_set_instance_attach($party, $set_type, $set_id, $main = false, $hat = '', $hat_main = false, $null = false) {
   $data = array(
     'pid' => $party->pid,
     'sid' => $set_id,
@@ -345,7 +345,7 @@ function crm_party_data_set_attach($party, $set_type, $set_id, $main = false, $h
  *
  * @todo Implement
  */
-function crm_party_data_set_detach($party, $set_type, $set_id){
+function crm_party_data_set_instance_detach($party, $set_type, $set_id){
   return TRUE;
 }
 
