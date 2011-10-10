@@ -132,6 +132,15 @@ function crm_party_menu() {
     'position' => 'left',
     'file' => 'crm_party.admin.inc',
   );
+  // @todo crib from one of the core modules for how this admin menu pattern should be done, eg 'People'.
+  $items['admin/community/parties'] = array(
+    'title' => 'List',
+    'page callback' => 'crm_party_admin',
+    'page arguments' => array('list'),
+    'access arguments' => array('administer parties'),
+    'position' => 'left',
+    'file' => 'crm_party.admin.inc',
+  );
   $items['admin/community/party/manage'] = array(
     'title' => 'Party admin',
     'description' => 'Manage contact information',
