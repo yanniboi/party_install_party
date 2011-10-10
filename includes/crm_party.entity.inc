@@ -16,14 +16,8 @@ class CRMPartyController extends EntityAPIController {
    * The party's label is determined by the currently active name label plugin.
    */
   public function save($crmParty) {
-    // Get the label plugin.
-    ctools_include('plugins');
-    // @todo: need a UI to pick one.
-    $label_plugin_name = variable_get('crm_party_name_label_plugin', 'pid');
-    $label_plugin = ctools_get_plugins('crm_party', 'party_name_label', $label_plugin_name);
-
-    // Generate the party label from the plugin.
-    $crmParty->label = $label_plugin['label callback']($party);
+    // Set the label on the party.
+    $this->setLabel($crmParty);
 
     if (isset($crmParty->pid)) {
       drupal_write_record('crm_party', $crmParty, 'pid');
@@ -37,7 +31,24 @@ class CRMPartyController extends EntityAPIController {
     }
     return $crmParty;
   }
-  
+
+  /**
+   * Set the label on a party object using the current label plugin.
+   *
+   * @param $crmParty
+   *  A party object.
+   */
+  public function setLabel($crmParty) {
+    // Get the label plugin.
+    ctools_include('plugins');
+    // @todo: need a UI to pick one.
+    $label_plugin_name = variable_get('crm_party_name_label_plugin', 'pid');
+    $label_plugin = ctools_get_plugins('crm_party', 'party_name_label', $label_plugin_name);
+
+    // Generate the party label from the plugin.
+    $label_callback = $label_plugin['label callback'];
+    $crmParty->label = $label_callback($crmParty);
+  }
   
   /**
    * Overriding the buildContent function to add entity specific fields.
