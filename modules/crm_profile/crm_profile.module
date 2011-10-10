@@ -9,6 +9,7 @@
  * Implements hook_menu()
  *
  * Define a page to edit a profile in place.
+ * DEPRECATED this will now be done with data sets
  */
 function crm_profile_menu() {
   // @todo: not sure we should be fiddling with profile's menu stuff!
@@ -29,6 +30,42 @@ function crm_profile_menu() {
     'file' => 'crm_profile.pages.inc',
   );
   return $items;
+}
+
+/**
+ * Implements hook_crm_party_data_set_info().
+ */
+function crm_profile_crm_party_data_set_info() {
+ $sets = array()
+  foreach(profile2_get_types() as $type => $info) {
+    $sets["profile2_".$type] = array(
+      'label' => $info->label,
+      'load callback' => "crm_profile_load_profile",
+      'load arguments' => array($type),
+      'form callback' => "crm_profile_form",
+      'form arguments' => array($type),
+    );
+  }
+  return $sets;
+}
+
+/**
+ * Load a profile
+ */
+function crm_profile_load_profile($party, $set_type, $set_id, $type) {
+  return entity_load('profile2', $set_id);
+}
+
+/**
+ * Get the profile2 form data
+ * @todo: Make this have $form and $form_state
+ */
+function crm_profile_form(&$form, &$form_state, $party, $set_type, $set_id, $type) {
+  // Make sure the uid is null. 
+  $form['uid'] = array(
+    '#type' => 'hidden',
+    '#value' => null,
+  );
 }
 
 /**
