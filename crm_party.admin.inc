@@ -107,7 +107,7 @@ function party_admin_form() {
   );
   $form['pager'] = array('#markup' => theme('pager'));
 
-  return $form;  
+  return $form;
 }
 
 /**
@@ -119,21 +119,44 @@ function crm_party_settings_label_plugin_form($form, &$form_state) {
   // Get the label plugin.
   ctools_include('plugins');
 
-  $label_plugin_name = variable_get('crm_party_name_label_plugin', 'pid');
+  $setting_plugin_name = variable_get('crm_party_name_label_plugin', 'pid');
   $label_plugins = ctools_get_plugins('crm_party', 'party_name_label');
-  //dsm($label_plugins);
 
-  foreach ($label_plugins as $plugin) {
-    $form[$plugin['name']] = array(
+  // spoofed in extra item for testing.
+  $label_plugins['foo'] = array(
+    'name' => 'foo',
+    'title' => 'Foo',
+    'description' => 'Dummy item for testing multiple radio buttons. Don\t pick me!',
+  );
+
+  $form['label'] = array(
+    '#type' => 'item',
+    '#title' => t('Party name label'),
+    '#description' => t('Choose which method to use to generate a label for each party.'),
+  );
+
+  foreach ($label_plugins as $plugin_name => $plugin) {
+    $form['label'][$plugin_name] = array(
       '#type' => 'radio',
+      // Strings from the plugin are already translated.
       '#title' => $plugin['title'],
       '#description' => $plugin['description'],
-      '#return_value' => $plugin['name'],
-      '#default_value' => $plugin['name'] == $label_plugin_name,
+      '#return_value' => $plugin_name,
+      '#default_value' => ($plugin_name == $setting_plugin_name),
+      // The #parents property lets single radio buttons behave as a set.
+      '#parents' => array('label'),
     );
   }
+
+  $form['submit'] = array('#type' => 'submit', '#value' => t('Save'));
 
   return $form;
 }
 
-// @todo submit handler for this!
+/**
+ * Submit handler for the party label plugin settings form.
+ */
+function crm_party_settings_label_plugin_form_submit($form, &$form_state) {
+  //dsm($form_state['values']);
+  variable_set('crm_party_name_label_plugin', $form_state['values']['label']);
+}

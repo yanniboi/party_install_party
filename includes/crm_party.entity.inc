@@ -41,7 +41,6 @@ class CRMPartyController extends EntityAPIController {
   public function setLabel($crmParty) {
     // Get the label plugin.
     ctools_include('plugins');
-    // @todo: need a UI to pick one.
     $label_plugin_name = variable_get('crm_party_name_label_plugin', 'pid');
     $label_plugin = ctools_get_plugins('crm_party', 'party_name_label', $label_plugin_name);
 
