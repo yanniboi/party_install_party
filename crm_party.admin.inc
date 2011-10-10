@@ -4,7 +4,71 @@
  * @file
  * Admin page callback file for the crm_party module.
  */
- 
+
+/**
+ * Mock up the CRM Party admin interface - this is horrible: do it a better way.
+ */
+function crm_party_info() {
+  // @todo: load bundles from entity info.
+  // @todo: probably some of this admin UI can be done by EntityAPI.
+  $types = array(
+    'individual' => array(
+      'label' => t('Individual Party'),
+      'description' => 'Parties representing individual people',
+      'admin' => array(
+        'path' => 'admin/community/party/manage/individual',
+        'access arguments' => array('administer parties'),
+      ),
+    ),
+    'organisation' => array(
+      'label' => t('Organisation Party'),
+      'description' => 'Parties representing organisations or groups of people',
+      'admin' => array(
+        'path' => 'admin/community/party/manage/organisation',
+        'access arguments' => array('administer parties'),
+      ),
+    ),
+  );
+
+  $rows = array();
+
+  foreach($types as $type => $info) {
+    $rows[] = array(
+      $info['label'] . " <small>(Machine name: ".$type.")</small><div class=\"description\">".$info['description']."</div>",
+      array(
+        'data' => l(t('edit'), 'admin/community/party/manage/'.$type),
+      ),
+      array(
+        'data' => l(t('Manage Fields'), 'admin/community/party/manage/'.$type.'/fields'),
+      ),
+      array(
+        'data' => l(t('Manage Fields'), 'admin/community/party/manage/'.$type.'/display'),
+      ),
+      array(
+        'data' => '', //for when we implement custom party types
+      ),
+    );
+  }
+
+
+  return array(
+    'party_table' => array(
+      '#theme' => 'table',
+      '#header' => array(
+        t('Party Type'), array('data' => t('Operations'), 'colspan' => '4'),
+      ),
+      '#rows' => $rows,
+    ),
+  );
+}
+
+/**
+ * The management page for each party type.
+ */
+function crm_party_manage($type) {
+  return "Welcome to the party type administration page for " . $type;
+}
+
 function crm_party_admin($callback_arg = '') {
   $op = (isset($_POST['op'])) ? $_POST['op'] : $callback_arg;
 
