@@ -395,7 +395,7 @@ function crm_party_get_party_piece_instances($parent, $party_type, $party_pieces
  * 
  * @param $instance array of all values needed for this instance
  */
-function crm_party_save_party_piece_instance($instance = array) {
+function crm_party_save_party_piece_instance($instance = array()) {
   //Do checks to make sure everthing is there
   
   //Encode arguments
