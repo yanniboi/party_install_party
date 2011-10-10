@@ -652,10 +652,13 @@ function crm_party_save(&$party) {
 }
 
 /**
- * Create a crm_party array ready for saving to the database.
+ * Create a crm_party object ready for saving to the database.
  *
- *  @param $info
- *    An array carrying all the important information.
+ * @param $info
+ *  An array carrying all the important information.
+ *
+ * @return
+ *  A party object that can be passed to crm_party_save().
  */
 function crm_party_create($info) {
   if (!is_array($info)) {
