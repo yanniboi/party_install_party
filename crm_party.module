@@ -133,21 +133,21 @@ function crm_party_menu() {
     'file' => 'crm_party.admin.inc',
   );
   $items['admin/community/party/manage'] = array(
-    'title' => 'Party Admin',
-    'description' => 'Manage Contact Information',
+    'title' => 'Party admin',
+    'description' => 'Manage contact information',
     'page callback' => 'crm_party_info',
     'access arguments' => array('administer parties'),
   );
   $items['admin/community/party/manage/individual'] = array(
-    'title' => 'Manage Individuals',
-    'description' => 'Manage Contact Information',
+    'title' => 'Manage individuals',
+    'description' => 'Manage contact information',
     'page callback' => 'crm_party_manage',
     'page arguments' => array('individual'),
     'access arguments' => array('administer parties'),
   );
   $items['admin/community/party/manage/organisation'] = array(
-    'title' => 'Manage Organisations',
-    'description' => 'Manage Contact Information',
+    'title' => 'Manage organisations',
+    'description' => 'Manage contact information',
     'page callback' => 'crm_party_manage',
     'page arguments' => array('organisation'),
     'access arguments' => array('administer parties'),
@@ -198,20 +198,20 @@ function crm_party_menu() {
   );
 
   $items['party/add'] = array(
-    'title' => 'Add Party',
+    'title' => 'Add party',
     'page callback' => 'crm_party_add',
     'file' => 'crm_party.pages.inc',
     'access arguments' => array('create contacts'),
   );
   $items['party/add/individual'] = array(
-    'title'=> 'Add Individual',
+    'title'=> 'Add individual',
     'page callback' => 'crm_party_add',
     'page arguments' => array('individual'),
     'file' => 'crm_party.pages.inc',
     'access arguments' => array('create contacts'),
   );
   $items['party/add/organisation'] = array(
-    'title' => 'Add Organisation',
+    'title' => 'Add organisation',
     'page callback' => 'crm_party_add',
     'page arguments' => array('organisation'),
     'file' => 'crm_party.pages.inc',
