@@ -10,6 +10,20 @@ include_once("includes/crm_party.entity.inc");
 include_once("includes/crm_party_type.entity.inc");
 
 /**
+ * Implements hook_help().
+ *
+ * @todo: figure out why this isn't working. *headdesk*
+ */
+function crm_party_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#party':
+      return t("TODO: Create admin help text.");
+    case 'admin/config/crm/labels':
+      return t("Party name label generators save a label whenever a party is created or updated. This lets you form the party's label or name in a variety of methods.");
+  }
+}
+
+/**
  * Implements hook_entity_info().
  *
  * Define 2 entities here - the actual entity that will hold our domain
@@ -216,6 +230,7 @@ function crm_party_menu() {
  */
 function crm_party_data_set_info() {
   $sets = module_invoke_all('party_data_set_info');
+  dsm($sets);
 
   //this should probably go somewhere else but I can't think where
   foreach ($sets as $type => $set) {
