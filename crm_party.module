@@ -5,14 +5,27 @@
  * Provides a generic CRM party entity.
  */
 
+// @todo: If these contain only classes they will be autoloaded and these include statements can be dropped.
 include_once("includes/crm_party.entity.inc");
 include_once("includes/crm_party_type.entity.inc");
 
 /**
+ * Implements hook_help().
+ */
+function crm_party_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#crm_party':
+      return t("TODO: Create admin help text.");
+    case 'admin/config/crm/labels':
+      return t("Party name label generators save a label whenever a party is created or updated. This lets you form the party's label or name in a variety of methods.");
+  }
+}
+
+/**
  * Implements hook_entity_info().
  *
- * Define 2 entities here - the actual entity that will hold our domain 
- * specific information and an entity that holds information about the 
+ * Define 2 entities here - the actual entity that will hold our domain
+ * specific information and an entity that holds information about the
  * different types of entities.
  */
 function crm_party_entity_info() {
@@ -56,7 +69,7 @@ function crm_party_entity_info() {
       ),
     )
   );
-  
+
   return $party_info;
 }
 
@@ -87,6 +100,29 @@ function crm_party_entity_info_alter(&$entity_info) {
  * Implements hook_menu().
  */
 function crm_party_menu() {
+  // CRM settings.
+  // Making up a new config category.
+  // Alternative is to put this all under top-level admin.
+  // But all this structure is rough anyway.
+  $items['admin/config/crm'] = array(
+    'title' => 'CRM',
+    'description' => 'CRM settings.',
+    'position' => 'left',
+    'weight' => -10,
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+  );
+  $items['admin/config/crm/labels'] = array(
+    'title' => 'Labels',
+    'description' => 'Determine how labels for parties are generated.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('crm_party_settings_label_plugin_form'),
+    'access arguments' => array('administer crm settings'),
+    'file' => 'crm_party.admin.inc',
+  );
+
   $items['admin/community'] = array(
     'title' => 'Community',
     'description' => 'Manage the community',
@@ -94,27 +130,39 @@ function crm_party_menu() {
     'page arguments' => array('list'),
     'access arguments' => array('administer parties'),
     'position' => 'left',
-    'file' => 'crm_party.admin.inc',  
+    'file' => 'crm_party.admin.inc',
+  );
+  // @todo crib from one of the core modules for how this admin menu pattern should be done, eg 'People'.
+  $items['admin/community/parties'] = array(
+    'title' => 'List',
+    'page callback' => 'crm_party_admin',
+    'page arguments' => array('list'),
+    'access arguments' => array('administer parties'),
+    'position' => 'left',
+    'file' => 'crm_party.admin.inc',
   );
   $items['admin/community/party/manage'] = array(
-    'title' => 'Party Admin',
-    'description' => 'Manage Contact Information',
+    'title' => 'Party admin',
+    'description' => 'Manage contact information',
     'page callback' => 'crm_party_info',
     'access arguments' => array('administer parties'),
+    'file' => 'crm_party.admin.inc',
   );
   $items['admin/community/party/manage/individual'] = array(
-    'title' => 'Manage Individuals',
-    'description' => 'Manage Contact Information',
+    'title' => 'Manage individuals',
+    'description' => 'Manage contact information',
     'page callback' => 'crm_party_manage',
     'page arguments' => array('individual'),
     'access arguments' => array('administer parties'),
+    'file' => 'crm_party.admin.inc',
   );
   $items['admin/community/party/manage/organisation'] = array(
-    'title' => 'Manage Organisations',
-    'description' => 'Manage Contact Information',
+    'title' => 'Manage organisations',
+    'description' => 'Manage contact information',
     'page callback' => 'crm_party_manage',
     'page arguments' => array('organisation'),
     'access arguments' => array('administer parties'),
+    'file' => 'crm_party.admin.inc',
   );
 
   $items['party/%crm_party'] = array(
@@ -136,7 +184,7 @@ function crm_party_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
   );
-  
+
   // Build the party view second-level tabs.
   // @todo: Consider whether to put edit below this and these at first level.
   // @todo: Write a contrib module to turn a set of tabs into ajax tabs,
@@ -162,86 +210,87 @@ function crm_party_menu() {
   );
 
   $items['party/add'] = array(
-    'title' => 'Add Party',
+    'title' => 'Add party',
     'page callback' => 'crm_party_add',
     'file' => 'crm_party.pages.inc',
     'access arguments' => array('create contacts'),
   );
   $items['party/add/individual'] = array(
-    'title'=> 'Add Individual',
+    'title'=> 'Add individual',
     'page callback' => 'crm_party_add',
     'page arguments' => array('individual'),
     'file' => 'crm_party.pages.inc',
     'access arguments' => array('create contacts'),
   );
   $items['party/add/organisation'] = array(
-    'title' => 'Add Organisation',
+    'title' => 'Add organisation',
     'page callback' => 'crm_party_add',
     'page arguments' => array('organisation'),
     'file' => 'crm_party.pages.inc',
     'access arguments' => array('create contacts'),
   );
-  
+
   return $items;
 }
 
 /**
- * Get all data sets
+ * Get all data sets.
  *
  * @todo: Can we cache this? Especially to avoid adding database tables
  */
 function crm_party_data_set_info() {
-  $sets = module_invoke_all('party_data_set_info');  
-  
+  $sets = module_invoke_all('party_data_set_info');
+  dsm($sets);
+
   //this should probably go somewhere else but I can't think where
-  foreach($sets as $type => $set) {
-    if(!db_table_exists('crm_party_data_set_'.$type)) {
+  foreach ($sets as $type => $set) {
+    if (!db_table_exists('crm_party_data_set_' . $type)) {
       crm_party_data_set_type_add($set_type);
     }
   }
-  
-  return $sets;  
+
+  return $sets;
 }
 
 /**
  * Add a new data set type to the system
  *
  * This adds a table to the database to handle parties relationships to data sets
- * 
+ *
  * @param $set_type the machine name of the type
- * 
+ *
  * @todo Make this use a hook to load the schema
  */
 function crm_party_data_set_type_add($set_type) {
   module_load_install('crm_party');
-  
+
   $schema = crm_party_party_data_set_schema();
   db_create_table('crm_party_data_set_'.$set_type);
 }
 
-/** 
+/**
  * Load a data set
  *
  * @param $party The party object of the party we're concerned with
  * @param $set_type The set type as defined in hook_data_set_info
  * @param $set_id The set id as stored in the related table
  *
- * @return 
+ * @return
  *   An object or array representing the data set.
  */
 function crm_party_data_set_load($party, $set_type, $set_id) {
   $sets = crm_party_data_set_info();
   $function = $sets[$set_type]['load callback'];
-  if(function_exists($function)) {
+  if (function_exists($function)) {
     $result = call_user_func($function, $party, $set_type, $set_id);
   }
   else {
-    return false;
-  }  
-  return $result; 
+    return FALSE;
+  }
+  return $result;
 }
 
-/** 
+/**
  * Get the form for a data set (more to the point get a set of fields for the data set
  * might need to work on this).
  *
@@ -249,19 +298,19 @@ function crm_party_data_set_load($party, $set_type, $set_id) {
  * @param $set_type The set type as defined in hook_data_set_info
  * @param $set_id The set id as stored in the related table
  *
- * @return 
- *   A form array. 
+ * @return
+ *   A form array.
  */
 function crm_party_data_set_form($party, $set_type, $set_id = FALSE) {
   $sets = crm_party_data_set_info();
   $function = $sets[$set_type]['form callback'];
-  if(function_exists($function)) {
+  if (function_exists($function)) {
     $result = call_user_func($function, $party, $set_type, $set_id);
   }
   else {
-    return false;
-  }  
-  return $result; 
+    return FALSE;
+  }
+  return $result;
 }
 
 /**
@@ -283,7 +332,7 @@ function crm_party_data_set_attach($party, $set_type, $set_id, $main = false, $h
     'hat_main' => $hat_main,
     'null' => $null,
   );
-  
+
   drupal_write_record('crm_party_data_set_'.$set_type, $data);
 }
 
@@ -297,8 +346,8 @@ function crm_party_data_set_attach($party, $set_type, $set_id, $main = false, $h
  * @todo Implement
  */
 function crm_party_data_set_detach($party, $set_type, $set_id){
-  return true;
-} 
+  return TRUE;
+}
 
 
 /**
@@ -314,24 +363,27 @@ function crm_party_party_piece_info() {
 /**
  * Get party piece instances
  *
- * @param $parent Id of the parent party piece
- * @param $party_type The party type we're looking at
- * @param $party_piece (optional) the Piece we're looking for
+ * @param $parent
+ *  Id of the parent party piece
+ * @param $party_type
+ *  The party type we're looking at
+ * @param $party_piece
+ *  (optional) the Piece we're looking for
  */
 function crm_party_get_party_piece_instances($parent, $party_type, $party_pieces = null) {
   // Build the query;
   $query = db_select('crm_party_party_pieces','pp');
   $query->fields('pp');
   $query->condition('parent_id', $parent, '=');
-  if(is_array($party_pieces) {
+  if (is_array($party_pieces)) {
     $query->condition('party_piece', $party_pieces, 'IN');
   }
   $query->condition('party_type', $party_type, '=');
   $query->orderBy('weight');
-  
+
   // Get all the results that fit
   $results = $query->execute()->fetchAllAssoc('instance_id');
-  foreach($results as $key => $result) {
+  foreach ($results as $key => $result) {
     // Decode the arguments into a useable form.
     $results[$key]['arguments'] = json_decode($result['arguments'], true);
   }
@@ -380,10 +432,10 @@ function crm_party_delete_party_piece_instance($instance) {
  *   (one row from crm_party_get_party_pieces);
  *
  * @todo workout something to do with permissions
- * @todo 
+ * @todo
  */
 function crm_party_party_piece_display($party, $instance) {
-  if(is_numeric($instance)) {
+  if (is_numeric($instance)) {
     // Build the query;
     $query = db_select('crm_party_party_pieces','pp');
     $query->fields('pp');
@@ -393,12 +445,12 @@ function crm_party_party_piece_display($party, $instance) {
     $result['arguments'] = json_decode($result['arguments'], true);
     $instance = $result;
   }
-  
+
   //Call the display function
   $pieces = crm_party_party_piece_info();
   $function = $pieces[$instance['party_piece']]['display callback'];
-  
-  if(function_exists($function)) {
+
+  if (function_exists($function)) {
     $result = call_user_func($function, $party, $instance, $instance['title'], $instance['arguments']);
   }
   else {
@@ -406,11 +458,11 @@ function crm_party_party_piece_display($party, $instance) {
   }
 
   //If the Party Piece can have children, load those children
-  if($pieces[$instance['party_piece']]['nesting']) {
+  if ($pieces[$instance['party_piece']]['nesting']) {
     $result += crm_party_party_piece_display_children($party, $instance);
   }
-  
-  return $result;   
+
+  return $result;
 }
 
 /**
@@ -433,7 +485,7 @@ function crm_party_party_piece_display_children($party, $instance) {
  */
 function crm_party_party_party_piece_info() {
   $pieces = array();
-  //Define tabs
+  // Define tabs
   $pieces['tab'] = array(
     'label' => 'Party Tab',
     'display callback' => 'crm_party_party_piece_tab_display',
@@ -447,9 +499,12 @@ function crm_party_party_party_piece_info() {
  *
  * @todo Implement. Use crm_party_party_piece_display_children() to get hte children of the tab.
  */
+/*
+// Commenting out as the [] in function args don't work and I'm not sure what they ought to be.
 function crm_party_party_piece_tab_display($party, $instance, $instance['title'], $instance['arguments']) {
   return array();
 }
+*/
 
 /**
  * Implements hook_crm_party_party_pieces().
@@ -498,23 +553,27 @@ function crm_party_crm_party_party_pieces() {
  * Implements hook_permission().
  */
 function crm_party_permission() {
-    return array(
+  return array(
+    'administer crm settings' => array(
+      'title' => t('Administer CRM settings'),
+      'restrict access' => TRUE,
+    ),
     'administer party types' => array(
-      'title' => t('Administer Party Types'),
+      'title' => t('Administer party types'),
       'restrict access' => TRUE,
     ),
     'administer parties' =>  array(
-      'title' => t('Administer Parties'),
+      'title' => t('Administer parties'),
       'restrict access' => TRUE,
     ),
     'create parties' => array(
-      'title' => t('Create Parties'),
+      'title' => t('Create parties'),
     ),
     'view parties' => array(
-      'title' => t('View Parties'),
+      'title' => t('View parties'),
     ),
     'edit parties' => array(
-      'title' => t('Edit Parties'),
+      'title' => t('Edit parties'),
     )
   );
 }
@@ -549,76 +608,9 @@ function crm_party_load($pid = NULL, $reset = FALSE) {
 
 /**
  * Load many contacts.
- */ 
+ */
 function crm_party_load_multiple($pids = array(), $conditions = array(), $reset = FALSE) {
   return entity_load('crm_party', $pids, $conditions, $reset);
-}
-
-/**
- * pages - to be moved to a different file
- */
-/**
- * Mock up the CRM Party admin interface - this is horrible: do it a better way.
- */
-function crm_party_info() {
-  // @todo: load bundles from entity info.
-  // @todo: probably some of this admin UI can be done by EntityAPI.
-  $types = array(
-    'individual' => array(
-      'label' => t('Individual Party'),
-      'description' => 'Parties representing individual people',
-      'admin' => array(
-        'path' => 'admin/community/party/manage/individual',
-        'access arguments' => array('administer parties'),
-      ),
-    ),
-    'organisation' => array(
-      'label' => t('Organisation Party'),
-      'description' => 'Parties representing organisations or groups of people',
-      'admin' => array(
-        'path' => 'admin/community/party/manage/organisation',
-        'access arguments' => array('administer parties'),
-      ),
-    ),
-  );
-  
-  $rows = array();
-  
-  foreach($types as $type => $info) {
-    $rows[] = array(
-      $info['label'] . " <small>(Machine name: ".$type.")</small><div class=\"description\">".$info['description']."</div>",
-      array(
-        'data' => l(t('edit'), 'admin/community/party/manage/'.$type),
-      ),
-      array(
-        'data' => l(t('Manage Fields'), 'admin/community/party/manage/'.$type.'/fields'),
-      ),
-      array(
-        'data' => l(t('Manage Fields'), 'admin/community/party/manage/'.$type.'/display'),
-      ),
-      array(
-        'data' => '', //for when we implement custom party types
-      ),
-    );
-  }
-  
-  
-  return array(
-    'party_table' => array(
-      '#theme' => 'table',
-      '#header' => array(
-        t('Party Type'), array('data' => t('Operations'), 'colspan' => '4'),
-      ),
-      '#rows' => $rows,
-    ),
-  );
-}
-
-/**
- * The management page for each party type.
- */
-function crm_party_manage($type) {
-  return "Welcome to the party type administration page for " . $type;
 }
 
 /**
@@ -639,10 +631,13 @@ function crm_party_save(&$party) {
 }
 
 /**
- * Create a crm_party array ready for saving to the database.
+ * Create a crm_party object ready for saving to the database.
  *
- *  @param $info
- *    An array carrying all the important information.
+ * @param $info
+ *  An array carrying all the important information.
+ *
+ * @return
+ *  A party object that can be passed to crm_party_save().
  */
 function crm_party_create($info) {
   if (!is_array($info)) {
@@ -651,11 +646,8 @@ function crm_party_create($info) {
   if (!isset($info['type'])) {
     return FALSE;
   }
-  if (!isset($info['label'])) {
-    return FALSE;
-  }
-  
-  return (object) $info;  
+
+  return (object) $info;
 }
 
 /**
@@ -687,3 +679,30 @@ function crm_party_views_api() {
     'path' => drupal_get_path('module', 'crm_party') . '/includes',
   );
 }
+
+// -----------------------------------------------------------------------
+// CTools hook implementations.
+
+/**
+ * Implements hook_ctools_plugin_type().
+ *
+ * Declare the plugin types we invent.
+ */
+function crm_party_ctools_plugin_type() {
+  // Party name label plugins provide ways to generate a party name label
+  // from a party.
+  $plugins['party_name_label'] = array(
+  );
+
+  return $plugins;
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function crm_party_ctools_plugin_directory($owner, $plugin_type) {
+  if ($owner == 'crm_party') {
+    return "plugins/$plugin_type";
+  }
+}
+

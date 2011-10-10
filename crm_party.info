@@ -10,4 +10,5 @@ files[] = includes/crm_party.views.inc
 files[] = includes/crm_party_plugin_display_party_piece.inc
 
 dependencies[] = entity
+dependencies[] = ctools
 

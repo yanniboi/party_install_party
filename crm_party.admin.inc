@@ -4,7 +4,77 @@
  * @file
  * Admin page callback file for the crm_party module.
  */
- 
+
+/**
+ * Mock up the CRM Party admin interface - this is horrible: do it a better way.
+ */
+function crm_party_info() {
+  // @todo: load bundles from entity info.
+  // @todo: probably some of this admin UI can be done by EntityAPI.
+  $types = array(
+    'individual' => array(
+      'label' => t('Individual Party'),
+      'description' => 'Parties representing individual people',
+      'admin' => array(
+        'path' => 'admin/community/party/manage/individual',
+        'access arguments' => array('administer parties'),
+      ),
+    ),
+    'organisation' => array(
+      'label' => t('Organisation Party'),
+      'description' => 'Parties representing organisations or groups of people',
+      'admin' => array(
+        'path' => 'admin/community/party/manage/organisation',
+        'access arguments' => array('administer parties'),
+      ),
+    ),
+  );
+
+  $rows = array();
+
+  foreach($types as $type => $info) {
+    $rows[] = array(
+      $info['label'] . " <small>(Machine name: ".$type.")</small><div class=\"description\">".$info['description']."</div>",
+      array(
+        'data' => l(t('edit'), 'admin/community/party/manage/'.$type),
+      ),
+      array(
+        'data' => l(t('Manage Fields'), 'admin/community/party/manage/'.$type.'/fields'),
+      ),
+      array(
+        'data' => l(t('Manage Fields'), 'admin/community/party/manage/'.$type.'/display'),
+      ),
+      array(
+        'data' => '', //for when we implement custom party types
+      ),
+    );
+  }
+
+
+  return array(
+    'party_table' => array(
+      '#theme' => 'table',
+      '#header' => array(
+        t('Party Type'), array('data' => t('Operations'), 'colspan' => '4'),
+      ),
+      '#rows' => $rows,
+    ),
+  );
+}
+
+/**
+ * The management page for each party type.
+ */
+function crm_party_manage($type) {
+  return "Welcome to the party type administration page for " . $type;
+}
+
+/**
+ * Page callback for party admin list.
+ *
+ * @param $callback_arg
+ *  @todo write me probably cribbed from node admin ;)
+ */
 function crm_party_admin($callback_arg = '') {
   $op = (isset($_POST['op'])) ? $_POST['op'] : $callback_arg;
 
@@ -28,6 +98,7 @@ function party_admin_form() {
   // Header for the tableselect element.
   $header = array(
     'pid' => array('data' => t('Party id'), 'field' => 'cp.pid'),
+    'label' => array('data' => t('Label'), 'field' => 'cp.label'),
     'type' => array('data' => t('Party type'), 'field' => 'cp.type'),
   );
   
@@ -39,7 +110,7 @@ function party_admin_form() {
 
   $query = $query->extend('PagerDefault')->extend('TableSort');
   $query
-    ->fields('cp', array('pid', 'type'))
+    ->fields('cp', array('pid', 'type', 'label'))
     ->limit(50)
     ->orderByHeader($header)
     ->setCountQuery($count_query);
@@ -68,7 +139,7 @@ function party_admin_form() {
     '#type' => 'submit',
     '#value' => t('Update'),
   );
-  
+
   // Builds the table list.
   $destination = drupal_get_destination();
 
@@ -86,6 +157,13 @@ function party_admin_form() {
           '#href' => 'party/' . $party->pid,
         ),
       ),
+      'label' => array(
+        'data' =>array(
+          '#type' => 'link',
+          '#title' => $party->label,
+          '#href' => 'party/' . $party->pid,
+        ),
+      ),
       'type' => $party_entity_info['bundles'][$party->type]['label'],
     );
     //implement making this hookable
@@ -99,5 +177,56 @@ function party_admin_form() {
   );
   $form['pager'] = array('#markup' => theme('pager'));
 
-  return $form;  
+  return $form;
+}
+
+/**
+ * Settings form for choosing the active party label plugin.
+ */
+function crm_party_settings_label_plugin_form($form, &$form_state) {
+  // @todo: hook_help text for this page.
+
+  // Get the label plugin.
+  ctools_include('plugins');
+
+  $setting_plugin_name = variable_get('crm_party_name_label_plugin', 'pid');
+  $label_plugins = ctools_get_plugins('crm_party', 'party_name_label');
+
+  // spoofed in extra item for testing.
+  $label_plugins['foo'] = array(
+    'name' => 'foo',
+    'title' => 'Foo',
+    'description' => 'Dummy item for testing multiple radio buttons. Don\t pick me!',
+  );
+
+  $form['label'] = array(
+    '#type' => 'item',
+    '#title' => t('Party name label'),
+    '#description' => t('Choose which method to use to generate a label for each party.'),
+  );
+
+  foreach ($label_plugins as $plugin_name => $plugin) {
+    $form['label'][$plugin_name] = array(
+      '#type' => 'radio',
+      // Strings from the plugin are already translated.
+      '#title' => $plugin['title'],
+      '#description' => $plugin['description'],
+      '#return_value' => $plugin_name,
+      '#default_value' => ($plugin_name == $setting_plugin_name),
+      // The #parents property lets single radio buttons behave as a set.
+      '#parents' => array('label'),
+    );
+  }
+
+  $form['submit'] = array('#type' => 'submit', '#value' => t('Save'));
+
+  return $form;
+}
+
+/**
+ * Submit handler for the party label plugin settings form.
+ */
+function crm_party_settings_label_plugin_form_submit($form, &$form_state) {
+  //dsm($form_state['values']);
+  variable_set('crm_party_name_label_plugin', $form_state['values']['label']);
 }
