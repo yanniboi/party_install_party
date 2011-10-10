@@ -11,12 +11,10 @@ include_once("includes/crm_party_type.entity.inc");
 
 /**
  * Implements hook_help().
- *
- * @todo: figure out why this isn't working. *headdesk*
  */
 function crm_party_help($path, $arg) {
   switch ($path) {
-    case 'admin/help#party':
+    case 'admin/help#crm_party':
       return t("TODO: Create admin help text.");
     case 'admin/config/crm/labels':
       return t("Party name label generators save a label whenever a party is created or updated. This lets you form the party's label or name in a variety of methods.");
