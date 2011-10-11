@@ -13,7 +13,7 @@ function crm_user_schema() {
 
   // Get the schema array for our data set relation table.
   module_load_install('crm_party');
-  $schema += crm_party_data_set_schema_template('crm_user');
+  $schema += crm_party_data_set_schema_template('user');
 
   return $schema;
 }
