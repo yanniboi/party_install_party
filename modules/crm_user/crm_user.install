@@ -1,1 +1,38 @@
-<?php/** * @file * * The install file for CRM user module */ /** * Implements hook_install(). */function crm_user_install() {  //Create a relation type  $relation_type = array(    'relation_type' => 'party_to_user',    'label' => 'Party to User',    'max_arity' => 2,    'source_bundles' => array(      'crm_party:*',      'user:*',    ),  );    relation_type_save($relation_type);   drupal_set_message("Party to User Relation Created"); }
+<?php
+/**
+ * @file
+ *
+ * Contains install hooks for CRM user module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function crm_user_schema() {
+  $schema = array();
+
+  // Get the schema array for our data set relation table.
+  module_load_install('crm_party');
+  $schema += crm_party_data_set_schema_template('crm_user');
+
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function crm_user_install() {
+  // Create a relation type
+  $relation_type = array(
+    'relation_type' => 'party_to_user',
+    'label' => 'Party to User',
+    'max_arity' => 2,
+    'source_bundles' => array(
+      'crm_party:*',
+      'user:*',
+    ),
+  );
+
+  relation_type_save($relation_type);
+  drupal_set_message("Party to User Relation Created");
+}
