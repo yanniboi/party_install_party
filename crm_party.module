@@ -238,8 +238,8 @@ function crm_party_menu() {
  *
  * @todo: Can we cache this? Especially to avoid adding database tables
  */
-  $sets = module_invoke_all('party_data_set_info');
 function crm_party_get_data_set_info() {
+  $sets = module_invoke_all('crm_party_get_data_set_info');
   dsm($sets);
 
   //this should probably go somewhere else but I can't think where

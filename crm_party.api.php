@@ -23,7 +23,7 @@
  *       the submit button). It gets $party, $set_type, $set_id, $form and $form_state.
  *   - "module" the name of the module implementing this data set
  */
-function hook_party_data_set_info() {
+function hook_crm_party_data_set_info() {
   $sets = array();
   
   //A user data set.
