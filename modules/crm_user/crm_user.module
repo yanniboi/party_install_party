@@ -6,6 +6,19 @@
  */
 
 /**
+ * Implements hook_party_data_set_info()
+ */
+function crm_user_party_data_set_info() {
+  $sets['user'] = array(
+    'label' => t("User account"),
+    'singleton' => TRUE,
+    'load callback' => "crm_user_load_user",
+    'form callback' => "crm_user_form_user",
+  );
+  return $sets;
+}
+
+/**
  * Implements hook_crm_party_party_pieces().
  */
 function crm_user_crm_party_party_pieces() {
