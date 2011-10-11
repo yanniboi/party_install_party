@@ -36,9 +36,9 @@ function crm_profile_menu() {
  * Implements hook_crm_party_data_set_info().
  */
 function crm_profile_crm_party_data_set_info() {
- $sets = array()
-  foreach(profile2_get_types() as $type => $info) {
-    $sets["profile2_".$type] = array(
+  $sets = array();
+  foreach (profile2_get_types() as $type => $info) {
+    $sets["profile2_" . $type] = array(
       'label' => $info->label,
       'load callback' => "crm_profile_load_profile",
       'load arguments' => array($type),
