@@ -238,8 +238,8 @@ function crm_party_menu() {
  *
  * @todo: Can we cache this? Especially to avoid adding database tables
  */
-function crm_party_data_set_info() {
   $sets = module_invoke_all('party_data_set_info');
+function crm_party_get_data_set_info() {
   dsm($sets);
 
   //this should probably go somewhere else but I can't think where
@@ -279,7 +279,7 @@ function crm_party_data_set_type_add($set_type) {
  *   An object or array representing the data set.
  */
 function crm_party_data_set_load($party, $set_type, $set_id) {
-  $sets = crm_party_data_set_info();
+  $sets = crm_party_get_data_set_info();
   $function = $sets[$set_type]['load callback'];
   if (function_exists($function)) {
     $result = call_user_func($function, $party, $set_type, $set_id);
@@ -302,7 +302,7 @@ function crm_party_data_set_load($party, $set_type, $set_id) {
  *   A form array.
  */
 function crm_party_data_set_form($party, $set_type, $set_id = FALSE) {
-  $sets = crm_party_data_set_info();
+  $sets = crm_party_get_data_set_info();
   $function = $sets[$set_type]['form callback'];
   if (function_exists($function)) {
     $result = call_user_func($function, $party, $set_type, $set_id);
