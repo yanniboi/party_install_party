@@ -59,6 +59,7 @@ function crm_profile_load_profile($party, $set_type, $set_id, $type) {
 /**
  * Get the profile2 form data
  * @todo: Make this have $form and $form_state
+ * @todo: finish
  */
 function crm_profile_form(&$form, &$form_state, $party, $set_type, $set_id, $type) {
   // Make sure the uid is null. 
@@ -66,6 +67,14 @@ function crm_profile_form(&$form, &$form_state, $party, $set_type, $set_id, $typ
     '#type' => 'hidden',
     '#value' => null,
   );
+  
+  if(is_numeric($set_id)) {
+    $form_state['profiles'][$type] = entity_load('profile2', $set_id);
+  }
+  else {
+    $form_state['profiles'][$type] = profile_create(array('type' => $type));
+  }  
+  profile2_attach_form($form, $form_state);  
 }
 
 /**
