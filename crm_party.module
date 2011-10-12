@@ -287,6 +287,48 @@ function crm_party_data_set_type_remove($set_name) {
   }
 }
 
+// -----------------------------------------------------------------------
+// API for relating and unrelating entities to a party.
+
+/**
+ * Attach an entity to a party according to a given data set.
+ *
+ * @param $party
+ *  The party to assign the entity to.
+ * @param $entity
+ *  The entity to relate to.
+ * @param $entity_type
+ *  Needed until http://drupal.org/node/1042822 is fixed.
+ * @param $data_set
+ *  The name of the data set.
+ *  DX WTF: can we sniff this out given the entity type and the entity object?
+ */
+function crm_party_relate($party, $entity, $entity_type, $data_set = NULL) {
+  $entity_type_info = entity_get_info($entity_type);
+  $entity_id_key = $entity_type_info['entity keys']['id'];
+
+  $relation = array(
+    'pid' => $party->pid,
+    'eid' => $entity->{$entity_id_key},
+  );
+
+  // WIP: chuck in defaults until I figure out what these do
+  $relation += array(
+    'main' => FALSE,
+    'hat' => 'trilby',
+    'hat_main' => FALSE,
+  );
+
+  $table = 'crm_party_set_' . $data_set;
+
+  // @todo: figure out when to insert and when to update! we probably need
+  // an extra parameter for this. #fail :(
+  drupal_write_record($table, $relation);
+}
+
+// -----------------------------------------------------------------------
+// API for loading data about a party.
+
 /**
  * Load a data set
  *

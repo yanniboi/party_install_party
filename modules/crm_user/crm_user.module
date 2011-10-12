@@ -88,11 +88,14 @@ function crm_user_post_form_submit_relate($form, &$form_state) {
   }
   
   $party = $form_state['crm_party'];
-  _crm_party_user_relate($party, $account);
+
+  crm_party_relate($party, $account, 'user', 'user');
 }
 
 /**
  * Relate a party entity to a user entity.
+ *
+ * @todo obsolete!
  *
  * @param $party
  *   A fully loaded party object, from crm_party_load(). Whats important is that the pid is correct.
