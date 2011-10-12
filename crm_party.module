@@ -355,6 +355,39 @@ function crm_party_relate($party, $entity, $entity_type, $data_set = NULL) {
   drupal_write_record($table, $relation);
 }
 
+/**
+ * Detach an entity from a party according to a given data set.
+ *
+ * @param $party
+ *  The party to detach the entity from.
+ * @param $entity
+ *  The entity to detach. This may also be just the entity id.
+ * @param $entity_type
+ *  Needed until http://drupal.org/node/1042822 is fixed.
+ * @param $data_set
+ *  The name of the data set.
+ *  DX WTF: can we sniff this out given the entity type and the entity object?
+ */
+function crm_party_unrelate($party, $entity, $entity_type, $data_set) {
+  // Allow the entity to be just an id.
+  if (is_numeric($entity)) {
+    $eid = $entity;
+  }
+  else {
+    $entity_type_info = entity_get_info($entity_type);
+    $entity_id_key = $entity_type_info['entity keys']['id'];
+    $eid = $entity->{$entity_id_key};
+  }
+
+  // @todo write me
+  $table = 'crm_party_set_' . $data_set;
+
+  $num_deleted = db_delete($table)
+    ->condition('pid', $party->pid)
+    ->condition('eid', $eid)
+    ->execute();
+}
+
 // -----------------------------------------------------------------------
 // API for loading data about a party.
 

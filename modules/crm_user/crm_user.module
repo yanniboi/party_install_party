@@ -70,6 +70,12 @@ function crm_user_form_crm_party_edit_form_alter(&$form, &$form_state, $form_id)
     $account = array_pop($entities);
   }
 
+  // Store the account uid so we can check if it changes on submit.
+  $form['crm_user_uid'] = array(
+    '#type' => 'value',
+    '#value' => isset($account) ? $account->uid : NULL,
+  );
+
   $form['user'] = array(
     '#type' => 'textfield',
     '#title' => t('User'),
@@ -87,17 +93,28 @@ function crm_user_form_crm_party_edit_form_alter(&$form, &$form_state, $form_id)
  * Relate the user entities to the crm_party in form_state
  */
 function crm_user_post_form_submit_relate($form, &$form_state) {
+  $original_uid = $form_state['values']['crm_user_uid'];
+
   // Attempt to load a user from the given input.
   $account = user_load_by_name($form_state['values']['user']);
   // Fall back to the anonymous user.
-  // @todo: why not just not make a relation at this point??
   if (!$account) {
     $account = user_load(0);
   }
-  
-  $party = $form_state['crm_party'];
 
-  crm_party_relate($party, $account, 'user', 'user');
+  // Only alter our records if something has changed.
+  if ($original_uid != $account->uid) {
+    $party = $form_state['crm_party'];
+
+    // Unrelate the original user, then relate the new one.
+    // In both cases, only act on non-anonymous accounts: that is not stored.
+    if ($original_uid) {
+      crm_party_unrelate($party, $original_uid, 'user', 'user');
+    }
+    if ($account->uid) {
+      crm_party_relate($party, $account, 'user', 'user');
+    }
+  }
 }
 
 /**
