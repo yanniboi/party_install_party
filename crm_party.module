@@ -245,7 +245,7 @@ function crm_party_get_data_set_info() {
   //this should probably go somewhere else but I can't think where
   foreach ($sets as $type => $set) {
     if (!db_table_exists('crm_party_data_set_' . $type)) {
-      crm_party_data_set_type_add($set_type);
+      crm_party_data_set_type_add($type);
     }
   }
 
@@ -355,7 +355,7 @@ function crm_party_data_set_instance_detach($party, $set_type, $set_id){
  *
  * @todo: Can we cache this?
  */
-function crm_party_party_piece_info() {
+function crm_party_get_party_piece_info() {
   $pieces = module_invoke_all('party_party_piece_info');
   return $pieces;
 }
