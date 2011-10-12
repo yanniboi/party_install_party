@@ -518,12 +518,10 @@ function crm_party_party_party_piece_info() {
  *
  * @todo Implement. Use crm_party_party_piece_display_children() to get hte children of the tab.
  */
-/*
-// Commenting out as the [] in function args don't work and I'm not sure what they ought to be.
-function crm_party_party_piece_tab_display($party, $instance, $instance['title'], $instance['arguments']) {
+function crm_party_party_piece_tab_display($party, $instance, $title, $arguments) {
   return array();
 }
-*/
+
 
 /**
  * Implements hook_crm_party_party_pieces().
