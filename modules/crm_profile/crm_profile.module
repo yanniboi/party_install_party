@@ -50,6 +50,15 @@ function crm_profile_crm_party_data_set_info() {
 }
 
 /**
+ * Implements hook_profile2_type_insert().
+ *
+ * Add a data set relation table when a new profile2 type is created.
+ */
+function crm_profile_profile2_type_insert($type) {
+  crm_party_data_set_type_add($type);
+}
+
+/**
  * Load a profile
  */
 function crm_profile_load_profile($party, $set_type, $set_id, $type) {
@@ -258,6 +267,8 @@ function crm_profile_crm_party_page_view_alter($party) {
  *
  * Make the right relation when a profile type is added.
  */
+// OBSOLETE -- we are using hook_profile2_type_insert() above.
+/* 
 function crm_profile_entity_insert($entity, $type) {
   if ($type == 'profile2_type') {  
     // Create the null profile.
@@ -301,6 +312,7 @@ function crm_profile_entity_insert($entity, $type) {
     }
   }
 }
+*/
 
 
 /**
