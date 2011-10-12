@@ -59,6 +59,8 @@ function crm_party_add($type = '') {
  * Party edit form.
  */
 function crm_party_edit_form($form, &$form_state, $party) {
+  $form['#party'] = $party;
+
   if (isset($party->pid)) {
     $form['pid'] = array(
       '#type' => 'value',

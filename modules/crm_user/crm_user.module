@@ -62,17 +62,24 @@ function crm_user_party_view_user($party) {
  * Alter Party forms to do things
  */
 function crm_user_form_crm_party_edit_form_alter(&$form, &$form_state, $form_id) {
-  // Make sure the uid is null. 
+  $party = $form['#party'];
+  // For an existing party, get the related user account if there is one.
+  if (isset($party->pid)) {
+    $entities = crm_party_data_set_load($party, 'user');
+    // We know we're a singleton data set so we can just pop off the one result.
+    $account = array_pop($entities);
+  }
+
   $form['user'] = array(
     '#type' => 'textfield',
-    '#title' => t('User'), 
-    '#maxlength' => 60, 
-    '#autocomplete_path' => 'user/autocomplete', 
-    '#default_value' => '', 
-    '#weight' => -1, 
+    '#title' => t('User'),
+    '#maxlength' => 60,
+    '#autocomplete_path' => 'user/autocomplete',
+    '#default_value' => isset($account) ? $account->name : '',
+    '#weight' => -1,
     '#description' => t('Leave blank for %anonymous.', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
   );
-  
+
   $form['#submit'][] = 'crm_user_post_form_submit_relate';
 }
 

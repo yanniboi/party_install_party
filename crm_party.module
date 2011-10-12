@@ -361,16 +361,40 @@ function crm_party_relate($party, $entity, $entity_type, $data_set = NULL) {
 /**
  * Load a data set
  *
- * @param $party The party object of the party we're concerned with
- * @param $set_type The set type as defined in hook_data_set_info
- * @param $set_id The set id as stored in the related table
+ * @param $party
+ *  The party object of the party we're concerned with.
+ * @param $set_name
+ *  The set type as defined in hook_crm_party_data_set_info().
  *
  * @return
- *   An object or array representing the data set.
+ *  An array of the entities attached to the party in the given data set,
+ *  keyed by entity id.
+ *  Each entity additionally has the property 'crm_party_main' set according
+ *  to the 'main' flag in the data set.
  */
-function crm_party_data_set_load($party, $set_type, $set_id) {
+function crm_party_data_set_load($party, $set_name) {
   $sets = crm_party_get_data_set_info();
-  $function = $sets[$set_type]['load callback'];
+  //dsm($sets);
+
+  $table = db_escape_table($sets[$set_name]['table']);
+  $result = db_query("SELECT eid, main FROM {$table} WHERE pid = :pid", array(
+    ':pid' => $party->pid,
+  ));
+  $items = $result->fetchAllAssoc('eid', PDO::FETCH_ASSOC);
+
+  // Load the entities.
+  $entities = entity_load($sets[$set_name]['entity type'], array_keys($items));
+
+  // Add our main flag.
+  foreach ($entities as $id => $entity) {
+    $entity->crm_party_main = (bool) $items[$id]['main'];
+  }
+  //dsm($entities);
+
+  return $entities;
+
+  /*
+  $function= $sets[$set_type]['load callback'];
   if (function_exists($function)) {
     $result = call_user_func($function, $party, $set_type, $set_id);
   }
@@ -378,6 +402,7 @@ function crm_party_data_set_load($party, $set_type, $set_id) {
     return FALSE;
   }
   return $result;
+  */
 }
 
 /**
