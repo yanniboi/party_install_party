@@ -22,6 +22,7 @@ function crm_user_schema() {
  * Implements hook_install().
  */
 function crm_user_install() {
+  /*
   // Create a relation type
   $relation_type = array(
     'relation_type' => 'party_to_user',
@@ -35,4 +36,5 @@ function crm_user_install() {
 
   relation_type_save($relation_type);
   drupal_set_message("Party to User Relation Created");
+  */
 }

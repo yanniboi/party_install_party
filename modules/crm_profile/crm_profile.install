@@ -59,6 +59,8 @@ function crm_profile_install() {
     );
     drupal_write_record('crm_profile_null', $data);
     
+    /*
+    // @todo this section is obsolete.
     // Create a relation type.
     $relation_type = array(
       'relation_type' => 'party_to_profile2_' . $type_name,
@@ -92,5 +94,6 @@ function crm_profile_install() {
     foreach ($parties as $party) {
       _crm_party_profile_relate($party, $profile);
     }
+    */
   }
 }
