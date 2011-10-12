@@ -183,7 +183,82 @@ function crm_party_schema() {
       'type' => array('type'),
     ),
   );*/
+
+  // Declare relation tables, based on the data sets declared by
+  // hook_crm_party_data_set_info().
+  // This adds nothing at at install time, because we don't declare any data
+  // sets ourselves, and dependent modules aren't enabled yet.
+  // However, it ensures our declared database schema is consistent with the
+  // tables we create dynamically.
+  // We manage these tables ourselves so that we have control over the
+  // implementation and can seamlessly upgrade all the relation tables should
+  // it be necessary to change the schema in future versions.
+  // If this is invoked during uninstall, we need to load module files.
+  drupal_load('module', 'crm_party');
+  $sets = crm_party_get_data_set_info();
+
+  // Create a database schema from each set using our template.
+  foreach ($sets as $key => $set) {
+    $schema += crm_party_data_set_schema_template($key);
+  }
+
   return $schema;
+}
+
+/**
+ * Implements hook_modules_installed().
+ *
+ * When a newly installed module provides CRM party data sets, create the
+ * corresponding tables.
+ *
+ * Despite a lack of documentation, comment module seems to confirm this hook
+ * goes in the install file. Bug in Drupal core! http://drupal.org/node/633332
+ */
+function crm_party_modules_installed($modules) {
+  // Get the data sets declared by the modules being installed.
+  $sets = array();
+  foreach ($modules as $module) {
+    if (module_hook($module, 'party_data_set_info')) {
+      $sets += module_invoke($module, 'party_data_set_info');
+    }
+  }
+
+  foreach ($sets as $set_name => $set) {
+    $schema = crm_party_data_set_schema_template($set_name);
+    // This is ugly as it's always a singleton array.
+    // @todo clean this up with a helper function that gets all the schemas
+    // for a list of sets?
+    foreach ($schema as $name => $table) {
+      db_create_table($name, $table);
+    }
+  }
+}
+
+/**
+ * Implements hook_modules_uninstalled().
+ *
+ * Drop the tables created for relations for the data sets provided by
+ * modules being uninstalled.
+ */
+function crm_party_modules_uninstalled($modules) {
+  $sets = array();
+  foreach ($modules as $module) {
+    // During uninstall we need to load module files.
+    drupal_load('module', $module);
+    if (module_hook($module, 'party_data_set_info')) {
+      $sets += module_invoke($module, 'party_data_set_info');
+    }
+  }
+
+  foreach ($sets as $set_name => $set) {
+    $schema = crm_party_data_set_schema_template($set_name);
+    // This is ugly as it's always a singleton array.
+    foreach ($schema as $name => $table) {
+      // And we don't need the schema for this, but keeping it symmetric
+      // offers hope of future refactoring ;)
+      db_drop_table($name);
+    }
+  }
 }
 
 /**
