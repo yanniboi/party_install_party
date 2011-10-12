@@ -143,8 +143,8 @@ function crm_party_schema() {
   $sets = crm_party_get_data_set_info();
 
   // Create a database schema from each set using our template.
-  foreach ($sets as $key => $set) {
-    $schema += crm_party_data_set_schema_template($key);
+  foreach ($sets as $set_name => $set) {
+    $schema += crm_party_data_set_schema_template($set_name);
   }
 
   return $schema;
