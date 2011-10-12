@@ -4,4 +4,3 @@ package = CRM
 core = 7.x
 
 dependencies[] = crm_party
-dependencies[] = relation
