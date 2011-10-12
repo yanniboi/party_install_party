@@ -33,6 +33,10 @@ function crm_party_entity_info() {
     'label' => t('Party'),
     'entity class' => 'CRMParty',
     'controller class' => 'CRMPartyController',
+    // We define this so entity module provides us with basic Views data, while
+    // allowing us to define more of our own.
+    // See http://drupal.org/node/1307760.
+    'views controller class' => 'EntityDefaultViewsController',
     'base table' => 'crm_party',
     //'uri callback' => 'crm_party_uri',
     'fieldable' => TRUE,
