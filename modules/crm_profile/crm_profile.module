@@ -55,14 +55,14 @@ function crm_profile_crm_party_data_set_info() {
  * Add a data set relation table when a new profile2 type is created.
  */
 function crm_profile_profile2_type_insert($type) {
-  crm_party_data_set_type_add($type->type);
+  crm_party_data_set_type_add("profile2_" . $type->type);
 }
 
 /**
  * Implements hook_profile2_type_delete().
  */
 function crm_profile_profile2_type_delete($type) {
-  crm_party_data_set_type_remove($type->type);
+  crm_party_data_set_type_remove("profile2_" . $type->type);
 }
 
 
