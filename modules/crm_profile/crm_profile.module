@@ -55,7 +55,7 @@ function crm_profile_crm_party_data_set_info() {
  * Add a data set relation table when a new profile2 type is created.
  */
 function crm_profile_profile2_type_insert($type) {
-  crm_party_data_set_type_add($type);
+  crm_party_data_set_type_add($type->type);
 }
 
 /**
