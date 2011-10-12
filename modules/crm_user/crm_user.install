@@ -6,19 +6,6 @@
  */
 
 /**
- * Implements hook_schema().
- */
-function crm_user_schema() {
-  $schema = array();
-
-  // Get the schema array for our data set relation table.
-  module_load_install('crm_party');
-  $schema += crm_party_data_set_schema_template('user');
-
-  return $schema;
-}
-
-/**
  * Implements hook_install().
  */
 function crm_user_install() {
