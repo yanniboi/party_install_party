@@ -233,14 +233,16 @@ function crm_party_menu() {
   return $items;
 }
 
+// -----------------------------------------------------------------------
+// API for getting and changing data sets.
+
 /**
  * Get all data sets.
  *
- * @todo: Can we cache this? Especially to avoid adding database tables
+ * @todo: cache this, either in the DB or using DrupalCacheArray.
  */
 function crm_party_get_data_set_info() {
   $sets = module_invoke_all('crm_party_data_set_info');
-
   return $sets;
 }
 
@@ -252,6 +254,8 @@ function crm_party_get_data_set_info() {
  * add data sets. They should be declared in hook_crm_party_data_set_info()
  * in all cases.
  *
+ * @see hook_crm_party_data_set_info().
+ *
  * @param $set_name
  *  The machine name of the data set.
  */
@@ -261,7 +265,6 @@ function crm_party_data_set_type_add($set_name) {
   // This is ugly as it's always a singleton array.
   // @todo clean this up with a helper function that gets all the schemas
   // for a list of sets?
-  dsm($schema);
   foreach ($schema as $name => $table) {
     db_create_table($name, $table);
   }
@@ -269,6 +272,9 @@ function crm_party_data_set_type_add($set_name) {
 
 /**
  * Remove a Party data set.
+ *
+ * @see hook_crm_party_data_set_info().
+ * @see crm_party_data_set_type_add().
  */
 function crm_party_data_set_type_remove($set_name) {
   module_load_install('crm_party');
