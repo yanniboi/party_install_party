@@ -163,8 +163,8 @@ function crm_party_modules_installed($modules) {
   // Get the data sets declared by the modules being installed.
   $sets = array();
   foreach ($modules as $module) {
-    if (module_hook($module, 'party_data_set_info')) {
-      $sets += module_invoke($module, 'party_data_set_info');
+    if (module_hook($module, 'crm_party_data_set_info')) {
+      $sets += module_invoke($module, 'crm_party_data_set_info');
     }
   }
 
@@ -190,8 +190,8 @@ function crm_party_modules_uninstalled($modules) {
   foreach ($modules as $module) {
     // During uninstall we need to load module files.
     drupal_load('module', $module);
-    if (module_hook($module, 'party_data_set_info')) {
-      $sets += module_invoke($module, 'party_data_set_info');
+    if (module_hook($module, 'crm_party_data_set_info')) {
+      $sets += module_invoke($module, 'crm_party_data_set_info');
     }
   }
 
