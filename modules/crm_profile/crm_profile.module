@@ -36,10 +36,17 @@ function crm_profile_menu() {
  * Implements hook_crm_party_data_set_info().
  */
 function crm_profile_crm_party_data_set_info() {
+  // Because this hook is invoked from hook_schema(), bad things happen if
+  // we use profile2_get_types(). Hence just grab the type names directly
+  // as that is all we need.
+  // See http://drupal.org/node/1307506 for more details.
+  $result = db_query("SELECT type, label FROM {profile_type}");
+  $types = $result->fetchAllKeyed();
+
   $sets = array();
-  foreach (profile2_get_types() as $type => $info) {
+  foreach ($types as $type => $label) {
     $sets["profile2_" . $type] = array(
-      'label' => $info->label,
+      'label' => $label,
       'load callback' => "crm_profile_load_profile",
       'load arguments' => array($type),
       'form callback' => "crm_profile_form",

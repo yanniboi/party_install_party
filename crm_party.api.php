@@ -11,7 +11,11 @@
  */
  
 /**
- * Defines data sets to be used by parties
+ * Defines data sets to be used by parties.
+ *
+ * Beware of making entity queries from within this hook, as this is called from
+ * within crm_party's hook_schema().
+ * See http://drupal.org/node/1307506 for background.
  *
  * @return
  *  And array of sets (similar to hook_menu()) where each key is the unique
