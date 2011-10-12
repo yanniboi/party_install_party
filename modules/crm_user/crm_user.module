@@ -11,6 +11,7 @@
 function crm_user_crm_party_data_set_info() {
   $sets['user'] = array(
     'label' => t("User account"),
+    'entity type' => 'user',
     'singleton' => TRUE,
     'load callback' => "crm_user_load_user",
     'form callback' => "crm_user_form_user",

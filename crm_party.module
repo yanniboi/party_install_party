@@ -263,6 +263,7 @@ function crm_party_get_data_set_info() {
         // be messing with a schema, and crm_party_modules_uninstalled()
         // doesn't want to call this.
         'table'  => 'crm_party_set_' . $set_name,
+        'singleton' => FALSE,
       );
       $sets[$set_name] = $set;
     }

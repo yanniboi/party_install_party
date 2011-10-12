@@ -18,21 +18,29 @@
  * See http://drupal.org/node/1307506 for background.
  *
  * @return
- *  And array of sets (similar to hook_menu()) where each key is the unique
- *  identifier of that "set type".
- *   - "label" the human readable name of the data set
- *   - "load callback" the name of the load function. This always gets given the $party object, set_type and set_id
- *   - "load callback arguements" any extra args to supply to the load callback //needed?!
- *   - "form callback" the name of the form function. This function should return a set of form fields (but not 
- *       the submit button). It gets $party, $set_type, $set_id, $form and $form_state.
- *   - "module" the name of the module implementing this data set
+ *  An array of sets where each key is the unique identifier of that "set type".
+ *  - 'label': The human readable name of the data set.
+ *  - 'entity type': The entity type this data set relates to parties.
+ *  - 'singleton': (optional) Whether this set's relationships only have one
+ *    entity relating to a party. Default: FALSE.
+ *  - 'load callback': The name of the load function. This always gets given
+ *    the $party object, set_type, and set_id.
+ *  - 'load callback arguments': Any extra args to supply to the load callback
+ *    //needed?!
+ *  - 'form callback': The name of the form function. This function should
+ *    return a set of form fields (but not the submit button).
+ *    It gets $party, $set_type, $set_id, $form and $form_state.
+ *  - 'module': (optional) The name of the module implementing this data set.
+ *    This will be filled in automatically if not supplied.
  */
 function hook_crm_party_data_set_info() {
   $sets = array();
   
-  //A user data set.
+  // A user data set.
   $sets['user'] = array(
-    'label' => "User Account",
+    'label' => t("User account"),
+    'entity type' => 'user',
+    'singleton' => TRUE,
     'load callback' => "crm_user_load_user",
     'form callback' => "crm_user_form_user",
   );
