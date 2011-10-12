@@ -237,12 +237,36 @@ function crm_party_menu() {
 // API for getting and changing data sets.
 
 /**
- * Get all data sets.
+ * Get all data sets from hook_crm_party_data_set_info().
  *
  * @todo: cache this, either in the DB or using DrupalCacheArray.
+ *
+ * @return
+ *  An array of data sets, keyed by set name. Each set is an array whose keys
+ *  are as returned by hookcrm_party_data_set_info(), with in addition:
+ *  - 'module': The module defining this set.
+ *  - 'table': The table in which this set's data is stored.
  */
 function crm_party_get_data_set_info() {
-  $sets = module_invoke_all('crm_party_data_set_info');
+  // Due to http://drupal.org/node/890660 we can't use module_invoke_all()
+  // because we need to know the provenance of each set.
+  $sets = array();
+  foreach (module_implements('crm_party_data_set_info') as $module) {
+    $sets_module = module_invoke($module, 'crm_party_data_set_info');
+    foreach ($sets_module as $set_name => $set) {
+      // Add in some essential data we need, but allow modules to set this too.
+      $set += array(
+        'module' => $module,
+        // It would be nice to make either crm_party_data_set_schema_template()
+        // or this function the single canonical place in which the table name
+        // is derived from the set name. But hook_views_data() doesn't want to
+        // be messing with a schema, and crm_party_modules_uninstalled()
+        // doesn't want to call this.
+        'table'  => 'crm_party_set_' . $set_name,
+      );
+      $sets[$set_name] = $set;
+    }
+  }
   return $sets;
 }
 
