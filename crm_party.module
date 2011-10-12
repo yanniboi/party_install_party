@@ -240,32 +240,38 @@ function crm_party_menu() {
  */
 function crm_party_get_data_set_info() {
   $sets = module_invoke_all('crm_party_data_set_info');
-  dsm($sets);
-
-  //this should probably go somewhere else but I can't think where
-  foreach ($sets as $type => $set) {
-    if (!db_table_exists('crm_party_data_set_' . $type)) {
-      crm_party_data_set_type_add($type);
-    }
-  }
 
   return $sets;
 }
 
 /**
- * Add a new data set type to the system
+ * Add a new Party data set.
  *
- * This adds a table to the database to handle parties relationships to data sets
+ * This adds a table to the database to handle relationships from parties to
+ * data sets. This should only be called by modules that need to dynamically
+ * add data sets. They should be declared in hook_crm_party_data_set_info()
+ * in all cases.
  *
- * @param $set_type the machine name of the type
- *
- * @todo Make this use a hook to load the schema
+ * @param $set_name
+ *  The machine name of the data set.
  */
-function crm_party_data_set_type_add($set_type) {
+function crm_party_data_set_type_add($set_name) {
   module_load_install('crm_party');
+  $schema = crm_party_data_set_schema_template($set_name);
+  // This is ugly as it's always a singleton array.
+  // @todo clean this up with a helper function that gets all the schemas
+  // for a list of sets?
+  dsm($schema);
+  foreach ($schema as $name => $table) {
+    db_create_table($name, $table);
+  }
+}
 
-  $schema = crm_party_party_data_set_schema();
-  db_create_table('crm_party_data_set_'.$set_type);
+/**
+ * Remove a Party data set.
+ */
+function crm_party_data_set_type_remove($set_name) {
+  // @todo: write me!
 }
 
 /**
