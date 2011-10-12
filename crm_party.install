@@ -4,61 +4,6 @@
  * @file
  * Contains install hooks for the CRM party module.
  */
- 
-/**
- * Implements hook_party_data_set_schema().
- *
- * @todo Make this a hook.
- */
-function crm_party_party_data_set_schema() {
-  return array(
-    'description' => 'This links parties to data sets of type '.$set_type,
-    'fields' => array(
-      'psid' => array(
-        'description' => 'The unique ID for this relationship.',
-        'type' => 'serial',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ),
-      'pid' => array(
-        'description' => 'The id of the party',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ),
-      'sid' => array(
-        'description' => 'The id of the set',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ),
-      'main' => array(
-        'description' => 'Is this the main set',
-        'type' => 'int',
-        'not null' => true,
-        'default' => 0,
-      ),
-      'hat_main' => array(
-        'description' => 'Is this the main set for this hat',
-        'type' => 'int',
-        'not null' => true,
-        'default' => 0,
-      ),
-      'hat' => array(
-        'description' => 'What hat is this associated with',
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => true,
-        'default' => 'all',
-      ),
-    ),
-    'indexes' => array(
-      'party' => array('pid'),
-      'set_id' => array('sid'),
-    ),
-    'primary key' => array('psid'),
-  );
-} 
 
 /**
  * Implements hook_schema().
