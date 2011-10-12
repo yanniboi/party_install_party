@@ -8,6 +8,7 @@ files[] = crm_party.pages.inc
 files[] = crm_party.admin.inc
 files[] = includes/crm_party.views.inc
 files[] = includes/crm_party_plugin_display_party_piece.inc
+files[] = includes/crm_party_handler_relationship_crm_party_set_eid.inc
 
 dependencies[] = entity
 dependencies[] = ctools

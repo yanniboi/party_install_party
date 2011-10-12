@@ -59,6 +59,8 @@ function crm_party_views_data() {
       ),
     );
 
+    // The eid field provides a relationship to the base table for the entity
+    // involved in this data set.
     $data[$table]['eid'] = array(
       // @todo: give the entity type here as well as the set name?
       'title' => $set['label'],
@@ -67,7 +69,7 @@ function crm_party_views_data() {
         'label' => $set['label'],
         'base' => $entity_right_join_info['base table'],
         'base field' => $entity_right_join_info['entity keys']['id'],
-        'handler' => 'views_handler_relationship',
+        'handler' => 'crm_party_handler_relationship_crm_party_set_eid',
         // This allows us to not show this relationship if the base is already
         // the right hand side so users won't create circular relationships.
         'skip base' => array($entity_right_join_info['base table']),
