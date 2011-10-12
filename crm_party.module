@@ -271,7 +271,14 @@ function crm_party_data_set_type_add($set_name) {
  * Remove a Party data set.
  */
 function crm_party_data_set_type_remove($set_name) {
-  // @todo: write me!
+  module_load_install('crm_party');
+  $schema = crm_party_data_set_schema_template($set_name);
+  // This is ugly as it's always a singleton array.
+  // @todo clean this up with a helper function that gets all the schemas
+  // for a list of sets?
+  foreach ($schema as $name => $table) {
+    db_drop_table($name);
+  }
 }
 
 /**

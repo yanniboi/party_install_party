@@ -59,6 +59,14 @@ function crm_profile_profile2_type_insert($type) {
 }
 
 /**
+ * Implements hook_profile2_type_delete().
+ */
+function crm_profile_profile2_type_delete($type) {
+  crm_party_data_set_type_remove($type->type);
+}
+
+
+/**
  * Load a profile
  */
 function crm_profile_load_profile($party, $set_type, $set_id, $type) {
