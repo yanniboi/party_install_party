@@ -141,8 +141,7 @@ function Xcrm_profile_preprocess_entity(&$vars) {
  * Alter Party forms to do things
  */
 function crm_profile_form_crm_party_edit_form_alter(&$form, &$form_state, $form_id) {
-  return;
-  
+  return; 
   // Make sure the uid is null. 
   $form['uid'] = array(
     '#type' => 'hidden',
@@ -177,7 +176,7 @@ function crm_profile_form_crm_party_edit_form_alter(&$form, &$form_state, $form_
 /**
  * Relate the profile2 entities to the crm_party in form_state
  */
-function Xcrm_profile_post_form_submit_relate($form, &$form_state) {
+function crm_profile_post_form_submit_relate($form, &$form_state) {
   $party = $form_state['crm_party'];
   $profiles = array();
   
@@ -195,7 +194,7 @@ function Xcrm_profile_post_form_submit_relate($form, &$form_state) {
   // Foreach profile2 in the form state add a binary relation linking it
   // to the party
   foreach ($profiles as $profile) {
-    _crm_party_profile_relate($party, $profile);
+    crm_party_relate($party, $profile, 'profile2_' . $profile->type);
   }
 }
 

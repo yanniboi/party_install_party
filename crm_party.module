@@ -462,6 +462,7 @@ function crm_party_relate($party, $entity, $data_set = NULL) {
   $class = $sets[$data_set]['class'];
   $dataSet = new $class($data_set, $entity);
   $dataSet->attach($party);
+  dsm($dataSet);
 }
 
 /**
