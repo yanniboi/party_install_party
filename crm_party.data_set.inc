@@ -17,7 +17,6 @@ abstract class CRMPartyDataSet {
    */
   const ENTITY_ID_KEY = "";
   
-  
   /**
    * var int $id
    *   A unique identifier for each data set instance
@@ -74,8 +73,14 @@ abstract class CRMPartyDataSet {
     // A "temporary" instance of the wrapper that gets saved when we attach
     // it.
     $this->type = $type;
-    $this->entity = $entity;
-    $this->eid = $entity->{$this->getEntityIdKey()};
+    
+    if(is_numeric($entity)) {
+      $this->eid = $entity;
+    }
+    else {
+      $this->entity = $entity;
+      $this->eid = $entity->{$this->getEntityIdKey()};
+    }
     
     // If the party is set we set the party and find the row in the data set table
     // to get the rest of the information
