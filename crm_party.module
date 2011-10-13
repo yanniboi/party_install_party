@@ -179,8 +179,7 @@ function crm_party_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  // Build the party view second-level tabs.
-  // @todo: Consider whether to put edit below this and these at first level.
+  // Build the party view first-level tabs.
   // @todo: Write a contrib module to turn a set of tabs into ajax tabs,
   // probably using or as part of quicktabs module.
   $pieces = crm_party_get_party_piece_info();
