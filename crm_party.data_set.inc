@@ -85,8 +85,14 @@ abstract class CRMPartyDataSet {
     // If the party is set we set the party and find the row in the data set table
     // to get the rest of the information
     if(isset($party)) {
-      $this->party = $party;
-      $this->pid = $party->pid;
+      if(is_numeric($party)) {
+        $this->pid = $party;
+        $this->party = entity_load('crm_party', $party);
+      }
+      else {
+        $this->party = $party;
+        $this->pid = $party->pid;
+      }
       
       $query = db_select($this->getTableName(), 'ds');
       $query->fields('ds');
