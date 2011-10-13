@@ -183,7 +183,7 @@ function crm_party_menu() {
   // @todo: Consider whether to put edit below this and these at first level.
   // @todo: Write a contrib module to turn a set of tabs into ajax tabs,
   // probably using or as part of quicktabs module.
-  $pieces = module_invoke_all('crm_party_party_pieces');
+  $pieces = crm_party_get_party_piece_info();
   foreach ($pieces as $path => $piece) {
     // Add in some defaults for convenience.
     // @todo: once these stabilize, document them in the API file.
@@ -237,6 +237,16 @@ function crm_party_menu() {
 
 // -----------------------------------------------------------------------
 // Party pieces: defining extra hook_menu() items according to data structure.
+
+/**
+ * Get all party piece definitions from hook_crm_party_party_pieces().
+ *
+ * @todo: Can we cache this?
+ */
+function crm_party_get_party_piece_info() {
+  $pieces = module_invoke_all('crm_party_party_pieces');
+  return $pieces;
+}
 
 /**
  * Implements hook_crm_party_party_pieces().
@@ -553,17 +563,6 @@ function crm_party_data_set_instance_attach($party, $set_type, $set_id, $main = 
  */
 function crm_party_data_set_instance_detach($party, $set_type, $set_id){
   return TRUE;
-}
-
-
-/**
- * Get all party piece definitions
- *
- * @todo: Can we cache this?
- */
-function crm_party_get_party_piece_info() {
-  $pieces = module_invoke_all('party_party_piece_info');
-  return $pieces;
 }
 
 /**
