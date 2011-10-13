@@ -33,6 +33,8 @@ function profile_page_add($party,$profile_type) {
  * The Party is the Party we will Redirect Back to.
  */ 
 function profile_edit_form($form, &$form_state, $profile, $party) {
+  // @todo: don't stash things in the form state; put them either
+  // in the form as hash properties or values.
   $form_state['profiles'][$profile->type] = $profile;
   $form_state['party'] = $party;
   profile2_attach_form($form, $form_state);
@@ -45,7 +47,7 @@ function profile_edit_form($form, &$form_state, $profile, $party) {
   
   dsm($profile);
   
-  if(!isset($profile->pid)) {
+  if (!isset($profile->pid)) {
     $form['#submit'][] = "profile_add_form_submit";
   }
   
@@ -59,19 +61,18 @@ function profile_edit_form($form, &$form_state, $profile, $party) {
  * Currently this just sets the redirect.
  */
 function profile_edit_form_submit($form, &$form_state) {
-  $form_state['redirect'] = 'party/'.$form_state['party']->pid;
+  $form_state['redirect'] = 'party/' . $form_state['party']->pid;
 }
 
 /**
- * Add a new profile to the party
- *
+ * Add a new profile to the party.
  */
 function profile_add_form_submit($form, &$form_state) {
-  //relate the party to the new profile
+  // Relate the party to the new profile
   $party = $form_state['party'];
   
   foreach($form_state['profiles'] as $type => $profile) {
-    _crm_party_profile_relate($party, $profile);
+    crm_party_relate($party, $profile, 'profile2', "profile2_" . $type);
   }
   
   //TODO: break the relation to the null profile for this type.
