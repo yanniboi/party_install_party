@@ -236,6 +236,66 @@ function crm_party_menu() {
 }
 
 // -----------------------------------------------------------------------
+// Party pieces: defining extra hook_menu() items according to data structure.
+
+/**
+ * Implements hook_crm_party_party_pieces().
+ *
+ * Defines:
+ *  - the basic piece for showing a party itself
+ *  - pieces that data sets provide
+ *  - pieces provided by Views as display plugins.
+ */
+function crm_party_crm_party_party_pieces() {
+  $pieces = array(
+    'party' => array(
+      'title' => 'Party',
+      'page callback' => 'crm_party_page_view',
+      'page arguments' => array(1),
+      'file' => 'crm_party.pages.inc',
+      'access arguments' => array('view contacts'),
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+      'weight' => -10,
+    ),
+  );
+
+  // Party data sets may provide a piece each.
+  $sets = crm_party_get_data_set_info();
+  foreach ($sets as $set_name => $set) {
+    if (isset($set['piece'])) {
+      $path = $set['piece']['path'];
+      unset($set['piece']['path']);
+      $pieces[$path] = $set['piece'];
+    }
+  }
+
+  // Custom pieces can be created as Views plugins.
+  if (module_exists('views')) {
+    // Get all views displays that implement our hook.
+    // There's no need to cache: views_menu() doesn't cache for page displays.
+    $views = views_get_all_views();
+    foreach ($views as $view) {
+      // Disabled views get nothing.
+      if (!empty($view->disabled)) {
+        continue;
+      }
+
+      $view->init_display();
+      foreach ($view->display as $display_id => $display) {
+        if (isset($display->handler) && !empty($display->handler->definition['uses hook crm_party_party_pieces'])) {
+          $result = $display->handler->execute_hook_crm_party_party_pieces();
+          if (is_array($result)) {
+            $pieces = array_merge($pieces, $result);
+          }
+        }
+      }
+    }
+  }
+
+  return $pieces;
+}
+
+// -----------------------------------------------------------------------
 // API for getting and changing data sets.
 
 /**
@@ -633,64 +693,6 @@ function crm_party_party_piece_display_children($party, $instance) {
  */
 function crm_party_party_piece_tab_display($party, $instance, $title, $arguments) {
   return array();
-}
-
-
-/**
- * Implements hook_crm_party_party_pieces().
- *
- * Defines:
- *  - the basic piece for showing a party itself
- *  - pieces that data sets provide
- *  - pieces provided by Views as display plugins.
- */
-function crm_party_crm_party_party_pieces() {
-  $pieces = array(
-    'party' => array(
-      'title' => 'Party',
-      'page callback' => 'crm_party_page_view',
-      'page arguments' => array(1),
-      'file' => 'crm_party.pages.inc',
-      'access arguments' => array('view contacts'),
-      'type' => MENU_DEFAULT_LOCAL_TASK,
-      'weight' => -10,
-    ),
-  );
-
-  // Party data sets may provide a piece each.
-  $sets = crm_party_get_data_set_info();
-  foreach ($sets as $set_name => $set) {
-    if (isset($set['piece'])) {
-      $path = $set['piece']['path'];
-      unset($set['piece']['path']);
-      $pieces[$path] = $set['piece'];
-    }
-  }
-
-  // Custom pieces can be created as Views plugins.
-  if (module_exists('views')) {
-    // Get all views displays that implement our hook.
-    // There's no need to cache: views_menu() doesn't cache for page displays.
-    $views = views_get_all_views();
-    foreach ($views as $view) {
-      // Disabled views get nothing.
-      if (!empty($view->disabled)) {
-        continue;
-      }
-
-      $view->init_display();
-      foreach ($view->display as $display_id => $display) {
-        if (isset($display->handler) && !empty($display->handler->definition['uses hook crm_party_party_pieces'])) {
-          $result = $display->handler->execute_hook_crm_party_party_pieces();
-          if (is_array($result)) {
-            $pieces = array_merge($pieces, $result);
-          }
-        }
-      }
-    }
-  }
-
-  return $pieces;
 }
 
 /**
