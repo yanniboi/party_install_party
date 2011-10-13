@@ -83,7 +83,7 @@ abstract class CRMPartyDataSet {
       $this->party = $party;
       $this->pid = $party->pid;
       
-      $query = db_select('crm_party_set_' . $type, 'ds');
+      $query = db_select($this->getTableName(), 'ds');
       $query->fields('ds');
       $query->condition('pid', $this->pid, '=');
       $query->condition('eid', $this->eid, '=');
@@ -139,11 +139,9 @@ abstract class CRMPartyDataSet {
       'hat_main' => FALSE,
     );
 
-    $table = 'crm_party_set_' . $this->type;
-
     // @todo: figure out when to insert and when to update! we probably need
     // an extra parameter for this. #fail :(
-    drupal_write_record($table, $relation);
+    drupal_write_record($this->getTableName(), $relation);
   }
   
   /**
@@ -151,7 +149,13 @@ abstract class CRMPartyDataSet {
    *   detach this data from the party
    */
   public function detach() {
-  
+    db_delete($this->getTableName())
+    ->condition('peid', $this->id)
+    ->execute();
+    
+    //now treat this as a "temporary data set" by unsetting the party end
+    unset($this->party);
+    unset($this->pid);
   }
   
   /**
@@ -204,5 +208,12 @@ abstract class CRMPartyDataSet {
   private function getEntityIdKey() {
     $c = get_called_class();
     return $c::ENTITY_ID_KEY;
+  }
+  
+  /**
+   * getTable
+   */
+  private function getTableName() {
+    return 'crm_party_set_' . $this->type;
   }
 }
