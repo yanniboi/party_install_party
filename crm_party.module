@@ -627,20 +627,6 @@ function crm_party_party_piece_display_children($party, $instance) {
 }
 
 /**
- * Implements hook_party_part_piece_info().
- */
-function crm_party_party_party_piece_info() {
-  $pieces = array();
-  // Define tabs
-  $pieces['tab'] = array(
-    'label' => 'Party Tab',
-    'display callback' => 'crm_party_party_piece_tab_display',
-    'nesting' => true,
-  );
-  return $pieces;
-}
-
-/**
  * Display a tab
  *
  * @todo Implement. Use crm_party_party_piece_display_children() to get hte children of the tab.
