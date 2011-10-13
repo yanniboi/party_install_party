@@ -105,7 +105,7 @@ function profile_add_form_submit($form, &$form_state) {
   $party = $form_state['party'];
   
   foreach($form_state['profiles'] as $type => $profile) {
-    crm_party_relate($party, $profile, 'profile2', "profile2_" . $type);
+    crm_party_relate($party, $profile, "profile2_" . $type);
   }
   
   //TODO: break the relation to the null profile for this type.
