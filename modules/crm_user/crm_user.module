@@ -116,32 +116,3 @@ function crm_user_post_form_submit_relate($form, &$form_state) {
     }
   }
 }
-
-/**
- * Relate a party entity to a user entity.
- *
- * @todo obsolete!
- *
- * @param $party
- *   A fully loaded party object, from crm_party_load(). Whats important is that the pid is correct.
- * @param $user
- *   A user object from user_load();
- */
-function _crm_party_user_relate($party, $account) {
-  $endpoints = array();
-  $endpoints[] = array(
-    'entity_type' => 'crm_party',
-    'entity_id' => $party->pid,
-  );
-  $endpoints[] = array(
-    'entity_type' => 'user',
-    'entity_id' => $account->uid,
-  );
-  
-  //create a relation for each party profile2 which is created.
-  $relation = relation_create('party_to_user', $endpoints);
-  $rid = relation_save($relation);
-  
-  //set some nice messages - change
-  drupal_set_message('Party: ' . $party->label . ' has been related to User: ' . $account->name);
-}
