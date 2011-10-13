@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Default theme implementation for profiles.
+ * Theme implementation for profiles shown within a party.
  *
  * Available variables:
  * - $content: An array of comment items. Use render($content) to print them all, or
@@ -30,14 +30,14 @@
 ?>
 <div class="<?php print $classes; ?> clearfix"<?php print $attributes; ?>>
   <div class="content"<?php print $content_attributes; ?>>
-    <?php if($profile2->is_null): ?>
+    <?php if ($profile2->is_null): ?>
       This is a null profile.
     <?php else: ?>  
       <?php
         print render($content);
       ?>
       <div class="crm_profile_ops" style="float: right;">
-        <?php print l("Edit", 'profile/'.$profile2->pid.'/edit'); ?>
+        <?php print l("Edit", 'profile/' . $profile2->pid . '/edit'); ?>
       </div>
     <?php endif; ?>
   </div>

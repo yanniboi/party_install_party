@@ -120,18 +120,19 @@ function crm_profile_form(&$form, &$form_state, $party, $set_type, $set_id, $typ
  */
 function crm_profile_entity_info_alter(&$entity_info) {
   $entity_info['profile2']['view modes']['party'] = array(
-    'label' => t('Party Display'),
-    'custom settings' => false,
+    'label' => t('Party display'),
+    'custom settings' => FALSE,
   );
 }
 
 /**
- * Implements hook_preprocess_HOOK()
+ * Implements hook_preprocess_HOOK().
  * 
- * Lets add a new tpl for party display
+ * Add our own template for party display.
  */
-  //Add a new profile view tpl.
 function crm_profile_preprocess_entity(&$vars) {
+  // Add a new profile view tpl.
+  // @todo This would be better off as a new feature in Profile2 module.
   if ($vars['view_mode'] == 'party') {
     $vars['theme_hook_suggestions'][] = 'profile2__all__party';
   }
@@ -448,8 +449,7 @@ function crm_profile_theme($existing, $type, $theme, $path) {
 /**
  * Profile2DataSet
  */
-class Profile2DataSet extends CRMPartyDataSet 
-{
+class Profile2DataSet extends CRMPartyDataSet {
   const ENTITY_TYPE = "profile2";
   const ENTITY_ID_KEY = "pid";
 }
