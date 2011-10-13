@@ -39,6 +39,8 @@ function crm_party_views_plugins() {
  * we set our entity's 'views controller class' in hook_entity_info().
  */
 function crm_party_views_data() {
+  $data = array();
+
   // Get all defined data sets.
   $sets = crm_party_get_data_set_info();
   // Get entity info so we can look up tables, field names, etc.
