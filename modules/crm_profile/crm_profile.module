@@ -130,8 +130,8 @@ function crm_profile_entity_info_alter(&$entity_info) {
  * 
  * Lets add a new tpl for party display
  */
-function Xcrm_profile_preprocess_entity(&$vars) {
   //Add a new profile view tpl.
+function crm_profile_preprocess_entity(&$vars) {
   if ($vars['view_mode'] == 'party') {
     $vars['theme_hook_suggestions'][] = 'profile2__all__party';
   }
@@ -431,6 +431,18 @@ function _crm_profile_relation_get_related_entities($entity_type, $entity_id, $r
     }
   }
   return $relations;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function crm_profile_theme($existing, $type, $theme, $path) {
+  return array(
+    'profile2__all__party' => array(
+      'render element' => 'elements',
+      'template' => 'profile2--all--party',
+    ),
+  );
 }
 
 /**
