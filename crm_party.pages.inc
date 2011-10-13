@@ -73,7 +73,7 @@ function crm_party_edit_form($form, &$form_state, $party) {
       '#value' => $party->pid,
     );
 
-    drupal_set_title("Edit ".$party->label);
+    drupal_set_title("Edit " . $party->label);
   }
 
   $form['type'] = array(
