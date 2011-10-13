@@ -230,3 +230,87 @@ function crm_party_settings_label_plugin_form_submit($form, &$form_state) {
   //dsm($form_state['values']);
   variable_set('crm_party_name_label_plugin', $form_state['values']['label']);
 }
+
+/**
+ * Settings form for ordering the party pieces.
+ */
+function crm_party_settings_pieces_order_form($form, &$form_state) {
+  // Get the pieces. These come in with the stored weight setting already.
+  $pieces = crm_party_get_party_piece_info();
+
+  $form['#tree'] = TRUE;
+  foreach ($pieces as $path => $piece) {
+    $form['pieces'][$path]['name'] = array('#markup' => check_plain($piece['title']));
+    $form['pieces'][$path]['weight'] = array(
+      '#type' => 'weight',
+      '#title' => t('Weight for @title', array('@title' => $piece['title'])),
+      '#title_display' => 'invisible',
+      '#delta' => 10,
+      '#default_value' => isset($piece['weight']) ? $piece['weight'] : 0,
+    );
+  }
+
+  // Only make this form include a submit button and weight if more than one
+  // piece exists.
+  if (count($pieces) > 1) {
+    $form['actions'] = array('#type' => 'actions');
+    $form['actions']['submit'] = array('#type' => 'submit', '#value' => t('Save'));
+  }
+  elseif (isset($piece)) {
+    unset($form['pieces'][$path]['weight']);
+  }
+
+  return $form;
+}
+
+/**
+ * Returns HTML for the vocabulary overview form as a sortable list of vocabularies.
+ *
+ * @param $variables
+ *   An associative array containing:
+ *   - form: A render element representing the form.
+ *
+ * @see taxonomy_overview_vocabularies()
+ * @ingroup themeable
+ */
+function theme_crm_party_settings_pieces_order_form($variables) {
+  $form = $variables['form'];
+
+  $rows = array();
+
+  foreach (element_children($form['pieces']) as $key) {
+    $piece = &$form['pieces'][$key];
+
+    $row = array();
+    $row[] = drupal_render($piece['name']);
+    if (isset($piece['weight'])) {
+      $piece['weight']['#attributes']['class'] = array('piece-weight');
+      $row[] = drupal_render($piece['weight']);
+    }
+    $rows[] = array('data' => $row, 'class' => array('draggable'));
+  }
+
+  $header = array(t('Piece label'));
+  if (isset($form['actions'])) {
+    $header[] = t('Weight');
+    drupal_add_tabledrag('crm-party-pieces-order', 'order', 'sibling', 'piece-weight');
+  }
+  return theme('table', array(
+    'header' => $header,
+    'rows' => $rows,
+    'attributes' => array('id' => 'crm-party-pieces-order'))
+  ) . drupal_render_children($form);
+}
+
+/**
+ * Submit handler for the party pieces order form.
+ */
+function crm_party_settings_pieces_order_form_submit($form, &$form_state) {
+  $settings = array();
+  foreach (array_keys($form_state['values']['pieces']) as $path) {
+    $settings[$path] = $form_state['values']['pieces'][$path]['weight'];
+  }
+
+  variable_set('crm_party_name_pieces_weights', $settings);
+  menu_rebuild();
+}
