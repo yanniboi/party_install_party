@@ -27,12 +27,6 @@ function crm_party_page_view($party, $view_mode = 'full') {
   return $build;
 }
 
-/**
- * Page title callback for party view page.
- */
-function crm_party_page_title($party) {
-  return $party->label;
-}
 
 /**
  * Page title callback for party edit page.
