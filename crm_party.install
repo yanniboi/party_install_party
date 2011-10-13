@@ -168,43 +168,13 @@ function crm_party_modules_installed($modules) {
     }
   }
 
+  drupal_load('module', 'crm_party');
   foreach ($sets as $set_name => $set) {
-    $schema = crm_party_data_set_schema_template($set_name);
-    // This is ugly as it's always a singleton array.
-    // @todo clean this up with a helper function that gets all the schemas
-    // for a list of sets?
-    foreach ($schema as $name => $table) {
-      db_create_table($name, $table);
-    }
+    crm_party_data_set_type_add($set_name);
   }
 }
 
-/**
- * Implements hook_modules_uninstalled().
- *
- * Drop the tables created for relations for the data sets provided by
- * modules being uninstalled.
- */
-function crm_party_modules_uninstalled($modules) {
-  $sets = array();
-  foreach ($modules as $module) {
-    // During uninstall we need to load module files.
-    drupal_load('module', $module);
-    if (module_hook($module, 'crm_party_data_set_info')) {
-      $sets += module_invoke($module, 'crm_party_data_set_info');
-    }
-  }
-
-  foreach ($sets as $set_name => $set) {
-    $schema = crm_party_data_set_schema_template($set_name);
-    // This is ugly as it's always a singleton array.
-    foreach ($schema as $name => $table) {
-      // And we don't need the schema for this, but keeping it symmetric
-      // offers hope of future refactoring ;)
-      db_drop_table($name);
-    }
-  }
-}
+// Note that hook_modules_uninstalled() has to be in the module file.
 
 /**
  * Helper function to provide a database schema for party set relation tables.

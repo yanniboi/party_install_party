@@ -57,8 +57,8 @@ function crm_profile_crm_party_data_set_info() {
       'piece' => array(
         'path' => 'profile-' . str_replace('_', '-', $type),
         'title' => $label,
-        'page callback' => 'crm_user_party_view_user', // @todo: change this!
-        'page arguments' => array(1),
+        'page callback' => 'crm_profile_party_view_profile_set',
+        'page arguments' => array(1, $type),
         'access arguments' => array("view any $type profile"), // @todo: IMCTT.
       ),
     );
@@ -128,7 +128,7 @@ function crm_profile_entity_info_alter(&$entity_info) {
  * 
  * Lets add a new tpl for party display
  */
-function crm_profile_preprocess_entity(&$vars) {
+function Xcrm_profile_preprocess_entity(&$vars) {
   //Add a new profile view tpl.
   if ($vars['view_mode'] == 'party') {
     $vars['theme_hook_suggestions'][] = 'profile2__all__party';
@@ -141,6 +141,8 @@ function crm_profile_preprocess_entity(&$vars) {
  * Alter Party forms to do things
  */
 function crm_profile_form_crm_party_edit_form_alter(&$form, &$form_state, $form_id) {
+  return;
+  
   // Make sure the uid is null. 
   $form['uid'] = array(
     '#type' => 'hidden',
@@ -175,7 +177,7 @@ function crm_profile_form_crm_party_edit_form_alter(&$form, &$form_state, $form_
 /**
  * Relate the profile2 entities to the crm_party in form_state
  */
-function crm_profile_post_form_submit_relate($form, &$form_state) {
+function Xcrm_profile_post_form_submit_relate($form, &$form_state) {
   $party = $form_state['crm_party'];
   $profiles = array();
   
@@ -225,6 +227,39 @@ function _crm_party_profile_relate($party, $profile) {
 }
 
 /**
+ * Page callback for our data set-based party pieces.
+ */
+function crm_profile_party_view_profile_set($party, $profile_type) {
+  $build = array();
+
+  // Load the profiles in this data set.
+  $profiles = crm_party_data_set_load($party, "profile2_" . $profile_type);
+  dsm($profiles);
+
+  foreach ($profiles as $profile) {
+    if (profile2_access('view', $profile)) {
+      $profile->this_party = $party;
+
+      $build['profile_' . $profile->pid] = array(
+        '#type' => 'fieldset',
+        '#title' => $profile->label,
+      );
+      $build['profile_' . $profile->pid]['view'] = $profile->view('party');
+    }
+  }
+  // @todo: shouldn't have HTML markup here.
+  // @todo: make this with hook_menu_local_tasks_alter()?
+  $entity_info_profile = entity_get_info('profile2');
+  $label = $entity_info_profile['bundles'][$profile_type]['label'];
+  $build['profile_' . $profile_type . '_add']['#markup'] = "<div class=\"clearfix\">
+    <div class=\"crm_profile_ops\" style=\"float: right\">".l("Add " . $label, 'party/' . $party->pid . '/add/' . $profile_type)."
+      </div>
+    </div>";
+
+  return $build;
+}
+
+/**
  * Change the Party Details Page
  *
  * @todo: see crm_profile_crm_party_party_pieces() -- this function should
@@ -240,7 +275,11 @@ function _crm_party_profile_relate($party, $profile) {
  */
 function crm_profile_crm_party_page_view_alter($party) {
   $build = array();
+  // broken right now.
+  return;
+  
   $allProfiles = _crm_profile_load_by_party($party);
+  
   foreach ($allProfiles as $type => $profiles) {
     //as $profiles could be a list of profiles we need to standardise what we're dealing with.
     if (is_object($profiles)) {

@@ -418,6 +418,30 @@ function crm_party_data_set_type_remove($set_name) {
   }
 }
 
+/**
+ * Implements hook_modules_uninstalled().
+ *
+ * (Note this has to be in the module file not the install file.)
+ *
+ * Drop the tables created for relations for the data sets provided by
+ * modules being uninstalled.
+ */
+function crm_party_modules_uninstalled($modules) {
+  $sets = array();
+  foreach ($modules as $module) {
+    // During uninstall we need to load module files.
+    drupal_load('module', $module);
+    if (module_hook($module, 'crm_party_data_set_info')) {
+      $sets += module_invoke($module, 'crm_party_data_set_info');
+    }
+  }
+
+  drupal_load('module', 'crm_party');
+  foreach ($sets as $set_name => $set) {
+    crm_party_data_set_type_remove($set_name);
+  }
+}
+
 // -----------------------------------------------------------------------
 // API for relating and unrelating entities to a party.
 
