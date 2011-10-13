@@ -126,6 +126,14 @@ function crm_party_menu() {
     'access arguments' => array('administer crm settings'),
     'file' => 'crm_party.admin.inc',
   );
+  $items['admin/config/crm/piece-order'] = array(
+    'title' => 'Piece order',
+    'description' => 'Rearrange the order of pieces within a party.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('crm_party_settings_pieces_order_form'),
+    'access arguments' => array('administer crm settings'),
+    'file' => 'crm_party.admin.inc',
+  );
 
   $items['admin/community'] = array(
     'title' => 'Community',
@@ -183,7 +191,12 @@ function crm_party_menu() {
   // @todo: Write a contrib module to turn a set of tabs into ajax tabs,
   // probably using or as part of quicktabs module.
   $pieces = crm_party_get_party_piece_info();
+  // These come sorted by weight so we know which to make the default tab.
   foreach ($pieces as $path => $piece) {
+    if (!isset($seen_first_piece)) {
+      $seen_first_piece = TRUE;
+      $piece['type'] = MENU_DEFAULT_LOCAL_TASK;
+    }
     // Add in some defaults for convenience.
     // @todo: once these stabilize, document them in the API file.
     $piece += array(
@@ -240,10 +253,28 @@ function crm_party_menu() {
 /**
  * Get all party piece definitions from hook_crm_party_party_pieces().
  *
- * @todo: Can we cache this?
+ * This is only used by hook_menu() and an admin page so no need to cache.
+ *
+ * @return
+ *  An array of party pieces, keyed by path and sorted by weight.
  */
 function crm_party_get_party_piece_info() {
   $pieces = module_invoke_all('crm_party_party_pieces');
+
+  // Add in weights from the admin setting.
+  $weights = variable_get('crm_party_name_pieces_weights', array());
+  foreach ($pieces as $path => $piece) {
+    // The weight setting overrides weights defined in the hook.
+    if (isset($weights[$path])) {
+      $pieces[$path]['weight'] = $weights[$path];
+    }
+  }
+
+  // Sort pieces array by weight for hook_menu() to figure out the default tab
+  // and the admin UI to show them in the right order.
+  // drupal_sort_weight() treats a missing weight key as a 0.
+  uasort($pieces, 'drupal_sort_weight');
+
   return $pieces;
 }
 
@@ -257,13 +288,16 @@ function crm_party_get_party_piece_info() {
  */
 function crm_party_crm_party_party_pieces() {
   $pieces = array(
+    // The main party piece.
+    // By default this is the default tab, but the MENU_DEFAULT_LOCAL_TASK
+    // is supplied in hook_menu() to allow the piece order setting to change
+    // the default tab accordingly.
     'party' => array(
       'title' => 'Party',
       'page callback' => 'crm_party_page_view',
       'page arguments' => array(1),
       'file' => 'crm_party.pages.inc',
       'access arguments' => array('view contacts'),
-      'type' => MENU_DEFAULT_LOCAL_TASK,
       'weight' => -10,
     ),
   );
@@ -734,6 +768,9 @@ function crm_party_uri($party) {
  */
 function crm_party_theme() {
   return array(
+    'crm_party_settings_pieces_order_form' => array(
+      'render element' => 'form',
+    ),
     'crm_party_email' => array(
       'variables' => array('crm_party_email', 'crm_party' => NULL),
       'template' => 'crm_party_email',
