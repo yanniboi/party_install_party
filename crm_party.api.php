@@ -32,6 +32,10 @@
  *    It gets $party, $set_type, $set_id, $form and $form_state.
  *  - 'module': (optional) The name of the module implementing this data set.
  *    This will be filled in automatically if not supplied.
+ *  - piece: (optional) Each set may define one party piece. The contents of
+ *    this array should be the same as those returned by
+ *    hook_party_party_piece_info(), with the addition of:
+*     - 'path': The menu path for the provided piece.
  */
 function hook_crm_party_data_set_info() {
   $sets = array();

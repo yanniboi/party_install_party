@@ -669,6 +669,16 @@ function crm_party_crm_party_party_pieces() {
     ),
   );
 
+  // Party data sets may provide a piece each.
+  $sets = crm_party_get_data_set_info();
+  foreach ($sets as $set_name => $set) {
+    if (isset($set['piece'])) {
+      $path = $set['piece']['path'];
+      unset($set['piece']['path']);
+      $pieces[$path] = $set['piece'];
+    }
+  }
+
   // Custom pieces can be created as Views plugins.
   if (module_exists('views')) {
     // Get all views displays that implement our hook.
