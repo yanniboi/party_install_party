@@ -8,6 +8,7 @@
 // @todo: If these contain only classes they will be autoloaded and these include statements can be dropped.
 include_once("includes/crm_party.entity.inc");
 include_once("includes/crm_party_type.entity.inc");
+include_once("crm_party.data_set.inc");
 
 /**
  * Implements hook_help().
@@ -427,33 +428,18 @@ function crm_party_data_set_type_remove($set_name) {
  *  The party to assign the entity to.
  * @param $entity
  *  The entity to relate to.
- * @param $entity_type
- *  Needed until http://drupal.org/node/1042822 is fixed.
  * @param $data_set
  *  The name of the data set.
  *  DX WTF: can we sniff this out given the entity type and the entity object?
+ *  DX WTF: Lots of sniffing now done BUT do we want the $data_set instance made elsewhere. If so where?
  */
-function crm_party_relate($party, $entity, $entity_type, $data_set = NULL) {
-  $entity_type_info = entity_get_info($entity_type);
-  $entity_id_key = $entity_type_info['entity keys']['id'];
-
-  $relation = array(
-    'pid' => $party->pid,
-    'eid' => $entity->{$entity_id_key},
-  );
-
-  // WIP: chuck in defaults until I figure out what these do
-  $relation += array(
-    'main' => FALSE,
-    'hat' => 'trilby',
-    'hat_main' => FALSE,
-  );
-
-  $table = 'crm_party_set_' . $data_set;
-
-  // @todo: figure out when to insert and when to update! we probably need
-  // an extra parameter for this. #fail :(
-  drupal_write_record($table, $relation);
+function crm_party_relate($party, $entity, $data_set = NULL) {
+  /* To Test */
+  $sets = crm_party_get_data_set_info();
+  $class = $sets[$data_set]['class'];
+  $dataSet = new $class($data_set, $entity);
+  $dataSet->attach($party);
+  dsm($dataSet);
 }
 
 /**

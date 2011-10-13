@@ -9,13 +9,13 @@ abstract class CRMPartyDataSet {
    * abstract $entity_type
    *   The entity type this Data Set Wraps around
    */
-  static protected $entity_type = "";
+  const ENTITY_TYPE = "";
   
   /**
    * abstract $entity_id_col
    *   The entity type this Data Set Wraps around
    */
-  static protected $entity_id_column = "";
+  const ENTITY_ID_KEY = "";
   
   
   /**
@@ -67,9 +67,41 @@ abstract class CRMPartyDataSet {
    *   Build this object from a set instance id
    *
    * @param $id The set instance ID
+   * @todo don't know how best to build this
    */
-  function __construct($id) {
-  
+  function __construct($type, $entity, $party = null) {
+    // If the party isn't set, this is just an entity really, so we create 
+    // A "temporary" instance of the wrapper that gets saved when we attach
+    // it.
+    $this->type = $type;
+    $this->entity = $entity;
+    $this->eid = $entity->{$this->getEntityIdKey()};
+    
+    // If the party is set we set the party and find the row in the data set table
+    // to get the rest of the information
+    if(isset($party)) {
+      $this->party = $party;
+      $this->pid = $party->pid;
+      
+      $query = db_select('crm_party_set_' . $type, 'ds');
+      $query->fields('ds');
+      $query->condition('pid', $this->pid, '=');
+      $query->condition('eid', $this->eid, '=');
+      $result = $query->execute()->fetchAssoc();
+      
+      // If there is no data set instance in the db we unset party and treat this like it
+      // hasn't been attached yet;
+      if(!$result) {
+        unset($this->party);
+        unset($this->pid);
+      }
+      else {
+        $this->main = $result['main'];
+        $this->hat = $result['hat'];
+        $this->hat_main = $result['hat_main'];
+        $this->id = $result['peid'];
+      }      
+    }    
   }
   
   /**
@@ -81,10 +113,10 @@ abstract class CRMPartyDataSet {
    */
   public function loadData() {
     if(!isset($this->entity)) {
-      $this->entity = entity_load($this->entity_type, $eid);
+      $this->entity = entity_load($this->getEntityType(), $eid);
     }
     
-    return $this->entity() 
+    return $this->entity; 
   }
   
   /**
@@ -95,7 +127,23 @@ abstract class CRMPartyDataSet {
    *   The party object we're attaching to.
    */
   public function attach($party) {
-  
+    $relation = array(
+      'pid' => $party->pid,
+      'eid' => $this->entity->{$this->getEntityIdKey()},
+    );
+
+    // WIP: chuck in defaults until I figure out what these do
+    $relation += array(
+      'main' => FALSE,
+      'hat' => 'trilby',
+      'hat_main' => FALSE,
+    );
+
+    $table = 'crm_party_set_' . $this->type;
+
+    // @todo: figure out when to insert and when to update! we probably need
+    // an extra parameter for this. #fail :(
+    drupal_write_record($table, $relation);
   }
   
   /**
@@ -137,15 +185,24 @@ abstract class CRMPartyDataSet {
   }
   
   /**
-   * @group Static Helper Functions
+   * Get Entity Type
+   *
+   * REQUIRES PHP 5.3.0
+   * @todo find a way around this requirement
    */
-   
+  private function getEntityType() {
+    $c = get_called_class();
+    return $c::ENTITY_TYPE;
+  }
+  
   /**
-   * getAllDataSets
-   *   Get all the data sets connected to a party of a particular type
-   * 
-   * @param Party $party The party we're getting the data sets of;
+   * getEntityIdKey
+   *
+   * REQUIRES PHP 5.3.0
+   * @todo find a way around this requirement
    */
-  public abstract static function getAllDataSets($party) {
+  private function getEntityIdKey() {
+    $c = get_called_class();
+    return $c::ENTITY_ID_KEY;
   }
 }

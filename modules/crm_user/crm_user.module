@@ -12,6 +12,7 @@ function crm_user_crm_party_data_set_info() {
   $sets['user'] = array(
     'label' => t("User account"),
     'entity type' => 'user',
+    'class' => 'UserDataSet',
     'singleton' => TRUE,
     'load callback' => "crm_user_load_user",
     'form callback' => "crm_user_form_user",
@@ -144,4 +145,15 @@ function _crm_party_user_relate($party, $account) {
   
   //set some nice messages - change
   drupal_set_message('Party: ' . $party->label . ' has been related to User: ' . $account->name);
+}
+
+/**
+ * UserDataSet
+ *  The user data set wrapper class
+ */
+class UserDataSet extends CRMPartyDataSet {
+   
+  const ENTITY_TYPE = "user";
+  const ENTITY_ID_KEY = "uid";
+
 }

@@ -48,10 +48,11 @@ function crm_profile_crm_party_data_set_info() {
     $sets["profile2_" . $type] = array(
       'label' => $label,
       'entity type' => 'profile2',
-      'load callback' => "crm_profile_load_profile",
-      'load arguments' => array($type),
-      'form callback' => "crm_profile_form",
-      'form arguments' => array($type),
+      //'load callback' => "crm_profile_load_profile", - No Longer needed with class implementation
+      //'load arguments' => array($type),
+      //'form callback' => "crm_profile_form", - No longer needed with class implementation
+      //'form arguments' => array($type),
+      'class' => 'Profile2DataSet',
       // Provide a piece corresponding to each data set.
       'piece' => array(
         'path' => 'profile-' . str_replace('_', '-', $type),
@@ -425,3 +426,11 @@ function _crm_profile_relation_get_related_entities($entity_type, $entity_id, $r
   return $relations;
 }
 
+/**
+ * Profile2DataSet
+ */
+class Profile2DataSet extends CRMPartyDataSet 
+{
+  const ENTITY_TYPE = "profile2";
+  const ENTITY_ID_KEY = "pid";
+}
