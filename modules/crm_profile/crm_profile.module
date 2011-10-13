@@ -127,7 +127,7 @@ function crm_profile_entity_info_alter(&$entity_info) {
  * 
  * Lets add a new tpl for party display
  */
-function crm_profile_preprocess_entity(&$vars) {
+function Xcrm_profile_preprocess_entity(&$vars) {
   //Add a new profile view tpl.
   if ($vars['view_mode'] == 'party') {
     $vars['theme_hook_suggestions'][] = 'profile2__all__party';
@@ -140,6 +140,8 @@ function crm_profile_preprocess_entity(&$vars) {
  * Alter Party forms to do things
  */
 function crm_profile_form_crm_party_edit_form_alter(&$form, &$form_state, $form_id) {
+  return;
+  
   // Make sure the uid is null. 
   $form['uid'] = array(
     '#type' => 'hidden',
@@ -174,7 +176,7 @@ function crm_profile_form_crm_party_edit_form_alter(&$form, &$form_state, $form_
 /**
  * Relate the profile2 entities to the crm_party in form_state
  */
-function crm_profile_post_form_submit_relate($form, &$form_state) {
+function Xcrm_profile_post_form_submit_relate($form, &$form_state) {
   $party = $form_state['crm_party'];
   $profiles = array();
   
@@ -239,7 +241,11 @@ function _crm_party_profile_relate($party, $profile) {
  */
 function crm_profile_crm_party_page_view_alter($party) {
   $build = array();
+  // broken right now.
+  return;
+  
   $allProfiles = _crm_profile_load_by_party($party);
+  
   foreach ($allProfiles as $type => $profiles) {
     //as $profiles could be a list of profiles we need to standardise what we're dealing with.
     if (is_object($profiles)) {
