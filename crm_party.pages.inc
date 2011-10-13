@@ -16,6 +16,12 @@ function crm_party_page_view($party, $view_mode = 'full') {
 
   $build = module_invoke_all('crm_party_page_view_alter', $party);
 
+  // Demo output so we see this works.
+  $build['demo'] = array(
+    '#type' => 'markup',
+    '#markup' => 'Party view page',
+  );
+
   $controller = entity_get_controller('crm_party');
   $build['party'] = $controller->view(array($party->pid => $party));
   return $build;

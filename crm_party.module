@@ -179,16 +179,6 @@ function crm_party_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['party/%crm_party/view'] = array(
-    'title' => t('View'),
-    'page callback' => 'crm_party_page_view',
-    'page arguments' => array(1),
-    'file' => 'crm_party.pages.inc',
-    'access arguments' => array('view contacts'),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -10,
-  );
-
   // Build the party view second-level tabs.
   // @todo: Consider whether to put edit below this and these at first level.
   // @todo: Write a contrib module to turn a set of tabs into ajax tabs,
@@ -201,10 +191,17 @@ function crm_party_menu() {
       'type' => MENU_LOCAL_TASK,
       'access arguments' => array('view contacts'),
     );
-    $items["party/%crm_party/view/$path"] = $piece;
+    $items["party/%crm_party/$path"] = $piece;
   }
 
-  $items['party/%crm_party/edit'] = array(
+  // This is temporary until I figure out a neat way to do tabs below pieces.
+  $items['party/%crm_party/party/view'] = $items['party/%crm_party/party'];
+  $items['party/%crm_party/party/view'] += array(
+    'title' => t('View'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $items['party/%crm_party/party/edit'] = array(
     'title' => t('Edit'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('crm_party_edit_form', 1),
@@ -212,6 +209,7 @@ function crm_party_menu() {
     'access arguments' => array('edit contacts'),
     'type' => MENU_LOCAL_TASK,
   );
+  // End temporary.
 
   $items['party/add'] = array(
     'title' => 'Add party',
@@ -654,7 +652,11 @@ function crm_party_party_piece_tab_display($party, $instance, $title, $arguments
 
 /**
  * Implements hook_crm_party_party_pieces().
- * rlmumford: DEPRECATED? http://drupal.org/node/1302682
+ *
+ * Defines:
+ *  - the basic piece for showing a party itself
+ *  - pieces that data sets provide
+ *  - pieces provided by Views as display plugins.
  */
 function crm_party_crm_party_party_pieces() {
   $pieces = array(
