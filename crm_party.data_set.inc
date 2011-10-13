@@ -22,45 +22,45 @@ abstract class CRMPartyDataSet {
    * var int $id
    *   A unique identifier for each data set instance
    */
-  protected $id;
+  public $id;
   
   /**
    * var string $type
    *   The data set type (array key in hook_data_set_info)
    */
-  protected $type;
+  public $type;
   
   /**
    * var $eid int the set ID
    */
-  protected $eid;
+  public $eid;
   
   /**
    * var object $entity 
    *   The Entity Object this wraps around
    */
-  protected $entity;
+  public $entity;
   
   /**
    * var $pid int the party id
    */
-  protected $pid;
+  public $pid;
   
   /**
    * var $party Party
    *   The Party object we're connected too.
    */
-  protected $party;
+  public $party;
   
   /**
    * var bool $main;
    */
-  protected $main;
+  public $main;
   
   /**
    * var string $hat
    */
-  protected $hat;
+  public $hat;
   
   /**
    * construct
@@ -211,9 +211,17 @@ abstract class CRMPartyDataSet {
   }
   
   /**
-   * getTable
+   * getTableName
    */
   private function getTableName() {
     return 'crm_party_set_' . $this->type;
+  }
+  
+  /**
+   * getInstanceTable
+   *  static method to get the table containing all the instances
+   */
+  public static function getInstanceTable($type) {
+    return 'crm_party_set_' . $type;
   }
 }
