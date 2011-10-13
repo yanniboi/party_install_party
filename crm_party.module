@@ -457,7 +457,7 @@ function crm_party_modules_uninstalled($modules) {
  *  DX WTF: can we sniff this out given the entity type and the entity object?
  *  DX WTF: Lots of sniffing now done BUT do we want the $data_set instance made elsewhere. If so where?
  */
-function crm_party_relate($party, $entity, $data_set = NULL) {
+function crm_party_relate($party, $entity, $data_set) {
   $sets = crm_party_get_data_set_info();
   $class = $sets[$data_set]['class'];
   $dataSet = new $class($data_set, $entity);

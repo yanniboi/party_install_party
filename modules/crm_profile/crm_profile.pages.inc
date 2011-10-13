@@ -5,6 +5,39 @@
  */
 
 /**
+ * Page callback for our data set-based party pieces.
+ */
+function crm_profile_party_view_profile_set($party, $profile_type) {
+  $build = array();
+
+  // Load the profiles in this data set.
+  $profiles = crm_party_data_set_load($party, "profile2_" . $profile_type);
+  dsm($profiles);
+
+  foreach ($profiles as $profile) {
+    if (profile2_access('view', $profile)) {
+      $profile->this_party = $party;
+
+      $build['profile_' . $profile->pid] = array(
+        '#type' => 'fieldset',
+        '#title' => $profile->label,
+      );
+      $build['profile_' . $profile->pid]['view'] = $profile->view('party');
+    }
+  }
+  // @todo: shouldn't have HTML markup here.
+  // @todo: make this with hook_menu_local_tasks_alter()?
+  $entity_info_profile = entity_get_info('profile2');
+  $label = $entity_info_profile['bundles'][$profile_type]['label'];
+  $build['profile_' . $profile_type . '_add']['#markup'] = "<div class=\"clearfix\">
+    <div class=\"crm_profile_ops\" style=\"float: right\">".l("Add " . $label, 'party/' . $party->pid . '/add/' . $profile_type)."
+      </div>
+    </div>";
+
+  return $build;
+}
+
+/**
  * Make the profile edity page
  */
 function profile_page_edit($profile) {
@@ -33,6 +66,8 @@ function profile_page_add($party,$profile_type) {
  * The Party is the Party we will Redirect Back to.
  */ 
 function profile_edit_form($form, &$form_state, $profile, $party) {
+  // @todo: don't stash things in the form state; put them either
+  // in the form as hash properties or values.
   $form_state['profiles'][$profile->type] = $profile;
   $form_state['party'] = $party;
   profile2_attach_form($form, $form_state);
@@ -45,7 +80,7 @@ function profile_edit_form($form, &$form_state, $profile, $party) {
   
   dsm($profile);
   
-  if(!isset($profile->pid)) {
+  if (!isset($profile->pid)) {
     $form['#submit'][] = "profile_add_form_submit";
   }
   
@@ -59,19 +94,18 @@ function profile_edit_form($form, &$form_state, $profile, $party) {
  * Currently this just sets the redirect.
  */
 function profile_edit_form_submit($form, &$form_state) {
-  $form_state['redirect'] = 'party/'.$form_state['party']->pid;
+  $form_state['redirect'] = 'party/' . $form_state['party']->pid;
 }
 
 /**
- * Add a new profile to the party
- *
+ * Add a new profile to the party.
  */
 function profile_add_form_submit($form, &$form_state) {
-  //relate the party to the new profile
+  // Relate the party to the new profile
   $party = $form_state['party'];
   
   foreach($form_state['profiles'] as $type => $profile) {
-    _crm_party_profile_relate($party, $profile);
+    crm_party_relate($party, $profile, "profile2_" . $type);
   }
   
   //TODO: break the relation to the null profile for this type.
