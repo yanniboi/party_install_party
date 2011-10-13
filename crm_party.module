@@ -505,33 +505,28 @@ function crm_party_data_set_load($party, $set_name) {
   $sets = crm_party_get_data_set_info();
   //dsm($sets);
 
-  $table = db_escape_table($sets[$set_name]['table']);
-  $result = db_query("SELECT eid, main FROM {$table} WHERE pid = :pid", array(
-    ':pid' => $party->pid,
-  ));
-  $items = $result->fetchAllAssoc('eid', PDO::FETCH_ASSOC);
+  $table = CRMPartyDataSet::getInstanceTable($set_name);
+  $items = db_select($table, 'ds')
+    ->fields('ds')
+    ->condition('pid',$party->pid,'=')
+    ->execute()
+    ->fetchAllAssoc('eid', PDO::FETCH_ASSOC);
+    
+  $dataSets = array();
 
-  // Load the entities.
-  $entities = entity_load($sets[$set_name]['entity type'], array_keys($items));
-
-  // Add our main flag.
-  foreach ($entities as $id => $entity) {
-    $entity->crm_party_main = (bool) $items[$id]['main'];
+  foreach ($items as $eid => $instance) {
+    $class = $sets[$set_name]['class'];
+    $dataSets[] = new $class($set_name, $eid, $party);
   }
-  //dsm($entities);
+  
+  // @todo get this function to return a set of data sets rather than
+  // a set of entities. (need to make sure whatever calls it is ready for
+  // the change).
+  foreach ($dataSets as $dataSet) {
+    $entities[$dataSet->eid] = $dataSet->loadData();
+  }
 
   return $entities;
-
-  /*
-  $function= $sets[$set_type]['load callback'];
-  if (function_exists($function)) {
-    $result = call_user_func($function, $party, $set_type, $set_id);
-  }
-  else {
-    return FALSE;
-  }
-  return $result;
-  */
 }
 
 /**
