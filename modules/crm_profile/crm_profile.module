@@ -60,6 +60,8 @@ function crm_profile_crm_party_data_set_info() {
         'page callback' => 'crm_profile_party_view_profile_set',
         'page arguments' => array(1, $type),
         'access arguments' => array("view any $type profile"), // @todo: IMCTT.
+        // File path is relative to implementing module.
+        'file' => 'modules/crm_profile/crm_profile.pages.inc',
       ),
     );
   }
@@ -224,39 +226,6 @@ function _crm_party_profile_relate($party, $profile) {
 
   //set some nice messages - change
   drupal_set_message('Party: ' . $party->label . ' has been related to Profile: ' . $profile->pid);
-}
-
-/**
- * Page callback for our data set-based party pieces.
- */
-function crm_profile_party_view_profile_set($party, $profile_type) {
-  $build = array();
-
-  // Load the profiles in this data set.
-  $profiles = crm_party_data_set_load($party, "profile2_" . $profile_type);
-  dsm($profiles);
-
-  foreach ($profiles as $profile) {
-    if (profile2_access('view', $profile)) {
-      $profile->this_party = $party;
-
-      $build['profile_' . $profile->pid] = array(
-        '#type' => 'fieldset',
-        '#title' => $profile->label,
-      );
-      $build['profile_' . $profile->pid]['view'] = $profile->view('party');
-    }
-  }
-  // @todo: shouldn't have HTML markup here.
-  // @todo: make this with hook_menu_local_tasks_alter()?
-  $entity_info_profile = entity_get_info('profile2');
-  $label = $entity_info_profile['bundles'][$profile_type]['label'];
-  $build['profile_' . $profile_type . '_add']['#markup'] = "<div class=\"clearfix\">
-    <div class=\"crm_profile_ops\" style=\"float: right\">".l("Add " . $label, 'party/' . $party->pid . '/add/' . $profile_type)."
-      </div>
-    </div>";
-
-  return $build;
 }
 
 /**

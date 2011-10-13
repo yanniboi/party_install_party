@@ -5,6 +5,39 @@
  */
 
 /**
+ * Page callback for our data set-based party pieces.
+ */
+function crm_profile_party_view_profile_set($party, $profile_type) {
+  $build = array();
+
+  // Load the profiles in this data set.
+  $profiles = crm_party_data_set_load($party, "profile2_" . $profile_type);
+  dsm($profiles);
+
+  foreach ($profiles as $profile) {
+    if (profile2_access('view', $profile)) {
+      $profile->this_party = $party;
+
+      $build['profile_' . $profile->pid] = array(
+        '#type' => 'fieldset',
+        '#title' => $profile->label,
+      );
+      $build['profile_' . $profile->pid]['view'] = $profile->view('party');
+    }
+  }
+  // @todo: shouldn't have HTML markup here.
+  // @todo: make this with hook_menu_local_tasks_alter()?
+  $entity_info_profile = entity_get_info('profile2');
+  $label = $entity_info_profile['bundles'][$profile_type]['label'];
+  $build['profile_' . $profile_type . '_add']['#markup'] = "<div class=\"clearfix\">
+    <div class=\"crm_profile_ops\" style=\"float: right\">".l("Add " . $label, 'party/' . $party->pid . '/add/' . $profile_type)."
+      </div>
+    </div>";
+
+  return $build;
+}
+
+/**
  * Make the profile edity page
  */
 function profile_page_edit($profile) {
