@@ -120,4 +120,4 @@ function profile_add_form_submit($form, &$form_state) {
   }
   
   //TODO: break the relation to the null profile for this type.
-}
+}*/
