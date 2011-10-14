@@ -79,7 +79,7 @@ abstract class CRMPartyDataSet {
    * @param $id The set instance ID
    * @todo don't know how best to build this
    */
-  function __construct($type, $entity, $party = null) {
+  function __construct($type, $entity, $party = NULL) {
     // If the party isn't set, this is just an entity really, so we create 
     // A "temporary" instance of the wrapper that gets saved when we attach
     // it.
@@ -92,11 +92,11 @@ abstract class CRMPartyDataSet {
       //throw an error
     }
         
-    if(is_numeric($entity)) {
+    if (is_numeric($entity)) {
       $this->eid = $entity;
       $this->loadData();
     }
-    else if ($entity !== null) {
+    elseif ($entity !== NULL) {
       $this->entity = $entity;
       $this->eid = $entity->{$this->getEntityIdKey()};
     }
@@ -107,8 +107,8 @@ abstract class CRMPartyDataSet {
     
     // If the party is set we set the party and find the row in the data set table
     // to get the rest of the information
-    if(isset($party)) {
-      if(is_numeric($party)) {
+    if (isset($party)) {
+      if (is_numeric($party)) {
         $this->pid = $party;
         $this->party = reset(entity_load('crm_party', array($party)));
       }
@@ -117,7 +117,7 @@ abstract class CRMPartyDataSet {
         $this->pid = $party->pid;
       }
       
-      if ($this->entity !== null) {
+      if ($this->entity !== NULL) {
         $query = db_select($this->getTableName(), 'ds');
         $query->fields('ds');
         $query->condition('pid', $this->pid, '=');
@@ -126,7 +126,7 @@ abstract class CRMPartyDataSet {
         
         // If there is no data set instance in the db we unset party and treat this like it
         // hasn't been attached yet;
-        if(!$result) {
+        if (!$result) {
           $this->attached = FALSE;
         }
         else {
@@ -166,7 +166,7 @@ abstract class CRMPartyDataSet {
    *   The party object we're attaching to.
    */
   public function attach($party) {
-    if(isset($this->party) AND $this->party != $party)
+    if (isset($this->party) && $this->party != $party)
       return;   
     
     $relation = array(

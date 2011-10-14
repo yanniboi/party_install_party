@@ -227,8 +227,8 @@ function crm_party_menu() {
   // Edit data set instance
   $items['party/%crm_party/edit/%/%'] = array(
     'page callback' => 'crm_party_data_set_edit',
-    'page arguments' => array(3,1,4), //3 Arguments, party then set type then set eid
-    'access callback' => true,
+    'page arguments' => array(3, 1, 4), //3 Arguments, party then set type then set eid
+    'access callback' => TRUE, // todo
     'access arguments' => array('edit contacts'),
     'file' => 'crm_party.pages.inc',
   ); 
@@ -236,16 +236,16 @@ function crm_party_menu() {
   // Remove a data set instance
   $items['party/%crm_party/remove/%/%'] = array(
     'page callback' => 'crm_party_data_set_remove',
-    'page arguments' => array(3,1,4), //3 Arguments, party then set type then set eid
-    'access callback' => true,
+    'page arguments' => array(3, 1, 4), //3 Arguments, party then set type then set eid
+    'access callback' => TRUE, // todo
     'file' => 'crm_party.pages.inc',
   );
   
   // Add a new instance of a data set
   $items['party/%/add/%'] = array(
     'page callback' => 'crm_party_data_set_edit',
-    'page arguments' => array(3,1,null), //3 Arguments, party then set type then set eid
-    'access callback' => true,
+    'page arguments' => array(3, 1, NULL), //3 Arguments, party then set type then set eid
+    'access callback' => TRUE, // todo
     'access arguments' => array('edit contacts'),
     'file' => 'crm_party.pages.inc',
   );

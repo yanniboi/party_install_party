@@ -133,7 +133,7 @@ function crm_party_page_view_piece_views($party, $view_name, $view_display_id) {
 }
 
 /**
- * Show the edit form for an individual data set
+ * Show the edit form for an individual data set.
  *
  * @param $set
  *   'The set type'
@@ -143,11 +143,11 @@ function crm_party_page_view_piece_views($party, $view_name, $view_display_id) {
  *    The id of the entity
  */
 function crm_party_data_set_edit($set, $pid, $eid) {
-  if($eid === null) {
+  if ($eid === NULL) {
     //return "@todo add add form";
   }
   
-  if(is_object($pid)) {
+  if (is_object($pid)) {
     $pid = $pid->pid;  
   }
   
@@ -155,7 +155,7 @@ function crm_party_data_set_edit($set, $pid, $eid) {
     'party' => $pid,
     'entity' => $eid,
   );
-  $dataSet = CRMPartyDataSet::getInstance($set,$info);
+  $dataSet = CRMPartyDataSet::getInstance($set, $info);
   return drupal_get_form('crm_party_data_set_edit_form', $dataSet);
 }
 
