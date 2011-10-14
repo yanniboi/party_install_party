@@ -297,15 +297,6 @@ abstract class CRMPartyDataSet {
   }
   
   /**
-   * Get Set Def Label
-   *
-   * @todo: rename
-   */
-  public function getTypeLabel() {
-    return $this->setDef['label'];
-  }
-  
-  /**
    * Get Entity Type
    *
    * REQUIRES PHP 5.3.0
@@ -340,6 +331,14 @@ abstract class CRMPartyDataSet {
    */
   public static function getInstanceTable($type) {
     return 'crm_party_set_' . $type;
+  }
+  
+  /**
+   * get the data set type label
+   */
+  public static function getTypeLabel($type) {
+    $sets = crm_party_get_data_set_info();
+    return $sets[$type]['label'];
   }
   
   /**

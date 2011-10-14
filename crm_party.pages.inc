@@ -218,7 +218,6 @@ function crm_party_data_set_edit_form_submit($form, &$form_state) {
   }
   
   $dataSet = CRMPartyDataSet::getInstance($type, $info);
-  print_r($dataSet);
   $dataSet->attach($dataSet->party);
   
   $form_state['redirect'] = 'party/' . $dataSet->pid;
@@ -307,12 +306,12 @@ function crm_party_view_data_set($party, $set) {
     );    
   }
   
-  $build[$dataSet->type . '_links'] = array(
+  $build[$set . '_links'] = array(
     '#theme' => 'links',
     '#links' => array(
       'add' => array(
-        'title' => "Add " . $dataSet->getTypeLabel(),
-        'href'  => 'party/' . $party->pid . '/add/' . $dataSet->type,
+        'title' => "Add " . CRMPartyDataSet::getTypeLabel($set),
+        'href'  => 'party/' . $party->pid . '/add/' . $set,
       ),
     ),
     '#attributes' => array('class' => array('crm-profile-links')),
