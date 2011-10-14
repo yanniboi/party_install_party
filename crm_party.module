@@ -274,6 +274,15 @@ function crm_party_menu() {
   return $items;
 }
 
+function crm_party_admin_paths() {
+  $paths = array(
+    'party/*/edit/*' => TRUE,
+    'party/*/remove/*' => TRUE,
+    'party/*/add/*' => TRUE,
+  );
+  return $paths;
+}
+
 /**
  * Page title callback for party view page.
  *
