@@ -165,12 +165,19 @@ function crm_party_data_set_edit($set, $pid, $eid) {
 function crm_party_data_set_edit_form($form, &$form_state, $dataSet) {
   $form['#dataSet'] = $dataSet;
   
-  $form['dataSet'] = array(
+  $form['data-set-type'] = array(
+    '#type' => 'hidden',
+    '#value' => $dataSet->type,
+  );   
+  
+  $form['data-set-id'] = array(
     '#type' => 'hidden',
     '#value' => $dataSet->id,
   );
   
   $dataSet->form($form,$form_state);
+  
+  $form['#submit'][] = 'crm_party_data_set_edit_form_submit';
   
   $form['submit'] = array(
     '#type' => 'submit',
@@ -192,7 +199,12 @@ function crm_party_data_set_edit_form_validate($form, &$form_state) {
  * The data set edit validate.
  */
 function crm_party_data_set_edit_form_submit($form, &$form_state) {
+  $type = $form_state['values']['data-set-type'];
+  $peid = $form_state['values']['data-set-id'];
   
+  $dataSet = CRMPartyDataSet::getInstance($type, $peid, CRMPartyDataSet::FROM_PEID);
+  
+  $form_state['redirect'] = 'party/' . $dataSet->pid;
 }
 
 /**
