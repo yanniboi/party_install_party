@@ -168,9 +168,9 @@ abstract class CRMPartyDataSet {
 
     // WIP: chuck in defaults until I figure out what these do
     $relation += array(
-      'main' => FALSE,
+      'main' => 0,
       'hat' => 'trilby',
-      'hat_main' => FALSE,
+      'hat_main' => 0,
     );
 
     // Try update first, and if that fails insert.
