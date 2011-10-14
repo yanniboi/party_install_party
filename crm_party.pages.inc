@@ -142,7 +142,7 @@ function crm_party_page_view_piece_views($party, $view_name, $view_display_id) {
  * @param $eid
  *    The id of the entity
  */
-function crm_party_data_set_edit($set, $pid, $eid) {
+function crm_party_data_set_edit($set, $pid, $eid = NULL) {
   if ($eid === NULL) {
     //return "@todo add add form";
   }
