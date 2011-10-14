@@ -165,7 +165,7 @@ abstract class CRMPartyDataSet {
    * @param $party
    *   The party object we're attaching to.
    */
-  public function attach($party) {
+  public function attach($party, $options = array()) {
     if (isset($this->party) && $this->party != $party)
       return;   
     
@@ -176,10 +176,21 @@ abstract class CRMPartyDataSet {
 
     // WIP: chuck in defaults until I figure out what these do
     $relation += array(
-      'main' => 0,
+      'main' => isset($options['main']) ? $options['main'] : 0,
       'hat' => 'trilby',
       'hat_main' => 0,
     );
+    
+    // If we're setting this as the main party first remove main from
+    // every other party. 
+    if (isset($options['main']) AND $options['main'] == 1 AND $this->isMain() != 1) {
+      $num = db_update($this->getTableName())
+        ->fields(array(
+          'main' => 0,
+        ))
+        ->condition('pid',$relation['pid'],'=')
+        ->execute();
+    }
 
     // Try update first, and if that fails insert.
     $result = db_update($this->getTableName())
@@ -277,7 +288,7 @@ abstract class CRMPartyDataSet {
    *   set this set instance as the main set of this type
    */
   public function setMain() {
-  
+    return $this->main;
   }
   
   /**
@@ -288,7 +299,7 @@ abstract class CRMPartyDataSet {
    *   True is the Set is the main one, False otherwise.
    */
   public function isMain() {
-  
+    return $this->main;
   }
   
   /**

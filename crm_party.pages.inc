@@ -180,6 +180,12 @@ function crm_party_data_set_edit_form($form, &$form_state, $dataSet) {
     '#value' => $dataSet->eid,
   );
   
+  $form['data-set-main'] = array(
+    '#type' => 'checkbox',
+    '#default_value' => $dataSet->isMain(),
+    '#title' => "This is the main " . CRMPartyDataSet::getTypeLabel($dataSet->type),
+  );
+  
   $dataSet->form($form, $form_state);
   
   $form['#submit'][] = 'crm_party_data_set_edit_form_submit';
@@ -218,7 +224,11 @@ function crm_party_data_set_edit_form_submit($form, &$form_state) {
   }
   
   $dataSet = CRMPartyDataSet::getInstance($type, $info);
-  $dataSet->attach($dataSet->party);
+  
+  $options = array(
+    'main' => $form_state['values']['data-set-main'],
+  );
+  $dataSet->attach($dataSet->party, $options);
   
   // Redirect to the set piece.
   $form_state['redirect'] = 'party/' . $dataSet->pid . '/' . $dataSet->getPathArg();
