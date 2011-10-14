@@ -306,17 +306,20 @@ function crm_party_view_data_set($party, $set) {
     );    
   }
   
-  $build[$set . '_links'] = array(
-    '#theme' => 'links',
-    '#links' => array(
-      'add' => array(
-        'title' => "Add " . CRMPartyDataSet::getTypeLabel($set),
-        'href'  => 'party/' . $party->pid . '/add/' . $set,
+  $setDef = CRMPartyDataSet::getSetDefinition($set);
+  if(!isset($setDef['max cardinality']) OR count($dataSets) < $setDef['max cardinality']) {
+    $build[$set . '_links'] = array(
+      '#theme' => 'links',
+      '#links' => array(
+        'add' => array(
+          'title' => "Add " . CRMPartyDataSet::getTypeLabel($set),
+          'href'  => 'party/' . $party->pid . '/add/' . $set,
+        ),
       ),
-    ),
-    '#attributes' => array('class' => array('crm-profile-links')),
-    '#weight' => 1,
-  );
+      '#attributes' => array('class' => array('crm-profile-links')),
+      '#weight' => 1,
+    );
+  }
   
   return $build;
 }
