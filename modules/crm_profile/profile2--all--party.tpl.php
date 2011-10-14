@@ -30,16 +30,12 @@
 ?>
 <div class="<?php print $classes; ?> clearfix"<?php print $attributes; ?>>
   <div class="content"<?php print $content_attributes; ?>>
-    <?php if ($profile2->is_null): ?>
-      This is a null profile.
-    <?php else: ?>  
-      <?php
-        print render($content);
-      ?>
-      <div class="crm_profile_ops" style="float: right;">
-        <?php /* @todo these should be done with Contextual links module */ ?>
-        <?php print l("Edit", 'profile/' . $profile2->pid . '/edit'); ?>
-      </div>
-    <?php endif; ?>
+    <?php
+      print render($content);
+    ?>
+    <div class="crm_profile_ops" style="float: right;">
+      <?php /* @todo these should be done with Contextual links module */ ?>
+      <?php print l("Edit", 'profile/' . $profile2->pid . '/edit'); ?>
+    </div>
   </div>
 </div>
