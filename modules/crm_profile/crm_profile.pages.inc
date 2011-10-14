@@ -12,8 +12,7 @@ function crm_profile_party_view_profile_set($party, $profile_type) {
 
   // Load the profiles in this data set.
   $profiles = crm_party_data_set_load($party, "profile2_" . $profile_type);
-  dsm($profiles);
-
+  
   foreach ($profiles as $profile) {
     if (profile2_access('view', $profile)) {
       $profile->this_party = $party;

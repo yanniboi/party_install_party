@@ -73,7 +73,7 @@ abstract class CRMPartyDataSet {
     // A "temporary" instance of the wrapper that gets saved when we attach
     // it.
     $this->type = $type;
-    
+        
     if(is_numeric($entity)) {
       $this->eid = $entity;
     }
@@ -123,8 +123,8 @@ abstract class CRMPartyDataSet {
    *   Entity object on success, False on failure
    */
   public function loadData() {
-    if(!isset($this->entity)) {
-      $this->entity = entity_load($this->getEntityType(), $eid);
+    if(!is_object($this->entity)) {
+      $this->entity = reset(entity_load($this->getEntityType(), array($this->eid))); 
     }
     
     return $this->entity; 
