@@ -57,11 +57,11 @@ function crm_profile_crm_party_data_set_info() {
       'piece' => array(
         'path' => 'profile-' . str_replace('_', '-', $type),
         'title' => $label,
-        'page callback' => 'crm_profile_party_view_profile_set',
-        'page arguments' => array(1, $type),
+        'page callback' => 'crm_party_view_data_set',
+        'page arguments' => array(1, "profile2_" . $type),
         'access arguments' => array("view any $type profile"), // @todo: IMCTT.
         // File path is relative to implementing module.
-        'file' => 'modules/crm_profile/crm_profile.pages.inc',
+        'file' => 'crm_party.pages.inc',
       ),
     );
   }
@@ -399,6 +399,9 @@ function crm_profile_theme($existing, $type, $theme, $path) {
 class Profile2DataSet extends CRMPartyDataSet {
   const ENTITY_TYPE = "profile2";
   const ENTITY_ID_KEY = "pid";
+  
+  // @todo Remove somehow.
+  const VIEW_MODE = 'party';
   
   public function form(&$form, &$form_state) {
     //If we're adding a set

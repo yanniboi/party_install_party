@@ -83,7 +83,14 @@ abstract class CRMPartyDataSet {
     // If the party isn't set, this is just an entity really, so we create 
     // A "temporary" instance of the wrapper that gets saved when we attach
     // it.
-    $this->type = $type;
+    $sets = crm_party_get_data_set_info();
+    if(isset($sets[$type])) {
+      $this->type = $type;
+      $this->setDef = $sets[$type];
+    }
+    else {
+      //throw an error
+    }
         
     if(is_numeric($entity)) {
       $this->eid = $entity;
@@ -124,6 +131,7 @@ abstract class CRMPartyDataSet {
         }
         else {
           $this->attached = TRUE;
+          $this->id = $result['peid'];
           $this->main = $result['main'];
           $this->hat = $result['hat'];
           $this->hat_main = $result['hat_main'];
@@ -183,7 +191,7 @@ abstract class CRMPartyDataSet {
       ->condition('pid',$relation['pid'],'=')
       ->condition('eid',$relation['eid'],'=')
       ->execute();
-    if ($result == 0) {
+    if ($result == 0 AND  !is_numeric($this->id)) {
       drupal_write_record($this->getTableName(), $relation);
     }    
   }
@@ -205,6 +213,26 @@ abstract class CRMPartyDataSet {
    * form_submit
    */
   //abstract public function form_submit($form, &$form_state);
+  
+  /**
+   *  display
+   *  Return the renderable array for this dataset
+   * 
+   *  @param $mode the display mode to use.
+   */
+  public function display($mode = '') {
+    return $this->entity->view($mode);
+  }
+
+  /** 
+   * getLabel
+   * get the label of the entity this data set wraps    
+   */
+  public function getLabel() {
+    return $this->entity->label;
+  }
+   
+   
   
   /**
    * actions
@@ -266,6 +294,15 @@ abstract class CRMPartyDataSet {
    */
   public function setHat() {
   
+  }
+  
+  /**
+   * Get Set Def Label
+   *
+   * @todo: rename
+   */
+  public function getTypeLabel() {
+    return $this->setDef['label'];
   }
   
   /**

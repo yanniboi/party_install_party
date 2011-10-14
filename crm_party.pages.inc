@@ -218,6 +218,7 @@ function crm_party_data_set_edit_form_submit($form, &$form_state) {
   }
   
   $dataSet = CRMPartyDataSet::getInstance($type, $info);
+  print_r($dataSet);
   $dataSet->attach($dataSet->party);
   
   $form_state['redirect'] = 'party/' . $dataSet->pid;
@@ -237,7 +238,7 @@ function crm_party_data_set_remove($set, $pid, $eid) {
   );
   
   $dataSet = CRMPartyDataSet::getInstance($set,$info);
-  drupal_set_title(t('Are you sure you want to remove ' . $dataSet->entity->label . ' from ' . $dataSet->party->label . '?'));
+  drupal_set_title(t('Are you sure you want to remove ' . $dataSet->getLabel() . ' from ' . $dataSet->party->label . '?'));
   return drupal_get_form('crm_party_data_set_remove_confirm', $dataSet);
 }
 
@@ -269,7 +270,7 @@ function crm_party_data_set_remove_confirm($form, &$form_state, $dataSet) {
 }
 
 /**
- * The data set edit validate.
+ * The data set remove submit
  */
 function crm_party_data_set_remove_confirm_submit($form, &$form_state) {
   $type = $form_state['values']['data-set-type'];
@@ -280,4 +281,43 @@ function crm_party_data_set_remove_confirm_submit($form, &$form_state) {
   $dataSet->detach();
   
   $form_state['redirect'] = 'party/' . $pid;
+}
+
+/**
+ * View a data set
+ */
+function crm_party_view_data_set($party, $set) {
+  $dataSets = CRMPartyDataSet::getInstances($set, $party);
+  
+  foreach($dataSets as $dataSet) {
+    $entity = $dataSet->entity;
+    $build[$dataSet->type . '_' . $dataSet->id] = array(
+        '#type' => 'fieldset',
+        // @todo: stop this depending on $entity being a drupal entity
+        '#title' => $dataSet->getLabel(),
+      );
+    
+    $build[$dataSet->type . '_' . $dataSet->id]['view'] = $dataSet->display($dataSet::VIEW_MODE);
+    $build[$dataSet->type . '_' . $dataSet->id]['actions'] = array(
+      '#theme' => 'links',
+      '#links' => $dataSet->actions(),
+      '#attributes' => array(
+        'class' => array('crm-set-action-links'),
+      ),
+    );    
+  }
+  
+  $build[$dataSet->type . '_links'] = array(
+    '#theme' => 'links',
+    '#links' => array(
+      'add' => array(
+        'title' => "Add " . $dataSet->getTypeLabel(),
+        'href'  => 'party/' . $party->pid . '/add/' . $dataSet->type,
+      ),
+    ),
+    '#attributes' => array('class' => array('crm-profile-links')),
+    '#weight' => 1,
+  );
+  
+  return $build;
 }
