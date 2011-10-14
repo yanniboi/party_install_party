@@ -133,8 +133,10 @@ abstract class CRMPartyDataSet {
    *   Entity object on success, False on failure
    */
   public function loadData() {
-    if(!is_object($this->entity)) {
-      $this->entity = reset(entity_load($this->getEntityType(), array($this->eid))); 
+    if (!isset($this->entity)) {
+      // @todo: make this cleaner without the array faffing.
+      $data = entity_load($this->type, array($this->eid));
+      $this->entity = $data[$this->eid];
     }
     
     return $this->entity; 
