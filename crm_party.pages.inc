@@ -144,7 +144,7 @@ function crm_party_page_view_piece_views($party, $view_name, $view_display_id) {
  */
 function crm_party_data_set_edit($set, $pid, $eid) {
   if($eid === null) {
-    return "@todo add add form";
+    //return "@todo add add form";
   }
   
   if(is_object($pid)) {
@@ -168,11 +168,16 @@ function crm_party_data_set_edit_form($form, &$form_state, $dataSet) {
   $form['data-set-type'] = array(
     '#type' => 'hidden',
     '#value' => $dataSet->type,
-  );   
-  
-  $form['data-set-id'] = array(
+  );
+
+  $form['data-set-pid'] = array(
     '#type' => 'hidden',
-    '#value' => $dataSet->id,
+    '#value' => $dataSet->pid,
+  );
+  
+  $form['data-set-eid'] = array(
+    '#type' => 'hidden',
+    '#value' => $dataSet->eid,
   );
   
   $dataSet->form($form,$form_state);
@@ -200,9 +205,20 @@ function crm_party_data_set_edit_form_validate($form, &$form_state) {
  */
 function crm_party_data_set_edit_form_submit($form, &$form_state) {
   $type = $form_state['values']['data-set-type'];
-  $peid = $form_state['values']['data-set-id'];
+  $info = array(
+    'party' => $form_state['values']['data-set-pid'],
+    'entity' => $form_state['values']['data-set-eid'],
+  );
   
-  $dataSet = CRMPartyDataSet::getInstance($type, $peid, CRMPartyDataSet::FROM_PEID);
+  if(!is_numeric($info['entity'])) {
+    $sets = crm_party_get_data_set_info();
+    $class = $sets[$type]['class'];
+    
+    $info['entity'] = $form_state['entity']->{$class::ENTITY_ID_KEY};
+  }
+  
+  $dataSet = CRMPartyDataSet::getInstance($type, $info);
+  $dataSet->attach($dataSet->party);
   
   $form_state['redirect'] = 'party/' . $dataSet->pid;
 }

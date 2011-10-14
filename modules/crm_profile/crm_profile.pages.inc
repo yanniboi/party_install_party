@@ -38,7 +38,7 @@ function crm_profile_party_view_profile_set($party, $profile_type) {
     '#links' => array(
       'add' => array(
         'title' => "Add " . $label,
-        'href'  => 'party/' . $party->pid . '/add/' . $profile_type,
+        'href'  => 'party/' . $party->pid . '/add/profile2_' . $profile_type,
       ),
     ),
     '#attributes' => array('class' => array('crm-profile-links')),

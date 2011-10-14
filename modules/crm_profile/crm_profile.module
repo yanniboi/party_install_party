@@ -12,7 +12,7 @@
  * DEPRECATED this will now be done with data sets
  */
 function crm_profile_menu() {
-  // @todo: not sure we should be fiddling with profile's menu stuff!
+  /* @todo: not sure we should be fiddling with profile's menu stuff!
   $items['profile/%profile2/edit'] = array(
     'title' => 'Edit Profile',
     'page callback' => 'profile_page_edit',
@@ -21,7 +21,7 @@ function crm_profile_menu() {
     'access arguments' => array('update', 1),
     'file' => 'crm_profile.pages.inc',
   );
-  $items['party/%crm_party/add/%profile2_type'] = array(
+  /*$items['party/%crm_party/add/%profile2_type'] = array(
     'title' => 'Add Profile',
     'page callback' => 'profile_page_add',
     'page arguments' => array(1,3),
@@ -29,7 +29,7 @@ function crm_profile_menu() {
     'access arguments' => array('create',3),
     'file' => 'crm_profile.pages.inc',
   );
-  return $items;
+  return $items;*/
 }
 
 /**
@@ -87,7 +87,7 @@ function crm_profile_profile2_type_delete($type) {
 
 /**
  * Load a profile
- */
+ *
 function crm_profile_load_profile($party, $set_type, $set_id, $type) {
   return entity_load('profile2', $set_id);
 }
@@ -96,7 +96,7 @@ function crm_profile_load_profile($party, $set_type, $set_id, $type) {
  * Get the profile2 form data
  * @todo: Make this have $form and $form_state
  * @todo: finish
- */
+ *
 function crm_profile_form(&$form, &$form_state, $party, $set_type, $set_id, $type) {
   // Make sure the uid is null. 
   $form['uid'] = array(
@@ -178,7 +178,7 @@ function crm_profile_form_crm_party_edit_form_alter(&$form, &$form_state, $form_
 
 /**
  * Relate the profile2 entities to the crm_party in form_state
- */
+ *
 function crm_profile_post_form_submit_relate($form, &$form_state) {
   $party = $form_state['crm_party'];
   $profiles = array();
@@ -208,7 +208,7 @@ function crm_profile_post_form_submit_relate($form, &$form_state) {
  *   A fully loaded party object, from crm_party_load(). Whats important is that the pid is correct.
  * @param $profile
  *   A profile2 object
- */
+ *
 function _crm_party_profile_relate($party, $profile) {
   $endpoints = array();
   $endpoints[] = array(
@@ -285,7 +285,7 @@ function crm_profile_crm_party_page_view_alter($party) {
  *
  * @return 
  *  An array of profiles attached to this party of the for ['type'][] = $profile;
- */
+ *
 function _crm_profile_load_by_party($party) {
   // Get the pid from whatever is passed.
   $pid = is_object($party) ? $party->pid : $party;
@@ -328,7 +328,7 @@ function _crm_profile_load_parties($profile) {
 
 /**
  * Find out if a profile is a null profile.
- */
+ *
 function _crm_profile_is_null(&$profile) {
   $query = db_select('crm_profile_null');
   $query->condition('pid', $profile->pid, '=');
@@ -349,7 +349,7 @@ function _crm_profile_is_null(&$profile) {
  *
  * This is just a stand-in until http://drupal.org/node/1288894 gets in, and
  * make developing CRM require one less patch to contrib modules.
- */
+ *
 function _crm_profile_relation_get_related_entities($entity_type, $entity_id, $relation_type = NULL, $r_index = NULL) {
   $query = relation_query($entity_type, $entity_id, $r_index);
   if ($relation_type) {
@@ -401,16 +401,18 @@ class Profile2DataSet extends CRMPartyDataSet {
   const ENTITY_ID_KEY = "pid";
   
   public function form(&$form, &$form_state) {
+    //If we're adding a set
+    if($this->eid === null) {
+      $this->entity = profile_create(array('type' => substr($this->type, 9))); //get rid of the profile2_ at the begginning
+    }
+    
     // @todo: don't stash things in the form state; put them either
     // in the form as hash properties or values.
     $form_state['profiles'][$this->entity->type] = $this->entity;
+    $form_state['entity'] = $this->entity;
     $form_state['party'] = $this->party;
     profile2_attach_form($form, $form_state);
 
-    if (!isset($this->entity->pid)) {
-      $form['#submit'][] = "profile_add_form_submit";
-    }
-    
     return $form;
   }
 }

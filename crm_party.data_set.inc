@@ -70,6 +70,8 @@ abstract class CRMPartyDataSet {
    */
   public $hat;
   
+  public $attached = FALSE;
+  
   /**
    * construct
    *   Build this object from a set instance id
@@ -85,11 +87,15 @@ abstract class CRMPartyDataSet {
         
     if(is_numeric($entity)) {
       $this->eid = $entity;
-      $this->entity = $this->loadData();
+      $this->loadData();
     }
     else if ($entity !== null) {
       $this->entity = $entity;
       $this->eid = $entity->{$this->getEntityIdKey()};
+    }
+    else {
+      $this->eid = null;
+      $this->entity = null;
     }
     
     // If the party is set we set the party and find the row in the data set table
@@ -104,24 +110,26 @@ abstract class CRMPartyDataSet {
         $this->pid = $party->pid;
       }
       
-      $query = db_select($this->getTableName(), 'ds');
-      $query->fields('ds');
-      $query->condition('pid', $this->pid, '=');
-      $query->condition('eid', $this->eid, '=');
-      $result = $query->execute()->fetchAssoc();
-      
-      // If there is no data set instance in the db we unset party and treat this like it
-      // hasn't been attached yet;
-      if(!$result) {
-        unset($this->party);
-        unset($this->pid);
+      if ($this->entity !== null) {
+        $query = db_select($this->getTableName(), 'ds');
+        $query->fields('ds');
+        $query->condition('pid', $this->pid, '=');
+        $query->condition('eid', $this->eid, '=');
+        $result = $query->execute()->fetchAssoc();
+        
+        // If there is no data set instance in the db we unset party and treat this like it
+        // hasn't been attached yet;
+        if(!$result) {
+          $this->attached = FALSE;
+        }
+        else {
+          $this->attached = TRUE;
+          $this->main = $result['main'];
+          $this->hat = $result['hat'];
+          $this->hat_main = $result['hat_main'];
+          $this->id = $result['peid'];
+        }  
       }
-      else {
-        $this->main = $result['main'];
-        $this->hat = $result['hat'];
-        $this->hat_main = $result['hat_main'];
-        $this->id = $result['peid'];
-      }      
     }    
   }
   
@@ -150,6 +158,9 @@ abstract class CRMPartyDataSet {
    *   The party object we're attaching to.
    */
   public function attach($party) {
+    if(isset($this->party) AND $this->party != $party)
+      return;   
+    
     $relation = array(
       'pid' => $party->pid,
       'eid' => $this->entity->{$this->getEntityIdKey()},
@@ -162,9 +173,19 @@ abstract class CRMPartyDataSet {
       'hat_main' => FALSE,
     );
 
-    // @todo: figure out when to insert and when to update! we probably need
-    // an extra parameter for this. #fail :(
-    drupal_write_record($this->getTableName(), $relation);
+    // Try update first, and if that fails insert.
+    $result = db_update($this->getTableName())
+      ->fields(array(
+        'main' => $relation['main'],
+        'hat' => $relation['hat'],
+        'hat_main' => $relation['hat_main'],
+      ))
+      ->condition('pid',$relation['pid'],'=')
+      ->condition('eid',$relation['eid'],'=')
+      ->execute();
+    if ($result == 0) {
+      drupal_write_record($this->getTableName(), $relation);
+    }    
   }
   
   /**
