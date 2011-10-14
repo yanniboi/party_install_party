@@ -135,7 +135,7 @@ abstract class CRMPartyDataSet {
   public function loadData() {
     if (!isset($this->entity)) {
       // @todo: make this cleaner without the array faffing.
-      $data = entity_load($this->type, array($this->eid));
+      $data = entity_load($this->getEntityType(), array($this->eid));
       $this->entity = $data[$this->eid];
     }
     
