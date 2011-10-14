@@ -220,7 +220,8 @@ function crm_party_data_set_edit_form_submit($form, &$form_state) {
   $dataSet = CRMPartyDataSet::getInstance($type, $info);
   $dataSet->attach($dataSet->party);
   
-  $form_state['redirect'] = 'party/' . $dataSet->pid;
+  // Redirect to the set piece.
+  $form_state['redirect'] = 'party/' . $dataSet->pid . '/' . $dataSet->getPathArg();
 }
 
 /**

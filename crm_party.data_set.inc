@@ -231,7 +231,13 @@ abstract class CRMPartyDataSet {
   public function getLabel() {
     return $this->entity->label;
   }
-   
+
+  /**
+   * Get the path argument for this set.
+   */
+   public function getPathArg() {
+     return str_replace('_', '-', $this->type);
+   }
    
   
   /**

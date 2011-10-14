@@ -422,4 +422,12 @@ class Profile2DataSet extends CRMPartyDataSet {
 
     return $form;
   }
+
+  /**
+   * Get the path argument for this set.
+   */
+   public function getPathArg() {
+     // @todo: figure a way to move this back up. It's messy here.
+     return str_replace('_', '-', 'profile-' . $this->entity->type);
+   }
 }
