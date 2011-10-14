@@ -404,11 +404,15 @@ class Profile2DataSet extends CRMPartyDataSet {
   const VIEW_MODE = 'party';
   
   public function form(&$form, &$form_state) {
-    //If we're adding a set
-    if($this->eid === null) {
-      $this->entity = profile_create(array('type' => substr($this->type, 9))); //get rid of the profile2_ at the begginning
+    // If we're adding a set
+    if ($this->eid === NULL) {
+      $this->entity = profile_create(array(
+        'type'  => substr($this->type, 9), // @todo get rid of the profile2_ at the beginning
+        // The uid needs to be set even if it is NULL.
+        'uid'   => NULL,
+      ));
     }
-    
+
     // @todo: don't stash things in the form state; put them either
     // in the form as hash properties or values.
     $form_state['profiles'][$this->entity->type] = $this->entity;
