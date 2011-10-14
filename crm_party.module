@@ -528,6 +528,8 @@ function crm_party_data_set_load($party, $set_name) {
     $dataSets[] = new $class($set_name, $eid, $party);
   }
   
+  $entities = array();
+  
   // @todo get this function to return a set of data sets rather than
   // a set of entities. (need to make sure whatever calls it is ready for
   // the change).
