@@ -147,6 +147,10 @@ function crm_party_data_set_edit($set, $pid, $eid) {
     return "@todo add add form";
   }
   
+  if(is_object($pid)) {
+    $pid = $pid->pid;  
+  }
+  
   $info = array(
     'party' => $pid,
     'entity' => $eid,
@@ -195,10 +199,15 @@ function crm_party_data_set_edit_form_submit($form, &$form_state) {
  * Remove a data set from a party
  */
 function crm_party_data_set_remove($set, $pid, $eid) {
+  if(is_object($pid)) {
+    $pid = $pid->pid;  
+  }
+  
   $info = array(
     'party' => $pid,
     'entity' => $eid,
   );
+  
   $dataSet = CRMPartyDataSet::getInstance($set,$info);
   drupal_set_title(t('Are you sure you want to remove ' . $dataSet->entity->label . ' from ' . $dataSet->party->label . '?'));
   return drupal_get_form('crm_party_data_set_remove_confirm', $dataSet);
@@ -239,7 +248,8 @@ function crm_party_data_set_remove_confirm_submit($form, &$form_state) {
   $peid = $form_state['values']['data-set-id'];
   
   $dataSet = CRMPartyDataSet::getInstance($type, $peid, CRMPartyDataSet::FROM_PEID);
+  $pid = $dataSet->pid;
   $dataSet->detach();
   
-  $form_state['#redirect'] = 'party/' . $dataSet->pid;
+  $form_state['redirect'] = 'party/' . $pid;
 }
