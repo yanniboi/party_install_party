@@ -194,14 +194,14 @@ function crm_party_data_set_edit_form($form, &$form_state, $dataSet) {
 }
 
 /**
- * The data set edit validate.
+ * Validation handler for the data set edit form.
  */
 function crm_party_data_set_edit_form_validate($form, &$form_state) {
   
 }
 
 /**
- * The data set edit validate.
+ * Submit handler for the data set edit form.
  */
 function crm_party_data_set_edit_form_submit($form, &$form_state) {
   $type = $form_state['values']['data-set-type'];
@@ -210,7 +210,7 @@ function crm_party_data_set_edit_form_submit($form, &$form_state) {
     'entity' => $form_state['values']['data-set-eid'],
   );
   
-  if(!is_numeric($info['entity'])) {
+  if (!is_numeric($info['entity'])) {
     $sets = crm_party_get_data_set_info();
     $class = $sets[$type]['class'];
     
