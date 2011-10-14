@@ -131,3 +131,115 @@ function crm_party_page_view_piece_views($party, $view_name, $view_display_id) {
     $view->destroy();
   }
 }
+
+/**
+ * Show the edit form for an individual data set
+ *
+ * @param $set
+ *   'The set type'
+ * @param $pid
+ *    The id of the party
+ * @param $eid
+ *    The id of the entity
+ */
+function crm_party_data_set_edit($set, $pid, $eid) {
+  if($eid === null) {
+    return "@todo add add form";
+  }
+  
+  $info = array(
+    'party' => $pid,
+    'entity' => $eid,
+  );
+  $dataSet = CRMPartyDataSet::getInstance($set,$info);
+  return drupal_get_form('crm_party_data_set_edit_form', $dataSet);
+}
+
+/**
+ * The data set edit form.
+ */
+function crm_party_data_set_edit_form($form, &$form_state, $dataSet) {
+  $form['#dataSet'] = $dataSet;
+  
+  $form['dataSet'] = array(
+    '#type' => 'hidden',
+    '#value' => $dataSet->id,
+  );
+  
+  $dataSet->form($form,$form_state);
+  
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+    '#weight' => 99,
+  );
+  
+  return $form;
+}
+
+/**
+ * The data set edit validate.
+ */
+function crm_party_data_set_edit_form_validate($form, &$form_state) {
+  
+}
+
+/**
+ * The data set edit validate.
+ */
+function crm_party_data_set_edit_form_submit($form, &$form_state) {
+  
+}
+
+/**
+ * Remove a data set from a party
+ */
+function crm_party_data_set_remove($set, $pid, $eid) {
+  $info = array(
+    'party' => $pid,
+    'entity' => $eid,
+  );
+  $dataSet = CRMPartyDataSet::getInstance($set,$info);
+  drupal_set_title(t('Are you sure you want to remove ' . $dataSet->entity->label . ' from ' . $dataSet->party->label . '?'));
+  return drupal_get_form('crm_party_data_set_remove_confirm', $dataSet);
+}
+
+/**
+ * Data set remove form
+ */
+function crm_party_data_set_remove_confirm($form, &$form_state, $dataSet) {
+  $form['data-set-type'] = array(
+    '#type' => 'hidden',
+    '#value' => $dataSet->type,
+  );   
+  
+  $form['data-set-id'] = array(
+    '#type' => 'hidden',
+    '#value' => $dataSet->id,
+  );
+  
+  $form['description'] = array(
+    '#markup' => '<p>Are you sure you want to remove this data set from this party?</p>',
+  );
+  
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Confirm'),
+    '#weight' => 99,
+  );
+  
+  return $form;
+}
+
+/**
+ * The data set edit validate.
+ */
+function crm_party_data_set_remove_confirm_submit($form, &$form_state) {
+  $type = $form_state['values']['data-set-type'];
+  $peid = $form_state['values']['data-set-id'];
+  
+  $dataSet = CRMPartyDataSet::getInstance($type, $peid, CRMPartyDataSet::FROM_PEID);
+  $dataSet->detach();
+  
+  $form_state['#redirect'] = 'party/' . $dataSet->pid;
+}

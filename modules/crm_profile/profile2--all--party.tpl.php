@@ -35,7 +35,8 @@
     ?>
     <div class="crm_profile_ops" style="float: right;">
       <?php /* @todo these should be done with Contextual links module */ ?>
-      <?php print l("Edit", 'profile/' . $profile2->pid . '/edit'); ?>
+      <?php print l("Edit", 'profile/' . $profile2->pid . '/edit'); ?> 
+      <?php print l("Remove", 'party/' . $party->pid . '/remove/profile2_' . $profile2->type . '/' . $profile2->pid); ?>
     </div>
   </div>
 </div>

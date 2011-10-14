@@ -123,9 +123,27 @@ function crm_user_post_form_submit_relate($form, &$form_state) {
  *  The user data set wrapper class
  */
 class UserDataSet extends CRMPartyDataSet {
-   
   const ENTITY_TYPE = "user";
   const ENTITY_ID_KEY = "uid";
 
+  public function form(&$form, &$form_state) {
+    // Store the account uid so we can check if it changes on submit.
+    $form['crm_user_uid'] = array(
+      '#type' => 'value',
+      '#value' => isset($this->entity) ? $this->entity->uid : NULL,
+    );
+
+    $form['user'] = array(
+      '#type' => 'textfield',
+      '#title' => t('User'),
+      '#maxlength' => 60,
+      '#autocomplete_path' => 'user/autocomplete',
+      '#default_value' => isset($this->entity) ? $this->entity->name : '',
+      '#weight' => -1,
+      '#description' => t('Leave blank for %anonymous.', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
+    );
+
+    $form['#submit'][] = 'crm_user_post_form_submit_relate';
+  }
 }
 

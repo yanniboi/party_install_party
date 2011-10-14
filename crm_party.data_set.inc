@@ -6,16 +6,25 @@
 abstract class CRMPartyDataSet {
   
   /**
-   * abstract $entity_type
+   * ENTITY_TYPE
    *   The entity type this Data Set Wraps around
    */
   const ENTITY_TYPE = "";
   
   /**
-   * abstract $entity_id_col
-   *   The entity type this Data Set Wraps around
+   * ENTITY_ID_KEY
+   *   The key of the entity unique id
    */
   const ENTITY_ID_KEY = "";
+  
+  /**
+   * Used in getInstance() to know how we're loading an
+   *   instance.
+   */
+  const FROM_PARTY_AND_ENTITY = 0;
+  const FROM_PEID = 1;
+  const FROM_PARTY = 2;
+  const FROM_ENTITY = 3;
   
   /**
    * var int $id
@@ -76,8 +85,9 @@ abstract class CRMPartyDataSet {
         
     if(is_numeric($entity)) {
       $this->eid = $entity;
+      $this->entity = $this->loadData();
     }
-    else {
+    else if ($entity !== null) {
       $this->entity = $entity;
       $this->eid = $entity->{$this->getEntityIdKey()};
     }
@@ -87,7 +97,7 @@ abstract class CRMPartyDataSet {
     if(isset($party)) {
       if(is_numeric($party)) {
         $this->pid = $party;
-        $this->party = entity_load('crm_party', $party);
+        $this->party = reset(entity_load('crm_party', array($party)));
       }
       else {
         $this->party = $party;
@@ -156,12 +166,48 @@ abstract class CRMPartyDataSet {
   }
   
   /**
+   * form
+   *   Return the form for this data set
+   */
+  abstract public function form(&$form, &$form_state);
+  
+  /**
+   * form_validate
+   */
+  public function form_validate($form, &$form_state) {
+    return;
+  }
+  
+  /**
+   * form_submit
+   */
+  //abstract public function form_submit($form, &$form_state);
+  
+  /**
+   * actions
+   * Return a array of action links
+   */
+  public function actions() {
+    $actions = array(
+      'edit' => array(
+        'title' => 'Edit',
+        'href' => 'party/' . $this->party->pid . '/edit/' . $this->type . '/' . $this->entity->{$this->getEntityIdKey()},
+      ),
+      'remove' => array(
+        'title' => 'Remove',
+        'href' => 'party/' . $this->party->pid . '/remove/' . $this->type . '/' . $this->entity->{$this->getEntityIdKey()},
+      ),
+    );
+    return $actions;
+  }  
+  
+  /**
    * detach
    *   detach this data from the party
    */
   public function detach() {
     db_delete($this->getTableName())
-    ->condition('peid', $this->id)
+    ->condition('peid', $this->id, '=')
     ->execute();
     
     //now treat this as a "temporary data set" by unsetting the party end
@@ -234,5 +280,95 @@ abstract class CRMPartyDataSet {
    */
   public static function getInstanceTable($type) {
     return 'crm_party_set_' . $type;
+  }
+  
+  /**
+   * getInstance
+   *   Get an instance of the CRMPartyDataSet class
+   *
+   * @param $type the type of data set.
+   * @param $info The data to load the instance from
+   *   Either a
+   *   - peid
+   *   - party_id
+   *   - entity_id
+   *   - Array(
+   *      - party a party id
+   *      - entity an entity id
+   * @param $how The way to load the instance
+   */
+  public static function getInstance($type, $info, $how = self::FROM_PARTY_AND_ENTITY) {
+    $sets = crm_party_get_data_set_info();
+    $class = $sets[$type]['class'];
+    
+    switch($how) {
+      case self::FROM_PEID :
+        $result = db_select(CRMPartyDataSet::getInstanceTable($type), 'ds')
+          ->fields('ds',array('pid','eid'))
+          ->condition('peid', $info, '=')
+          ->execute()
+          ->fetchAssoc();
+          
+        // @todo add error handling for if record doesnt exist
+        return new $class($type,$result['eid'],$result['pid']);
+        break;
+      case self::FROM_PARTY :
+        // @todo Make some kind of proccess for adding data sets for entities that
+        // dont exist yet.
+        break;
+      case self::FROM_ENTITY :
+        return new $class($type,$info);
+        break;
+      case self::FROM_PARTY_AND_ENTITY :
+        return new $class($type,$info['entity'],$info['party']);
+        break;
+    }
+  }
+  
+  /**
+   * getInstances
+   *   Get all instances attached to a party
+   *
+   * @param $type the type of data set.
+   * @param $info The data to load the instance from
+   *   Either a
+   *   - party_id
+   *   - entity_id
+   * 
+   * @param $how The way to load the instances
+   */
+  public static function getInstances($type, $info, $how = self::FROM_PARTY) {
+    $sets = crm_party_get_data_set_info();
+    $class = $sets[$type]['class'];
+    $results = array();
+    
+    switch($how) {
+      case self::FROM_PARTY :
+        $info = (is_object($info)) ? $info->pid : $info;
+        $results = db_select(CRMPartyDataSet::getInstanceTable($type), 'ds')
+          ->fields('ds',array('peid','pid','eid'))
+          ->condition('pid', $info, '=')
+          ->execute()
+          ->fetchAllAssoc('peid',PDO::FETCH_ASSOC);
+        break;
+      case self::FROM_ENTITY :
+        $results = db_select(CRMPartyDataSet::getInstanceTable($type), 'ds')
+          ->fields('ds',array('peid','pid','eid'))
+          ->condition('eid', $info, '=')
+          ->execute()
+          ->fetchAllAssoc('peid',PDO::FETCH_ASSOC);
+        break;          
+    }
+    
+    $dataSets = array();
+    foreach ($results as $peid => $result) {
+      $info = array(
+        'party' => $result['pid'],
+        'entity' => $result['eid'],
+      );
+      $dataSets[$peid] = self::getInstance($type, $info);
+    }
+    
+    return $dataSets;
   }
 }

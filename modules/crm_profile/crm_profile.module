@@ -278,59 +278,6 @@ function crm_profile_crm_party_page_view_alter($party) {
 }
 
 /**
- * Implements hook_entity_insert().
- *
- * Make the right relation when a profile type is added.
- */
-// OBSOLETE -- we are using hook_profile2_type_insert() above.
-/* 
-function crm_profile_entity_insert($entity, $type) {
-  if ($type == 'profile2_type') {  
-    // Create the null profile.
-    $profile = profile_create(array('type' => $entity->type, 'uid' => NULL));
-    profile2_save($profile);
-      
-    $data = array(
-      'type' => $entity->type,
-      'pid' => $profile->pid,
-    );
-    drupal_write_record('crm_profile_null', $data);
-
-    //Create a relation type
-    $relation_type = array(
-      'relation_type' => 'party_to_profile2_' . $entity->type,
-      'label' => 'Party to Profile ' . $entity->label,
-      'max_arity' => 2,
-      'source_bundles' => array(
-        'crm_party:*',
-        'profile2:' . $entity->type,
-      ),
-    );
-    
-    relation_type_save($relation_type); 
-    drupal_set_message(t("Contact to profile @entity-label created", array(
-      '@entity-label' => $entity->label,
-    )));
-    
-    //TODO: Relate every existing party to this null profile;
-    $query = db_select('crm_party', 'cp');
-    $query->fields('cp');
-    $result = $query->execute();
-    
-    while ($record = $result->fetchAssoc()) {
-      //this is cheating so we can use another function, probably the function needs to be fixed
-      $party = new stdClass();
-      $party->pid = $record['pid'];
-      $party->label = $record['label'];
-      
-      _crm_party_profile_relate($party, $profile);
-    }
-  }
-}
-*/
-
-
-/**
  * Load all the profiles for a given party. 
  *
  * @param $party
@@ -452,4 +399,19 @@ function crm_profile_theme($existing, $type, $theme, $path) {
 class Profile2DataSet extends CRMPartyDataSet {
   const ENTITY_TYPE = "profile2";
   const ENTITY_ID_KEY = "pid";
+  
+  public function form(&$form, &$form_state) {
+    // @todo: don't stash things in the form state; put them either
+    // in the form as hash properties or values.
+    $form_state['profiles'][$this->entity->type] = $this->entity;
+    $form_state['party'] = $this->party;
+    profile2_attach_form($form, $form_state);
+
+    if (!isset($this->entity->pid)) {
+      $form['#submit'][] = "profile_add_form_submit";
+    }
+    
+    $form['#submit'][] = "profile_edit_form_submit";
+    return $form;
+  }
 }

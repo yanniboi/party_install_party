@@ -223,6 +223,32 @@ function crm_party_menu() {
     'type' => MENU_LOCAL_TASK,
   );
   // End temporary.
+  
+  // Edit data set instance
+  $items['party/%/edit/%/%'] = array(
+    'page callback' => 'crm_party_data_set_edit',
+    'page arguments' => array(3,1,5), //3 Arguments, party then set type then set eid
+    'access callback' => true,
+    'access arguments' => array('edit contacts'),
+    'file' => 'crm_party.pages.inc',
+  ); 
+  
+  // Remove a data set instance
+  $items['party/%/remove/%/%'] = array(
+    'page callback' => 'crm_party_data_set_remove',
+    'page arguments' => array(3,1,5), //3 Arguments, party then set type then set eid
+    'access callback' => true,
+    'file' => 'crm_party.pages.inc',
+  );
+  
+  // Add a new instance of a data set
+  $items['party/%/add/%'] = array(
+    'page callback' => 'crm_party_data_set_edit',
+    'page arguments' => array(3,1,null), //3 Arguments, party then set type then set eid
+    'access callback' => true,
+    'access arguments' => array('edit contacts'),
+    'file' => 'crm_party.pages.inc',
+  );
 
   $items['party/add'] = array(
     'title' => 'Add party',

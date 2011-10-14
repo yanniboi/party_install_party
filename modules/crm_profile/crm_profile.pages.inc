@@ -11,17 +11,23 @@ function crm_profile_party_view_profile_set($party, $profile_type) {
   $build = array();
 
   // Load the profiles in this data set.
-  $profiles = crm_party_data_set_load($party, "profile2_" . $profile_type);
+  $sets = CRMPartyDataSet::getInstances("profile2_" . $profile_type, $party);
   
-  foreach ($profiles as $profile) {
+  foreach ($sets as $set) {
+    $profile = $set->entity;
     if (profile2_access('view', $profile)) {
-      $profile->this_party = $party;
-
       $build['profile_' . $profile->pid] = array(
         '#type' => 'fieldset',
         '#title' => $profile->label,
       );
       $build['profile_' . $profile->pid]['view'] = $profile->view('party');
+      $build['profile_' . $profile->pid]['actions'] = array(
+        '#theme' => 'links',
+        '#links' => $set->actions(),
+        '#attributes' => array(
+          'class' => array('crm-set-action-links'),
+        ),
+      );
     }
   }
 
