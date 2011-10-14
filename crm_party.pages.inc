@@ -284,20 +284,24 @@ function crm_party_data_set_remove_confirm_submit($form, &$form_state) {
 }
 
 /**
- * View a data set
+ * Page callback to view a data set.
  */
 function crm_party_view_data_set($party, $set) {
   $dataSets = CRMPartyDataSet::getInstances($set, $party);
   
-  foreach($dataSets as $dataSet) {
+  foreach ($dataSets as $dataSet) {
     $entity = $dataSet->entity;
     $build[$dataSet->type . '_' . $dataSet->id] = array(
+        // @todo: this is sort of an abuse of what fieldsets are meant for... :/
         '#type' => 'fieldset',
         // @todo: stop this depending on $entity being a drupal entity
+        // really? anything that's not an Entity on D7 isn't worth bothering with!
         '#title' => $dataSet->getLabel(),
       );
     
     $build[$dataSet->type . '_' . $dataSet->id]['view'] = $dataSet->display($dataSet::VIEW_MODE);
+ 
+    // @todo: change these to contextual links.
     $build[$dataSet->type . '_' . $dataSet->id]['actions'] = array(
       '#theme' => 'links',
       '#links' => $dataSet->actions(),
@@ -308,7 +312,7 @@ function crm_party_view_data_set($party, $set) {
   }
   
   $setDef = CRMPartyDataSet::getSetDefinition($set);
-  if(!isset($setDef['max cardinality']) OR count($dataSets) < $setDef['max cardinality']) {
+  if(!isset($setDef['max cardinality']) || count($dataSets) < $setDef['max cardinality']) {
     $build[$set . '_links'] = array(
       '#theme' => 'links',
       '#links' => array(
