@@ -50,7 +50,7 @@ function crm_profile_party_view_profile_set($party, $profile_type) {
 
 /**
  * Make the profile edity page
- */
+ *
 function profile_page_edit($profile) {
   //TODO: do some magic and work out the page title. 
   //This works for now but will break once parties share the same profile
@@ -61,7 +61,7 @@ function profile_page_edit($profile) {
 
 /**
  * Make the profile add page
- */
+ *
 function profile_page_add($party,$profile_type) {
   //TODO: do some magic and work out the page title. 
   //This works for now but will break once parties share the same profile
@@ -75,7 +75,7 @@ function profile_page_add($party,$profile_type) {
  * Make a form to edit an individual profile
  *
  * The Party is the Party we will Redirect Back to.
- */ 
+ *
 function profile_edit_form($form, &$form_state, $profile, $party) {
   // @todo: don't stash things in the form state; put them either
   // in the form as hash properties or values.
@@ -103,14 +103,14 @@ function profile_edit_form($form, &$form_state, $profile, $party) {
  * Submit handler for profile edit for.
  *
  * Currently this just sets the redirect.
- */
+ *
 function profile_edit_form_submit($form, &$form_state) {
   $form_state['redirect'] = 'party/' . $form_state['party']->pid;
 }
 
 /**
  * Add a new profile to the party.
- */
+ *
 function profile_add_form_submit($form, &$form_state) {
   // Relate the party to the new profile
   $party = $form_state['party'];
