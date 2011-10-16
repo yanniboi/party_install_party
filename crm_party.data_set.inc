@@ -386,7 +386,7 @@ abstract class CRMPartyDataSet {
     // @todo: fail gracefull if no class found, eg bad URLs.
     $class = $sets[$type]['class'];
     
-    switch($how) {
+    switch ($how) {
       case self::FROM_PEID :
         $result = db_select(CRMPartyDataSet::getInstanceTable($type), 'ds')
           ->fields('ds',array('pid','eid'))

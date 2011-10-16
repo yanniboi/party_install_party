@@ -322,7 +322,7 @@ function crm_party_view_data_set($party, $set) {
   }
   
   $setDef = CRMPartyDataSet::getSetDefinition($set);
-  if(!isset($setDef['max cardinality']) || count($dataSets) < $setDef['max cardinality']) {
+  if (!isset($setDef['max cardinality']) || count($dataSets) < $setDef['max cardinality']) {
     $build[$set . '_links'] = array(
       '#theme' => 'links',
       '#links' => array(
