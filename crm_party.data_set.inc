@@ -383,6 +383,7 @@ abstract class CRMPartyDataSet {
    */
   public static function getInstance($type, $info, $how = self::FROM_PARTY_AND_ENTITY) {
     $sets = crm_party_get_data_set_info();
+    // @todo: fail gracefull if no class found, eg bad URLs.
     $class = $sets[$type]['class'];
     
     switch($how) {
