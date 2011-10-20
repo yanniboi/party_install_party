@@ -274,6 +274,9 @@ function crm_party_menu() {
   return $items;
 }
 
+/**
+ * Implements hook_admin_paths().
+ */
 function crm_party_admin_paths() {
   $paths = array(
     'party/*/edit/*' => TRUE,
