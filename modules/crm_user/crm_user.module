@@ -9,9 +9,9 @@
  * Implements hook_entity_info_alter().
  */
 function crm_user_entity_info_alter(&$entity_info) {
-  $entity_info['user']['crm controller class'] = 'EntityDefaultCRMController';
+  $entity_info['user']['crm controller class'] = 'UserCRMController';
   // Pass this on to the controller class to make further changes.
-  EntityDefaultCRMController::hook_entity_info_alter($entity_info['user']);
+  UserCRMController::hook_entity_info_alter($entity_info['user']);
 }
 
 /**
@@ -21,7 +21,7 @@ function crm_user_crm_party_data_set_info() {
   $sets['user'] = array(
     'label' => t("User account"),
     'entity type' => 'user',
-    'class' => 'UserDefaultCRMController',
+    'class' => 'UserCRMController',
     'singleton' => TRUE,
     'max cardinality' => 1,
     'load callback' => "crm_user_load_user",
@@ -145,7 +145,7 @@ function crm_user_user_edit_form_submit($form, &$form_state) {
  *
  * @todo: move this to an inc file for autoloading.
  */
-class UserDefaultCRMController extends EntityDefaultCRMController {
+class UserCRMController extends EntityDefaultCRMController {
   const ENTITY_TYPE = "user";
   const ENTITY_ID_KEY = "uid";
   

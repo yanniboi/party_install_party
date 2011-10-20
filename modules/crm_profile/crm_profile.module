@@ -38,9 +38,9 @@ function crm_profile_menu() {
  * Add a new view mode to profile2's for parties
  */
 function crm_profile_entity_info_alter(&$entity_info) {
-  $entity_info['profile2']['crm controller class'] = 'EntityDefaultCRMController';
+  $entity_info['profile2']['crm controller class'] = 'Profile2CRMController';
   // Pass this on to the controller class to make further changes.
-  EntityDefaultCRMController::hook_entity_info_alter($entity_info['profile2']);
+  Profile2CRMController::hook_entity_info_alter($entity_info['profile2']);
 }
 
 /**
@@ -63,7 +63,7 @@ function crm_profile_crm_party_data_set_info() {
       //'load arguments' => array($type),
       //'form callback' => "crm_profile_form", - No longer needed with class implementation
       //'form arguments' => array($type),
-      'class' => 'Profile2DefaultCRMController',
+      'class' => 'Profile2CRMController',
       // Provide a piece corresponding to each data set.
       'piece' => array(
         'path' => 'profile-' . str_replace('_', '-', $type),
@@ -397,7 +397,7 @@ function crm_profile_theme($existing, $type, $theme, $path) {
  *
  * @todo: move this to an inc file for autoloading.
  */
-class Profile2DefaultCRMController extends EntityDefaultCRMController {
+class Profile2CRMController extends EntityDefaultCRMController {
   const ENTITY_TYPE = "profile2";
   const ENTITY_ID_KEY = "pid";
   
