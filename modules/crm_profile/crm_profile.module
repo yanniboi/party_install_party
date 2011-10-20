@@ -33,6 +33,17 @@ function crm_profile_menu() {
 }
 
 /**
+ * Implements hook_entity_info_alter()
+ *
+ * Add a new view mode to profile2's for parties
+ */
+function crm_profile_entity_info_alter(&$entity_info) {
+  $entity_info['profile2']['crm controller class'] = 'EntityDefaultCRMController';
+  // Pass this on to the controller class to make further changes.
+  EntityDefaultCRMController::hook_entity_info_alter($entity_info['profile2']);
+}
+
+/**
  * Implements hook_crm_party_data_set_info().
  */
 function crm_profile_crm_party_data_set_info() {
@@ -111,17 +122,6 @@ function crm_profile_form(&$form, &$form_state, $party, $set_type, $set_id, $typ
     $form_state['profiles'][$type] = profile_create(array('type' => $type));
   }  
   profile2_attach_form($form, $form_state);  
-}
-
-/**
- * Implements hook_entity_info_alter()
- *
- * Add a new view mode to profile2's for parties
- */
-function crm_profile_entity_info_alter(&$entity_info) {
-  $entity_info['profile2']['crm controller class'] = 'EntityDefaultCRMController';
-  // Pass this on to the controller class to make further changes.
-  EntityDefaultCRMController::hook_entity_info_alter($entity_info['profile2']);
 }
 
 /**
