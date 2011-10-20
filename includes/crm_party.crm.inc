@@ -73,6 +73,22 @@ abstract class EntityDefaultCRMController {
   public $attached = FALSE;
   
   /**
+   * Alters entity info for entities requesting CRM integration.
+   *
+   * @param $entity_info
+   *  The info array for a single entity.
+   *  Apparently, you can pass this in from the original array in an
+   *  implementation of hook_entity_info_alter, thus:
+   *    EntityDefaultCRMController::hook_entity_info_alter($entity_info['profile2']);
+   */
+  static function hook_entity_info_alter(&$entity_info) {
+    $entity_info['view modes']['party'] = array(
+      'label' => t('Party display'),
+      'custom settings' => FALSE,
+    );
+  }
+
+  /**
    * construct
    *   Build this object from a set instance id
    *

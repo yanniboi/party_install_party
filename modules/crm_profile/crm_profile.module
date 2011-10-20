@@ -119,10 +119,9 @@ function crm_profile_form(&$form, &$form_state, $party, $set_type, $set_id, $typ
  * Add a new view mode to profile2's for parties
  */
 function crm_profile_entity_info_alter(&$entity_info) {
-  $entity_info['profile2']['view modes']['party'] = array(
-    'label' => t('Party display'),
-    'custom settings' => FALSE,
-  );
+  $entity_info['profile2']['crm controller class'] = 'EntityDefaultCRMController';
+  // Pass this on to the controller class to make further changes.
+  EntityDefaultCRMController::hook_entity_info_alter($entity_info['profile2']);
 }
 
 /**
