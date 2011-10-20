@@ -6,6 +6,15 @@
  */
 
 /**
+ * Implements hook_entity_info_alter().
+ */
+function crm_user_entity_info_alter(&$entity_info) {
+  $entity_info['user']['crm controller class'] = 'EntityDefaultCRMController';
+  // Pass this on to the controller class to make further changes.
+  EntityDefaultCRMController::hook_entity_info_alter($entity_info['user']);
+}
+
+/**
  * Implements hook_crm_party_data_set_info()
  */
 function crm_user_crm_party_data_set_info() {
