@@ -3,7 +3,7 @@
 /**
  * The standard data set class
  */
-abstract class CRMPartyDataSet {
+abstract class EntityDefaultCRMController {
   
   /**
    * ENTITY_TYPE
@@ -368,7 +368,7 @@ abstract class CRMPartyDataSet {
   
   /**
    * getInstance
-   *   Get an instance of the CRMPartyDataSet class
+   *   Get an instance of the EntityDefaultCRMController class
    *
    * @param $type the type of data set.
    * @param $info The data to load the instance from
@@ -388,7 +388,7 @@ abstract class CRMPartyDataSet {
     
     switch ($how) {
       case self::FROM_PEID :
-        $result = db_select(CRMPartyDataSet::getInstanceTable($type), 'ds')
+        $result = db_select(EntityDefaultCRMController::getInstanceTable($type), 'ds')
           ->fields('ds',array('pid','eid'))
           ->condition('peid', $info, '=')
           ->execute()
@@ -430,14 +430,14 @@ abstract class CRMPartyDataSet {
     switch($how) {
       case self::FROM_PARTY :
         $info = (is_object($info)) ? $info->pid : $info;
-        $results = db_select(CRMPartyDataSet::getInstanceTable($type), 'ds')
+        $results = db_select(EntityDefaultCRMController::getInstanceTable($type), 'ds')
           ->fields('ds',array('peid','pid','eid'))
           ->condition('pid', $info, '=')
           ->execute()
           ->fetchAllAssoc('peid',PDO::FETCH_ASSOC);
         break;
       case self::FROM_ENTITY :
-        $results = db_select(CRMPartyDataSet::getInstanceTable($type), 'ds')
+        $results = db_select(EntityDefaultCRMController::getInstanceTable($type), 'ds')
           ->fields('ds',array('peid','pid','eid'))
           ->condition('eid', $info, '=')
           ->execute()

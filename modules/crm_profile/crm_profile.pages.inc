@@ -11,7 +11,7 @@ function crm_profile_party_view_profile_set($party, $profile_type) {
   $build = array();
 
   // Load the profiles in this data set.
-  $sets = CRMPartyDataSet::getInstances("profile2_" . $profile_type, $party);
+  $sets = EntityDefaultCRMController::getInstances("profile2_" . $profile_type, $party);
   
   // Output each profile provided the user has view access.
   foreach ($sets as $set) {

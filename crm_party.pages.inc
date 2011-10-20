@@ -155,7 +155,7 @@ function crm_party_data_set_edit($set, $pid, $eid = NULL) {
     'party' => $pid,
     'entity' => $eid,
   );
-  $dataSet = CRMPartyDataSet::getInstance($set, $info);
+  $dataSet = EntityDefaultCRMController::getInstance($set, $info);
   return drupal_get_form('crm_party_data_set_edit_form', $dataSet);
 }
 
@@ -183,7 +183,7 @@ function crm_party_data_set_edit_form($form, &$form_state, $dataSet) {
   $form['data-set-main'] = array(
     '#type' => 'checkbox',
     '#default_value' => $dataSet->isMain(),
-    '#title' => "This is the main " . CRMPartyDataSet::getTypeLabel($dataSet->type),
+    '#title' => "This is the main " . EntityDefaultCRMController::getTypeLabel($dataSet->type),
   );
   
   $dataSet->form($form, $form_state);
@@ -223,7 +223,7 @@ function crm_party_data_set_edit_form_submit($form, &$form_state) {
     $info['entity'] = $form_state['entity']->{$class::ENTITY_ID_KEY};
   }
   
-  $dataSet = CRMPartyDataSet::getInstance($type, $info);
+  $dataSet = EntityDefaultCRMController::getInstance($type, $info);
   
   $options = array(
     'main' => $form_state['values']['data-set-main'],
@@ -247,7 +247,7 @@ function crm_party_data_set_remove($set, $pid, $eid) {
     'entity' => $eid,
   );
   
-  $dataSet = CRMPartyDataSet::getInstance($set,$info);
+  $dataSet = EntityDefaultCRMController::getInstance($set,$info);
   drupal_set_title(t('Are you sure you want to remove ' . $dataSet->getLabel() . ' from ' . $dataSet->party->label . '?'));
   return drupal_get_form('crm_party_data_set_remove_confirm', $dataSet);
 }
@@ -286,7 +286,7 @@ function crm_party_data_set_remove_confirm_submit($form, &$form_state) {
   $type = $form_state['values']['data-set-type'];
   $peid = $form_state['values']['data-set-id'];
   
-  $dataSet = CRMPartyDataSet::getInstance($type, $peid, CRMPartyDataSet::FROM_PEID);
+  $dataSet = EntityDefaultCRMController::getInstance($type, $peid, EntityDefaultCRMController::FROM_PEID);
   $pid = $dataSet->pid;
   $dataSet->detach();
   
@@ -297,7 +297,7 @@ function crm_party_data_set_remove_confirm_submit($form, &$form_state) {
  * Page callback to view a data set.
  */
 function crm_party_view_data_set($party, $set) {
-  $dataSets = CRMPartyDataSet::getInstances($set, $party);
+  $dataSets = EntityDefaultCRMController::getInstances($set, $party);
   
   foreach ($dataSets as $dataSet) {
     $entity = $dataSet->entity;
@@ -321,13 +321,13 @@ function crm_party_view_data_set($party, $set) {
     );    
   }
   
-  $setDef = CRMPartyDataSet::getSetDefinition($set);
+  $setDef = EntityDefaultCRMController::getSetDefinition($set);
   if (!isset($setDef['max cardinality']) || count($dataSets) < $setDef['max cardinality']) {
     $build[$set . '_links'] = array(
       '#theme' => 'links',
       '#links' => array(
         'add' => array(
-          'title' => "Add " . CRMPartyDataSet::getTypeLabel($set),
+          'title' => "Add " . EntityDefaultCRMController::getTypeLabel($set),
           'href'  => 'party/' . $party->pid . '/add/' . $set,
         ),
       ),

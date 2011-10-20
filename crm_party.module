@@ -549,7 +549,7 @@ function crm_party_data_set_load($party, $set_name) {
   $sets = crm_party_get_data_set_info();
   //dsm($sets);
 
-  $table = CRMPartyDataSet::getInstanceTable($set_name);
+  $table = EntityDefaultCRMController::getInstanceTable($set_name);
   $items = db_select($table, 'ds')
     ->fields('ds')
     ->condition('pid',$party->pid,'=')

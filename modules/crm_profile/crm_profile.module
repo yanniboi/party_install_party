@@ -52,7 +52,7 @@ function crm_profile_crm_party_data_set_info() {
       //'load arguments' => array($type),
       //'form callback' => "crm_profile_form", - No longer needed with class implementation
       //'form arguments' => array($type),
-      'class' => 'Profile2DataSet',
+      'class' => 'Profile2DefaultCRMController',
       // Provide a piece corresponding to each data set.
       'piece' => array(
         'path' => 'profile-' . str_replace('_', '-', $type),
@@ -394,9 +394,11 @@ function crm_profile_theme($existing, $type, $theme, $path) {
 }
 
 /**
- * Profile2DataSet
+ * Controller class for CRM integration.
+ *
+ * @todo: move this to an inc file for autoloading.
  */
-class Profile2DataSet extends CRMPartyDataSet {
+class Profile2DefaultCRMController extends EntityDefaultCRMController {
   const ENTITY_TYPE = "profile2";
   const ENTITY_ID_KEY = "pid";
   
