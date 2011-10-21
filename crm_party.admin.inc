@@ -94,15 +94,37 @@ function crm_party_hat_manage() {
   $build['actions'] = array(
     '#markup' => l("Add a hat", 'admin/community/hats/add'),
   );
-  $build['main'] = array(
-    '#markup' => 'A List of all the hats available',
+  
+  $result = db_select('crm_party_hats', 'ph')
+    ->fields('ph')
+    ->execute()
+    ->fetchAllAssoc('hid');
+  
+  $header = array(t('Hat'), array(
+    'data' => t('Operations'),
+    'colspan' => '2',
+  ));
+  $rows = array();
+  foreach ($result as $hat) {
+    $row = array( t(':label <small>:name</small>', array(':label' => $hat->label, ':name' => $hat->name)));
+    $row[] = array( 'data' => l(t('edit'), 'admin/community/hats/' . $hat->name . '/edit'));
+    $row[] = array( 'data' => l(t('delete'), 'admin/community/hats/' . $hat->name . '/delete'));
+    
+    $rows[] = $row;
+  }
+  
+  $build['hat_table'] = array(
+    '#theme' => 'table',
+    '#header' => $header,
+    '#rows' => $rows,
+    '#empty' => t('No hats have been defined. <a href="@link">Add Hatt</a>', array('@link' => url('admin/community/hats/add'))),
   );
   
   return $build;
 }
 
 /**
- * Page callback for adding a hat
+ * Page callback for adding a new hat
  */
 function crm_party_hat_add() {
   $hat = new stdClass();
@@ -174,7 +196,8 @@ function crm_party_hat_edit_form_submit($form, &$form_state) {
     $hat->hid = $form_state['values']['hid'];
   }
   crm_party_hat_save($hat);
-  field_attach_submit('crm_party_hat', $hat, $form, $form_state);  
+  field_attach_submit('crm_party_hat', $hat, $form, $form_state); 
+  $form_state['redirect'] = 'admin/community/hats';  
 }
 
 /**
