@@ -7,6 +7,7 @@
 
 // @todo: If these contain only classes they will be autoloaded and these include statements can be dropped.
 include_once("includes/crm_party_type.entity.inc");
+include_once("includes/crm_party_hat.entity.inc");
 
 /**
  * Implements hook_help().
@@ -23,9 +24,12 @@ function crm_party_help($path, $arg) {
 /**
  * Implements hook_entity_info().
  *
- * Define 2 entities here - the actual entity that will hold our domain
- * specific information and an entity that holds information about the
- * different types of entities.
+ * Define 2 entities: 
+ *  - The base Party Entity
+ *  - The Hat entity
+ *
+ * @todo: Improve documentation
+ * @todo: Party types?!
  */
 function crm_party_entity_info() {
   $party_info['crm_party'] = array(
@@ -73,6 +77,39 @@ function crm_party_entity_info() {
     )
   );
 
+  //The hat entity
+  $party_info['crm_party_hat'] = array(
+    'label' => t('Hat'),
+    'entity class' => 'CRMPartyHat',
+    'controller class' => 'CRMPartyHatController',
+    // We define this so entity module provides us with basic Views data, while
+    // allowing us to define more of our own.
+    // See http://drupal.org/node/1307760.
+    'views controller class' => 'EntityDefaultViewsController',
+    'base table' => 'crm_party_hats',
+    'fieldable' => TRUE,
+    'module' => 'crm_party',
+    'entity keys' => array(
+      'id' => 'hid'
+    ),
+    'exportable' => TRUE,
+    'bundles' => array(
+      'hat' => array(
+        'label' => t('Hat'),
+        'admin' => array(
+          'path' => 'admin/community/hats',
+          'access arguments' => array('administer hats'),
+        ),
+      ),
+    ),
+    'view modes' => array(
+      'full' => array(
+        'label' => t('Full Hat'),
+        'custom settings' =>  FALSE,
+      ),
+    )
+  );
+    
   return $party_info;
 }
 
@@ -175,7 +212,23 @@ function crm_party_menu() {
     'access arguments' => array('administer parties'),
     'file' => 'crm_party.admin.inc',
   );
-
+  
+  //hats
+  $items['admin/community/hats'] = array(
+    'title' => 'Party Hats',
+    'description' => 'Manage Hats',
+    'page callback' => 'crm_party_hat_manage',
+    'access arguments' => array('administer hats'),
+    'file' => 'crm_party.admin.inc',
+  );
+  $items['admin/community/hats/add'] = array(
+    'title' => 'Party Hats',
+    'description' => 'Manage Hats',
+    'page callback' => 'crm_party_hat_add',
+    'access arguments' => array('administer hats'),
+    'file' => 'crm_party.admin.inc',
+  );
+  
   $items['party/%crm_party'] = array(
     'title callback' => 'crm_party_page_title',
     'title arguments' => array(1),
@@ -841,7 +894,7 @@ function crm_party_delete(CRMParty $party) {
 /**
  * Save a crm_party.
  *
- *  @param $info
+ *  @param $party
  *
  */
 function crm_party_save(&$party) {
@@ -896,6 +949,18 @@ function crm_party_views_api() {
     'api' => '3.0-alpha1',
     'path' => drupal_get_path('module', 'crm_party') . '/includes',
   );
+}
+
+// -----------------------------------------------------------------------
+// Party Hats
+
+/**
+ * Save a hat
+ *
+ * @param $hat a crm_party_hat object.
+ */
+function crm_party_hat_save(&$hat) {
+  return entity_get_controller('crm_party_hat')->save($hat);
 }
 
 // -----------------------------------------------------------------------

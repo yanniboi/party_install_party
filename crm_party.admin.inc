@@ -88,6 +88,104 @@ function crm_party_admin($callback_arg = '') {
 }
 
 /**
+ * Page callback for the hats list page
+ */
+function crm_party_hat_manage() {
+  $build['actions'] = array(
+    '#markup' => l("Add a hat", 'admin/community/hats/add'),
+  );
+  $build['main'] = array(
+    '#markup' => 'A List of all the hats available',
+  );
+  
+  return $build;
+}
+
+/**
+ * Page callback for adding a hat
+ */
+function crm_party_hat_add() {
+  $hat = new stdClass();
+  return drupal_get_form('crm_party_hat_edit_form', $hat); 
+}
+
+/**
+ * Form to add/edit a hat
+ *
+ * @param $hat a hat object
+ */
+function crm_party_hat_edit_form($form, &$form_state, $hat) {
+  $form['#hat'] = $hat;
+  
+  if(isset($hat->hid)) {
+    $form['hid'] = array(
+      '#type' => 'hidden',
+      '#value' => $hat->hid,
+    );
+    drupal_set_title('Edit Hat: ' . $hat->label);
+  }
+  
+  $form['label'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Hat Name'),
+    '#required' => TRUE,
+    '#default_value' => isset($hat->label) ? $hat->label : '',
+  );
+  
+  $form['name'] = array(
+    '#type' => 'machine_name',
+    '#title' => t('Hat Machine Name'),
+    '#default_value' => isset($hat->name) ? $hat->name : '',
+    '#description' => t('A unique, machine readable name for the hat'),
+    '#machine_name' => array(
+      'exists' => 'crm_party_hat_hat_machine_name_exists',
+      'source' => array('label'),
+    ),
+    '#disabled' => isset($hat->name),
+  );
+  
+  field_attach_form('crm_party_hat', $hat, $form, $form_state);
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+    '#weight' => 99,
+  );
+
+  return $form;  
+}
+
+/**
+ * Form validation for crm_party_hat_edit_form
+ */
+function crm_party_hat_edit_form_validate($form, &$form_state) {
+  $submission = (object) $form_state['values'];
+  field_attach_form_validate('crm_party_hat', $submission, $form, $form_state);
+}
+
+/**
+ * Form submission for crm_party_hat_edit_form
+ */
+function crm_party_hat_edit_form_submit($form, &$form_state) {
+  $hat = new CRMPartyHat();
+  $hat->name = $form_state['values']['name'];
+  $hat->label = $form_state['values']['label'];
+  if(isset($form_state['values']['hid'])) {
+    $hat->hid = $form_state['values']['hid'];
+  }
+  crm_party_hat_save($hat);
+  field_attach_submit('crm_party_hat', $hat, $form, $form_state);  
+}
+
+/**
+ * Check whether a machine name already exists
+ */
+function crm_party_hat_hat_machine_name_exists($value) {
+  $exists = db_query_range('SELECT 1 FROM {crm_party_hats} WHERE `name` = :name', 0, 1, array(':name' => $value))->fetchField();
+  return $exists;
+}
+
+/**
  * Form builder; Parties administration page.
  *
  * @ingroup forms

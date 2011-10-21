@@ -4,7 +4,41 @@
  * @file
  * Contains install hooks for the CRM party module.
  */
-
+ 
+/**
+ * Add the party hats table.
+ */
+function crm_party_update_7000() {
+  //schema for the hats
+  $schema = array(
+    'description' => 'Stores hat definitions',
+    'fields' => array(
+      'hid' => array(
+        'description' => 'Primary key for the hat.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'name' => array(
+        'description' => 'The machine readable name of the hat',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'label' => array(
+        'description' => 'A human readable name for the hat',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE
+      ) + entity_exportable_schema_fields(),
+    ),
+    'primary key' => array('hid'),
+  );
+  
+  db_create_table("crm_party_hats", $schema);
+}
+ 
 /**
  * Implements hook_schema().
  */
@@ -83,6 +117,33 @@ function crm_party_schema() {
       ),
     ),
     'primary key' => array('instance_id'),
+  );
+  
+  //schema for the hats
+  $schema['crm_party_hats'] = array(
+    'description' => 'Stores hat definitions',
+    'fields' => array(
+      'hid' => array(
+        'description' => 'Primary key for the hat.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'name' => array(
+        'description' => 'The machine readable name of the hat',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'label' => array(
+        'description' => 'A human readable name for the hat',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE
+      ) + entity_exportable_schema_fields(),
+    ),
+    'primary key' => array('hid'),
   );
   
   //This table is how we link party pieces to party types and weight them etc
