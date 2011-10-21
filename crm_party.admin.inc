@@ -132,6 +132,13 @@ function crm_party_hat_add() {
 }
 
 /**
+ * Page callback for editing a hat
+ */
+function crm_party_hat_edit($hat) {
+  return drupal_get_form('crm_party_hat_edit_form', $hat);
+}
+
+/**
  * Form to add/edit a hat
  *
  * @param $hat a hat object

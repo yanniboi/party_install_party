@@ -16,6 +16,17 @@ function crm_party_page_view($party, $view_mode = 'full') {
 
   $build = module_invoke_all('crm_party_page_view_alter', $party);
 
+  $hats = crm_party_get_hats($party);
+  $markup = '<ul>';
+  foreach($hats as $hat) {
+    $markup .= '<li>'.$hat->label.'</li>';
+  }
+  $markup .= '</ul>';
+  
+  $build['hats'] = array(
+    '#markup' => $markup,
+  );
+  
   // Demo output so we see this works.
   $build['demo'] = array(
     '#type' => 'markup',
@@ -81,7 +92,31 @@ function crm_party_edit_form($form, &$form_state, $party) {
     '#required' => TRUE,
     '#default_value' => $party->label,
   );
-
+  
+  //Get all available hats
+  $hats = crm_party_get_all_hats();
+  $options = array();
+  foreach($hats as $hat) {
+    $options[$hat->name] = $hat->label;
+  }
+  
+  $form['hats'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Hats'),
+    '#options' => $options,
+  );
+  
+  //get hats associated with this party
+  if (isset($party->pid)) {
+    $party_hats = crm_party_get_hats($party->pid);
+    $defaults = array();
+    foreach ($party_hats as $ph) {
+      $defaults[] = $ph->name;
+    }
+    
+    $form['hats']['#default_value'] = $defaults;
+  }
+  
   field_attach_form('crm_party', $party, $form, $form_state);
 
   $form['submit'] = array(
@@ -102,6 +137,17 @@ function crm_party_edit_form_submit($form, &$form_state) {
   $party = (object) $form_state['values'];
   field_attach_submit('crm_party', $party, $form, $form_state);
   $party = crm_party_save($party);
+  
+  //Do hats
+  foreach ($form_state['values']['hats'] as $hat => $checked) {
+    if ($checked === 0) {
+      crm_party_hat_unassign($party, $hat);
+    }
+    else {
+      crm_party_hat_assign($party, $hat);
+    }
+  }
+  
   $form_state['crm_party'] = $party;
   $form_state['redirect'] = 'party/' . $party->pid;
 }

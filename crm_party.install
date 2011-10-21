@@ -6,6 +6,39 @@
  */
  
 /**
+ * Add the hattings table
+ * Do we need the phid column?
+ */ 
+function crm_party_update_7001() {
+  $schema = array(
+    'description' => 'Stores hattings (relationships between hats and parties)',
+    'fields' => array(
+      'phid' => array(
+        'description' => 'Primary key for the hatting.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'hat' => array(
+        'description' => 'The machine readable name of the hat',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'party' => array(
+        'description' => 'The Party Id',
+        'type' => 'int',
+        'not null' => TRUE
+      ),
+    ),
+    'primary key' => array('phid'),
+  );
+  
+  db_create_table("crm_party_hattings", $schema);
+}
+ 
+/**
  * Add the party hats table.
  */
 function crm_party_update_7000() {
@@ -144,6 +177,32 @@ function crm_party_schema() {
       ) + entity_exportable_schema_fields(),
     ),
     'primary key' => array('hid'),
+  );
+  
+  // @todo do we need the phid column?
+  $schema['crm_party_hattings'] = array(
+    'description' => 'Stores hattings (relationships between hats and parties)',
+    'fields' => array(
+      'phid' => array(
+        'description' => 'Primary key for the hatting.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'hat' => array(
+        'description' => 'The machine readable name of the hat',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'party' => array(
+        'description' => 'The Party Id',
+        'type' => 'int',
+        'not null' => TRUE
+      ),
+    ),
+    'primary key' => array('phid'),
   );
   
   //This table is how we link party pieces to party types and weight them etc
