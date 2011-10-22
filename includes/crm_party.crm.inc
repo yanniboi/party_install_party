@@ -268,8 +268,10 @@ abstract class EntityDefaultCRMController {
    
   
   /**
-   * actions
-   * Return a array of action links
+   * Get actions for the attached entity.
+   *
+   * @return
+   *  An array of links suitable for theme_links().
    */
   public function actions() {
     $actions = array(
@@ -286,8 +288,7 @@ abstract class EntityDefaultCRMController {
   }  
   
   /**
-   * detach
-   *   detach this data from the party
+   * Detach this entity from the party.
    */
   public function detach() {
     db_delete($this->getTableName())
@@ -308,8 +309,7 @@ abstract class EntityDefaultCRMController {
   }
   
   /**
-   * isMain
-   *   is this the main instance of this set for this party
+   * Determine whether this is the main instance of this set for this party.
    *
    * @return
    *   True is the Set is the main one, False otherwise.

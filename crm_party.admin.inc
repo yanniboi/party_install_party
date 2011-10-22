@@ -124,7 +124,7 @@ function crm_party_hat_manage() {
 }
 
 /**
- * Page callback for adding a new hat
+ * Page callback for adding a new hat.
  */
 function crm_party_hat_add() {
   $hat = new stdClass();
@@ -132,16 +132,20 @@ function crm_party_hat_add() {
 }
 
 /**
- * Page callback for editing a hat
+ * Page callback for editing a hat.
+ *
+ * @param $hat
+ *  A hat object.
  */
 function crm_party_hat_edit($hat) {
   return drupal_get_form('crm_party_hat_edit_form', $hat);
 }
 
 /**
- * Form to add/edit a hat
+ * Form to add/edit a hat.
  *
- * @param $hat a hat object
+ * @param $hat
+ *  A hat object.
  */
 function crm_party_hat_edit_form($form, &$form_state, $hat) {
   $form['#hat'] = $hat;
@@ -156,14 +160,14 @@ function crm_party_hat_edit_form($form, &$form_state, $hat) {
   
   $form['label'] = array(
     '#type' => 'textfield',
-    '#title' => t('Hat Name'),
+    '#title' => t('Hat name'),
     '#required' => TRUE,
     '#default_value' => isset($hat->label) ? $hat->label : '',
   );
   
   $form['name'] = array(
     '#type' => 'machine_name',
-    '#title' => t('Hat Machine Name'),
+    '#title' => t('Hat machine name'),
     '#default_value' => isset($hat->name) ? $hat->name : '',
     '#description' => t('A unique, machine readable name for the hat'),
     '#machine_name' => array(
