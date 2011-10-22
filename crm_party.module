@@ -266,11 +266,10 @@ function crm_party_menu() {
   }
 
   // This is temporary until I figure out a neat way to do tabs below pieces.
-  $items['party/%crm_party/party/view'] = $items['party/%crm_party/party'];
-  $items['party/%crm_party/party/view'] += array(
+  $items['party/%crm_party/party/view'] = array(
     'title' => t('View'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
-  );
+  ) + $items['party/%crm_party/party'];
 
   $items['party/%crm_party/party/edit'] = array(
     'title' => t('Edit'),
