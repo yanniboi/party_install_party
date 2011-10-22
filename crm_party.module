@@ -977,16 +977,6 @@ function crm_party_party_operations_merge($parties) {
   // @todo: write me!
 }
 
-/**
- * Implements hook_views_api().
- */
-function crm_party_views_api() {
-  return array(
-    'api' => '3.0-alpha1',
-    'path' => drupal_get_path('module', 'crm_party') . '/includes',
-  );
-}
-
 // -----------------------------------------------------------------------
 // Party Hats
 
@@ -1132,6 +1122,19 @@ function crm_party_get_all_hats() {
   }
   $hats = entity_load('crm_party_hat', $hids);
   return $hats;  
+}
+
+// -----------------------------------------------------------------------
+// Views hook implementations.
+
+/**
+ * Implements hook_views_api().
+ */
+function crm_party_views_api() {
+  return array(
+    'api' => '3.0-alpha1',
+    'path' => drupal_get_path('module', 'crm_party') . '/includes',
+  );
 }
 
 // -----------------------------------------------------------------------
