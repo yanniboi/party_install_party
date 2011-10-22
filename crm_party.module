@@ -214,22 +214,22 @@ function crm_party_menu() {
   
   //hats
   $items['admin/community/hats'] = array(
-    'title' => 'Party Hats',
-    'description' => 'Manage Hats',
+    'title' => 'Party hats',
+    'description' => 'Manage hats',
     'page callback' => 'crm_party_hat_manage',
     'access arguments' => array('administer hats'),
     'file' => 'crm_party.admin.inc',
   );
   $items['admin/community/hats/add'] = array(
-    'title' => 'Party Hats',
+    'title' => 'Add hat',
     'description' => 'Manage Hats',
     'page callback' => 'crm_party_hat_add',
     'access arguments' => array('administer hats'),
     'file' => 'crm_party.admin.inc',
   );
   $items['admin/community/hats/%crm_party_hat/edit'] = array(
-    'title' => 'Edit Party Hat',
-    'description' => 'Edit a Party Hat',
+    'title' => 'Edit party hat',
+    'description' => 'Edit a party hat',
     'page callback' => 'crm_party_hat_edit',
     'page arguments' => array(3),
     'access arguments' => array('administer hats'),
