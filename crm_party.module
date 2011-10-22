@@ -883,16 +883,38 @@ function crm_party_theme() {
 }
 
 /**
- * Load a single contact.
+ * Load a party entity from the database.
+ *
+ * @param $pid
+ *  The party ID.
+ * @param $reset
+ *  Whether to reset the crm_party_load_multiple cache.
+ *
+ * @return
+ *   A party object.
  */
 function crm_party_load($pid = NULL, $reset = FALSE) {
-  $pids = (isset ($pid) ? array($pid) : array());
+  $pids = (isset($pid) ? array($pid) : array());
   $party = crm_party_load_multiple($pids, $reset);
-  return $party ? reset ($party) : FALSE;
+  return $party ? reset($party) : FALSE;
 }
 
 /**
- * Load many contacts.
+ * Load party entities from the database.
+ *
+ * @param $pids
+ *  An array of party IDs.
+ * @param $conditions
+ *   (deprecated) An associative array of conditions on the {crm_party}
+ *   table, where the keys are the database fields and the values are the
+ *   values those fields must have. Instead, it is preferable to use
+ *   EntityFieldQuery to retrieve a list of entity IDs loadable by
+ *   this function.
+ * @param $reset
+ *   Whether to reset the cache.
+ *
+ * @return
+ *   An array of party objects indexed by nid.
  */
 function crm_party_load_multiple($pids = array(), $conditions = array(), $reset = FALSE) {
   return entity_load('crm_party', $pids, $conditions, $reset);
