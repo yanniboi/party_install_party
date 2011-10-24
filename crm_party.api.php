@@ -9,6 +9,35 @@
  * @addtogroup hooks
  * @{
  */
+
+/**
+ * Control access to parties and their attachments.
+ *
+ * Modules may implement this hook if they want to have a say in whether or not
+ * a given user has access to perform a given operation on a profile.
+ *
+ * @param $op
+ *   The operation being performed.
+ * @param $party
+ *   A party to check access for.
+ * @param $attached_entity
+ *   (optional) An attached entity to check access for. If nothing is given,
+ *   access for just the party itself is determined.
+ * @param $account
+ *   (optional) The user to check for. If no account is passed, access is
+ *   determined for the global user.
+ *
+ * @return boolean
+ *   Return TRUE to grant access, FALSE to explicitly deny access. Return NULL
+ *   or nothing to not affect the operation.
+ *   Access is granted as soon as a module grants access and no one denies
+ *   access. Thus if no module explicitly grants access, access will be denied.
+ *
+ * @see crm_party_access()
+ */
+function hook_crm_party_access($op, $party = NULL, $attached_entity = NULL, $account = NULL) {
+
+}
  
 /**
  * Defines data sets to be used by parties.

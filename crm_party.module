@@ -332,6 +332,45 @@ function crm_party_menu() {
 }
 
 /**
+ * Determines whether the party may attach the given entity.
+ *
+ * @param $op
+ *   The operation being performed.
+ * @param $party
+ *   A party to check access for.
+ * @param $attached_entity
+ *   (optional) An attached entity to check access for. If nothing is given,
+ *   access for just the party itself is determined.
+ * @param $account
+ *   The user to check for. Leave it to NULL to check for the global user.
+ *
+ * @return boolean
+ *   Whether access is allowed or not.
+ *
+ * @see hook_crm_party_access()
+ * @see crm_party_crm_party_access()
+ */
+function crm_party_access($op, $party = NULL, $attached_entity = NULL, $account = NULL) {
+  // Let the admin through when there's no attached entity being considered.
+  if (!isset($attached_entity) && user_access('administer parties', $account)) {
+    return TRUE;
+  }
+
+  // Allow modules to grant / deny access.
+  $access = module_invoke_all('crm_party_access', $op, $party, $attached_entity, $account);
+
+  // Only grant access if at least one module granted access and no one denied
+  // access.
+  if (in_array(FALSE, $access, TRUE)) {
+    return FALSE;
+  }
+  elseif (in_array(TRUE, $access, TRUE)) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
  * Implements hook_admin_paths().
  */
 function crm_party_admin_paths() {
