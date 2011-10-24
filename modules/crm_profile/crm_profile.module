@@ -70,7 +70,10 @@ function crm_profile_crm_party_data_set_info() {
         'title' => $label,
         'page callback' => 'crm_party_view_data_set',
         'page arguments' => array(1, "profile2_" . $type),
-        'access arguments' => array("view any $type profile"), // @todo: IMCTT.
+        // @todo: this needs to tell the access arguments for crm_party_access()
+        // about the argument for loading our attached entities.
+        // In other words, some sort of %wildcard_to_arg() function maybe?
+        'access arguments' => array("view any $type profile"),
         // File path is relative to implementing module.
         'file' => 'crm_party.pages.inc',
       ),
