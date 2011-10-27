@@ -249,6 +249,74 @@ function crm_party_schema() {
     ),
   );*/
 
+  // New, WIP table to connect parties to attached entities.
+  $schema['crm_party_attached_entity'] = array(
+    'description' => "This links parties to attached entities.",
+    'fields' => array(
+      // @todo: do we need this?
+      'peid' => array(
+        'description' => 'The unique ID for this relationship.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'pid' => array(
+        'description' => 'The id of the party entity.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'eid' => array(
+        'description' => 'The id of the attached entity.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'data_set' => array(
+        'description' => 'The data set this entity falls under.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'entity_type' => array(
+        'description' => 'The type of the attached entity.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'entity_bundle' => array(
+        'description' => 'The bundle of the attached entity.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'main' => array(
+        'description' => 'Flags a relation as being to the main attached entity.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'hat_main' => array(
+        'description' => 'Is this the main set for this hat.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'hat' => array(
+        'description' => 'The hat this is associated with.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => 'all',
+      ),
+    ),
+    'indexes' => array(
+      'party' => array('pid'),
+      'entity' => array('eid'),
+    ),
+    'primary key' => array('peid'),
+  );
+
   // Declare relation tables, based on the data sets declared by
   // hook_crm_party_data_set_info().
   // This adds nothing at at install time, because we don't declare any data
