@@ -199,7 +199,7 @@ abstract class EntityDefaultCRMController {
     
     // If we're setting this as the main party first remove main from
     // every other party. 
-    if (isset($options['main']) AND $options['main'] == 1 AND $this->isMain() != 1) {
+    if (isset($options['main']) && $options['main'] == 1 && $this->isMain() != 1) {
       $num = db_update($this->getTableName())
         ->fields(array(
           'main' => 0,
@@ -218,7 +218,7 @@ abstract class EntityDefaultCRMController {
       ->condition('pid',$relation['pid'],'=')
       ->condition('eid',$relation['eid'],'=')
       ->execute();
-    if ($result == 0 AND  !is_numeric($this->id)) {
+    if ($result == 0 && !is_numeric($this->id)) {
       drupal_write_record($this->getTableName(), $relation);
     }    
   }
