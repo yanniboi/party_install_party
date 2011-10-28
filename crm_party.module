@@ -1086,7 +1086,7 @@ function crm_party_hat_load_multiple($hids = array(), $conditions = array(), $re
  *       At the moment we do 3 queries when we add a rule and 1 when we update it and 2 when we keep it the same..
  *       Is this better than 2 queries for both?
  */
-function crm_party_hat_set_data_set_rule($hat, $set, $value = CRM_PARTY_HAT_CAN_HAVE_SET) {
+function crm_party_hat_set_data_set_rule($hat, $set, $value = CRM_PARTY_HAT_NOT_HAVE_SET) {
   //try updating the table
   $num_affected = db_update('crm_party_hat_data_set_rules')
     ->fields(array('rule' => $value))
@@ -1138,6 +1138,23 @@ function crm_party_hat_get_data_set_rule($hat, $set) {
   //get the first $result (there should only ever be one)
   $result = reset($results);
   return $result->rule;
+}
+
+/**
+ * Get all the sets for a Hat
+ * This returns an array of sets that a Party Must have or can have multiple of
+ */
+function crm_party_hat_get_data_sets ($hat, $multiple_only = FALSE) {
+  $condition = ($multiple_only) ? CRM_PARTY_HAT_CAN_HAVE_MULTIPLE : CRM_PARTY_HAT_MUST_HAVE_SET;
+  
+  $results = db_select('crm_party_hat_data_set_rules', 'c')
+    ->fields('c')
+    ->condition('hat', $hat->name, '=')
+    ->condition('rule', $condition, '>=')
+    ->execute()
+    ->fetchAllAssoc('data_set');
+  
+  return array_keys($results);
 }
  
 /**

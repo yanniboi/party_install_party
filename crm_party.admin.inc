@@ -203,9 +203,9 @@ function crm_party_hat_edit_form($form, &$form_state, $hat) {
       '#title' => t($set['label']),
       '#default_value' => $default,
       '#options' => array(
-        CRM_PARTY_HAT_NOT_HAVE_SET => t("Doesn't Have"),
-        CRM_PARTY_HAT_MUST_HAVE_SET => t("Must Have"),
-        CRM_PARTY_HAT_CAN_HAVE_MULTIPLE => t("Can Have Multiple"),
+        CRM_PARTY_HAT_NOT_HAVE_SET => t("Doesn't have"),
+        CRM_PARTY_HAT_MUST_HAVE_SET => t("Must have"),
+        CRM_PARTY_HAT_CAN_HAVE_MULTIPLE => t("Must have and can have multiple"),
       ),
     );      
   }

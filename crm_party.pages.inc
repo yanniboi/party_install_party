@@ -100,22 +100,32 @@ function crm_party_edit_form($form, &$form_state, $party) {
     $options[$hat->name] = $hat->label;
   }
   
-  $form['hats'] = array(
-    '#type' => 'checkboxes',
-    '#title' => t('Hats'),
-    '#options' => $options,
-  );
-  
-  $party_hats = crm_party_get_hats($party);
-  
   //get hats associated with this party
   // @todo stop from unsetting required hats
+  $party_hats = crm_party_get_hats($party);
   $defaults = array();
   foreach ($party_hats as $ph) {
     $defaults[] = $ph->name;
   }   
-  $form['hats']['#default_value'] = $defaults;
+    
+  $form['hats'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Hats'),
+    '#options' => $options,
+    '#default_value' => $defaults,
+  );
   
+  // Get Party Hat must have data sets
+  $data_sets = array();
+  foreach ($party_hats as $hat) {
+    $data_sets += crm_party_hat_get_data_sets($hat);
+  }
+
+  foreach ($data_sets as $set) {
+    $form['set_'.$set] = array(
+      '#markup' => $set,
+    );
+  }
   
   field_attach_form('crm_party', $party, $form, $form_state);
 
