@@ -189,8 +189,8 @@ abstract class EntityDefaultCRMController {
       'pid' => $party->pid,
       'eid' => $this->entity->{$this->getEntityIdKey()},
       'data_set' => $this->type,
-      'entity_type' => 'todoarghwedonthavethisyet',
-      'entity_bundle' => $this->entity->type, // todo: look up bundle key properly
+      'entity_type' => $this->getEntityType(),
+      'entity_bundle' => $this->getEntityBundle(),
     );
 
     // WIP: chuck in defaults until I figure out what these do
@@ -389,6 +389,16 @@ abstract class EntityDefaultCRMController {
     return $c::ENTITY_ID_KEY;
   }
   
+  /**
+   * Get the bundle name of the attached entity.
+   */
+  private function getEntityBundle() {
+    $entity_type = $this->getEntityType();
+    $info = entity_get_info($entity_type);
+    $bundle_key = $info['entity keys']['bundle'];
+    return $this->entity->{$bundle_key};
+  }
+
   /**
    * getTableName
    */
