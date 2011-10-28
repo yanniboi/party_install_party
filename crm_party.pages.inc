@@ -106,16 +106,16 @@ function crm_party_edit_form($form, &$form_state, $party) {
     '#options' => $options,
   );
   
+  $party_hats = crm_party_get_hats($party);
+  
   //get hats associated with this party
-  if (isset($party->pid)) {
-    $party_hats = crm_party_get_hats($party->pid);
-    $defaults = array();
-    foreach ($party_hats as $ph) {
-      $defaults[] = $ph->name;
-    }
-    
-    $form['hats']['#default_value'] = $defaults;
-  }
+  // @todo stop from unsetting required hats
+  $defaults = array();
+  foreach ($party_hats as $ph) {
+    $defaults[] = $ph->name;
+  }   
+  $form['hats']['#default_value'] = $defaults;
+  
   
   field_attach_form('crm_party', $party, $form, $form_state);
 

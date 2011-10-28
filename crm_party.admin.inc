@@ -150,6 +150,8 @@ function crm_party_hat_edit($hat) {
 function crm_party_hat_edit_form($form, &$form_state, $hat) {
   $form['#hat'] = $hat;
   
+  dsm($hat);
+  
   if(isset($hat->hid)) {
     $form['hid'] = array(
       '#type' => 'hidden',
@@ -182,7 +184,7 @@ function crm_party_hat_edit_form($form, &$form_state, $hat) {
   $form['required'] = array(
     '#type' => 'checkbox',
     '#title' => t('Required'),
-    '#default' => $hat->required,
+    '#default_value' => $hat->required,
     '#description' => 'Do (individual) Parties require this hat?',
     '#weight' => 5,
   );
