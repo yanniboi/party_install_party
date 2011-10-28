@@ -117,8 +117,8 @@ abstract class EntityDefaultCRMController {
       $this->eid = $entity->{$this->getEntityIdKey()};
     }
     else {
-      $this->eid = null;
-      $this->entity = null;
+      $this->eid = NULL;
+      $this->entity = NULL;
     }
     
     // If the party is set we set the party and find the row in the data set table
