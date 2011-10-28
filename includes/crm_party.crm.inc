@@ -9,6 +9,10 @@ abstract class EntityDefaultCRMController {
    * ENTITY_TYPE
    *   The entity type this Data Set Wraps around
    */
+  // @todo. I'm not sure setting this as class constant is the best way; apart
+  // from the PHP 5.3 requirement it forces, it means that information about
+  // this data set is effectively split between the info hook and the class
+  // definition. 
   const ENTITY_TYPE = "";
   
   /**
@@ -36,6 +40,7 @@ abstract class EntityDefaultCRMController {
    * var string $type
    *   The data set type (array key in hook_data_set_info)
    */
+  // @todo: change this var name; 'type' is overloaded already.
   public $type;
   
   /**
