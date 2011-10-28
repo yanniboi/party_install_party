@@ -9,6 +9,10 @@ abstract class EntityDefaultCRMController {
    * ENTITY_TYPE
    *   The entity type this Data Set Wraps around
    */
+  // @todo. I'm not sure setting this as class constant is the best way; apart
+  // from the PHP 5.3 requirement it forces, it means that information about
+  // this data set is effectively split between the info hook and the class
+  // definition. 
   const ENTITY_TYPE = "";
   
   /**
@@ -36,6 +40,7 @@ abstract class EntityDefaultCRMController {
    * var string $type
    *   The data set type (array key in hook_data_set_info)
    */
+  // @todo: change this var name; 'type' is overloaded already.
   public $type;
   
   /**
@@ -117,8 +122,8 @@ abstract class EntityDefaultCRMController {
       $this->eid = $entity->{$this->getEntityIdKey()};
     }
     else {
-      $this->eid = null;
-      $this->entity = null;
+      $this->eid = NULL;
+      $this->entity = NULL;
     }
     
     // If the party is set we set the party and find the row in the data set table
@@ -189,8 +194,8 @@ abstract class EntityDefaultCRMController {
       'pid' => $party->pid,
       'eid' => $this->entity->{$this->getEntityIdKey()},
       'data_set' => $this->type,
-      'entity_type' => 'todoarghwedonthavethisyet',
-      'entity_bundle' => $this->entity->type, // todo: look up bundle key properly
+      'entity_type' => $this->getEntityType(),
+      'entity_bundle' => $this->getEntityBundle(),
     );
 
     // WIP: chuck in defaults until I figure out what these do
@@ -389,6 +394,16 @@ abstract class EntityDefaultCRMController {
     return $c::ENTITY_ID_KEY;
   }
   
+  /**
+   * Get the bundle name of the attached entity.
+   */
+  private function getEntityBundle() {
+    $entity_type = $this->getEntityType();
+    $info = entity_get_info($entity_type);
+    $bundle_key = $info['entity keys']['bundle'];
+    return $this->entity->{$bundle_key};
+  }
+
   /**
    * getTableName
    */
