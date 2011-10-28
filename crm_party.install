@@ -6,6 +6,47 @@
  */
  
 /**
+ * Add the hat data set settings table
+ * @todo Do we need phdsid?
+ */ 
+function crm_party_update_7002() {
+  $schema = array(
+    'description' => 'Store data set settings for hats',
+    'fields' => array(
+      'phdsid' => array(
+        'description' => 'Primary key for the setting.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'hat' => array(
+        'description' => 'The machine readable name of the hat',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'data_set' => array(
+        'description' => 'The machine readable name of the data_Set',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'rule' => array(
+        'description' => 'The Party Id',
+        'type' => 'int',
+        'default' => 0,
+        'not null' => TRUE
+      ),
+    ),
+    'primary key' => array('phdsid'),
+  );
+  
+  db_create_table("crm_party_hat_data_set_rules", $schema);
+}
+
+/**
  * Add the hattings table
  * Do we need the phid column?
  */ 
@@ -180,6 +221,7 @@ function crm_party_schema() {
   );
   
   // @todo do we need the phid column?
+  //       We need a primary key and neither of the two fields would be unique
   $schema['crm_party_hattings'] = array(
     'description' => 'Stores hattings (relationships between hats and parties)',
     'fields' => array(
@@ -204,6 +246,42 @@ function crm_party_schema() {
     ),
     'primary key' => array('phid'),
   );
+  
+  // Store data set settings for hats
+  $schema['crm_party_hat_data_set_rules'] = array(
+    'description' => 'Store data set settings for hats',
+    'fields' => array(
+      'phdsid' => array(
+        'description' => 'Primary key for the setting.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'hat' => array(
+        'description' => 'The machine readable name of the hat',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'data_set' => array(
+        'description' => 'The machine readable name of the data_Set',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'rule' => array(
+        'description' => 'The Party Id',
+        'type' => 'int',
+        'default' => 0,
+        'not null' => TRUE
+      ),
+    ),
+    'primary key' => array('phdsid'),
+  );
+  
+  
   
   //This table is how we link party pieces to party types and weight them etc
 

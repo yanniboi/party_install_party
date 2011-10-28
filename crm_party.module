@@ -1034,6 +1034,10 @@ function crm_party_party_operations_merge($parties) {
 // -----------------------------------------------------------------------
 // Party Hats
 
+define('CRM_PARTY_HAT_CAN_HAVE_SET', 0);
+define('CRM_PARTY_HAT_MUST_HAVE_SET', 1);
+
+
 /**
  * Save a hat
  *
@@ -1046,12 +1050,12 @@ function crm_party_hat_save(&$hat) {
 /**
  * Load a hat
  *
- * @param the hat label
+ * @param the hat name
  */
 function crm_party_hat_load($hat) {
   $query = db_select('crm_party_hats', 'ph');
   $query->addField('ph', 'hid');
-  $result = $query->condition('label', $hat, '=')
+  $result = $query->condition('name', $hat, '=')
     ->execute()
     ->fetchAllAssoc('hid');
   
@@ -1070,6 +1074,71 @@ function crm_party_hat_load_multiple($hids = array(), $conditions = array(), $re
   return entity_load('crm_party_hat', $hids, $conditions, $reset);
 }
 
+/**
+ * Save a hat data set rule
+ *
+ * @param $hat the hat name
+ * @param $set the set type
+ * @param $value the value
+ *
+ * @todo Refactor so that we don't do 3 queries to update one rule. 
+ *       At the moment we do 3 queries when we add a rule and 1 when we update it and 2 when we keep it the same..
+ *       Is this better than 2 queries for both?
+ */
+function crm_party_hat_set_data_set_rule($hat, $set, $value = CRM_PARTY_HAT_CAN_HAVE_SET) {
+  //try updating the table
+  $num_affected = db_update('crm_party_hat_data_set_rules')
+    ->fields(array('rule' => $value))
+    ->condition('hat', $hat, '=')
+    ->condition('data_set', $set, '=')
+    ->execute();
+    
+  if ($num_affected < 1) {
+    // We have to check that we haven't kept the row the same.
+    // @todo: refactor this so that we don't do 3 queries
+    $count = db_select('crm_party_hat_data_set_rules', 'c')
+      ->fields('c')
+      ->condition('hat', $hat, '=')
+      ->condition('data_set', $set, '=')
+      ->execute()
+      ->rowCount();
+    
+    if($count < 1) {  
+      $data = array(
+        'hat' => $hat,
+        'data_set' => $set,
+        'rule' => $value,
+      );
+      drupal_write_record('crm_party_hat_data_set_rules',  $data);
+    }
+  }
+}
+
+/**
+ * Get a hat data set rule
+ *
+ * @param $hat the hat name
+ * @param $set the set type
+ */
+function crm_party_hat_get_data_set_rule($hat, $set) {
+  //select from the table where the hat and data set are right
+  $results = db_select('crm_party_hat_data_set_rules', 'c')
+    ->fields('c')
+    ->condition('hat', $hat, '=')
+    ->condition('data_set', $set, '=')
+    ->execute()
+    ->fetchAllAssoc('phdsid');
+  
+  //if the rule doesn't exist yet return a default.
+  if (count($results) < 1) {
+    return CRM_PARTY_HAT_CAN_HAVE_SET;
+  }
+  
+  //get the first $result (there should only ever be one)
+  $result = reset($results);
+  return $result->rule;
+}
+ 
 /**
  * Assign a hat to a party
  *

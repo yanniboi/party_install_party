@@ -178,6 +178,56 @@ function crm_party_hat_edit_form($form, &$form_state, $hat) {
   );
   
   field_attach_form('crm_party_hat', $hat, $form, $form_state);
+  
+  $form['data_set_rules'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Data Set Rules'),
+    '#description' => 'Set rules for which data sets a party with this hat can/must have',
+    '#weight' => 3,
+    '#tree' => true,
+  );
+  
+  foreach (crm_party_get_data_set_info() as $type => $set) {
+    //get the rule
+    if (isset($hat->name)) {
+      $default = crm_party_hat_get_data_set_rule($hat->name, $type);
+    }
+    else {
+      $default = CRM_PARTY_HAT_CAN_HAVE_SET;
+    }
+    
+    $form['data_set_rules'][$type] = array(
+      '#type' => 'radios',
+      '#title' => t($set['label']),
+      '#default_value' => $default,
+      '#options' => array(
+        CRM_PARTY_HAT_CAN_HAVE_SET => t("Can Have"),
+        CRM_PARTY_HAT_MUST_HAVE_SET => t("Must Have"),
+      ),
+    );      
+  }    
+  
+  $form['party_piece_settings'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('party piece settings'),
+    '#weight' => 10,
+    '#tree' => true,
+  );
+  
+  $form['party_piece_settings']['placeholder'] = array(
+    '#markup' => '<i>This is a placeholder, in future hats will be able to define party pieces that can have views & data sets inside them.</i>',
+  );
+  
+  $form['associated_roles'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Associated Roles'),
+    '#weight' => 20,
+    '#tree' => true,
+  );
+  
+  $form['associated_roles']['placeholder'] = array(
+    '#markup' => '<i>This is a placeholder, in future hats will be able to define associated roles that get added to the User when this hat is assigned to the party</i>',
+  );
 
   $form['submit'] = array(
     '#type' => 'submit',
@@ -208,6 +258,11 @@ function crm_party_hat_edit_form_submit($form, &$form_state) {
   }
   crm_party_hat_save($hat);
   field_attach_submit('crm_party_hat', $hat, $form, $form_state); 
+  
+  foreach ($form_state['values']['data_set_rules'] as $type => $value) {
+    crm_party_hat_set_data_set_rule($hat->name, $type, $value);
+  }
+  
   $form_state['redirect'] = 'admin/community/hats';  
 }
 
