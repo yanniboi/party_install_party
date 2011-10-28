@@ -179,11 +179,40 @@ function crm_party_hat_edit_form($form, &$form_state, $hat) {
   
   field_attach_form('crm_party_hat', $hat, $form, $form_state);
   
+  $form['required'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Required'),
+    '#default' => $hat->required,
+    '#description' => 'Do (individual) Parties require this hat?',
+    '#weight' => 5,
+  );
+  
+  foreach (crm_party_get_data_set_info() as $type => $set) {
+    //get the rule
+    if (isset($hat->name)) {
+      $default = crm_party_hat_get_data_set_rule($hat->name, $type);
+    }
+    else {
+      $default = CRM_PARTY_HAT_NOT_HAVE_SET;
+    }
+    
+    $form['data_set_rules'][$type] = array(
+      '#type' => 'radios',
+      '#title' => t($set['label']),
+      '#default_value' => $default,
+      '#options' => array(
+        CRM_PARTY_HAT_NOT_HAVE_SET => t("Doesn't Have"),
+        CRM_PARTY_HAT_MUST_HAVE_SET => t("Must Have"),
+        CRM_PARTY_HAT_CAN_HAVE_MULTIPLE => t("Can Have Multiple"),
+      ),
+    );      
+  }
+  
   $form['data_set_rules'] = array(
     '#type' => 'fieldset',
     '#title' => t('Data Set Rules'),
-    '#description' => 'Set rules for which data sets a party with this hat can/must have',
-    '#weight' => 3,
+    '#description' => 'Set rules for which data set these hats give',
+    '#weight' => 5,
     '#tree' => true,
   );
   
@@ -193,7 +222,7 @@ function crm_party_hat_edit_form($form, &$form_state, $hat) {
       $default = crm_party_hat_get_data_set_rule($hat->name, $type);
     }
     else {
-      $default = CRM_PARTY_HAT_CAN_HAVE_SET;
+      $default = CRM_PARTY_HAT_NOT_HAVE_SET;
     }
     
     $form['data_set_rules'][$type] = array(
@@ -201,8 +230,9 @@ function crm_party_hat_edit_form($form, &$form_state, $hat) {
       '#title' => t($set['label']),
       '#default_value' => $default,
       '#options' => array(
-        CRM_PARTY_HAT_CAN_HAVE_SET => t("Can Have"),
+        CRM_PARTY_HAT_NOT_HAVE_SET => t("Doesn't Have"),
         CRM_PARTY_HAT_MUST_HAVE_SET => t("Must Have"),
+        CRM_PARTY_HAT_CAN_HAVE_MULTIPLE => t("Can Have Multiple"),
       ),
     );      
   }    
@@ -256,6 +286,7 @@ function crm_party_hat_edit_form_submit($form, &$form_state) {
   if(isset($form_state['values']['hid'])) {
     $hat->hid = $form_state['values']['hid'];
   }
+  $hat->required = $form_state['values']['required'];
   crm_party_hat_save($hat);
   field_attach_submit('crm_party_hat', $hat, $form, $form_state); 
   

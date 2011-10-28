@@ -1034,8 +1034,9 @@ function crm_party_party_operations_merge($parties) {
 // -----------------------------------------------------------------------
 // Party Hats
 
-define('CRM_PARTY_HAT_CAN_HAVE_SET', 0);
+define('CRM_PARTY_HAT_NOT_HAVE_SET', 0);
 define('CRM_PARTY_HAT_MUST_HAVE_SET', 1);
+define('CRM_PARTY_HAT_CAN_HAVE_MULTIPLE', 2);
 
 
 /**
@@ -1131,7 +1132,7 @@ function crm_party_hat_get_data_set_rule($hat, $set) {
   
   //if the rule doesn't exist yet return a default.
   if (count($results) < 1) {
-    return CRM_PARTY_HAT_CAN_HAVE_SET;
+    return CRM_PARTY_HAT_NOT_HAVE_SET;
   }
   
   //get the first $result (there should only ever be one)

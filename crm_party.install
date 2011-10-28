@@ -6,6 +6,20 @@
  */
  
 /**
+ * Add the required field to the hats table
+ * @todo Make it so thaat you can set hats as required for different Party Types
+ */
+function crm_party_update_7003() {
+  db_add_field('crm_party_hats','required', array(
+        'description' => 'This Hat is required',
+        'type' => 'int',
+        'not null' => true,
+        'default' => 0,
+      )
+    );
+}
+ 
+/**
  * Add the hat data set settings table
  * @todo Do we need phdsid?
  */ 
@@ -215,6 +229,12 @@ function crm_party_schema() {
         'type' => 'varchar',
         'length' => '255',
         'not null' => TRUE
+      ),
+      'required' => array(
+        'description' => 'This Hat is required',
+        'type' => 'int',
+        'not null' => true,
+        'default' => 0,
       ) + entity_exportable_schema_fields(),
     ),
     'primary key' => array('hid'),

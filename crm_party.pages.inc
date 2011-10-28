@@ -232,6 +232,13 @@ function crm_party_data_set_edit_form($form, &$form_state, $dataSet) {
     '#title' => "This is the main " . EntityDefaultCRMController::getTypeLabel($dataSet->type),
   );
   
+  $form['data-set-hat'] = array(
+    '#type' => 'select',
+    '#options' =>,
+    '#title' => t('Hat'),
+    '#description' => 'Which hat (if any) is this data set associated with?',
+  );
+  
   $dataSet->form($form, $form_state);
   
   $form['#submit'][] = 'crm_party_data_set_edit_form_submit';
