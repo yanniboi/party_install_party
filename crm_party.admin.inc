@@ -106,7 +106,10 @@ function crm_party_hat_manage() {
   ));
   $rows = array();
   foreach ($result as $hat) {
-    $row = array( t(':label <small>:name</small>', array(':label' => $hat->label, ':name' => $hat->name)));
+    $row = array( t('@label <small>(Machine name: @name)</small>', array(
+      '@label' => $hat->label,
+      '@name' => $hat->name,
+    )));
     $row[] = array( 'data' => l(t('edit'), 'admin/community/hats/' . $hat->name . '/edit'));
     $row[] = array( 'data' => l(t('delete'), 'admin/community/hats/' . $hat->name . '/delete'));
     
