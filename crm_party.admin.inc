@@ -32,17 +32,17 @@ function crm_party_info() {
 
   $rows = array();
 
-  foreach($types as $type => $info) {
+  foreach ($types as $type => $info) {
     $rows[] = array(
-      $info['label'] . " <small>(Machine name: ".$type.")</small><div class=\"description\">".$info['description']."</div>",
+      $info['label'] . " <small>(Machine name: " . $type . ")</small><div class=\"description\">" . $info['description'] . "</div>",
       array(
-        'data' => l(t('edit'), 'admin/community/party/manage/'.$type),
+        'data' => l(t('edit'), 'admin/community/party/manage/' . $type),
       ),
       array(
-        'data' => l(t('Manage Fields'), 'admin/community/party/manage/'.$type.'/fields'),
+        'data' => l(t('Manage Fields'), 'admin/community/party/manage/' . $type . '/fields'),
       ),
       array(
-        'data' => l(t('Manage Fields'), 'admin/community/party/manage/'.$type.'/display'),
+        'data' => l(t('Manage Fields'), 'admin/community/party/manage/' . $type . '/display'),
       ),
       array(
         'data' => '', //for when we implement custom party types
@@ -117,7 +117,7 @@ function crm_party_hat_manage() {
     '#theme' => 'table',
     '#header' => $header,
     '#rows' => $rows,
-    '#empty' => t('No hats have been defined. <a href="@link">Add Hatt</a>', array('@link' => url('admin/community/hats/add'))),
+    '#empty' => t('No hats have been defined. <a href="@link">Add a hat</a>', array('@link' => url('admin/community/hats/add'))),
   );
   
   return $build;
@@ -152,12 +152,13 @@ function crm_party_hat_edit_form($form, &$form_state, $hat) {
   
   dsm($hat);
   
-  if(isset($hat->hid)) {
+  if (isset($hat->hid)) {
     $form['hid'] = array(
       '#type' => 'hidden',
       '#value' => $hat->hid,
     );
-    drupal_set_title('Edit Hat: ' . $hat->label);
+    // @todo missing t().
+    drupal_set_title('Edit hat: ' . $hat->label);
   }
   
   $form['label'] = array(
@@ -185,12 +186,12 @@ function crm_party_hat_edit_form($form, &$form_state, $hat) {
     '#type' => 'checkbox',
     '#title' => t('Required'),
     '#default_value' => $hat->required,
-    '#description' => 'Do (individual) Parties require this hat?',
+    '#description' => 'Whether (individual) parties require this hat.',
     '#weight' => 5,
   );
   
   foreach (crm_party_get_data_set_info() as $type => $set) {
-    //get the rule
+    // Get the rule.
     if (isset($hat->name)) {
       $default = crm_party_hat_get_data_set_rule($hat->name, $type);
     }
@@ -232,9 +233,9 @@ function crm_party_hat_edit_form($form, &$form_state, $hat) {
       '#title' => t($set['label']),
       '#default_value' => $default,
       '#options' => array(
-        CRM_PARTY_HAT_NOT_HAVE_SET => t("Doesn't Have"),
-        CRM_PARTY_HAT_MUST_HAVE_SET => t("Must Have"),
-        CRM_PARTY_HAT_CAN_HAVE_MULTIPLE => t("Can Have Multiple"),
+        CRM_PARTY_HAT_NOT_HAVE_SET => t("Doesn't have"),
+        CRM_PARTY_HAT_MUST_HAVE_SET => t("Must have"),
+        CRM_PARTY_HAT_CAN_HAVE_MULTIPLE => t("Can have multiple"),
       ),
     );      
   }    
