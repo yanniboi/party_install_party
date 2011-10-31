@@ -1,0 +1,5 @@
+name = CRM party hat
+description = Allows access rules to be defined for parties. 
+dependencies[] = crm_party
+core = 7.x
+files[] = crm_party_hat.module

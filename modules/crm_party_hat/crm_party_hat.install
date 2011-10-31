@@ -1,0 +1,106 @@
+<?php
+/**
+ * @file crm_party_hat.install
+ * TODO: Enter file description here.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function crm_party_hat_schema() {
+  $schema['crm_party_hats'] = array(
+    'description' => 'Stores hat definitions',
+    'fields' => array(
+      'hid' => array(
+        'description' => 'Primary key for the hat.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'name' => array(
+        'description' => 'The machine readable name of the hat',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'label' => array(
+        'description' => 'A human readable name for the hat',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE
+      ),
+      'required' => array(
+        'description' => 'This Hat is required',
+        'type' => 'int',
+        'not null' => true,
+        'default' => 0,
+      ) + entity_exportable_schema_fields(),
+    ),
+    'primary key' => array('hid'),
+  );
+  
+  // @todo do we need the phid column?
+  //       We need a primary key and neither of the two fields would be unique
+  $schema['crm_party_hattings'] = array(
+    'description' => 'Stores hattings (relationships between hats and parties)',
+    'fields' => array(
+      'phid' => array(
+        'description' => 'Primary key for the hatting.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'hat' => array(
+        'description' => 'The machine readable name of the hat',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'party' => array(
+        'description' => 'The Party Id',
+        'type' => 'int',
+        'not null' => TRUE
+      ),
+    ),
+    'primary key' => array('phid'),
+  );
+  
+  // Store data set settings for hats
+  $schema['crm_party_hat_data_set_rules'] = array(
+    'description' => 'Store data set settings for hats',
+    'fields' => array(
+      'phdsid' => array(
+        'description' => 'Primary key for the setting.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'hat' => array(
+        'description' => 'The machine readable name of the hat',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'data_set' => array(
+        'description' => 'The machine readable name of the data_Set',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'rule' => array(
+        'description' => 'The Party Id',
+        'type' => 'int',
+        'default' => 0,
+        'not null' => TRUE
+      ),
+    ),
+    'primary key' => array('phdsid'),
+  );
+
+  return $schema;
+}
+

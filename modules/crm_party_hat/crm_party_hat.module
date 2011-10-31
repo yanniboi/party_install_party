@@ -1,0 +1,337 @@
+<?php
+/**
+ * @file crm_party_hat.module
+ * Provides an extensible access system for CRM parties.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function crm_party_hat_menu() { 
+  $items['admin/community/hats'] = array(
+    'title' => 'Party hats',
+    'description' => 'Manage hats',
+    'page callback' => 'crm_party_hat_manage',
+    'access arguments' => array('administer hats'),
+    'file' => 'crm_party.admin.inc',
+  );
+  $items['admin/community/hats/add'] = array(
+    'title' => 'Add hat',
+    'description' => 'Manage Hats',
+    'page callback' => 'crm_party_hat_add',
+    'access arguments' => array('administer hats'),
+    'file' => 'crm_party.admin.inc',
+  );
+  $items['admin/community/hats/%crm_party_hat/edit'] = array(
+    'title' => 'Edit party hat',
+    'description' => 'Edit a party hat',
+    'page callback' => 'crm_party_hat_edit',
+    'page arguments' => array(3),
+    'access arguments' => array('administer hats'),
+    'file' => 'crm_party.admin.inc',
+  );
+
+  return $items;
+}
+
+
+/**
+ * Implements hook_permission().
+ */
+function crm_party_hat_permission() {
+  return array(
+    'administer hats' => array(
+      'title' => t('Administer CRM party hats'), 
+      'description' => t('TODO write me.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_entity_info().
+ */
+function crm_party_hat_entity_info() {
+  // The hat entity.
+  $entity_info['crm_party_hat'] = array(
+    'label' => t('Hat'),
+    'entity class' => 'CRMPartyHat',
+    'controller class' => 'CRMPartyHatController',
+    // We define this so entity module provides us with basic Views data, while
+    // allowing us to define more of our own.
+    // See http://drupal.org/node/1307760.
+    'views controller class' => 'EntityDefaultViewsController',
+    'base table' => 'crm_party_hats',
+    'fieldable' => TRUE,
+    'module' => 'crm_party',
+    'entity keys' => array(
+      'id' => 'hid'
+    ),
+    'exportable' => TRUE,
+    'bundles' => array(
+      'hat' => array(
+        'label' => t('Hat'),
+        'admin' => array(
+          'path' => 'admin/community/hats',
+          'access arguments' => array('administer hats'),
+        ),
+      ),
+    ),
+    'view modes' => array(
+      'full' => array(
+        'label' => t('Full Hat'),
+        'custom settings' =>  FALSE,
+      ),
+    )
+  );
+  return $entity_info;
+}
+
+// -----------------------------------------------------------------------
+// Party Hats API
+
+define('CRM_PARTY_HAT_NOT_HAVE_SET', 0);
+define('CRM_PARTY_HAT_MUST_HAVE_SET', 1);
+define('CRM_PARTY_HAT_CAN_HAVE_MULTIPLE', 2);
+
+
+/**
+ * Save a hat
+ *
+ * @param $hat a crm_party_hat object.
+ */
+function crm_party_hat_save(&$hat) {
+  return entity_get_controller('crm_party_hat')->save($hat);
+}
+
+/**
+ * Load a hat
+ *
+ * @param the hat name
+ */
+function crm_party_hat_load($hat) {
+  $query = db_select('crm_party_hats', 'ph');
+  $query->addField('ph', 'hid');
+  $result = $query->condition('name', $hat, '=')
+    ->execute()
+    ->fetchAllAssoc('hid');
+  
+  $ids = array_keys($result);
+  
+  if(count($ids) < 1 && is_numeric($hat)) {
+    $ids = array($hat);
+  }
+  return reset(crm_party_hat_load_multiple($ids));
+}
+
+/**
+ * Load many hats.
+ */
+function crm_party_hat_load_multiple($hids = array(), $conditions = array(), $reset = FALSE) {
+  return entity_load('crm_party_hat', $hids, $conditions, $reset);
+}
+
+/**
+ * Save a hat data set rule
+ *
+ * @param $hat the hat name
+ * @param $set the set type
+ * @param $value the value
+ *
+ * @todo Refactor so that we don't do 3 queries to update one rule. 
+ *       At the moment we do 3 queries when we add a rule and 1 when we update it and 2 when we keep it the same..
+ *       Is this better than 2 queries for both?
+ */
+function crm_party_hat_set_data_set_rule($hat, $set, $value = CRM_PARTY_HAT_NOT_HAVE_SET) {
+  //try updating the table
+  $num_affected = db_update('crm_party_hat_data_set_rules')
+    ->fields(array('rule' => $value))
+    ->condition('hat', $hat, '=')
+    ->condition('data_set', $set, '=')
+    ->execute();
+    
+  if ($num_affected < 1) {
+    // We have to check that we haven't kept the row the same.
+    // @todo: refactor this so that we don't do 3 queries
+    $count = db_select('crm_party_hat_data_set_rules', 'c')
+      ->fields('c')
+      ->condition('hat', $hat, '=')
+      ->condition('data_set', $set, '=')
+      ->execute()
+      ->rowCount();
+    
+    if($count < 1) {  
+      $data = array(
+        'hat' => $hat,
+        'data_set' => $set,
+        'rule' => $value,
+      );
+      drupal_write_record('crm_party_hat_data_set_rules',  $data);
+    }
+  }
+}
+
+/**
+ * Get a hat data set rule
+ *
+ * @param $hat the hat name
+ * @param $set the set type
+ */
+function crm_party_hat_get_data_set_rule($hat, $set) {
+  //select from the table where the hat and data set are right
+  $results = db_select('crm_party_hat_data_set_rules', 'c')
+    ->fields('c')
+    ->condition('hat', $hat, '=')
+    ->condition('data_set', $set, '=')
+    ->execute()
+    ->fetchAllAssoc('phdsid');
+  
+  //if the rule doesn't exist yet return a default.
+  if (count($results) < 1) {
+    return CRM_PARTY_HAT_NOT_HAVE_SET;
+  }
+  
+  //get the first $result (there should only ever be one)
+  $result = reset($results);
+  return $result->rule;
+}
+
+/**
+ * Get all the sets for a Hat
+ * This returns an array of sets that a Party Must have or can have multiple of
+ */
+function crm_party_hat_get_data_sets ($hat, $multiple_only = FALSE) {
+  $condition = ($multiple_only) ? CRM_PARTY_HAT_CAN_HAVE_MULTIPLE : CRM_PARTY_HAT_MUST_HAVE_SET;
+  
+  $results = db_select('crm_party_hat_data_set_rules', 'c')
+    ->fields('c')
+    ->condition('hat', $hat->name, '=')
+    ->condition('rule', $condition, '>=')
+    ->execute()
+    ->fetchAllAssoc('data_set');
+  
+  return array_keys($results);
+}
+ 
+/**
+ * Assign a hat to a party
+ *
+ * @param $party the Party Object
+ * @param $hat the Hat object or name
+ *
+ * @todo Change Name?
+ * @todo Build
+ */
+function crm_party_hat_assign($party, $hat) {
+  //get the party id out
+  if (is_object($party)) {
+    $party = $party->pid;
+  }
+  
+  //get hold of the $hat name
+  if(is_object($hat)) {
+    $hat = $hat->id;
+  }
+  
+  $result = db_select('crm_party_hattings', 'ph')
+    ->fields('ph')
+    ->condition('party', $party, '=')
+    ->condition('hat', $hat, '=')
+    ->execute()
+    ->fetchAllAssoc('phid');
+    
+  if ( count($result) < 1 ) {
+    $record = array('party' => $party, 'hat' => $hat);
+    drupal_write_record('crm_party_hattings', $record);
+  }
+}
+
+/**
+ * Unassign a hat from a party
+ *
+ * @param $party the Party Object
+ * @param $hat the Hat object or name
+ *
+ * @todo Change Name?
+ * @todo Build
+ */
+function crm_party_hat_unassign($party, $hat) {
+  //get the party id out
+  if(is_object($party)) {
+    $party = $party->pid;
+  }
+  
+  //get hold of the $hat name
+  if(is_object($hat)) {
+    $hat = $hat->name;
+  }
+  
+  $num = db_delete('crm_party_hattings')
+    ->condition('party', $party, '=')
+    ->condition('hat', $hat, '=')
+    ->execute();
+  
+  return $num;
+}
+
+/**
+ * Get all the Hats a Party is Wearing
+ *
+ * @param $party the Party object or ID
+ */
+function crm_party_get_hats($party) {
+  if(is_object($party)) {
+    //if the party id isn't set
+    if(!isset($party->pid)) {
+      //We're making a new party so get the required hats
+      $query = new EntityFieldQuery();
+      $query->entityCondition('entity_type','crm_party_hat', '=')
+        ->propertyCondition('required', 1, '=');
+      $result = $query->execute();
+      $hids = array();
+      foreach($result['crm_party_hat'] as $record) {
+        $hids[] = $record->hid;
+      }
+      $hats = entity_load('crm_party_hat', $hids);
+      return $hats;
+    }
+    else {
+      $party = $party->pid;
+    }
+  }
+  
+  $result = db_select('crm_party_hattings','ph')
+    ->condition('party',$party,'=')
+    ->fields('ph')
+    ->execute()
+    ->fetchAllAssoc('hat');
+ 
+  $hats = array_keys($result);
+ 
+  if (count($hats) > 0) {
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type','crm_party_hat', '=')
+      ->propertyCondition('name', $hats, 'IN');
+    $result = $query->execute();
+    $hids = array();
+    foreach($result['crm_party_hat'] as $record) {
+      $hids[] = $record->hid;
+    }
+    $hats = entity_load('crm_party_hat', $hids);
+  }
+  return $hats;  
+}
+
+/**
+ * Get all availably hats.
+ */
+function crm_party_get_all_hats() {
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type','crm_party_hat', '=');
+  $result = $query->execute();
+  $hids = array();
+  foreach($result['crm_party_hat'] as $record) {
+    $hids[] = $record->hid;
+  }
+  $hats = entity_load('crm_party_hat', $hids);
+  return $hats;  
+}
