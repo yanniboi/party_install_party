@@ -110,27 +110,6 @@ function crm_party_hat_edit_form($form, &$form_state, $hat) {
     '#weight' => 5,
   );
   
-  foreach (crm_party_get_data_set_info() as $type => $set) {
-    // Get the rule.
-    if (isset($hat->name)) {
-      $default = crm_party_hat_get_data_set_rule($hat->name, $type);
-    }
-    else {
-      $default = CRM_PARTY_HAT_NOT_HAVE_SET;
-    }
-    
-    $form['data_set_rules'][$type] = array(
-      '#type' => 'radios',
-      '#title' => t($set['label']),
-      '#default_value' => $default,
-      '#options' => array(
-        CRM_PARTY_HAT_NOT_HAVE_SET => t("Doesn't have"),
-        CRM_PARTY_HAT_MUST_HAVE_SET => t("Must have"),
-        CRM_PARTY_HAT_CAN_HAVE_MULTIPLE => t("Must have and can have multiple"),
-      ),
-    );      
-  }
-  
   $form['data_set_rules'] = array(
     '#type' => 'fieldset',
     '#title' => t('Data Set Rules'),
