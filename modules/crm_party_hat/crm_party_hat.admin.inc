@@ -226,6 +226,7 @@ function crm_party_hat_edit_form_submit($form, &$form_state) {
   field_attach_submit('crm_party_hat', $hat, $form, $form_state); 
   
   dsm($form_state['values']['data_set_rules']);
+  // @todo: fix this with the new values.
   
   foreach ($form_state['values']['data_set_rules'] as $type => $value) {
     //crm_party_hat_set_data_set_rule($hat->name, $type, $value);
