@@ -7,4 +7,3 @@ files[] = crm_profile.pages.inc
 
 dependencies[] = profile2
 dependencies[] = crm_party
-dependencies[] = relation
