@@ -335,3 +335,14 @@ function crm_party_get_all_hats() {
   $hats = entity_load('crm_party_hat', $hids);
   return $hats;  
 }
+
+/**
+ * Implements hook_theme().
+ */
+function crm_party_hat_theme($existing, $type, $theme, $path) {
+  return array(
+    'crm_hat_data_set_rules_form' => array(
+      'render element' => 'form',
+    ),
+  );
+}

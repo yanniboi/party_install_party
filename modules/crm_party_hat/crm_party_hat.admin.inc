@@ -154,8 +154,10 @@ function crm_party_hat_edit_form($form, &$form_state, $hat) {
       '#title' => t($set['label']),
       '#default_value' => $default,
       '#options' => array(
-        NULL => 'na',
-        0 => 'deny',
+        // We have to use different keys to what the access hook expects for
+        // FormAPI radio values to work.
+        0 => 'na',
+        -1 => 'deny',
         1 => 'allow',
         /*
         CRM_PARTY_HAT_NOT_HAVE_SET => t("Doesn't have"),
@@ -195,6 +197,31 @@ function crm_party_hat_edit_form($form, &$form_state, $hat) {
   );
 
   return $form;  
+}
+
+/**
+ * Theme function for the data set rules form fieldset.
+ */
+function theme_crm_hat_data_set_rules_form($variables) {
+  $form = $variables['form'];
+
+  $output = '';
+  $rows = array();
+  foreach (element_children($form) as $data_set) {
+    $row = array();
+    $row[] = $data_set;
+    foreach (array_keys($form[$data_set]['#options']) as $radio_key) {
+      // @todo: move label to headers.
+      $row[] = drupal_render($form[$data_set][$radio_key]);
+    }
+
+    $rows[] = $row;
+  }
+
+  $header = array_merge(array(t('Data set')), $form[$data_set]['#options']);
+  $output .= theme('table', array('rows' => $rows, 'header' => $header));
+
+  return $output;
 }
 
 /**
