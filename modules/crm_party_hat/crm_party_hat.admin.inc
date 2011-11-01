@@ -121,9 +121,9 @@ function crm_party_hat_edit_form($form, &$form_state, $hat) {
       '#options' => array(
         // We have to use different keys to what the access hook expects for
         // FormAPI radio values to work.
-        0 => 'na',
-        -1 => 'deny',
-        1 => 'allow',
+        1   => t('Allow'),
+        -1  => t('Deny'),
+        0   => t('Neither'),
         /*
         CRM_PARTY_HAT_NOT_HAVE_SET => t("Doesn't have"),
         CRM_PARTY_HAT_MUST_HAVE_SET => t("Must have"),
