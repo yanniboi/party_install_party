@@ -8,10 +8,6 @@
  * Page callback for the hats list page
  */
 function crm_party_hat_manage() {
-  $build['actions'] = array(
-    '#markup' => l("Add a hat", 'admin/community/hats/add'),
-  );
-  
   $result = db_select('crm_party_hats', 'ph')
     ->fields('ph')
     ->execute()

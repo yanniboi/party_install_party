@@ -21,6 +21,7 @@ function crm_party_hat_menu() {
     'page callback' => 'crm_party_hat_add',
     'access arguments' => array('administer hats'),
     'file' => 'crm_party_hat.admin.inc',
+    'type' => MENU_LOCAL_ACTION,
   );
   $items['admin/community/hats/%crm_party_hat/edit'] = array(
     'title' => 'Edit party hat',
