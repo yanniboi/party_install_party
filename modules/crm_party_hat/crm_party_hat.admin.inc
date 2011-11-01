@@ -23,8 +23,8 @@ function crm_party_hat_manage() {
       '@label' => $hat->label,
       '@name' => $hat->name,
     )));
-    $row[] = array( 'data' => l(t('edit'), 'admin/community/hats/' . $hat->name . '/edit'));
-    $row[] = array( 'data' => l(t('delete'), 'admin/community/hats/' . $hat->name . '/delete'));
+    $row[] = array('data' => l(t('edit'), 'admin/community/hats/' . $hat->name . '/edit'));
+    $row[] = array('data' => l(t('delete'), 'admin/community/hats/' . $hat->name . '/delete'));
     
     $rows[] = $row;
   }
@@ -98,15 +98,15 @@ function crm_party_hat_edit_form($form, &$form_state, $hat) {
   
   $form['data_set_rules'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Data Set Rules'),
-    '#description' => 'Set rules for which data set these hats give',
+    '#title' => t('Data set rules'),
+    '#description' => 'Set rules for which data set these hats give.',
     '#weight' => 5,
     '#tree' => TRUE,
     '#theme' => 'crm_hat_data_set_rules_form',
   );
   
   foreach (crm_party_get_data_set_info() as $type => $set) {
-    //get the rule
+    // Get the rule.
     if (isset($hat->name)) {
       $default = crm_party_hat_get_data_set_rule($hat->name, $type);
     }
@@ -135,7 +135,7 @@ function crm_party_hat_edit_form($form, &$form_state, $hat) {
   
   $form['party_piece_settings'] = array(
     '#type' => 'fieldset',
-    '#title' => t('party piece settings'),
+    '#title' => t('Party piece settings'),
     '#weight' => 10,
     '#tree' => true,
   );
@@ -146,7 +146,7 @@ function crm_party_hat_edit_form($form, &$form_state, $hat) {
   
   $form['associated_roles'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Associated Roles'),
+    '#title' => t('Associated roles'),
     '#weight' => 20,
     '#tree' => true,
   );

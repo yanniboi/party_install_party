@@ -17,7 +17,7 @@ function crm_party_hat_menu() {
   );
   $items['admin/community/hats/add'] = array(
     'title' => 'Add hat',
-    'description' => 'Manage Hats',
+    'description' => 'Manage hats',
     'page callback' => 'crm_party_hat_add',
     'access arguments' => array('administer hats'),
     'file' => 'crm_party_hat.admin.inc',
