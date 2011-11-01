@@ -25,8 +25,8 @@ function crm_party_hat_menu() {
   $items['admin/community/hats/%crm_party_hat/edit'] = array(
     'title' => 'Edit party hat',
     'description' => 'Edit a party hat',
-    'page callback' => 'crm_party_hat_edit',
-    'page arguments' => array(3),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('crm_party_hat_edit_form', 3),
     'access arguments' => array('administer hats'),
     'file' => 'crm_party_hat.admin.inc',
   );
