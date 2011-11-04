@@ -151,7 +151,7 @@ function crm_profile_form_crm_party_edit_form_alter(&$form, &$form_state, $form_
   // Make sure the uid is null. 
   $form['uid'] = array(
     '#type' => 'hidden',
-    '#value' => null,
+    '#value' => NULL,
   );  
   
   $profiles = array();
@@ -272,7 +272,7 @@ function crm_profile_crm_party_page_view_alter($party) {
       }
     }
     $build['profile_' . $type . '_add']['#markup'] = "<div class=\"clearfix\">
-      <div class=\"crm_profile_ops\" style=\"float: right\">".l("Add " . reset($profiles)->label, 'party/' . $party->pid . '/add/' . $type)."
+      <div class=\"crm_profile_ops\" style=\"float: right\">" . l("Add " . reset($profiles)->label, 'party/' . $party->pid . '/add/' . $type) . "
         </div>
       </div>";
   }
@@ -326,7 +326,7 @@ function _crm_profile_load_parties($profile) {
     }
   }
   
-  return($parties);
+  return $parties;
 }
 
 /**

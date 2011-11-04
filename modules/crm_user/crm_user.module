@@ -40,7 +40,7 @@ function crm_user_crm_party_party_pieces() {
       'page callback' => 'crm_party_view_data_set',
       'page arguments' => array(1, 'user'),
       'file' => 'crm_party.pages.inc', 
-      'access callback' => true,
+      'access callback' => TRUE,
       'access arguments' => array(1),
       'weight' => -8,
     ),
@@ -153,8 +153,8 @@ class UserCRMController extends EntityDefaultCRMController {
   const VIEW_MODE = "full";
 
   public function form(&$form, &$form_state) {
-    if($this->eid !== null) {
-      module_load_include('inc','user','user.pages');
+    if ($this->eid !== NULL) {
+      module_load_include('inc', 'user', 'user.pages');
       $form = user_profile_form($form, $form_state, $this->entity);
       unset($form['actions']);
       
