@@ -50,6 +50,8 @@ function hook_crm_party_access($op, $party = NULL, $attached_entity = NULL, $acc
  *  An array of sets where each key is the unique identifier of that "set type".
  *  - 'label': The human readable name of the data set.
  *  - 'entity type': The entity type this data set relates to parties.
+ *  - 'entity bundle': (optional) The entity bundle that this data set restricts
+ *    to. May be omitted to allow any bundle.
  *  - 'singleton': (optional) Whether this set's relationships only have one
  *    entity relating to a party. Default: FALSE.
  *  - 'load callback': The name of the load function. This always gets given

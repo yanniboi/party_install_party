@@ -59,6 +59,7 @@ function crm_profile_crm_party_data_set_info() {
     $sets["profile2_" . $type] = array(
       'label' => $label,
       'entity type' => 'profile2',
+      'entity bundle' => $type,
       //'load callback' => "crm_profile_load_profile", - No Longer needed with class implementation
       //'load arguments' => array($type),
       //'form callback' => "crm_profile_form", - No longer needed with class implementation
