@@ -3,7 +3,26 @@
  * @file crm_party_hat.install
  * TODO: Enter file description here.
  */
-
+ 
+/**
+ * Change data set rules: Drop the rule column and add 'has' and 'multiple'
+ */
+function crm_party_hat_update_7001() {
+  db_drop_field('crm_party_hat_data_set_rules', 'rule');
+  db_add_field('crm_party_hat_data_set_rules', 'has', array(
+    'description' => 'Does the Party Have this data set',
+    'type' => 'int',
+    'default' => 0,
+    'not null' => TRUE,
+  ));
+  db_add_field('crm_party_hat_data_set_rules', 'multiple', array(
+    'description' => 'Does the Party Have multiple of this data set',
+    'type' => 'int',
+    'default' => 0,
+    'not null' => TRUE,
+  ));
+}
+ 
 /**
  * Implements hook_schema().
  */
@@ -91,8 +110,14 @@ function crm_party_hat_schema() {
         'not null' => TRUE,
         'default' => '',
       ),
-      'rule' => array(
-        'description' => 'The Party Id',
+      'has' => array(
+        'description' => 'Does the Party Have this data set',
+        'type' => 'int',
+        'default' => 0,
+        'not null' => TRUE
+      ),
+      'multiple' => array(
+        'description' => 'Does the Party Have multiple of this data set',
         'type' => 'int',
         'default' => 0,
         'not null' => TRUE

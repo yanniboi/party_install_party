@@ -145,10 +145,10 @@ function crm_party_hat_load_multiple($hids = array(), $conditions = array(), $re
  *       At the moment we do 3 queries when we add a rule and 1 when we update it and 2 when we keep it the same..
  *       Is this better than 2 queries for both?
  */
-function crm_party_hat_set_data_set_rule($hat, $set, $value = CRM_PARTY_HAT_NOT_HAVE_SET) {
+function crm_party_hat_set_data_set_rule($hat, $set, $values = array()) {
   //try updating the table
   $num_affected = db_update('crm_party_hat_data_set_rules')
-    ->fields(array('rule' => $value))
+    ->fields($values)
     ->condition('hat', $hat, '=')
     ->condition('data_set', $set, '=')
     ->execute();
@@ -167,8 +167,7 @@ function crm_party_hat_set_data_set_rule($hat, $set, $value = CRM_PARTY_HAT_NOT_
       $data = array(
         'hat' => $hat,
         'data_set' => $set,
-        'rule' => $value,
-      );
+      ) + $values;
       drupal_write_record('crm_party_hat_data_set_rules',  $data);
     }
   }
@@ -191,12 +190,18 @@ function crm_party_hat_get_data_set_rule($hat, $set) {
   
   //if the rule doesn't exist yet return a default.
   if (count($results) < 1) {
-    return CRM_PARTY_HAT_NOT_HAVE_SET;
+    return array(
+      'has' => 0,
+      'multiple' => 0,
+    );
   }
   
   //get the first $result (there should only ever be one)
   $result = reset($results);
-  return $result->rule;
+  return array(
+    'has' => $result->has,
+    'multiple' => $result->multiple,
+  );
 }
 
 /**

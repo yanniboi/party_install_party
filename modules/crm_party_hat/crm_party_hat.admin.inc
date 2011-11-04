@@ -93,14 +93,14 @@ function crm_party_hat_edit_form($form, &$form_state, $hat) {
     '#title' => t('Required'),
     '#default_value' => $hat->required,
     '#description' => 'Whether (individual) parties require this hat.',
-    '#weight' => 5,
+    '#weight' => 1,
   );
   
   $form['data_set_rules'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Data set rules'),
+    '#title' => t('Data rules'),
     '#description' => 'Set rules for which data set these hats give.',
-    '#weight' => 5,
+    '#weight' => 3,
     '#tree' => TRUE,
     '#theme' => 'crm_hat_data_set_rules_form',
   );
@@ -109,29 +109,40 @@ function crm_party_hat_edit_form($form, &$form_state, $hat) {
     // Get the rule.
     if (isset($hat->name)) {
       $default = crm_party_hat_get_data_set_rule($hat->name, $type);
+      foreach($default as $key => $var) {
+        if($var == 1) {
+          $default[$key] = $key;
+        }
+      }
     }
     else {
-      $default = CRM_PARTY_HAT_NOT_HAVE_SET;
+      $default = array('has' => 0, 'multiple' => 0);
     }
     
     $form['data_set_rules'][$type] = array(
-      '#type' => 'radios',
+      '#type' => 'checkboxes',
       '#title' => t($set['label']),
       '#default_value' => $default,
       '#options' => array(
         // We have to use different keys to what the access hook expects for
         // FormAPI radio values to work.
-        1   => t('Allow'),
-        -1  => t('Deny'),
-        0   => t('Neither'),
-        /*
-        CRM_PARTY_HAT_NOT_HAVE_SET => t("Doesn't have"),
-        CRM_PARTY_HAT_MUST_HAVE_SET => t("Must have"),
-        CRM_PARTY_HAT_CAN_HAVE_MULTIPLE => t("Can have multiple"),
-        */
+        'has'   => t('Has'),
+        'multiple'  => t('Can have Multiple'),
       ),
     );      
-  }    
+  }
+
+  $form['data_set_access'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Data Access'),
+    '#description' => 'Set rules for who can see data of a party with this hat',
+    '#weight' => 5,
+    '#tree' => TRUE,
+  );
+  
+  $form['data_set_access']['placeholder'] = array(
+    '#markup' => '<i>This is a placeholder, in future hats will be able to define who can see the data of the party they\'re attached too</i>',
+  );
   
   $form['party_piece_settings'] = array(
     '#type' => 'fieldset',
@@ -214,8 +225,14 @@ function crm_party_hat_edit_form_submit($form, &$form_state) {
   dsm($form_state['values']['data_set_rules']);
   // @todo: fix this with the new values.
   
-  foreach ($form_state['values']['data_set_rules'] as $type => $value) {
-    //crm_party_hat_set_data_set_rule($hat->name, $type, $value);
+  foreach ($form_state['values']['data_set_rules'] as $type => $values) {
+    // convert to a 1/0 column. There must be a better way! It probably involves having two different checkboxes
+    foreach($values as $key => $var) {
+      if($key === $var) {
+        $values[$key] = 1;
+      }
+    }
+    crm_party_hat_set_data_set_rule($hat->name, $type, $values);
   }
   
   //$form_state['redirect'] = 'admin/community/hats';  
