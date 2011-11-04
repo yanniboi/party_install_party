@@ -983,7 +983,7 @@ function crm_party_party_operations_merge($parties) {
 function crm_party_views_api() {
   return array(
     'api' => '3.0-alpha1',
-    'path' => drupal_get_path('module', 'crm_party') . '/includes',
+    'path' => drupal_get_path('module', 'crm_party') . '/includes/views',
   );
 }
 
