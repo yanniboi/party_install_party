@@ -96,6 +96,27 @@ function crm_party_views_data() {
       'help' => t('The type of attached entities. Will produce multiple rows per party.'),
       'handler' => 'views_handler_field',
     ),
+    'filter' => array(
+      'label' => t('Attached entity type'),
+      'help' => t('The type of attached entities.'),
+      // @todo: write handler that provides a UI to pick entity type based on data sets.
+      'handler' => 'views_handler_filter_string',
+    ),
+  );
+
+  $data['crm_party_attached_entity']['entity_bundle'] = array(
+    'title' => t('Attached entity bundle'),
+    'field' => array(
+      'label' => t('Attached entity bundle'),
+      'help' => t('The bundle type of attached entities. Will produce multiple rows per party.'),
+      'handler' => 'views_handler_field',
+    ),
+    'filter' => array(
+      'label' => t('Attached entity bundle'),
+      'help' => t('The bundle of attached entities.'),
+      // @todo: write handler that provides a UI to pick entity type based on data sets.
+      'handler' => 'views_handler_filter_string',
+    ),
   );
 
   // Get all defined data sets.
