@@ -9,8 +9,11 @@ files[] = crm_party.admin.inc
 files[] = includes/crm_party.crm.inc
 files[] = includes/crm_party.entity.inc
 files[] = includes/crm_party_hat.entity.inc
+
+; Views files
 files[] = includes/views/crm_party.views.inc
 files[] = includes/views/crm_party_plugin_display_party_piece.inc
+files[] = includes/views/crm_party_plugin_row_attached_entity.inc
 files[] = includes/views/crm_party_handler_relationship_crm_party_set_eid.inc
 files[] = includes/views/crm_party_handler_relationship_crm_party_attached_eid.inc
 

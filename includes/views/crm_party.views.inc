@@ -29,6 +29,18 @@ function crm_party_views_plugins() {
         //'help topic' => 'display-node-content',
       ),
     ),
+    'row' => array(
+      'party_attached_entity' => array(
+        'title' => t('Party attached entity'),
+        'help' => t('Display entities attached to a party with their default display.'),
+        'handler' => 'crm_party_plugin_row_attached_entity',
+        'uses fields' => FALSE,
+        'uses options' => TRUE,
+        'type' => 'normal',
+        //'theme' => 'views_view_row_node', // @todo: needed?
+        'base' => array('crm_party'), // Only works with party base.
+        ),
+     ),
   );
 }
 
