@@ -616,7 +616,7 @@ function crm_party_data_set_load($party, $set_name) {
   $table = EntityDefaultCRMController::getInstanceTable($set_name);
   $items = db_select($table, 'ds')
     ->fields('ds')
-    ->condition('pid',$party->pid,'=')
+    ->condition('pid', $party->pid,'=')
     ->execute()
     ->fetchAllAssoc('eid', PDO::FETCH_ASSOC);
     
@@ -673,7 +673,7 @@ function crm_party_data_set_form($party, $set_type, $set_id = FALSE) {
  * @param $hat Not used yet
  * @param $hat_main Not used yet
  */
-function crm_party_data_set_instance_attach($party, $set_type, $set_id, $main = false, $hat = '', $hat_main = false, $null = false) {
+function crm_party_data_set_instance_attach($party, $set_type, $set_id, $main = FALSE, $hat = '', $hat_main = FALSE, $null = FALSE) {
   $data = array(
     'pid' => $party->pid,
     'sid' => $set_id,
@@ -683,7 +683,7 @@ function crm_party_data_set_instance_attach($party, $set_type, $set_id, $main = 
     'null' => $null,
   );
 
-  drupal_write_record('crm_party_data_set_'.$set_type, $data);
+  drupal_write_record('crm_party_data_set_' . $set_type, $data);
 }
 
 /**
@@ -695,7 +695,7 @@ function crm_party_data_set_instance_attach($party, $set_type, $set_id, $main = 
  *
  * @todo Implement
  */
-function crm_party_data_set_instance_detach($party, $set_type, $set_id){
+function crm_party_data_set_instance_detach($party, $set_type, $set_id) {
   return TRUE;
 }
 
@@ -709,9 +709,9 @@ function crm_party_data_set_instance_detach($party, $set_type, $set_id){
  * @param $party_piece
  *  (optional) the Piece we're looking for
  */
-function crm_party_get_party_piece_instances($parent, $party_type, $party_pieces = null) {
+function crm_party_get_party_piece_instances($parent, $party_type, $party_pieces = NULL) {
   // Build the query;
-  $query = db_select('crm_party_party_pieces','pp');
+  $query = db_select('crm_party_party_pieces', 'pp');
   $query->fields('pp');
   $query->condition('parent_id', $parent, '=');
   if (is_array($party_pieces)) {
@@ -724,7 +724,7 @@ function crm_party_get_party_piece_instances($parent, $party_type, $party_pieces
   $results = $query->execute()->fetchAllAssoc('instance_id');
   foreach ($results as $key => $result) {
     // Decode the arguments into a useable form.
-    $results[$key]['arguments'] = json_decode($result['arguments'], true);
+    $results[$key]['arguments'] = json_decode($result['arguments'], TRUE);
   }
   return $results;
 }
@@ -741,13 +741,13 @@ function crm_party_save_party_piece_instance($instance = array()) {
   $instance['arguments'] = json_encode($instance['arguments']);
   
   //If the $instance['instance_id'] is set, we're updating.
-  if(isset($instance['instance_id'])) {
+  if (isset($instance['instance_id'])) {
     $id = $instance['instance_id'];
     unset($instance['instance_id']);
-    drupal_write_record('crm_party_party_pieces',$instance,$id);
+    drupal_write_record('crm_party_party_pieces', $instance, $id);
   }
   else {
-    drupal_write_record('crm_party_party_pieces',$instance);
+    drupal_write_record('crm_party_party_pieces', $instance);
   }
 }
 
@@ -760,7 +760,7 @@ function crm_party_save_party_piece_instance($instance = array()) {
  * @todo: implement
  */
 function crm_party_delete_party_piece_instance($instance) {
-  return true;
+  return TRUE;
 } 
 
 /**
@@ -776,7 +776,7 @@ function crm_party_delete_party_piece_instance($instance) {
 function crm_party_party_piece_display($party, $instance) {
   if (is_numeric($instance)) {
     // Build the query;
-    $query = db_select('crm_party_party_pieces','pp');
+    $query = db_select('crm_party_party_pieces', 'pp');
     $query->fields('pp');
     $query->condition('instance_id', $instance, '=');
     // Get the row
@@ -793,7 +793,7 @@ function crm_party_party_piece_display($party, $instance) {
     $result = call_user_func($function, $party, $instance, $instance['title'], $instance['arguments']);
   }
   else {
-    return false;
+    return FALSE;
   }
 
   //If the Party Piece can have children, load those children
