@@ -54,7 +54,7 @@ function crm_party_add($type = '') {
     // @todo: use theme_item_list().
     return "<ul class=\"admin-list\">
               <li class=\"leaf\">".l(t('Add Individual'), 'party/add/individual')."<div class=\"description\">Add an individual party</div></li>
-              <li class=\"leaf\">".l(t('Add Organisation'), 'party/add/organisation')."Add Organisation</a><div class=\"description\">Add an organisation party</div></li>
+              <li class=\"leaf\">".l(t('Add Organisation'), 'party/add/organisation')."<div class=\"description\">Add an organisation party</div></li>
             </ul>";
   }
 
