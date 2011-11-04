@@ -6,6 +6,81 @@
  */
  
 /**
+ * Add new attached entit table
+ */
+function crm_party_update_7004() {
+ // New, WIP table to connect parties to attached entities.
+  $schema = array(
+    'description' => "This links parties to attached entities.",
+    'fields' => array(
+      // @todo: do we need this?
+      'peid' => array(
+        'description' => 'The unique ID for this relationship.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'pid' => array(
+        'description' => 'The id of the party entity.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'eid' => array(
+        'description' => 'The id of the attached entity.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'data_set' => array(
+        'description' => 'The data set this entity falls under.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'entity_type' => array(
+        'description' => 'The type of the attached entity.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'entity_bundle' => array(
+        'description' => 'The bundle of the attached entity.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'main' => array(
+        'description' => 'Flags a relation as being to the main attached entity.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'hat_main' => array(
+        'description' => 'Is this the main set for this hat.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'hat' => array(
+        'description' => 'The hat this is associated with.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => 'all',
+      ),
+    ),
+    'indexes' => array(
+      'party' => array('pid'),
+      'entity' => array('eid'),
+    ),
+    'primary key' => array('peid'),
+  ); 
+  
+  db_create_table("crm_party_attached_entity", $schema);  
+}
+
+/**
  * Add the required field to the hats table
  * @todo Make it so thaat you can set hats as required for different Party Types
  */

@@ -208,13 +208,12 @@ function crm_party_hat_get_data_set_rule($hat, $set) {
  * Get all the sets for a Hat
  * This returns an array of sets that a Party Must have or can have multiple of
  */
-function crm_party_hat_get_data_sets ($hat, $multiple_only = FALSE) {
-  $condition = ($multiple_only) ? CRM_PARTY_HAT_CAN_HAVE_MULTIPLE : CRM_PARTY_HAT_MUST_HAVE_SET;
-  
+function crm_party_hat_get_data_sets ($hat, $rule = 'has') {
+   
   $results = db_select('crm_party_hat_data_set_rules', 'c')
     ->fields('c')
     ->condition('hat', $hat->name, '=')
-    ->condition('rule', $condition, '>=')
+    ->condition($rule, 1, '=')
     ->execute()
     ->fetchAllAssoc('data_set');
   
