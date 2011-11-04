@@ -90,8 +90,11 @@ function crm_party_hat_entity_info() {
 // -----------------------------------------------------------------------
 // Party Hats API
 
+// The Hat says nothing about whether the Party has this set or not
 define('CRM_PARTY_HAT_NOT_HAVE_SET', 0);
+// A Party with this Hat must have 1 of these sets 
 define('CRM_PARTY_HAT_MUST_HAVE_SET', 1);
+// A Party with this Hat can have multiple of these sets (but must have 1?)
 define('CRM_PARTY_HAT_CAN_HAVE_MULTIPLE', 2);
 
 
