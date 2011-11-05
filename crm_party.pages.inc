@@ -383,8 +383,8 @@ function crm_party_view_data_set($party, $set) {
     );    
   }
   
-  $setDef = EntityDefaultCRMController::getSetDefinition($set);
-  if (!isset($setDef['max cardinality']) || count($dataSets) < $setDef['max cardinality']) {
+  $set_definition = EntityDefaultCRMController::getSetDefinition($set);
+  if (!isset($set_definition['max cardinality']) || count($dataSets) < $set_definition['max cardinality']) {
     $build[$set . '_links'] = array(
       '#theme' => 'links',
       '#links' => array(

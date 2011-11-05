@@ -107,7 +107,7 @@ abstract class EntityDefaultCRMController {
     $sets = crm_party_get_data_set_info();
     if(isset($sets[$type])) {
       $this->type = $type;
-      $this->setDef = $sets[$type];
+      $this->definition = $sets[$type];
     }
     else {
       //throw an error
