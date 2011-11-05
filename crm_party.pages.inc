@@ -242,14 +242,16 @@ function crm_party_data_set_edit_form($form, &$form_state, $dataSet) {
     '#value' => $dataSet->eid,
   );
   
-  $form['data-set-main'] = array(
-    '#type' => 'checkbox',
-    '#default_value' => $dataSet->isMain(),
-    '#title' => "This is the main " . EntityDefaultCRMController::getTypeLabel($dataSet->type),
-  );
-  
   $dataSet->form($form, $form_state);
   
+  if (!$dataSet->definition['singleton']) {
+    $form['data-set-main'] = array(
+      '#type' => 'checkbox',
+      '#default_value' => $dataSet->isMain(),
+      '#title' => "This is the main " . EntityDefaultCRMController::getTypeLabel($dataSet->type),
+    );
+  }
+
   $form['#submit'][] = 'crm_party_data_set_edit_form_submit';
   
   $form['submit'] = array(
