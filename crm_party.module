@@ -294,6 +294,30 @@ function crm_party_menu_local_tasks_alter(&$data, $router_item, $root_path) {
       );
     }
   }
+
+  // Add action links for attaching new entities on party pieces that are built
+  // from data sets.
+  if (substr($root_path, 0, 8) == 'party/%/') {
+    $piece_subpath = arg(2, $root_path);
+    $pieces = crm_party_get_party_piece_info();
+    $piece = $pieces[$piece_subpath];
+
+    if (isset($piece['data_set'])) {
+      $item = menu_get_item('party/%/add/%');
+      if ($item['access']) {
+        $data_sets = crm_party_get_data_set_info();
+        $data_set = $data_sets[$piece['data_set']];
+        $data['actions']['output'][] = array(
+          '#theme' => 'menu_local_action',
+          '#link' => array(
+            'title' => t('Attach new @data-set', array('@data-set' => $data_set['label'])),
+            // @todo: remove arg(), use menu_get_object().
+            'href' => 'party/' . arg(1) . '/add/' . $piece['data_set'],
+          ),
+        );
+      }
+    }
+  }
 }
 
 /**
@@ -383,6 +407,8 @@ function crm_party_page_title($party) {
  *
  * @return
  *  An array of party pieces, keyed by path and sorted by weight.
+ *  Keys in addition to those defined in hook_crm_party_party_pieces():
+ *  - data_set: The id of a data set if this piece is defined from one.
  */
 function crm_party_get_party_piece_info() {
   $pieces = module_invoke_all('crm_party_party_pieces');
@@ -432,8 +458,12 @@ function crm_party_crm_party_party_pieces() {
   $sets = crm_party_get_data_set_info();
   foreach ($sets as $set_name => $set) {
     if (isset($set['piece'])) {
+      // The path becomes the piece's key.
       $path = $set['piece']['path'];
       unset($set['piece']['path']);
+      // Add a key to say we came from a dataset.
+      $set['piece']['data_set'] = $set_name;
+
       $pieces[$path] = $set['piece'];
     }
   }
