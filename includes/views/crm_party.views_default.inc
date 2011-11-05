@@ -28,6 +28,14 @@ function crm_party_views_default_views() {
   $handler->display->display_options['pager']['type'] = 'none';
   $handler->display->display_options['style_plugin'] = 'list';
   $handler->display->display_options['row_plugin'] = 'party_attached_entity';
+  /* No results behavior: Global: Text area */
+  $handler->display->display_options['empty']['area']['id'] = 'area';
+  $handler->display->display_options['empty']['area']['table'] = 'views';
+  $handler->display->display_options['empty']['area']['field'] = 'area';
+  $handler->display->display_options['empty']['area']['empty'] = FALSE;
+  $handler->display->display_options['empty']['area']['content'] = t('There are no attached items to display.');
+  $handler->display->display_options['empty']['area']['format'] = 'filtered_html';
+  $handler->display->display_options['empty']['area']['tokenize'] = 0;
   /* Field: Party: Party ID */
   $handler->display->display_options['fields']['pid']['id'] = 'pid';
   $handler->display->display_options['fields']['pid']['table'] = 'crm_party';
@@ -59,6 +67,9 @@ function crm_party_views_default_views() {
   foreach ($sets as $set_id => $set) {
     $handler = $view->new_display('crm_party_piece', $set['label'], 'crm_party_piece_' . $set_id);
     $handler->display->display_options['display_description'] = 'Party component - ' . $set['label'];
+    // @todo extra appendings are temporary.
+    $handler->display->display_options['party_piece_label'] = $set['label'] . '(v)';
+    $handler->display->display_options['party_piece_path'] = $set['piece']['path'] . '-view';
     $handler->display->display_options['defaults']['filters'] = FALSE;
     /* Filter criterion: Party: Attached entity type */
     $handler->display->display_options['filters']['entity_type']['id'] = 'entity_type';
