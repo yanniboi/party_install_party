@@ -400,8 +400,16 @@ abstract class EntityDefaultCRMController {
   private function getEntityBundle() {
     $entity_type = $this->getEntityType();
     $info = entity_get_info($entity_type);
-    $bundle_key = $info['entity keys']['bundle'];
-    return $this->entity->{$bundle_key};
+    if (empty($info['entity keys']['bundle'])) {
+      // If there's no bundle key, it's a singleton entity and the bundle is
+      // the same as the entity type.
+      $bundle = $entity_type;
+    }
+    else {
+      $bundle_key = $info['entity keys']['bundle'];
+      $bundle = $this->entity->{$bundle_key};
+    }
+    return $bundle;
   }
 
   /**
