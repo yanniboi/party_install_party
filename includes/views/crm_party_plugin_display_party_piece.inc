@@ -92,20 +92,16 @@ class crm_party_plugin_display_party_piece extends views_plugin_display {
   }
 
   /**
-   * metacribbed from eva.
-   * The display block handler returns the structure necessary for a block.
+   * metacribbed from eva. may need work.
+   * @todo this doesn't even seem to run!?!?!
    */
   function execute() {
     // Prior to this being called, the $view should already be set to this
     // display, and arguments should be set on the view.
-    if (!isset($this->view->override_path)) {
-      $this->view->override_path = $_GET['q'];
-    }
+    $this->view->build();
 
-    $data = $this->view->render();
-    if (!empty($this->view->result) || $this->get_option('empty') || !empty($this->view->style_plugin->definition['even empty'])) {
-      return $data;
-    }
+    // And now render the view.
+    return $this->view->render();
   }
 
   /**
