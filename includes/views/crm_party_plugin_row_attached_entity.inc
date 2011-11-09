@@ -58,7 +58,7 @@ class crm_party_plugin_row_attached_entity extends views_plugin_row {
     $id           = $result->{$this->field_alias_eid};
 
     $entity = $this->entities[$entity_type][$id];
-    $content = entity_view($entity_type, array($id => $entity), 'full');
+    $content = entity_view($entity_type, array($id => $entity), 'party');
     return drupal_render($content);
   }
 }
