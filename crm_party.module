@@ -922,7 +922,28 @@ function crm_party_theme() {
       'variables' => array('crm_party_email', 'crm_party' => NULL),
       'template' => 'crm_party_email',
     ),
+    'entity__all__party' => array(
+      'render element' => 'elements',
+      'template' => 'entity--all--party',
+      'path' => drupal_get_path('module', 'crm_party') . '/theme',
+    ),
   );
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ *
+ * Add our own template for party display.
+ */
+function crm_party_preprocess_entity(&$variables) {
+  // @todo This would be better off as a new feature in Entity API
+  if ($variables['view_mode'] == 'party') {
+    $entity_type = $variables['entity_type'];
+    $variables['theme_hook_suggestions'][] = 'entity__all__party';
+    // @todo Hmmmm how do we let hook_theme() know about this?
+    $variables['theme_hook_suggestions'][] = 'entity__' . $entity_type . '__all__party';
+    dsm($variables);
+  }
 }
 
 /**
