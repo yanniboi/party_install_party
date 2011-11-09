@@ -66,7 +66,7 @@ function hook_crm_party_access($op, $party = NULL, $attached_entity = NULL, $acc
  *  - piece: (optional) Each set may define one party piece. The contents of
  *    this array should be the same as those returned by
  *    hook_party_party_piece_info(), with the addition of:
-*     - 'path': The menu path for the provided piece.
+ *    - 'path': The menu path for the provided piece.
  *    - 'uses views': (optional) Indicates that the piece should be generated
  *      with a default view. Default to FALSE.
  *    - 'view name': (optional) @todo! write the code for this! ;)
@@ -80,7 +80,7 @@ function hook_crm_party_data_set_info() {
   $sets['user'] = array(
     'label' => t("User account"),
     'entity type' => 'user',
-    'singleton' => TRUE,
+    'singleton' => TRUE, // There is only one user per party.
     'load callback' => "crm_user_load_user",
     'form callback' => "crm_user_form_user",
   );
@@ -91,14 +91,18 @@ function hook_crm_party_data_set_info() {
  * Defines party pieces, that is, components of the party display.
  *
  * @return
- *  An array of display pieces (similar to hook_menu) where each key is the unique Id of the display
- *   - "label" The human readable name of the party piece
- *   - "display callback" The name of the display function. This is always given $party, 
- *       $instance, $title, $arguments. This should return a renderable array.
- *   - "display callback arguments" any extra arguments to supply to the display callback
- *   - "data set" (optional) the data set this is associated with. (If this is set, edit and add links
- *       will appear around the piece linking to the forms laid out in data_set_info);
- *   - "nesting" true if the party piece can have children
+ *  An array of display pieces (similar to hook_menu) where each key is the
+ *  unique Id of the display.
+ *   - 'label': The human readable name of the party piece.
+ *   - 'display callback': The name of the display function. This is always
+ *     given $party, $instance, $title, $arguments. This should return a
+ *     renderable array.
+ *   - 'display callback arguments': Any extra arguments to supply to the
+ *     display callback.
+ *   - 'data set': (optional) The data set this is associated with. (If this is
+ *     set, edit and add links will appear around the piece linking to the forms
+ *     laid out in data_set_info);
+ *   - 'nesting': True if the party piece can have children.
  */
 function hook_party_party_piece_info() {
   $pieces = array();
