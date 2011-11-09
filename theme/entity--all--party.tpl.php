@@ -29,6 +29,7 @@
  */
 ?>
 <div class="<?php print $classes; ?> clearfix"<?php print $attributes; ?>>
+  <h2 class="title"><?php print $title; ?></h2>
   <div class="content"<?php print $content_attributes; ?>>
     <?php
       print render($content);
