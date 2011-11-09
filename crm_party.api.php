@@ -67,6 +67,11 @@ function hook_crm_party_access($op, $party = NULL, $attached_entity = NULL, $acc
  *    this array should be the same as those returned by
  *    hook_party_party_piece_info(), with the addition of:
 *     - 'path': The menu path for the provided piece.
+ *    - 'uses views': (optional) Indicates that the piece should be generated
+ *      with a default view. Default to FALSE.
+ *    - 'view name': (optional) @todo! write the code for this! ;)
+ *      The machine name of the view to define in
+ *      hook_views_default_views(). This allows multiple default views to exist.
  */
 function hook_crm_party_data_set_info() {
   $sets = array();

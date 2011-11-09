@@ -69,6 +69,7 @@ function crm_profile_crm_party_data_set_info() {
       'piece' => array(
         'path' => 'profile-' . str_replace('_', '-', $type),
         'title' => $label,
+        'uses views' => TRUE,
         'page callback' => 'crm_party_view_data_set',
         'page arguments' => array(1, "profile2_" . $type),
         // @todo: this needs to tell the access arguments for crm_party_access()

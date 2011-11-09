@@ -8,6 +8,7 @@
  * Implements hook_views_default_views().
  */
 function crm_party_views_default_views() {
+  // The main view of party pieces based on data sets.
   $view = new view;
   $view->name = 'crm_party_attached_entities';
   $view->description = '';
@@ -63,8 +64,15 @@ function crm_party_views_default_views() {
 
   // Get all defined data sets.
   $sets = crm_party_get_data_set_info();
+  //dsm($sets);
   // Make a display for each data set.
   foreach ($sets as $set_id => $set) {
+    // Skip those data sets that request neither a piece nor it to be a view.
+    // @todo: the second part of this if fails, but I've not yet had breakfast and I can't see why. fixme!
+    if (!isset($set['piece']) && !isset($set['piece']['uses views'])) {
+      continue;
+    }
+
     $handler = $view->new_display('crm_party_piece', $set['label'], 'crm_party_piece_' . $set_id);
     $handler->display->display_options['display_description'] = 'Party component - ' . $set['label'];
     // @todo extra appendings are temporary.
