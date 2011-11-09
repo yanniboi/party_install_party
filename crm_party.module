@@ -942,7 +942,6 @@ function crm_party_preprocess_entity(&$variables) {
     $variables['theme_hook_suggestions'][] = 'entity__all__party';
     // @todo Hmmmm how do we let hook_theme() know about this?
     $variables['theme_hook_suggestions'][] = 'entity__' . $entity_type . '__all__party';
-    dsm($variables);
   }
 }
 
