@@ -19,4 +19,5 @@ files[] = includes/views/crm_party_handler_relationship_crm_party_attached_eid.i
 
 dependencies[] = entity
 dependencies[] = ctools
+dependencies[] = views
 
