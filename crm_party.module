@@ -498,6 +498,19 @@ function crm_party_crm_party_party_pieces() {
 // API for getting and changing data sets.
 
 /**
+ * Get the attached Entity Controller
+ *
+ * @param $data_set_name the name of the $set definition
+ */
+function crm_party_get_crm_controller($data_set_name) {
+  $sets = crm_party_get_data_set_info();
+  
+  // @todo: error handling
+  $class = $sets[$data_set_name]['class'];
+  return new $class($data_set_name);  
+}
+
+/**
  * Get all data sets from hook_crm_party_data_set_info().
  *
  * @todo: cache this, either in the DB or using DrupalCacheArray.
@@ -1079,3 +1092,55 @@ function crm_party_ctools_plugin_directory($owner, $plugin_type) {
   }
 }
 
+// --------------------------------------------------------------------------
+// CRM Party Attached Entity Form API
+
+/**
+ * Get the form callback for attached entities
+ */
+function crm_party_attached_entity_form_callback($data_set) {
+  $sets = crm_party_get_data_set_info();
+  return $sets[$data_set]['form callback'];
+}
+
+/**
+ * Attach attached entity forms to a form 
+ */
+function crm_party_attached_entity_attach_form(&$form, &$form_state) {
+  //Get all attached entities from $form_state
+  $attached_entities = $form_state['#attached_entities'];
+  
+  foreach ($attached_entities as $hash => $attached_entity) {
+    //get the form callback
+    $callback = crm_party_attached_entity_form_callback($attached_entity->type);
+    //run the form callback
+    $form[$hash] =  $callback($form, $form_state, $attached_entity, $form_state['#party']);
+  }
+  
+  $form['#submit'][] = 'crm_party_attached_entity_attach_form_submit';
+  $form['#validate'][] = 'crm_party_attached_entity_attach_form_validate';
+}
+
+/**
+ * Validate attached entity forms
+ */
+function crm_party_attached_entity_attach_form_validate(&$form, &$form_state) {
+
+}
+
+/**
+ * Submit attached entity forms
+ */
+function crm_party_attached_entity_attach_form_submit(&$form, &$form_state) {
+  //Get all attached entities from $form_state
+  $attached_entities = $form_state['#attached_entities'];
+  $party = $form_state['#party'];
+  
+  foreach ($attached_entities as $hash => $attached_entity) {
+    //get the form callback
+    $callback = crm_party_attached_entity_form_callback($attached_entity->type) . '_submit';
+    //run the form callback
+    $callback($form, $form_state, $attached_entity, $form_state['#party']);    
+    $attached_entity->attach($party);
+  }
+}

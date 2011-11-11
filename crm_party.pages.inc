@@ -125,6 +125,7 @@ function crm_party_edit_form($form, &$form_state, $party) {
     $form['set_'.$set] = array(
       '#markup' => $set,
     );
+
   }
   
   field_attach_form('crm_party', $party, $form, $form_state);
@@ -161,6 +162,8 @@ function crm_party_edit_form_submit($form, &$form_state) {
   $form_state['crm_party'] = $party;
   $form_state['redirect'] = 'party/' . $party->pid;
 }
+
+
 
 /**
  * Show a View display plugin as a party piece.
@@ -208,12 +211,14 @@ function crm_party_data_set_edit($set, $pid, $eid = NULL) {
     $pid = $pid->pid;  
   }
   
-  $info = array(
-    'party' => $pid,
-    'entity' => $eid,
-  );
-  $dataSet = EntityDefaultCRMController::getInstance($set, $info);
-  return drupal_get_form('crm_party_data_set_edit_form', $dataSet);
+  $attached_entity = crm_party_get_crm_controller($set);
+  $attached_entity->setParty($pid);
+  
+  if ($eid !== NULL) {
+    $attached_entity->setAttachedEntity($eid);
+  }
+  
+  return drupal_get_form('crm_party_data_set_edit_form', $attached_entity);
 }
 
 /**

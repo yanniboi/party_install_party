@@ -95,71 +95,114 @@ abstract class EntityDefaultCRMController {
 
   /**
    * construct
-   *   Build this object from a set instance id
+   *   Get a attached_entity object with placeholder entity and party
    *
-   * @param $id The set instance ID
+   * @param $data_set_name The set name
    * @todo don't know how best to build this
    */
-  function __construct($type, $entity, $party = NULL) {
+  function __construct($data_set_name) {
     // If the party isn't set, this is just an entity really, so we create 
     // A "temporary" instance of the wrapper that gets saved when we attach
     // it.
     $sets = crm_party_get_data_set_info();
-    if(isset($sets[$type])) {
-      $this->type = $type;
-      $this->definition = $sets[$type];
+    if(isset($sets[$data_set_name])) {
+      $this->type = $data_set_name;
+      $this->definition = $sets[$data_set_name];
     }
     else {
       //throw an error
     }
-        
+    
+    // Create as place holder entity
+    $values = array();
+    $bundle_key = $this->getBundleKey();
+    if (is_string($bundle_key)) {
+      $values[$bundle_key] = $this->getEntityBundle();
+    }
+    
+    $this->entity = entity_create($this->definition['entity type'], $values);
+  }
+  
+  /**
+   * Set the party. This does not save the attachment in the database.
+   *
+   * @param $party a Party object or Id.
+   */   
+  public function setParty($party) {
+    if (is_numeric($party)) {
+      $this->pid = $party;
+      $this->party = reset(entity_load('crm_party', array($party)));
+    }
+    else {
+      $this->party = $party;
+      $this->pid = $party->pid;
+    }
+    
+    // If $this->entity looks like an actual entity stored in the database.
+    if (isset($this->entity->{$this->getEntityIdKey()})) {
+      $query = db_select($this->getTableName(), 'ds');
+      $query->fields('ds');
+      $query->condition('pid', $this->pid, '=');
+      $query->condition('eid', $this->eid, '=');
+      $result = $query->execute()->fetchAssoc();
+      
+      // If there is no attached in the db we unset party and treat this like it
+      // hasn't been attached yet;
+      if (!$result) {
+        $this->attached = FALSE;
+      }
+      else {
+        $this->attached = TRUE;
+        $this->id = $result['peid'];
+        $this->main = $result['main'];
+        $this->hat = $result['hat'];
+        $this->hat_main = $result['hat_main'];
+        $this->id = $result['peid'];
+      }  
+    }    
+  }
+  
+  /**
+   * Set Entity. This does not attach the Party to the entity.
+   *
+   * @param $entity_type what the entity is
+   * @param $entity Object or Id representing the $entity
+   */
+  public function setAttachedEntity($entity) {
     if (is_numeric($entity)) {
       $this->eid = $entity;
-      $this->loadData();
+      $this->entity = reset(entity_load($this->getEntityType(), array($entity)));
     }
-    elseif ($entity !== NULL) {
+    else {
+      dsm($entity);
       $this->entity = $entity;
       $this->eid = $entity->{$this->getEntityIdKey()};
     }
-    else {
-      $this->eid = NULL;
-      $this->entity = NULL;
-    }
     
-    // If the party is set we set the party and find the row in the data set table
-    // to get the rest of the information
-    if (isset($party)) {
-      if (is_numeric($party)) {
-        $this->pid = $party;
-        $this->party = reset(entity_load('crm_party', array($party)));
+    // If the Party is a Real Party, see if they're attached.
+    if (isset($this->party->pid)) {
+      $query = db_select($this->getTableName(), 'ds');
+      $query->fields('ds');
+      $query->condition('pid', $this->pid, '=');
+      $query->condition('eid', $this->eid, '=');
+      $result = $query->execute()->fetchAssoc();
+      
+      // If there is no attached in the db we unset party and treat this like it
+      // hasn't been attached yet;
+      if (!$result) {
+        $this->attached = FALSE;
       }
       else {
-        $this->party = $party;
-        $this->pid = $party->pid;
-      }
-      
-      if ($this->entity !== NULL) {
-        $query = db_select($this->getTableName(), 'ds');
-        $query->fields('ds');
-        $query->condition('pid', $this->pid, '=');
-        $query->condition('eid', $this->eid, '=');
-        $result = $query->execute()->fetchAssoc();
-        
-        // If there is no data set instance in the db we unset party and treat this like it
-        // hasn't been attached yet;
-        if (!$result) {
-          $this->attached = FALSE;
-        }
-        else {
-          $this->attached = TRUE;
-          $this->id = $result['peid'];
-          $this->main = $result['main'];
-          $this->hat = $result['hat'];
-          $this->hat_main = $result['hat_main'];
-          $this->id = $result['peid'];
-        }  
-      }
-    }    
+        $this->attached = TRUE;
+        $this->id = $result['peid'];
+        $this->main = $result['main'];
+        $this->hat = $result['hat'];
+        $this->hat_main = $result['hat_main'];
+        $this->id = $result['peid'];
+      }  
+    }
+    
+    return true;
   }
   
   /**
@@ -373,6 +416,17 @@ abstract class EntityDefaultCRMController {
   }
   
   /**
+   * Get the hash. This allows this attached entity to be identified exactly with a string
+   * 
+   * At the moment, the only time this fails is if there a 2 new attached entities of the same set.
+   */
+  public function hash() {
+    $identifier = (isset($entity->{$this->getEntityIdKey()})) ? $entity->{$this->getEntityIdKey()} : 'new';
+  
+    return $this->type . '_' . $identifier;
+  }
+  
+  /**
    * Get Entity Type
    *
    * REQUIRES PHP 5.3.0
@@ -398,18 +452,32 @@ abstract class EntityDefaultCRMController {
    * Get the bundle name of the attached entity.
    */
   private function getEntityBundle() {
-    $entity_type = $this->getEntityType();
-    $info = entity_get_info($entity_type);
-    if (empty($info['entity keys']['bundle'])) {
+    $bundle_key = $this->getBundleKey();
+    if (!$bundle_key) {
       // If there's no bundle key, it's a singleton entity and the bundle is
       // the same as the entity type.
       $bundle = $entity_type;
     }
-    else {
-      $bundle_key = $info['entity keys']['bundle'];
-      $bundle = $this->entity->{$bundle_key};
+    else {  
+      // @todo: I kept this in, but really, if these two aren't the same something has gone very
+      // wrong.
+      if (isset($this->entity->{$bundle_key})) {
+        $bundle = $this->entity->{$bundle_key};
+      }
+      else {
+        $bundle = $this->definition['entity bundle'];
+      }
     }
     return $bundle;
+  }
+  
+  /**
+   * Get the bundle key of the attached entity.
+   */
+  private function getBundleKey() {
+    $entity_type = $this->getEntityType();
+    $info = entity_get_info($entity_type);
+    return empty($info['entity keys']['bundle']) ? false : $info['entity keys']['bundle'];
   }
 
   /**
@@ -463,6 +531,7 @@ abstract class EntityDefaultCRMController {
     // @todo: fail gracefull if no class found, eg bad URLs.
     $class = $sets[$type]['class'];
     
+    $instance = new $class($type);    
     switch ($how) {
       case self::FROM_PEID :
         $result = db_select(EntityDefaultCRMController::getInstanceTable($type), 'ds')
@@ -472,17 +541,22 @@ abstract class EntityDefaultCRMController {
           ->fetchAssoc();
           
         // @todo add error handling for if record doesnt exist
-        return new $class($type,$result['eid'],$result['pid']);
+        $instance->setParty($result['pid']);
+        $instance->setAttachedEntity($result['eid']);
+        return $instance;
         break;
       case self::FROM_PARTY :
-        // @todo Make some kind of proccess for adding data sets for entities that
-        // dont exist yet.
+        $instance->setParty($info);
+        return $instance;
         break;
       case self::FROM_ENTITY :
-        return new $class($type,$info);
+        $instance->setAttachedEntity($info);
+        return $instance;
         break;
       case self::FROM_PARTY_AND_ENTITY :
-        return new $class($type,$info['entity'],$info['party']);
+        $instance->setParty($info['party']);
+        $instance->setAttachedEntity($info['entity']);
+        return $instance;
         break;
     }
   }
