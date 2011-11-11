@@ -173,25 +173,20 @@ function crm_party_edit_form_submit($form, &$form_state) {
  *  The machine name of a view display.
  */
 function crm_party_page_view_piece_views($party, $view_name, $view_display_id) {
-  return views_embed_view($view_name, $view_display_id, $party->pid);
-
-  // @todo The code below is probably the better way of doing this but it's
-  // not working :(
-  /*
   if ($view = views_get_view($view_name)) {
     if ($view->access($view_display_id)) {
       $view->set_display($view_display_id);
       if (isset($view->display_handler)) {
+        $view->set_arguments(array($party->pid));
         $output = $view->execute_display($view_display_id);
         // @todo:
-        //views_add_block_contextual_links($output, $view, $display_id);
+        //views_add_block_contextual_links($output, $view, $view_display_id);
         $view->destroy();
         return $output;
       }
     }
     $view->destroy();
   }
-  */
 }
 
 /**
