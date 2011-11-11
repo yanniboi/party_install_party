@@ -511,6 +511,37 @@ function crm_party_get_crm_controller($data_set_name) {
 }
 
 /**
+ * Get the data set definition associated wiht a given entity and bundle.
+ *
+ * @param $entity_type the entity type e.g profile2 etc
+ * @param $entity the entity object or id
+ *
+ * @return A data set name if one exists, false otherwise.
+ */
+function crm_party_get_entity_data_set($entity_type, $entity) {
+  $data_set_info = crm_party_get_data_set_info();
+  
+  //Get bundle
+  $info = entity_get_info($entity_type);
+  $bundle_key = empty($info['entity keys']['bundle']) ? false : $info['entity keys']['bundle'];
+  
+  if(!$bundle_key) {
+    $bundle = $entity_type;
+  }
+  else {
+    $bundle = $entity->{$bundle_key};
+  }
+  
+  foreach ($data_set_info as $data_set_name => $data_set) {
+    if ($data_set['entity type'] == $entity_type && $data_set['entity bundle'] == $entity->type) {
+      return $data_set_name;
+    }
+  }
+  
+  return false;
+}
+
+/**
  * Get all data sets from hook_crm_party_data_set_info().
  *
  * @todo: cache this, either in the DB or using DrupalCacheArray.
