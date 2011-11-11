@@ -58,6 +58,15 @@ class crm_party_plugin_row_attached_entity extends views_plugin_row {
     $id           = $result->{$this->field_alias_eid};
 
     $entity = $this->entities[$entity_type][$id];
+
+    // We assume that this plugin is used within the context of a party
+    // piece, and that the first argument to the view is the party id.
+    // @todo: add a nicer mechanism to get this than going digging in the args?
+    // @todo: add validation to this plugin to only allow it in the party piece
+    // display and with the party id argument?
+    $party_id = $this->view->args[0];
+    $entity->crm_attaching_party = $party_id;
+
     $content = entity_view($entity_type, array($id => $entity), 'party');
     return drupal_render($content);
   }
