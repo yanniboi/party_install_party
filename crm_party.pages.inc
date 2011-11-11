@@ -107,7 +107,7 @@ function crm_party_edit_form($form, &$form_state, $party) {
   foreach ($party_hats as $ph) {
     $defaults[] = $ph->name;
   }   
-    
+  
   $form['hats'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Hats'),
@@ -118,15 +118,34 @@ function crm_party_edit_form($form, &$form_state, $party) {
   // Get Party Hat must have data sets
   $data_sets = array();
   foreach ($party_hats as $hat) {
-    $data_sets += crm_party_hat_get_data_sets($hat);
+    $temp_sets = crm_party_hat_get_data_sets($hat);
+    foreach ($temp_sets as $set) {
+      $data_sets[] = $set;
+    }
   }
 
-  foreach ($data_sets as $set) {
-    $form['set_'.$set] = array(
-      '#markup' => $set,
-    );
-
+  $form_state['#party'] = $party;
+  $form_state['#attached_entities'] = array();
+  
+  foreach ($data_sets as $data_set) {
+    $attached_entities = array();
+    if (isset($party->pid)) {
+      $attached_entities = crm_party_get_attached_entities($party, $data_set);
+    }
+    
+    if (count($attached_entities) < 1) {
+      $attached_entity = crm_party_get_crm_controller($data_set);
+      $attached_entity->setParty($party);
+      $attached_entities[$attached_entity->hash()] = $attached_entity;
+    }    
+    
+    $form_state['#attached_entities'] = array_merge($form_state['#attached_entities'], $attached_entities);
   }
+  
+  $form['#validate'][] = 'crm_party_edit_form_validate';
+  $form['#submit'][] = 'crm_party_edit_form_submit';
+  
+  crm_party_attached_entity_attach_form($form, $form_state);
   
   field_attach_form('crm_party', $party, $form, $form_state);
 
@@ -135,7 +154,8 @@ function crm_party_edit_form($form, &$form_state, $party) {
     '#value' => t('Save'),
     '#weight' => 99,
   );
-
+  
+  $form['#submit'][] = 'crm_party_edit_form_hat_check';
   return $form;
 }
 
@@ -149,6 +169,8 @@ function crm_party_edit_form_submit($form, &$form_state) {
   field_attach_submit('crm_party', $party, $form, $form_state);
   $party = crm_party_save($party);
   
+  //This turns to true if a hat has been added that needs more information
+  $hat_redirect = FALSE;
   //Do hats
   foreach ($form_state['values']['hats'] as $hat => $checked) {
     if ($checked === 0) {
@@ -156,11 +178,39 @@ function crm_party_edit_form_submit($form, &$form_state) {
     }
     else {
       crm_party_hat_assign($party, $hat);
+      //check that all the data_sets are present
+      //If they are not, redirect back to the form for them
+      //to be added.
     }
   }
   
   $form_state['crm_party'] = $party;
+  $form_state['#party'] = $party;
   $form_state['redirect'] = 'party/' . $party->pid;
+}
+
+/**
+ * This checks if all expected data sets are present and, if not, sends the user
+ * back to the form with a nice message.
+ */
+function crm_party_edit_form_hat_check($form, &$form_state) {
+  foreach ($form_state['values']['hats'] as $hat => $checked) {
+    $data_sets = array();
+    foreach ($party_hats as $hat) {
+      $temp_sets = crm_party_hat_get_data_sets($hat);
+      foreach ($temp_sets as $set) {
+        $data_sets[] = $set;
+      }
+    }
+    
+    foreach($data_sets as $data_set_name) {
+      $attached_entities = crm_party_get_attached_entities($form_state['#party'], $data_set_name);
+      if (count($attached_entities) < 1) {
+        $form_state['redirect'] = 'party/' . $form_state['#party']->pid . '/party/edit';
+        drupal_set_message("$party->label is expected to have a $data_set_name which wasn't present. Please enter the data now");
+      }
+    }
+  }
 }
 
 

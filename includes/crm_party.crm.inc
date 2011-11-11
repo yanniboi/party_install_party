@@ -135,7 +135,7 @@ abstract class EntityDefaultCRMController {
     }
     else {
       $this->party = $party;
-      $this->pid = $party->pid;
+      $this->pid = isset($party->pid) ? $party->pid : NULL;
     }
     
     // If $this->entity looks like an actual entity stored in the database.
@@ -229,10 +229,7 @@ abstract class EntityDefaultCRMController {
    * @param $party
    *   The party object we're attaching to.
    */
-  public function attach($party, $options = array()) {
-    if (isset($this->party) && $this->party != $party)
-      return;   
-    
+  public function attach($party, $options = array()) {    
     $relation = array(
       'pid' => $party->pid,
       'eid' => $this->entity->{$this->getEntityIdKey()},
@@ -342,7 +339,7 @@ abstract class EntityDefaultCRMController {
    * get the label of the entity this data set wraps    
    */
   public function getLabel() {
-    return $this->entity->label;
+    return isset($this->entity->label) ? $this->entity->label : $this->type;
   }
 
   /**
@@ -421,7 +418,7 @@ abstract class EntityDefaultCRMController {
    * At the moment, the only time this fails is if there a 2 new attached entities of the same set.
    */
   public function hash() {
-    $identifier = (isset($entity->{$this->getEntityIdKey()})) ? $entity->{$this->getEntityIdKey()} : 'new';
+    $identifier = (isset($this->entity->{$this->getEntityIdKey()})) ? $this->entity->{$this->getEntityIdKey()} : 'new';
   
     return $this->type . '_' . $identifier;
   }

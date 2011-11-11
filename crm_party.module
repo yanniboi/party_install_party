@@ -686,7 +686,7 @@ function crm_party_unrelate($party, $entity, $data_set) {
 // API for loading data about a party.
 
 /**
- * Load a data set
+ * Return all attached entities of a particular set.
  *
  * @param $party
  *  The party object of the party we're concerned with.
@@ -699,35 +699,27 @@ function crm_party_unrelate($party, $entity, $data_set) {
  *  Each entity additionally has the property 'crm_party_main' set according
  *  to the 'main' flag in the data set.
  */
-function crm_party_data_set_load($party, $set_name) {
+function crm_party_get_attached_entities($party, $data_set_name) {
   $sets = crm_party_get_data_set_info();
   //dsm($sets);
 
-  $table = EntityDefaultCRMController::getInstanceTable($set_name);
+  $table = EntityDefaultCRMController::getInstanceTable($data_set_name);
   $items = db_select($table, 'ds')
     ->fields('ds')
     ->condition('pid', $party->pid,'=')
     ->execute()
     ->fetchAllAssoc('eid', PDO::FETCH_ASSOC);
     
-  $dataSets = array();
+  $attached_entities = array();
 
   foreach ($items as $eid => $instance) {
-    $class = $sets[$set_name]['class'];
-    $dataSets[] = new $class($set_name, $eid, $party);
+    $attached_entity = crm_party_get_crm_controller($data_set_name);
+    $attached_entity->setParty($party);
+    $attached_entity->setAttachedEntity($eid);
+    $attached_entities[$attached_entity->hash()] = $attached_entity;
   }
   
-  $entities = array();
-  
-  // @todo get this function to return a set of data sets rather than
-  // a set of entities. (need to make sure whatever calls it is ready for
-  // the change).
-  $entities = array();
-  foreach ($dataSets as $dataSet) {
-    $entities[$dataSet->eid] = $dataSet->loadData();
-  }
-
-  return $entities;
+  return $attached_entities;
 }
 
 /**
@@ -1146,6 +1138,9 @@ function crm_party_attached_entity_attach_form(&$form, &$form_state) {
     $callback = crm_party_attached_entity_form_callback($attached_entity->type);
     //run the form callback
     $form[$hash] =  $callback($form, $form_state, $attached_entity, $form_state['#party']);
+    $form[$hash]['#type'] = 'fieldset';
+    $form[$hash]['#title'] = $attached_entity->getLabel();
+    $form[$hash]['#tree'] = TRUE;
   }
   
   $form['#submit'][] = 'crm_party_attached_entity_attach_form_submit';
@@ -1156,7 +1151,7 @@ function crm_party_attached_entity_attach_form(&$form, &$form_state) {
  * Validate attached entity forms
  */
 function crm_party_attached_entity_attach_form_validate(&$form, &$form_state) {
-
+  return true;
 }
 
 /**
@@ -1171,7 +1166,10 @@ function crm_party_attached_entity_attach_form_submit(&$form, &$form_state) {
     //get the form callback
     $callback = crm_party_attached_entity_form_callback($attached_entity->type) . '_submit';
     //run the form callback
-    $callback($form, $form_state, $attached_entity, $form_state['#party']);    
+    dsm($callback);
+    $callback($form, $form_state, $attached_entity, $form_state['#party']);
+    
     $attached_entity->attach($party);
+    dsm($attached_entity);    
   }
 }

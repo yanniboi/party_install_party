@@ -130,11 +130,14 @@ function crm_profile_attached_entity_form($form, &$form_state, &$attached_entity
 }
 
 function crm_profile_attached_entity_form_submit($form, &$form_state, &$attached_entity, $party) {
-  //submit fields
-  field_attach_submit('profile2', $attached_entity->entity, $form[$attached_entity->hash()], $form_state);
+  $hash = $attached_entity->hash();
   
   //save the profile
   profile2_save($attached_entity->entity);
+  
+  //submit fields
+  field_attach_submit('profile2', $attached_entity->entity, $form[$hash], $form_state);
+  dsm($attached_entity);
 }
 
 function crm_profile_attached_entity_form_validate($form, &$form_state, &$attached_entity, $party) {
