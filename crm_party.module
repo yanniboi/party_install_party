@@ -550,13 +550,17 @@ function crm_party_get_entity_data_set($entity_type, $entity) {
  *
  * @todo: cache this, either in the DB or using DrupalCacheArray.
  *
+ * @param $data_set_name
+ *  (optional) The name of the data set to return. If omitted, all are returned.
+ *
  * @return
- *  An array of data sets, keyed by set name. Each set is an array whose keys
- *  are as returned by hookcrm_party_data_set_info(), with in addition:
+ *  Either a single data set, or an array of data sets keyed by set name.
+ *  Each set is an array whose keys are as returned by
+ *  hook_crm_party_data_set_info(), with in addition:
  *  - 'module': The module defining this set.
  *  - 'table': The table in which this set's data is stored.
  */
-function crm_party_get_data_set_info() {
+function crm_party_get_data_set_info($data_set_name = NULL) {
   // Due to http://drupal.org/node/890660 we can't use module_invoke_all()
   // because we need to know the provenance of each set.
   $sets = array();
@@ -577,7 +581,13 @@ function crm_party_get_data_set_info() {
       $sets[$set_name] = $set;
     }
   }
-  return $sets;
+
+  if (isset($data_set_name)) {
+    return $sets[$data_set_name];
+  }
+  else {
+    return $sets;
+  }
 }
 
 /**
