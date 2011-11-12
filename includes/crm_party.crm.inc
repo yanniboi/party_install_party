@@ -94,10 +94,12 @@ abstract class EntityDefaultCRMController {
   }
 
   /**
-   * construct
+   * Constructor.
    *   Get a attached_entity object with placeholder entity and party
+   * @todo: why do we need placeholders??? doesn't make sense.
    *
-   * @param $data_set_name The set name
+   * @param $data_set_name 
+   *  The set name.
    * @todo don't know how best to build this
    */
   function __construct($data_set_name) {
@@ -105,8 +107,12 @@ abstract class EntityDefaultCRMController {
     // A "temporary" instance of the wrapper that gets saved when we attach
     // it.
     $sets = crm_party_get_data_set_info();
-    if(isset($sets[$data_set_name])) {
+    if (isset($sets[$data_set_name])) {
       $this->type = $data_set_name;
+      // @todo: not sure about this, as it duplicates the set definition over 
+      // and over in memory. The data set definitions should be statically cached
+      // by crm_party_get_data_set_info() (in due course!) and that function should
+      // be given a parameter to get just the one set.
       $this->definition = $sets[$data_set_name];
     }
     else {
@@ -124,9 +130,10 @@ abstract class EntityDefaultCRMController {
   }
   
   /**
-   * Set the party. This does not save the attachment in the database.
+   * Set the party this controller works with.
    *
-   * @param $party a Party object or Id.
+   * @param $party
+   *  A Party object or Id.
    */   
   public function setParty($party) {
     if (is_numeric($party)) {
@@ -139,6 +146,9 @@ abstract class EntityDefaultCRMController {
     }
     
     // If $this->entity looks like an actual entity stored in the database.
+    // @todo: what? this method shouldn't be doing entity stuff. It sets
+    // the value of the attaching party, that should be all, no? if it does
+    // more, this needs explaining!
     if (isset($this->entity->{$this->getEntityIdKey()})) {
       $query = db_select($this->getTableName(), 'ds');
       $query->fields('ds');
@@ -163,9 +173,10 @@ abstract class EntityDefaultCRMController {
   }
   
   /**
-   * Set Entity. This does not attach the Party to the entity.
+   * Set the entity this controller works with. This does not attach the Party to the entity.
    *
-   * @param $entity_type what the entity is
+   * @param $entity_type
+   *  The type of the entity.
    * @param $entity Object or Id representing the $entity
    */
   public function setAttachedEntity($entity) {
@@ -202,7 +213,7 @@ abstract class EntityDefaultCRMController {
       }  
     }
     
-    return true;
+    return TRUE;
   }
   
   /**
@@ -386,6 +397,7 @@ abstract class EntityDefaultCRMController {
   /**
    * setMain
    *   set this set instance as the main set of this type
+   * @todo appears to do no such thing!
    */
   public function setMain() {
     return $this->main;
@@ -414,6 +426,8 @@ abstract class EntityDefaultCRMController {
   
   /**
    * Get the hash. This allows this attached entity to be identified exactly with a string
+   *
+   * @todo call it something other than hash. $entity_key?
    * 
    * At the moment, the only time this fails is if there a 2 new attached entities of the same set.
    */
@@ -470,11 +484,16 @@ abstract class EntityDefaultCRMController {
   
   /**
    * Get the bundle key of the attached entity.
+   *
+   * @todo: this has no need to be here, does it?
+   * we can just as easily have a help function get_entity_bundle_key($entity_type, $entity)
+   * in the main module (or even better give it to EntityAPI)
+   * as it never needs to be overridden.
    */
   private function getBundleKey() {
     $entity_type = $this->getEntityType();
     $info = entity_get_info($entity_type);
-    return empty($info['entity keys']['bundle']) ? false : $info['entity keys']['bundle'];
+    return empty($info['entity keys']['bundle']) ? FALSE : $info['entity keys']['bundle'];
   }
 
   /**
@@ -512,16 +531,19 @@ abstract class EntityDefaultCRMController {
    * getInstance
    *   Get an instance of the EntityDefaultCRMController class
    *
-   * @param $type the type of data set.
-   * @param $info The data to load the instance from
-   *   Either a
+   * @param $type
+   *  The type of data set.
+   * @param $info
+   *  The data to load the instance from. One of:
    *   - peid
    *   - party_id
    *   - entity_id
    *   - Array(
    *      - party a party id
    *      - entity an entity id
-   * @param $how The way to load the instance
+   * @param $how
+   *  The way to load the instance
+   *  @todo: how? document this properly!!!
    */
   public static function getInstance($type, $info, $how = self::FROM_PARTY_AND_ENTITY) {
     $sets = crm_party_get_data_set_info();
