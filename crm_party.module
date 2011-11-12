@@ -498,47 +498,51 @@ function crm_party_crm_party_party_pieces() {
 // API for getting and changing data sets.
 
 /**
- * Get the attached Entity Controller
+ * Get the attached entity controller.
  *
- * @param $data_set_name the name of the $set definition
+ * @param $data_set_name
+ *  The name of the $set definition.
  */
 function crm_party_get_crm_controller($data_set_name) {
   $sets = crm_party_get_data_set_info();
-  
+
   // @todo: error handling
   $class = $sets[$data_set_name]['class'];
-  return new $class($data_set_name);  
+  return new $class($data_set_name);
 }
 
 /**
- * Get the data set definition associated wiht a given entity and bundle.
+ * Get the data set definition associated with a given entity and bundle.
  *
- * @param $entity_type the entity type e.g profile2 etc
- * @param $entity the entity object or id
+ * @param $entity_type
+ *  The entity type e.g profile2 etc.
+ * @param $entity
+ *  The entity object or id.
  *
- * @return A data set name if one exists, false otherwise.
+ * @return
+ *  A data set name if one exists, NULL otherwise.
  */
 function crm_party_get_entity_data_set($entity_type, $entity) {
   $data_set_info = crm_party_get_data_set_info();
-  
-  //Get bundle
+
+  // Get bundle.
   $info = entity_get_info($entity_type);
-  $bundle_key = empty($info['entity keys']['bundle']) ? false : $info['entity keys']['bundle'];
-  
-  if(!$bundle_key) {
+  $bundle_key = empty($info['entity keys']['bundle']) ? FALSE : $info['entity keys']['bundle'];
+
+  if (!$bundle_key) {
     $bundle = $entity_type;
   }
   else {
     $bundle = $entity->{$bundle_key};
   }
-  
+
   foreach ($data_set_info as $data_set_name => $data_set) {
     if ($data_set['entity type'] == $entity_type && $data_set['entity bundle'] == $entity->type) {
       return $data_set_name;
     }
   }
-  
-  return false;
+
+  return NULL;
 }
 
 /**
@@ -1119,7 +1123,7 @@ function crm_party_ctools_plugin_directory($owner, $plugin_type) {
 // CRM Party Attached Entity Form API
 
 /**
- * Get the form callback for attached entities
+ * Get the form callback for attached entities.
  */
 function crm_party_attached_entity_form_callback($data_set) {
   $sets = crm_party_get_data_set_info();
@@ -1127,49 +1131,50 @@ function crm_party_attached_entity_form_callback($data_set) {
 }
 
 /**
- * Attach attached entity forms to a form 
+ * Attach attached entity forms to a form.
  */
 function crm_party_attached_entity_attach_form(&$form, &$form_state) {
-  //Get all attached entities from $form_state
+  // Get all attached entities from $form_state.
   $attached_entities = $form_state['#attached_entities'];
-  
+
   foreach ($attached_entities as $hash => $attached_entity) {
-    //get the form callback
+    // Get the form callback.
     $callback = crm_party_attached_entity_form_callback($attached_entity->type);
-    //run the form callback
+    // Execute the form callback.
     $form[$hash] =  $callback($form, $form_state, $attached_entity, $form_state['#party']);
     $form[$hash]['#type'] = 'fieldset';
     $form[$hash]['#title'] = $attached_entity->getLabel();
     $form[$hash]['#tree'] = TRUE;
   }
-  
+
   $form['#submit'][] = 'crm_party_attached_entity_attach_form_submit';
   $form['#validate'][] = 'crm_party_attached_entity_attach_form_validate';
 }
 
 /**
- * Validate attached entity forms
+ * Validate attached entity forms.
  */
 function crm_party_attached_entity_attach_form_validate(&$form, &$form_state) {
-  return true;
+  return TRUE;
 }
 
 /**
  * Submit attached entity forms
  */
 function crm_party_attached_entity_attach_form_submit(&$form, &$form_state) {
-  //Get all attached entities from $form_state
+  // Get all attached entities from $form_state.
   $attached_entities = $form_state['#attached_entities'];
   $party = $form_state['#party'];
-  
+
   foreach ($attached_entities as $hash => $attached_entity) {
-    //get the form callback
+    /// @todo explain what $hash is.
+    // Get the form callback.
     $callback = crm_party_attached_entity_form_callback($attached_entity->type) . '_submit';
-    //run the form callback
+    // Execute the form callback.
     dsm($callback);
     $callback($form, $form_state, $attached_entity, $form_state['#party']);
-    
+
     $attached_entity->attach($party);
-    dsm($attached_entity);    
+    dsm($attached_entity);
   }
 }
