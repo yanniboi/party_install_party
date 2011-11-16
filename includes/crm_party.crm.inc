@@ -430,6 +430,12 @@ abstract class EntityDefaultCRMController {
    * @todo call it something other than hash. $entity_key?
    * 
    * At the moment, the only time this fails is if there a 2 new attached entities of the same set.
+   *
+   * @todo: this is not safe.
+   * $this->type is already a concatenation of entity type + bundle, and that's
+   * only in the cases we control.
+   * Concatenation with underscores is open to ambiguity, as ENTITY + BUNDLE
+   * could match a different ENTITY.
    */
   public function hash() {
     $identifier = (isset($this->entity->{$this->getEntityIdKey()})) ? $this->entity->{$this->getEntityIdKey()} : 'new';
