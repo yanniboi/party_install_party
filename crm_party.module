@@ -718,9 +718,10 @@ function crm_party_get_attached_entities($party, $data_set_name) {
   //dsm($sets);
 
   $table = EntityDefaultCRMController::getInstanceTable($data_set_name);
-  $items = db_select($table, 'ds')
+  $items = db_select('crm_party_attached_entity', 'ds')
     ->fields('ds')
     ->condition('pid', $party->pid,'=')
+    ->condition('data_set', $data_set_name,'=')
     ->execute()
     ->fetchAllAssoc('eid', PDO::FETCH_ASSOC);
     
