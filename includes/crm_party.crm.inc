@@ -40,8 +40,10 @@ abstract class EntityDefaultCRMController {
    * var string $type
    *   The data set type (array key in hook_data_set_info)
    */
-  // @todo: change this var name; 'type' is overloaded already.
+  // $type is obsolete as it is overloaded already in Drupal!
+  // @todo: finish removing.
   public $type;
+  public $data_set_name;
   
   /**
    * var $eid int the set ID
@@ -109,6 +111,7 @@ abstract class EntityDefaultCRMController {
     $sets = crm_party_get_data_set_info();
     if (isset($sets[$data_set_name])) {
       $this->type = $data_set_name;
+      $this->data_set_name = $data_set_name;
       // @todo: not sure about this, as it duplicates the set definition over 
       // and over in memory. The data set definitions should be statically cached
       // by crm_party_get_data_set_info() (in due course!) and that function should
@@ -249,7 +252,7 @@ abstract class EntityDefaultCRMController {
     $relation = array(
       'pid' => $party->pid,
       'eid' => $this->entity->{$this->getEntityIdKey()},
-      'data_set' => $this->type,
+      'data_set' => $this->data_set_name,
       'entity_type' => $this->getEntityType(),
       'entity_bundle' => $this->getEntityBundle(),
     );
@@ -311,11 +314,11 @@ abstract class EntityDefaultCRMController {
         'main' => $relation['main'],
         'hat' => $relation['hat'],
         'hat_main' => $relation['hat_main'],
-        'data_set' => $this->type,
+        'data_set' => $this->data_set_name,
       ))
       ->condition('pid', $relation['pid'], '=')
       ->condition('eid', $relation['eid'], '=')
-      ->condition('data_set', $this->type, '=')
+      ->condition('data_set', $this->data_set_name, '=')
       ->execute();
     if ($result == 0 && !is_numeric($this->id)) {
       drupal_write_record($table, $relation);
@@ -355,14 +358,14 @@ abstract class EntityDefaultCRMController {
    * get the label of the entity this data set wraps    
    */
   public function getLabel() {
-    return isset($this->entity->label) ? $this->entity->label : $this->type;
+    return isset($this->entity->label) ? $this->entity->label : $this->data_set_name;
   }
 
   /**
    * Get the path argument for this set.
    */
    public function getPathArg() {
-     return str_replace('_', '-', $this->type);
+     return str_replace('_', '-', $this->data_set_name);
    }
    
   
@@ -376,11 +379,11 @@ abstract class EntityDefaultCRMController {
     $actions = array(
       'edit' => array(
         'title' => 'Edit',
-        'href' => 'party/' . $this->party->pid . '/edit/' . $this->type . '/' . $this->entity->{$this->getEntityIdKey()},
+        'href' => 'party/' . $this->party->pid . '/edit/' . $this->data_set_name . '/' . $this->entity->{$this->getEntityIdKey()},
       ),
       'remove' => array(
         'title' => 'Remove',
-        'href' => 'party/' . $this->party->pid . '/remove/' . $this->type . '/' . $this->entity->{$this->getEntityIdKey()},
+        'href' => 'party/' . $this->party->pid . '/remove/' . $this->data_set_name . '/' . $this->entity->{$this->getEntityIdKey()},
       ),
     );
     return $actions;
@@ -437,7 +440,7 @@ abstract class EntityDefaultCRMController {
    * At the moment, the only time this fails is if there a 2 new attached entities of the same set.
    *
    * @todo: this is not safe.
-   * $this->type is already a concatenation of entity type + bundle, and that's
+   * $this->data_set_name is already a concatenation of entity type + bundle, and that's
    * only in the cases we control.
    * Concatenation with underscores is open to ambiguity, as ENTITY + BUNDLE
    * could match a different ENTITY.
@@ -445,7 +448,7 @@ abstract class EntityDefaultCRMController {
   public function hash() {
     $identifier = (isset($this->entity->{$this->getEntityIdKey()})) ? $this->entity->{$this->getEntityIdKey()} : 'new';
   
-    return $this->type . '_' . $identifier;
+    return $this->data_set_name . '_' . $identifier;
   }
   
   /**
@@ -511,7 +514,7 @@ abstract class EntityDefaultCRMController {
    * getTableName
    */
   private function getTableName() {
-    return 'crm_party_set_' . $this->type;
+    return 'crm_party_set_' . $this->data_set_name;
   }
   
   /**

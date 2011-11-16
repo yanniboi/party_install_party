@@ -279,7 +279,7 @@ function crm_party_data_set_edit_form($form, &$form_state, $dataSet) {
   
   $form['data-set-type'] = array(
     '#type' => 'hidden',
-    '#value' => $dataSet->type,
+    '#value' => $dataSet->data_set_name,
   );
 
   $form['data-set-pid'] = array(
@@ -298,7 +298,7 @@ function crm_party_data_set_edit_form($form, &$form_state, $dataSet) {
     $form['data-set-main'] = array(
       '#type' => 'checkbox',
       '#default_value' => $dataSet->isMain(),
-      '#title' => "This is the main " . EntityDefaultCRMController::getTypeLabel($dataSet->type),
+      '#title' => "This is the main " . EntityDefaultCRMController::getTypeLabel($dataSet->data_set_name),
     );
   }
 
@@ -372,7 +372,7 @@ function crm_party_data_set_remove($set, $pid, $eid) {
 function crm_party_data_set_remove_confirm($form, &$form_state, $dataSet) {
   $form['data-set-type'] = array(
     '#type' => 'hidden',
-    '#value' => $dataSet->type,
+    '#value' => $dataSet->data_set_name,
   );   
   
   $form['data-set-id'] = array(
@@ -415,7 +415,7 @@ function crm_party_view_data_set($party, $set) {
 
   foreach ($attached_entity_controllers as $crm_controller) {
     $entity = $crm_controller->entity;
-    $build[$crm_controller->type . '_' . $crm_controller->id] = array(
+    $build[$crm_controller->data_set_name . '_' . $crm_controller->id] = array(
         // @todo: this is sort of an abuse of what fieldsets are meant for... :/
         '#type' => 'fieldset',
         // @todo: stop this depending on $entity being a drupal entity
@@ -423,10 +423,10 @@ function crm_party_view_data_set($party, $set) {
         '#title' => $crm_controller->getLabel(),
       );
     
-    $build[$crm_controller->type . '_' . $crm_controller->id]['view'] = $crm_controller->display($crm_controller::VIEW_MODE);
+    $build[$crm_controller->data_set_name . '_' . $crm_controller->id]['view'] = $crm_controller->display($crm_controller::VIEW_MODE);
  
     // @todo: change these to contextual links.
-    $build[$crm_controller->type . '_' . $crm_controller->id]['actions'] = array(
+    $build[$crm_controller->data_set_name . '_' . $crm_controller->id]['actions'] = array(
       '#theme' => 'links',
       '#links' => $crm_controller->actions(),
       '#attributes' => array(

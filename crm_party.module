@@ -1150,7 +1150,7 @@ function crm_party_attached_entity_attach_form(&$form, &$form_state) {
 
   foreach ($attached_entities as $hash => $attached_entity) {
     // Get the form callback.
-    $callback = crm_party_attached_entity_form_callback($attached_entity->type);
+    $callback = crm_party_attached_entity_form_callback($attached_entity->data_set_name);
     // Execute the form callback.
     $form[$hash] =  $callback($form, $form_state, $attached_entity, $form_state['#party']);
     $form[$hash]['#type'] = 'fieldset';
@@ -1180,7 +1180,7 @@ function crm_party_attached_entity_attach_form_submit(&$form, &$form_state) {
   foreach ($attached_entities as $hash => $attached_entity) {
     /// @todo explain what $hash is.
     // Get the form callback.
-    $callback = crm_party_attached_entity_form_callback($attached_entity->type) . '_submit';
+    $callback = crm_party_attached_entity_form_callback($attached_entity->data_set_name) . '_submit';
     // Execute the form callback.
     dsm($callback);
     $callback($form, $form_state, $attached_entity, $form_state['#party']);
