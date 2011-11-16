@@ -712,6 +712,7 @@ function crm_party_unrelate($party, $entity, $data_set) {
  *  party in the given data set, keyed by entity id.
  *  Each entity additionally has the property 'crm_party_main' set according
  *  to the 'main' flag in the data set.
+ *  @todo fix the hash this is indexed by!
  */
 function crm_party_get_attached_entities($party, $data_set_name) {
   $sets = crm_party_get_data_set_info();
