@@ -393,11 +393,14 @@ abstract class EntityDefaultCRMController {
    * Detach this entity from the party.
    */
   public function detach() {
-    db_delete($this->getTableName())
+    db_delete('crm_party_attached_entity')
     ->condition('peid', $this->id, '=')
+    ->condition('data_set', $this->data_set_name,'=')
     ->execute();
     
     //now treat this as a "temporary data set" by unsetting the party end
+    // @todo: do we need this? surely if we detach the entity then
+    // this controller's job is done?
     unset($this->party);
     unset($this->pid);
   }
