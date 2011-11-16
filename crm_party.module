@@ -708,8 +708,8 @@ function crm_party_unrelate($party, $entity, $data_set) {
  *  The set type as defined in hook_crm_party_data_set_info().
  *
  * @return
- *  An array of the entities attached to the party in the given data set,
- *  keyed by entity id.
+ *  An array of the attached entity controllers for the entities attached to the
+ *  party in the given data set, keyed by entity id.
  *  Each entity additionally has the property 'crm_party_main' set according
  *  to the 'main' flag in the data set.
  */
