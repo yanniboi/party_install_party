@@ -570,11 +570,7 @@ function crm_party_get_data_set_info($data_set_name = NULL) {
       // Add in some essential data we need, but allow modules to set this too.
       $set += array(
         'module' => $module,
-        // It would be nice to make either crm_party_data_set_schema_template()
-        // or this function the single canonical place in which the table name
-        // is derived from the set name. But hook_views_data() doesn't want to
-        // be messing with a schema, and crm_party_modules_uninstalled()
-        // doesn't want to call this.
+        // @todo: this is obsolete; check nothing uses it then remove it.
         'table'  => 'crm_party_set_' . $set_name,
         'singleton' => FALSE,
       );
@@ -587,71 +583,6 @@ function crm_party_get_data_set_info($data_set_name = NULL) {
   }
   else {
     return $sets;
-  }
-}
-
-/**
- * Add a new Party data set.
- *
- * This adds a table to the database to handle relationships from parties to
- * data sets. This should only be called by modules that need to dynamically
- * add data sets. They should be declared in hook_crm_party_data_set_info()
- * in all cases.
- *
- * @see hook_crm_party_data_set_info().
- *
- * @param $set_name
- *  The machine name of the data set.
- */
-function crm_party_data_set_type_add($set_name) {
-  module_load_install('crm_party');
-  $schema = crm_party_data_set_schema_template($set_name);
-  // This is ugly as it's always a singleton array.
-  // @todo clean this up with a helper function that gets all the schemas
-  // for a list of sets?
-  foreach ($schema as $name => $table) {
-    db_create_table($name, $table);
-  }
-}
-
-/**
- * Remove a Party data set.
- *
- * @see hook_crm_party_data_set_info().
- * @see crm_party_data_set_type_add().
- */
-function crm_party_data_set_type_remove($set_name) {
-  module_load_install('crm_party');
-  $schema = crm_party_data_set_schema_template($set_name);
-  // This is ugly as it's always a singleton array.
-  // @todo clean this up with a helper function that gets all the schemas
-  // for a list of sets?
-  foreach ($schema as $name => $table) {
-    db_drop_table($name);
-  }
-}
-
-/**
- * Implements hook_modules_uninstalled().
- *
- * (Note this has to be in the module file not the install file.)
- *
- * Drop the tables created for relations for the data sets provided by
- * modules being uninstalled.
- */
-function crm_party_modules_uninstalled($modules) {
-  $sets = array();
-  foreach ($modules as $module) {
-    // During uninstall we need to load module files.
-    drupal_load('module', $module);
-    if (module_hook($module, 'crm_party_data_set_info')) {
-      $sets += module_invoke($module, 'crm_party_data_set_info');
-    }
-  }
-
-  drupal_load('module', 'crm_party');
-  foreach ($sets as $set_name => $set) {
-    crm_party_data_set_type_remove($set_name);
   }
 }
 
