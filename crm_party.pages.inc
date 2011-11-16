@@ -411,24 +411,24 @@ function crm_party_data_set_remove_confirm_submit($form, &$form_state) {
  * Page callback to view a data set.
  */
 function crm_party_view_data_set($party, $set) {
-  $attached_entities = crm_party_get_attached_entities($party, $set);
+  $attached_entity_controllers = crm_party_get_attached_entities($party, $set);
 
-  foreach ($attached_entities as $dataSet) {
-    $entity = $dataSet->entity;
-    $build[$dataSet->type . '_' . $dataSet->id] = array(
+  foreach ($attached_entity_controllers as $crm_controller) {
+    $entity = $crm_controller->entity;
+    $build[$crm_controller->type . '_' . $crm_controller->id] = array(
         // @todo: this is sort of an abuse of what fieldsets are meant for... :/
         '#type' => 'fieldset',
         // @todo: stop this depending on $entity being a drupal entity
         // really? anything that's not an Entity on D7 isn't worth bothering with!
-        '#title' => $dataSet->getLabel(),
+        '#title' => $crm_controller->getLabel(),
       );
     
-    $build[$dataSet->type . '_' . $dataSet->id]['view'] = $dataSet->display($dataSet::VIEW_MODE);
+    $build[$crm_controller->type . '_' . $crm_controller->id]['view'] = $crm_controller->display($crm_controller::VIEW_MODE);
  
     // @todo: change these to contextual links.
-    $build[$dataSet->type . '_' . $dataSet->id]['actions'] = array(
+    $build[$crm_controller->type . '_' . $crm_controller->id]['actions'] = array(
       '#theme' => 'links',
-      '#links' => $dataSet->actions(),
+      '#links' => $crm_controller->actions(),
       '#attributes' => array(
         'class' => array('crm-set-action-links'),
       ),
@@ -436,7 +436,7 @@ function crm_party_view_data_set($party, $set) {
   }
   
   $set_definition = EntityDefaultCRMController::getSetDefinition($set);
-  if (!isset($set_definition['max cardinality']) || count($attached_entities) < $set_definition['max cardinality']) {
+  if (!isset($set_definition['max cardinality']) || count($attached_entity_controllers) < $set_definition['max cardinality']) {
     $build[$set . '_links'] = array(
       '#theme' => 'links',
       '#links' => array(
