@@ -189,7 +189,12 @@ abstract class EntityDefaultCRMController {
       $this->entity = $entity;
       $this->eid = $entity->{$this->getEntityIdKey()};
     }
-    
+
+    // Set the id of the attaching party on the entity for our view mode to use.
+    if (!empty($this->pid)) {
+      $this->entity->crm_attaching_party = $this->pid;
+    }
+
     // If the Party is a Real Party, see if they're attached.
     if (isset($this->party->pid)) {
       $query = db_select($this->getTableName(), 'ds');
