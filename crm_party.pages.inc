@@ -424,15 +424,6 @@ function crm_party_view_data_set($party, $set) {
       );
     
     $build[$crm_controller->data_set_name . '_' . $crm_controller->id]['view'] = $crm_controller->display($crm_controller::VIEW_MODE);
- 
-    // @todo: change these to contextual links.
-    $build[$crm_controller->data_set_name . '_' . $crm_controller->id]['actions'] = array(
-      '#theme' => 'links',
-      '#links' => $crm_controller->actions(),
-      '#attributes' => array(
-        'class' => array('crm-set-action-links'),
-      ),
-    );    
   }
   
   $set_definition = EntityDefaultCRMController::getSetDefinition($set);
