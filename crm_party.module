@@ -987,9 +987,33 @@ function crm_party_theme() {
  * Add our own template for party display.
  */
 function crm_party_preprocess_entity(&$variables) {
-  // @todo This would be better off as a new feature in Entity API
   if ($variables['view_mode'] == 'party') {
-    $entity_type = $variables['entity_type'];
+    $entity_type  = $variables['entity_type'];
+    $entity       = $variables['elements']['#entity'];
+    list($eid, ) = entity_extract_ids($entity_type, $entity);
+
+    //dsm($variables);
+    $party_id = $entity->crm_attaching_party;
+
+    // @todo: clean this up -- having to load up the controller all over
+    // again when we probably had it at some earlier point is just messy.
+    $data_set_name = crm_party_get_entity_data_set($entity_type, $entity);
+    $crm_controller = crm_party_get_crm_controller($data_set_name, $party_id);
+    $crm_controller->setParty($party_id);
+    $crm_controller->setAttachedEntity($eid);
+    //dsm($crm_controller);
+
+    // Add the attached entity actions to the build content.
+    $variables['content']['crm_party_actions'] = array(
+      '#theme' => 'links',
+      '#links' => $crm_controller->actions(),
+      '#attributes' => array(
+        'class' => array('links inline crm-set-action-links'),
+      ),
+      '#weight' => 100,
+    );
+
+    // @todo This would be better off as a new feature in Entity API
     $variables['theme_hook_suggestions'][] = 'entity__all__party';
     // @todo Hmmmm how do we let hook_theme() know about this?
     $variables['theme_hook_suggestions'][] = 'entity__' . $entity_type . '__all__party';
