@@ -411,9 +411,9 @@ function crm_party_data_set_remove_confirm_submit($form, &$form_state) {
  * Page callback to view a data set.
  */
 function crm_party_view_data_set($party, $set) {
-  $dataSets = EntityDefaultCRMController::getInstances($set, $party);
-  
-  foreach ($dataSets as $dataSet) {
+  $attached_entities = crm_party_get_attached_entities($party, $set);
+
+  foreach ($attached_entities as $dataSet) {
     $entity = $dataSet->entity;
     $build[$dataSet->type . '_' . $dataSet->id] = array(
         // @todo: this is sort of an abuse of what fieldsets are meant for... :/
@@ -436,7 +436,7 @@ function crm_party_view_data_set($party, $set) {
   }
   
   $set_definition = EntityDefaultCRMController::getSetDefinition($set);
-  if (!isset($set_definition['max cardinality']) || count($dataSets) < $set_definition['max cardinality']) {
+  if (!isset($set_definition['max cardinality']) || count($attached_entities) < $set_definition['max cardinality']) {
     $build[$set . '_links'] = array(
       '#theme' => 'links',
       '#links' => array(
