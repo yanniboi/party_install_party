@@ -935,6 +935,7 @@ function crm_party_preprocess_entity(&$variables) {
     //dsm($crm_controller);
 
     // Add the attached entity actions to the build content.
+    // @todo: change these to contextual links?
     $variables['content']['crm_party_actions'] = array(
       '#theme' => 'links',
       '#links' => $crm_controller->actions(),

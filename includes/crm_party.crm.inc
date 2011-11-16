@@ -471,8 +471,11 @@ abstract class EntityDefaultCRMController {
 
   /**
    * getTableName
+   *
+   * @todo: finish removing this
    */
   private function getTableName() {
+    //return 'crm_party_attached_entity';
     return 'crm_party_set_' . $this->data_set_name;
   }
   
