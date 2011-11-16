@@ -263,53 +263,9 @@ abstract class EntityDefaultCRMController {
       'hat' => 'trilby',
       'hat_main' => 0,
     );
-    
-    $table = $this->getTableName();
-
-    // If we're setting this as the main party first remove main from
-    // every other party. 
-    if (isset($options['main']) && $options['main'] == 1 && $this->isMain() != 1) {
-      $num = db_update($table)
-        ->fields(array(
-          'main' => 0,
-        ))
-        ->condition('pid',$relation['pid'],'=')
-        ->execute();
-    }
 
     // Try update first, and if that fails insert.
-    $result = db_update($table)
-      ->fields(array(
-        'main' => $relation['main'],
-        'hat' => $relation['hat'],
-        'hat_main' => $relation['hat_main'],
-      ))
-      ->condition('pid',$relation['pid'],'=')
-      ->condition('eid',$relation['eid'],'=')
-      ->execute();
-    if ($result == 0 && !is_numeric($this->id)) {
-      drupal_write_record($table, $relation);
-    }
-
-    // TEMPORARY: repeat the whole thing again for our unified table.
-    $table = 'crm_party_attached_entity';
-
-    // If we're setting this as the main party first remove main from
-    // every other party.
-    /*
-    // @TODO! within THIS SET!
-    if (isset($options['main']) && $options['main'] == 1 && $this->isMain() != 1) {
-      $num = db_update($table)
-        ->fields(array(
-          'main' => 0,
-        ))
-        ->condition('pid',$relation['pid'],'=')
-        ->execute();
-    }
-    */
-
-    // Try update first, and if that fails insert.
-    $result = db_update($table)
+    $result = db_update('crm_party_attached_entity')
       ->fields(array(
         'main' => $relation['main'],
         'hat' => $relation['hat'],
@@ -321,7 +277,7 @@ abstract class EntityDefaultCRMController {
       ->condition('data_set', $this->data_set_name, '=')
       ->execute();
     if ($result == 0 && !is_numeric($this->id)) {
-      drupal_write_record($table, $relation);
+      drupal_write_record('crm_party_attached_entity', $relation);
     }
   }
   
