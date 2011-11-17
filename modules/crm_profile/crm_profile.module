@@ -262,8 +262,7 @@ function crm_profile_crm_party_page_view_alter($party) {
       $profiles[] = $temp;
     }
     foreach ($profiles as $profile) {
-      _crm_profile_is_null($profile);
-      if (!$profile->is_null && profile2_access('view', $profile)) {
+      if (profile2_access('view', $profile)) {
         $profile->this_party = $party;
         
         $build['profile_' . $profile->pid] = array(
@@ -329,24 +328,6 @@ function _crm_profile_load_parties($profile) {
   }
   
   return $parties;
-}
-
-/**
- * Find out if a profile is a null profile.
- *
-function _crm_profile_is_null(&$profile) {
-  $query = db_select('crm_profile_null');
-  $query->condition('pid', $profile->pid, '=');
-  $query = $query->countQuery();
-  $result = $query->execute();
-  $record = $result->fetchAssoc();
-  
-  if ($record['expression'] == '1') {
-    $profile->is_null = TRUE;
-  }
-  else {
-    $profile->is_null = FALSE;
-  }
 }
 
 /**
