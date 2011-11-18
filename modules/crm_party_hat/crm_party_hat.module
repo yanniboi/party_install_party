@@ -9,11 +9,12 @@
  */
 function crm_party_hat_menu() { 
   $items['admin/community/hats'] = array(
-    'title' => 'Party hats',
+    'title' => 'Manage Hats',
     'description' => 'Manage hats',
     'page callback' => 'crm_party_hat_manage',
     'access arguments' => array('administer hats'),
     'file' => 'crm_party_hat.admin.inc',
+    'type' => MENU_LOCAL_TASK,
   );
   $items['admin/community/hats/add'] = array(
     'title' => 'Add hat',
