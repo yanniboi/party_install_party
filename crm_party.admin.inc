@@ -182,6 +182,8 @@ function party_admin_form() {
 
 /**
  * Manage Data Sets Page
+ *
+ * @todo: Get links on this page to always redirect back to this page.
  */
 function crm_party_data_set_admin() {
   $data_sets = crm_party_get_data_set_info();

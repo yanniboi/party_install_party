@@ -297,7 +297,7 @@ function crm_party_hat_unassign($party, $hat) {
  *
  * @param $party the Party object or ID
  */
-function crm_party_get_hats($party) {
+function crm_party_hat_get_hats($party) {
   if (is_object($party)) {
     //if the party id isn't set
     if (!isset($party->pid)) {
@@ -340,10 +340,15 @@ function crm_party_get_hats($party) {
   return $hats;  
 }
 
+//TEMP WRAPPER
+function crm_party_get_hats($party) {
+  return crm_party_hat_get_hats($party);
+}
+
 /**
  * Get all availably hats.
  */
-function crm_party_get_all_hats() {
+function crm_party_hat_get_all_hats() {
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'crm_party_hat', '=');
   $result = $query->execute();
@@ -353,6 +358,11 @@ function crm_party_get_all_hats() {
   }
   $hats = entity_load('crm_party_hat', $hids);
   return $hats;  
+}
+
+//TEMP WRAPPER
+function crm_party_get_all_hats() {
+  return crm_party_hat_get_all_hats();
 }
 
 /**
