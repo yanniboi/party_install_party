@@ -121,15 +121,6 @@ abstract class EntityDefaultCRMController {
     else {
       //throw an error
     }
-    
-    // Create as place holder entity
-    $values = array();
-    $bundle_key = $this->getBundleKey();
-    if (is_string($bundle_key)) {
-      $values[$bundle_key] = $this->getEntityBundle();
-    }
-    
-    $this->entity = entity_create($this->definition['entity type'], $values);
   }
   
   /**
@@ -222,6 +213,20 @@ abstract class EntityDefaultCRMController {
     }
     
     return TRUE;
+  }
+  
+  /**
+   * Create an attached entity ready for use
+   */
+  function createAttachedEntity() {
+    // Create as place holder entity
+    $values = array();
+    $bundle_key = $this->getBundleKey();
+    if (is_string($bundle_key)) {
+      $values[$bundle_key] = $this->getEntityBundle();
+    }
+    
+    $this->entity = entity_create($this->definition['entity type'], $values);  
   }
   
   /**
@@ -542,6 +547,7 @@ abstract class EntityDefaultCRMController {
         break;
       case self::FROM_PARTY :
         $instance->setParty($info);
+        $instance->createAttachedEntity();
         return $instance;
         break;
       case self::FROM_ENTITY :
