@@ -481,7 +481,7 @@ abstract class EntityDefaultCRMController {
    */
   private function getTableName() {
     //return 'crm_party_attached_entity';
-    return 'crm_party_set_' . $this->data_set_name;
+    return 'crm_party_attached_entity';
   }
   
   /**
@@ -489,7 +489,7 @@ abstract class EntityDefaultCRMController {
    *  static method to get the table containing all the instances
    */
   public static function getInstanceTable($type) {
-    return 'crm_party_set_' . $type;
+    return 'crm_party_attached_entity';
   }
   
   /**
