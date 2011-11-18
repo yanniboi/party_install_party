@@ -89,6 +89,9 @@ function crm_party_edit_form($form, &$form_state, $party) {
     $options[$hat->name] = $hat->label;
   }
   
+  $form_state['#party'] = $party;
+  $form_state['#attached_entities'] = array();
+  
   //get hats associated with this party
   // @todo: Get into crm_party_hat module.
   $party_hats = crm_party_hat_get_hats($party);
@@ -96,13 +99,6 @@ function crm_party_edit_form($form, &$form_state, $party) {
   foreach ($party_hats as $ph) {
     $defaults[] = $ph->name;
   }   
-  
-  $form['hats'] = array(
-    '#type' => 'checkboxes',
-    '#title' => t('Hats'),
-    '#options' => $options,
-    '#default_value' => $defaults,
-  );
   
   // Get Party Hat must have data sets
   $data_sets = array();
@@ -113,9 +109,6 @@ function crm_party_edit_form($form, &$form_state, $party) {
     }
   }
 
-  $form_state['#party'] = $party;
-  $form_state['#attached_entities'] = array();
-  
   foreach ($data_sets as $data_set) {
     $attached_entities = array();
     if (isset($party->pid)) {
@@ -131,6 +124,7 @@ function crm_party_edit_form($form, &$form_state, $party) {
     
     $form_state['#attached_entities'] = array_merge($form_state['#attached_entities'], $attached_entities);
   }
+  // Everything between the last @todo and here needs to be in a hook so that other modules can change it.  
   
   $form['#validate'][] = 'crm_party_edit_form_validate';
   $form['#submit'][] = 'crm_party_edit_form_submit';
