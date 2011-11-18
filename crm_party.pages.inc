@@ -94,15 +94,15 @@ function crm_party_edit_form($form, &$form_state, $party) {
   );
   
   //Get all available hats
-  $hats = crm_party_get_all_hats();
+  $hats = crm_party_hat_get_all_hats();
   $options = array();
   foreach($hats as $hat) {
     $options[$hat->name] = $hat->label;
   }
   
   //get hats associated with this party
-  // @todo stop from unsetting required hats
-  $party_hats = crm_party_get_hats($party);
+  // @todo: Get into crm_party_hat module.
+  $party_hats = crm_party_hat_get_hats($party);
   $defaults = array();
   foreach ($party_hats as $ph) {
     $defaults[] = $ph->name;
