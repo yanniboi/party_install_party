@@ -184,7 +184,39 @@ function party_admin_form() {
  * Manage Data Sets Page
  */
 function crm_party_data_set_admin() {
-  return "This a placeholder for data set settings";
+  $data_sets = crm_party_get_data_set_info();
+  
+  $header = array(
+    0 => 'Data Set Name',
+    1 => array(
+      'data' => 'Operations',
+      'colspan' => '6',
+    ),
+  );
+  
+  $rows = array();
+  foreach ($data_sets as $key => $data_set) {
+    $name = "{$data_set['label']} <small>(Machine name: $key)</small>";
+    $ops = array('edit', 'manage fields', 'manage display', 'clone', 'export', 'delete');
+    
+    $row = array($name);
+    foreach ($ops as $op) {
+      $row[] = array(
+        'data' => isset($data_set['admin'][$op]) ? l($op, $data_set['admin'][$op]) : '',
+      );
+    }
+    
+    $rows[] = $row;
+  }
+  
+  $build['dataset_table'] = array(
+    '#theme' => 'table',
+    '#header' => $header,
+    '#rows' => $rows,
+    '#empty' => 'No Data Sets Available',
+  );
+  
+  return $build;
 }
 
 /**

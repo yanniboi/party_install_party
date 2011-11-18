@@ -24,6 +24,11 @@ function crm_user_crm_party_data_set_info() {
     'class' => 'UserCRMController',
     'singleton' => TRUE,
     'max cardinality' => 1,
+    'admin' => array(
+      'edit' => 'admin/config/people/accounts',
+      'manage fields' => 'admin/config/people/accounts/fields',
+      'manage display' => 'admin/config/people/accounts/display',
+    ),
     'load callback' => "crm_user_load_user",
     'form callback' => "crm_user_form_user",
   );

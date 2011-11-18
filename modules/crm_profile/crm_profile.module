@@ -64,6 +64,15 @@ function crm_profile_crm_party_data_set_info() {
       //'load arguments' => array($type),
       'form callback' => "crm_profile_attached_entity_form",
       'class' => 'Profile2CRMController',
+      // Provide details of admin interfaces
+      'admin' => array(
+        'edit' => 'admin/structure/profiles/manage/' . $type,
+        'manage fields' => 'admin/structure/profiles/manage/' . $type . '/fields',
+        'manage display' => 'admin/structure/profiles/manage/' . $type . '/display',
+        'clone' => 'admin/structure/profiles/manage/' . $type . '/clone',
+        'delete' => 'admin/structure/profiles/manage/' . $type . '/delete',
+        'export' => 'admin/structure/profiles/manage/' . $type . '/export',
+      ),
       // Provide a piece corresponding to each data set.
       'piece' => array(
         'path' => 'profile-' . str_replace('_', '-', $type),
