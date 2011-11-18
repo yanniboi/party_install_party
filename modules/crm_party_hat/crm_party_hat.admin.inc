@@ -243,4 +243,40 @@ function crm_party_hat_hat_machine_name_exists($value) {
   $exists = db_query_range('SELECT 1 FROM {crm_party_hats} WHERE `name` = :name', 0, 1, array(':name' => $value))->fetchField();
   return $exists;
 }
+
+/**
+ * Confirm Deletion Form
+ */
+function crm_party_hat_delete_form($form, &$form_state, $hat) {
+  $form['hat_id'] = array(
+    '#type' => 'hidden',
+    '#value' => $hat->hid,
+  );
+  
+  $form['description'] = array(
+    '#markup' => 'Are you shure you want to delete ' . $hat->label . '?',
+  );
+  
+  $form['actions'] = array(
+    '#type' => 'actions',
+  );
+  
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Delete',
+  );
+  
+  $form['actions']['cancel'] = array(
+    '#type' => 'link',
+    '#title' => 'Cancel',
+    '#href' => 'admin/community/hats',
+  );
+
+  return $form;  
+}
+
+function crm_party_hat_delete_form_submit($form, &$form_state) {
+  entity_delete('crm_party_hat', $form_state['values']['hat_id']);
+  $form_state['redirect'] = 'admin/community/hats';
+}
  

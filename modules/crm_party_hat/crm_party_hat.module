@@ -31,6 +31,16 @@ function crm_party_hat_menu() {
     'access arguments' => array('administer hats'),
     'file' => 'crm_party_hat.admin.inc',
   );
+  $items['admin/community/hats/%crm_party_hat/delete'] = array(
+    'title' => 'Delete Hat',
+    'description' => 'Delete a party hat',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('crm_party_hat_delete_form', 3),
+    'access arguments' => array('administer hats'),
+    'file' => 'crm_party_hat.admin.inc',
+  );
+  
+  
 
   return $items;
 }
