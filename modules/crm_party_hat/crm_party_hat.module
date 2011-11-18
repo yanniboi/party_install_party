@@ -300,51 +300,17 @@ function crm_party_hat_unassign($party, $hat) {
  * @param $party the Party object or ID
  */
 function crm_party_hat_get_hats($party) {
-  if (is_object($party)) {
-    //if the party id isn't set
-    if (!isset($party->pid)) {
-      //We're making a new party so get the required hats
-      $query = new EntityFieldQuery();
-      $query->entityCondition('entity_type', 'crm_party_hat', '=')
-        ->propertyCondition('required', 1, '=');
-      $result = $query->execute();
-      $hids = array();
-      foreach ($result['crm_party_hat'] as $record) {
-        $hids[] = $record->hid;
-      }
-      $hats = entity_load('crm_party_hat', $hids);
-      return $hats;
-    }
-    else {
-      $party = $party->pid;
-    }
+  if (!is_object($party)) {
+    $party = crm_party_load($party);
   }
   
-  $result = db_select('crm_party_hattings', 'ph')
-    ->condition('party', $party, '=')
-    ->fields('ph')
-    ->execute()
-    ->fetchAllAssoc('hat');
- 
-  $hats = array_keys($result);
- 
-  if (count($hats) > 0) {
-    $query = new EntityFieldQuery();
-    $query->entityCondition('entity_type', 'crm_party_hat', '=')
-      ->propertyCondition('name', $hats, 'IN');
-    $result = $query->execute();
-    $hids = array();
-    foreach ($result['crm_party_hat'] as $record) {
-      $hids[] = $record->hid;
-    }
-    $hats = entity_load('crm_party_hat', $hids);
+  $hats = array();
+  foreach ($party->party_hat['und'] as $hat_name) {
+    $hat = crm_party_hat_load($hat_name);
+    $hats[$hat->hid] = $hat; 
   }
+  
   return $hats;  
-}
-
-//TEMP WRAPPER
-function crm_party_get_hats($party) {
-  return crm_party_hat_get_hats($party);
 }
 
 /**
@@ -360,11 +326,6 @@ function crm_party_hat_get_all_hats() {
   }
   $hats = entity_load('crm_party_hat', $hids);
   return $hats;  
-}
-
-//TEMP WRAPPER
-function crm_party_get_all_hats() {
-  return crm_party_hat_get_all_hats();
 }
 
 /**
