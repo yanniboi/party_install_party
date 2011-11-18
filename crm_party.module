@@ -292,14 +292,48 @@ function crm_party_menu() {
  * Implements hook_menu_local_tasks_alter().
  */
 function crm_party_menu_local_tasks_alter(&$data, $router_item, $root_path) {
-  // Add action link to 'party/add' on 'admin/community/parties' page.
-  if ($root_path == 'admin/community/parties') {
+  // Add action link to 'party/add' on 'admin/community/list' page.
+  if ($root_path == 'admin/community/list') {
     $item = menu_get_item('party/add');
     if ($item['access']) {
       $data['actions']['output'][] = array(
         '#theme' => 'menu_local_action',
         '#link' => $item,
       );
+    }
+  }
+  
+  // Add action links to 'admin/community/datasets' page.
+  if ($root_path == 'admin/community/datasets') {
+    $data_sets = crm_party_get_data_set_info();
+    $attached_entity_types = array();
+    foreach ($data_sets as $data_set) {
+      $attached_entity_types[$data_set['entity type']] = $data_set['admin'];
+    }
+
+    foreach ($attached_entity_types as $type => $admin) {
+      $type = entity_get_info($type);
+      if (isset($admin['create'])) {
+        $item = menu_get_item($admin['create']);
+        if ($item['access']) {
+          $item['title'] = 'Add ' . $type['label'] . ' Data Set';
+          $data['actions']['output'][] = array(
+            '#theme' => 'menu_local_action',
+            '#link' => $item,
+          );
+        }
+      }
+      
+      if (isset($admin['import'])) {
+        $item = menu_get_item($admin['import']);
+        $item['title'] = 'Import ' . $type['label'] . ' Data Set';
+        if ($item['access']) {
+          $data['actions']['output'][] = array(
+            '#theme' => 'menu_local_action',
+            '#link' => $item,
+          );
+        }
+      }
     }
   }
 

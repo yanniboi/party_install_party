@@ -66,6 +66,8 @@ function crm_profile_crm_party_data_set_info() {
       'class' => 'Profile2CRMController',
       // Provide details of admin interfaces
       'admin' => array(
+        'create' => 'admin/structure/profiles/add',
+        'import' => 'admin/structure/profiles/import',
         'edit' => 'admin/structure/profiles/manage/' . $type,
         'manage fields' => 'admin/structure/profiles/manage/' . $type . '/fields',
         'manage display' => 'admin/structure/profiles/manage/' . $type . '/display',
