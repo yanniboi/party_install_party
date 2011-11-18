@@ -84,7 +84,9 @@ function crm_user_form_crm_party_edit_form_alter(&$form, &$form_state, $form_id)
   if (isset($party->pid)) {
     $attached_entities = crm_party_get_attached_entities($party, 'user');
     // We know we're a singleton data set so we can just pop off the one result.
-    $account = array_pop($attached_entities)->entity;
+    $attached_user = array_pop($attached_entities);
+
+    $account = is_object($attached_user) ? $attached_user->entity : NULL;
   }
 
   // Store the account uid so we can check if it changes on submit.
