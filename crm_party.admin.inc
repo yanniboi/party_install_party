@@ -181,6 +181,13 @@ function party_admin_form() {
 }
 
 /**
+ * Manage Data Sets Page
+ */
+function crm_party_data_set_admin() {
+  return "This a placeholder for data set settings";
+}
+
+/**
  * Settings form for choosing the active party label plugin.
  */
 function crm_party_settings_label_plugin_form($form, &$form_state) {
