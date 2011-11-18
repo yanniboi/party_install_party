@@ -16,17 +16,6 @@ function crm_party_page_view($party, $view_mode = 'full') {
 
   $build = module_invoke_all('crm_party_page_view_alter', $party);
 
-  $hats = crm_party_get_hats($party);
-  $markup = '<ul>';
-  foreach($hats as $hat) {
-    $markup .= '<li>'.$hat->label.'</li>';
-  }
-  $markup .= '</ul>';
-  
-  $build['hats'] = array(
-    '#markup' => $markup,
-  );
-  
   // Demo output so we see this works.
   $build['demo'] = array(
     '#type' => 'markup',
