@@ -232,13 +232,12 @@ function crm_party_page_view_piece_views($party, $view_name, $view_display_id) {
  * @param $eid
  *    The id of the entity
  */
-function crm_party_data_set_edit($set, $pid, $eid = NULL) {
-  if ($eid === NULL) {
-    //return "@todo add add form";
+function crm_party_data_set_edit($set, $party, $eid = NULL) {
+  if (is_object($party)) {
+    $pid = $party->pid;  
   }
-  
-  if (is_object($pid)) {
-    $pid = $pid->pid;  
+  else {
+    $pid = $party;
   }
   
   $attached_entity = crm_party_get_crm_controller($set);
@@ -246,6 +245,10 @@ function crm_party_data_set_edit($set, $pid, $eid = NULL) {
   
   if ($eid !== NULL) {
     $attached_entity->setAttachedEntity($eid);
+    drupal_set_title("Edit Data Set: " . $attached_entity->entity->label);
+  }
+  else {
+    drupal_set_title("Add {$attached_entity->definition['label']} Data Set to {$party->label}");
   }
   
   return drupal_get_form('crm_party_data_set_edit_form', $attached_entity);

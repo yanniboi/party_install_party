@@ -345,7 +345,7 @@ function crm_party_menu_local_tasks_alter(&$data, $router_item, $root_path) {
     $piece = $pieces[$piece_subpath];
 
     if (isset($piece['data_set'])) {
-      $item = menu_get_item('party/%/add/%');
+      $item = menu_get_item('party/%crm_party/%/add');
       if ($item['access']) {
         $data_sets = crm_party_get_data_set_info();
         $data_set = $data_sets[$piece['data_set']];
@@ -354,7 +354,7 @@ function crm_party_menu_local_tasks_alter(&$data, $router_item, $root_path) {
           '#link' => array(
             'title' => t('Attach new @data-set', array('@data-set' => $data_set['label'])),
             // @todo: remove arg(), use menu_get_object().
-            'href' => 'party/' . arg(1) . '/add/' . $piece['data_set'],
+            'href' => 'party/' . arg(1) . '/' . $piece['data_set'] . '/add',
           ),
         );
       }
@@ -423,9 +423,9 @@ function crm_party_crm_party_access($op, $party = NULL, $attached_entity = NULL,
  */
 function crm_party_admin_paths() {
   $paths = array(
-    'party/*/edit/*' => TRUE,
-    'party/*/remove/*' => TRUE,
-    'party/*/add/*' => TRUE,
+    'party/*/*/edit/*' => TRUE,
+    'party/*/*/remove/*' => TRUE,
+    'party/*/*/add' => TRUE,
   );
   return $paths;
 }

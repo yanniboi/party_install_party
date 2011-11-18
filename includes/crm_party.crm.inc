@@ -340,11 +340,11 @@ abstract class EntityDefaultCRMController {
     $actions = array(
       'edit' => array(
         'title' => 'Edit',
-        'href' => 'party/' . $this->party->pid . '/edit/' . $this->data_set_name . '/' . $this->entity->{$this->getEntityIdKey()},
+        'href' => 'party/' . $this->party->pid . '/' . $this->data_set_name . '/edit/' . $this->entity->{$this->getEntityIdKey()},
       ),
       'remove' => array(
         'title' => 'Remove',
-        'href' => 'party/' . $this->party->pid . '/remove/' . $this->data_set_name . '/' . $this->entity->{$this->getEntityIdKey()},
+        'href' => 'party/' . $this->party->pid . '/' . $this->data_set_name . '/remove/' . $this->entity->{$this->getEntityIdKey()},
       ),
     );
     return $actions;
