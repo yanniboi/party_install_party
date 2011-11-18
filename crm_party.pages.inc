@@ -176,17 +176,13 @@ function crm_party_edit_form_submit($form, &$form_state) {
 /**
  * This checks if all expected data sets are present and, if not, sends the user
  * back to the form with a nice message.
+ *
+ * @todo: Move to crm_party_hats
  */
 function crm_party_edit_form_hat_check($form, &$form_state) {
-  foreach ($form_state['values']['hats'] as $hat => $checked) {
-    $data_sets = array();
-    foreach ($party_hats as $hat) {
-      $temp_sets = crm_party_hat_get_data_sets($hat);
-      foreach ($temp_sets as $set) {
-        $data_sets[] = $set;
-      }
-    }
-    
+  foreach (crm_party_hat_get_hats($form_state['#party']) as $hat => $checked) {
+    $data_sets = crm_party_hat_get_data_sets($hat);
+        
     foreach($data_sets as $data_set_name) {
       $attached_entities = crm_party_get_attached_entities($form_state['#party'], $data_set_name);
       if (count($attached_entities) < 1) {
