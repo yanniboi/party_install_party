@@ -135,6 +135,7 @@ function crm_party_edit_form($form, &$form_state, $party) {
     
     if (count($attached_entities) < 1) {
       $attached_entity = crm_party_get_crm_controller($data_set);
+      $attached_entity->createAttachedEntity();
       $attached_entity->setParty($party);
       $attached_entities[$attached_entity->hash()] = $attached_entity;
     }    

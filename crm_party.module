@@ -1180,10 +1180,8 @@ function crm_party_attached_entity_attach_form_submit(&$form, &$form_state) {
     // Get the form callback.
     $callback = crm_party_attached_entity_form_callback($attached_entity->data_set_name) . '_submit';
     // Execute the form callback.
-    dsm($callback);
     $callback($form, $form_state, $attached_entity, $form_state['#party']);
 
     $attached_entity->attach($party);
-    dsm($attached_entity);
   }
 }
