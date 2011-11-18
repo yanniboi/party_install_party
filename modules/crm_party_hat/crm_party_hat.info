@@ -5,3 +5,4 @@ dependencies[] = crm_party
 core = 7.x
 files[] = crm_party_hat.module
 files[] = crm_party_hat.admin.inc
+files[] = includes/crm_party_hat.entity.inc
