@@ -3,6 +3,42 @@
  * @file crm_party_hat.install
  * TODO: Enter file description here.
  */
+ 
+/**
+ * Implements hook_install()
+ */
+function crm_party_hat_install() {
+  if (!field_info_field('party_hat')) {
+    $field = array(
+      'field_name' => 'party_hat',
+      'type' => 'hat_reference',
+      'settings' => array(
+        'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+      ),
+    );
+    field_create_field($field);
+
+    $instance = array(
+      'field_name' => 'party_hat',
+      'entity_type' => 'crm_party',
+      'bundle' => 'individual',
+      'label' => 'Hats',
+      'required' => TRUE,
+      'description' => 'This Parties\' Hats',
+      'widget' => array(
+        'type' => 'options_buttons',
+        'settings' => array(),
+      ),
+      'display' => array(
+        'default' => array(
+          'type' => 'hat_reference_default',
+          'label' => 'inline',
+        ),
+      ),
+    );
+    field_create_instance($instance);
+  }
+}
 
 /**
  * Implements hook_schema().
@@ -152,3 +188,33 @@ function crm_party_hat_update_7001() {
 /**
  * Add This field to a Party.
  */
+function crm_party_hat_update_7002() {
+  $field = array(
+    'field_name' => 'party_hat',
+    'type' => 'hat_reference',
+    'settings' => array(
+      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+    ),
+  );
+  field_create_field($field);
+
+  $instance = array(
+    'field_name' => 'party_hat',
+    'entity_type' => 'crm_party',
+    'bundle' => 'individual',
+    'label' => 'Hats',
+    'required' => TRUE,
+    'description' => 'This Parties\' Hats',
+    'widget' => array(
+      'type' => 'options_buttons',
+      'settings' => array(),
+    ),
+    'display' => array(
+      'default' => array(
+        'type' => 'hat_reference_default',
+        'label' => 'inline',
+      ),
+    ),
+  );
+  field_create_instance($instance);        
+}

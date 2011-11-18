@@ -16,6 +16,7 @@ function crm_party_hat_field_info() {
       'default_formatter' => 'hat_reference_default',
       'module' => 'crm_party_hat',
       'settings' => array(),
+      'instance_settings' => array(),
     )
   );
 }
@@ -76,18 +77,6 @@ function crm_party_hat_field_presave($entity_type, $entity, $field, $instance, $
 }
 
 /**
- * Implements hook_field_widget_info()
- *
-function crm_party_hat_field_widget_info() {
-  return array(
-    'hat_reference_default' => array(
-      'label' => t('Default Hat Reference'),
-      'field types' => array('hat_reference'),
-    ),
-  );
-}*/
-
-/**
  * Implements hook_field_formatter_info()
  *
  * Returns information about available field formatters.
@@ -106,12 +95,13 @@ function crm_party_hat_field_formatter_info() {
  */
 function crm_party_hat_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $element = array();
+  
   switch ($display['type']) {
     case 'hat_reference_default':
       foreach($items as $delta => $item) {
-        $output = $item['hat_name'];
+        $hat = crm_party_hat_load($item['hat_name']);
         
-        $element[$delta] = $output;
+        $element[$delta]['#markup'] = $hat->label;
       }
     break;
   }
