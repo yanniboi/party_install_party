@@ -4,6 +4,8 @@
  * Provides an extensible access system for CRM parties.
  */
 
+include("crm_party_hat.field.inc"); 
+ 
 /**
  * Implements hook_menu().
  */

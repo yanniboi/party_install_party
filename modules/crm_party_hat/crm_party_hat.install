@@ -111,6 +111,26 @@ function crm_party_hat_schema() {
 }
 
 /**
+ * Implements hook_field_schema()
+ */
+function crm_party_hat_field_schema() {
+  $columns = array(
+    'hat_name' => array(
+      'description' => 'The machine readable name of the hat',
+      'type' => 'varchar',
+      'length' => '255',
+      'not null' => TRUE,
+      'default' => '',
+    ),
+  );
+  $indexes = array();
+  return array(
+    'columns' => $columns,
+    'indexes' => $indexes,
+  );
+}
+
+/**
  * Change data set rules: Drop the rule column and add 'has' and 'multiple'
  */
 function crm_party_hat_update_7001() {
@@ -128,3 +148,7 @@ function crm_party_hat_update_7001() {
     'not null' => TRUE,
   ));
 }
+
+/**
+ * Add This field to a Party.
+ */
