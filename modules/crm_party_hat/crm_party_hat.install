@@ -22,9 +22,9 @@ function crm_party_hat_install() {
       'field_name' => 'party_hat',
       'entity_type' => 'crm_party',
       'bundle' => 'individual',
-      'label' => 'Hats',
+      'label' => t('Hats'),
       'required' => TRUE,
-      'description' => 'This Parties\' Hats',
+      'description' => t("This party's hats"),
       'widget' => array(
         'type' => 'options_buttons',
         'settings' => array(),
