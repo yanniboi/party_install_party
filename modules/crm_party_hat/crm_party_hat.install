@@ -12,8 +12,8 @@ function crm_party_hat_install() {
     $field = array(
       'field_name' => 'party_hat',
       'type' => 'hat_reference',
+      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
       'settings' => array(
-        'cardinality' => FIELD_CARDINALITY_UNLIMITED,
       ),
     );
     field_create_field($field);
