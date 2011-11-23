@@ -611,6 +611,7 @@ function crm_party_get_data_set_info($data_set_name = NULL) {
     foreach ($sets_module as $set_name => $set) {
       // Add in some essential data we need, but allow modules to set this too.
       $set += array(
+        'set_name' => $set_name,
         'module' => $module,
         // @todo: this is obsolete; check nothing uses it then remove it.
         'table'  => 'crm_party_set_' . $set_name,
