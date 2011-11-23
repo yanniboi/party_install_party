@@ -330,6 +330,7 @@ function crm_party_data_set_edit_form_submit($form, &$form_state) {
     $info['entity'] = $form_state['entity']->{$class::ENTITY_ID_KEY};
   }
   
+  // @todo: this is available in the form.
   $dataSet = EntityDefaultCRMController::getInstance($type, $info);
   
   $options = array(
@@ -355,6 +356,7 @@ function crm_party_data_set_remove($data_set, $pid, $eid) {
   );
   
   $attached_entity_controller = EntityDefaultCRMController::getInstance($data_set['set_name'], $info);
+  // @todo: fix misuse of t().
   drupal_set_title(t('Are you sure you want to remove ' . $attached_entity_controller->getLabel() . ' from ' . $attached_entity_controller->party->label . '?'));
   return drupal_get_form('crm_party_data_set_remove_confirm', $attached_entity_controller);
 }
