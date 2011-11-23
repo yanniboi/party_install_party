@@ -82,13 +82,6 @@ function crm_party_edit_form($form, &$form_state, $party) {
     '#default_value' => $party->label,
   );
   
-  //Get all available hats
-  $hats = crm_party_hat_get_all_hats();
-  $options = array();
-  foreach($hats as $hat) {
-    $options[$hat->name] = $hat->label;
-  }
-  
   $form_state['#party'] = $party;
   $form_state['#attached_entities'] = array();
   
