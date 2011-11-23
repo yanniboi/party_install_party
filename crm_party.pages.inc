@@ -261,32 +261,37 @@ function crm_party_data_set_edit($data_set, $party, $eid = NULL) {
 
 /**
  * The data set edit form.
+ *
+ * @param $attached_entity
+ *  An attached entity controller.
+ *  @todo: allow this to be NULL for adding new entities.
  */
-function crm_party_data_set_edit_form($form, &$form_state, $dataSet) {
-  $form['#dataSet'] = $dataSet;
+function crm_party_data_set_edit_form($form, &$form_state, $attached_entity_controller) {
+  $form['#dataSet'] = $attached_entity_controller;
   
   $form['data-set-type'] = array(
     '#type' => 'hidden',
-    '#value' => $dataSet->data_set_name,
+    '#value' => $attached_entity_controller->data_set_name,
   );
 
   $form['data-set-pid'] = array(
     '#type' => 'hidden',
-    '#value' => $dataSet->pid,
+    '#value' => $attached_entity_controller->pid,
   );
   
   $form['data-set-eid'] = array(
     '#type' => 'hidden',
-    '#value' => $dataSet->eid,
+    '#value' => $attached_entity_controller->eid,
   );
   
-  $dataSet->form($form, $form_state);
+  $attached_entity_controller->form($form, $form_state);
   
-  if (!$dataSet->definition['singleton']) {
+  if (!$attached_entity_controller->definition['singleton']) {
     $form['data-set-main'] = array(
       '#type' => 'checkbox',
-      '#default_value' => $dataSet->isMain(),
-      '#title' => "This is the main " . EntityDefaultCRMController::getTypeLabel($dataSet->data_set_name),
+      '#default_value' => $attached_entity_controller->isMain(),
+      // @todo: WTF: calling a static with the class of the object????
+      '#title' => "This is the main " . EntityDefaultCRMController::getTypeLabel($attached_entity_controller->data_set_name),
     );
   }
 
