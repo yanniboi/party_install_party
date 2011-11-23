@@ -189,7 +189,7 @@ function crm_party_data_set_admin() {
   $data_sets = crm_party_get_data_set_info();
   
   $header = array(
-    0 => 'Data Set Name',
+    0 => 'Data set name',
     1 => array(
       'data' => 'Operations',
       'colspan' => '6',
@@ -215,7 +215,7 @@ function crm_party_data_set_admin() {
     '#theme' => 'table',
     '#header' => $header,
     '#rows' => $rows,
-    '#empty' => 'No Data Sets Available',
+    '#empty' => t('No data sets available'),
   );
   
   return $build;

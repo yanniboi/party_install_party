@@ -148,7 +148,7 @@ function crm_party_menu() {
   );
   // @todo crib from one of the core modules for how this admin menu pattern should be done, eg 'People'.
   $items['admin/community/list'] = array(
-    'title' => 'List Contacts',
+    'title' => 'List contacts',
     'page callback' => 'crm_party_admin',
     'page arguments' => array('list'),
     'access arguments' => array('administer parties'),
@@ -157,7 +157,7 @@ function crm_party_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
   $items['admin/community/datasets'] = array(
-    'title' => 'Manage Data Sets',
+    'title' => 'Manage data sets',
     'page callback' => 'crm_party_data_set_admin',
     'access arguments' => array('administer parties'),
     'file' => 'crm_party.admin.inc',
@@ -315,7 +315,7 @@ function crm_party_menu_local_tasks_alter(&$data, $router_item, $root_path) {
       if (isset($admin['create'])) {
         $item = menu_get_item($admin['create']);
         if ($item['access']) {
-          $item['title'] = 'Add ' . $type['label'] . ' Data Set';
+          $item['title'] = 'Add ' . $type['label'] . ' data set';
           $data['actions']['output'][] = array(
             '#theme' => 'menu_local_action',
             '#link' => $item,
@@ -325,7 +325,7 @@ function crm_party_menu_local_tasks_alter(&$data, $router_item, $root_path) {
       
       if (isset($admin['import'])) {
         $item = menu_get_item($admin['import']);
-        $item['title'] = 'Import ' . $type['label'] . ' Data Set';
+        $item['title'] = 'Import ' . $type['label'] . ' data set';
         if ($item['access']) {
           $data['actions']['output'][] = array(
             '#theme' => 'menu_local_action',
