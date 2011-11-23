@@ -198,7 +198,8 @@ function crm_party_data_set_admin() {
   
   $rows = array();
   foreach ($data_sets as $key => $data_set) {
-    $name = "{$data_set['label']} <small>(Machine name: $key)</small>";
+    $name = check_plain($data_set['label']);
+    $name .= ' <small>' . t('(Machine name: @set-name)', array('@set-name' => $key)) . '</small>';
     $ops = array('edit', 'manage fields', 'manage display', 'clone', 'export', 'delete');
     
     $row = array($name);
