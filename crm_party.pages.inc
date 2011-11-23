@@ -225,22 +225,27 @@ function crm_party_page_view_piece_views($party, $view_name, $view_display_id) {
 /**
  * Show the edit form for an individual data set.
  *
- * @param $set
- *   'The set type'
+ * @todo: there seems to be no reason why this and crm_party_data_set_edit_form()
+ * can't be combined.
+ *
+ * @param $data_set
+ *   A loaded data set.
+ *   We don't actually need this loaded, but we need a menu loader to convert
+ *   the path-style string to the machine name, and a menu loader that doesn't
+ *   load would be weird too.
  * @param $pid
  *    The id of the party
  * @param $eid
  *    The id of the entity
  */
-function crm_party_data_set_edit($set, $party, $eid = NULL) {
+function crm_party_data_set_edit($data_set, $party, $eid = NULL) {
   if (is_object($party)) {
     $pid = $party->pid;  
   }
   else {
     $pid = $party;
   }
-  
-  $attached_entity = crm_party_get_crm_controller($set);
+  $attached_entity = crm_party_get_crm_controller($data_set['set_name']);
   $attached_entity->setParty($pid);
   
   if ($eid !== NULL) {
@@ -334,7 +339,7 @@ function crm_party_data_set_edit_form_submit($form, &$form_state) {
 /**
  * Remove a data set from a party
  */
-function crm_party_data_set_remove($set, $pid, $eid) {
+function crm_party_data_set_remove($data_set, $pid, $eid) {
   if(is_object($pid)) {
     $pid = $pid->pid;  
   }
@@ -344,9 +349,9 @@ function crm_party_data_set_remove($set, $pid, $eid) {
     'entity' => $eid,
   );
   
-  $dataSet = EntityDefaultCRMController::getInstance($set,$info);
-  drupal_set_title(t('Are you sure you want to remove ' . $dataSet->getLabel() . ' from ' . $dataSet->party->label . '?'));
-  return drupal_get_form('crm_party_data_set_remove_confirm', $dataSet);
+  $attached_entity_controller = EntityDefaultCRMController::getInstance($data_set['set_name'], $info);
+  drupal_set_title(t('Are you sure you want to remove ' . $attached_entity_controller->getLabel() . ' from ' . $attached_entity_controller->party->label . '?'));
+  return drupal_get_form('crm_party_data_set_remove_confirm', $attached_entity_controller);
 }
 
 /**

@@ -326,9 +326,15 @@ abstract class EntityDefaultCRMController {
    * Get the path argument for this set.
    */
    public function getPathArg() {
-     return str_replace('_', '-', $this->data_set_name);
+     if (isset($this->definition['piece'])) {
+       $path_element = $this->definition['piece']['path'];
+     }
+     else {
+       // @todo: figure out if this even happens any more.
+       $path_element = str_replace('_', '-', $this->data_set_name);
+     }
+     return $path_element;
    }
-   
   
   /**
    * Get actions for the attached entity.
@@ -340,11 +346,11 @@ abstract class EntityDefaultCRMController {
     $actions = array(
       'edit' => array(
         'title' => 'Edit',
-        'href' => 'party/' . $this->party->pid . '/' . $this->data_set_name . '/edit/' . $this->entity->{$this->getEntityIdKey()},
+        'href' => 'party/' . $this->party->pid . '/' . $this->getPathArg() . '/edit/' . $this->entity->{$this->getEntityIdKey()},
       ),
       'remove' => array(
         'title' => 'Remove',
-        'href' => 'party/' . $this->party->pid . '/' . $this->data_set_name . '/remove/' . $this->entity->{$this->getEntityIdKey()},
+        'href' => 'party/' . $this->party->pid . '/' . $this->getPathArg() . '/remove/' . $this->entity->{$this->getEntityIdKey()},
       ),
     );
     return $actions;

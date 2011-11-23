@@ -238,25 +238,24 @@ function crm_party_menu() {
   );
   // End temporary.
   
-  // Edit data set instance
-  $items['party/%crm_party/%/edit/%'] = array(
+  // Attached entity menu items
+  // Edit an attached entity
+  $items['party/%crm_party/%crm_party_data_set/edit/%'] = array(
     'page callback' => 'crm_party_data_set_edit',
     'page arguments' => array(2, 1, 4), //3 Arguments, data set name then party then set eid
     'access callback' => TRUE, // todo
     'access arguments' => array('edit contacts'),
     'file' => 'crm_party.pages.inc',
   ); 
-  
-  // Remove a data set instance
-  $items['party/%crm_party/%/remove/%'] = array(
+  // Detach an attached entity
+  $items['party/%crm_party/%crm_party_data_set/remove/%'] = array(
     'page callback' => 'crm_party_data_set_remove',
     'page arguments' => array(2, 1, 4), //3 Arguments, data set name then party then set eid
     'access callback' => TRUE, // todo
     'file' => 'crm_party.pages.inc',
   );
-  
-  // Add a new instance of a data set
-  $items['party/%crm_party/%/add'] = array(
+  // Add an attached entity
+  $items['party/%crm_party/%crm_party_data_set/add'] = array(
     'page callback' => 'crm_party_data_set_edit',
     'page arguments' => array(2, 1), // 2 Arguments, data set name then party.
     'access callback' => TRUE, // todo
@@ -360,6 +359,25 @@ function crm_party_menu_local_tasks_alter(&$data, $router_item, $root_path) {
           );
         }
       }
+    }
+  }
+}
+
+/**
+ * Menu loader for data sets.
+ *
+ * @param $data_set_url_string
+ *  The url-form of a data set name, ie with hyphens instead of underscores.
+ *
+ * @return
+ *  A loaded data set definition.
+ */
+function crm_party_data_set_load($data_set_url_string) {
+  foreach (crm_party_get_data_set_info() as $data_set => $info) {
+    // Match the path string we've been given with the one that's defined in
+    // data sets and return the data set we find.
+    if (isset($info['piece']) && $info['piece']['path'] == $data_set_url_string) {
+      return $info;
     }
   }
 }
