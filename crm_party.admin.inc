@@ -13,7 +13,7 @@ function crm_party_info() {
   // @todo: probably some of this admin UI can be done by EntityAPI.
   $types = array(
     'individual' => array(
-      'label' => t('Individual Party'),
+      'label' => t('Individual party'),
       'description' => 'Parties representing individual people',
       'admin' => array(
         'path' => 'admin/community/party/manage/individual',
@@ -21,7 +21,7 @@ function crm_party_info() {
       ),
     ),
     'organisation' => array(
-      'label' => t('Organisation Party'),
+      'label' => t('Organisation party'),
       'description' => 'Parties representing organisations or groups of people',
       'admin' => array(
         'path' => 'admin/community/party/manage/organisation',
@@ -33,16 +33,19 @@ function crm_party_info() {
   $rows = array();
 
   foreach ($types as $type => $info) {
+    $name = check_plain($info['label']);
+    $name .= ' <small>' . t('(Machine name: @type)', array('@type' => $type)) . '</small>';
+    $name .= '<div class="description">' . check_plain($info['description']) . '</div>';
     $rows[] = array(
-      $info['label'] . " <small>(Machine name: " . $type . ")</small><div class=\"description\">" . $info['description'] . "</div>",
+      $name,
       array(
         'data' => l(t('edit'), 'admin/community/party/manage/' . $type),
       ),
       array(
-        'data' => l(t('Manage Fields'), 'admin/community/party/manage/' . $type . '/fields'),
+        'data' => l(t('Manage fields'), 'admin/community/party/manage/' . $type . '/fields'),
       ),
       array(
-        'data' => l(t('Manage Fields'), 'admin/community/party/manage/' . $type . '/display'),
+        'data' => l(t('Manage fields'), 'admin/community/party/manage/' . $type . '/display'),
       ),
       array(
         'data' => '', //for when we implement custom party types
@@ -55,7 +58,7 @@ function crm_party_info() {
     'party_table' => array(
       '#theme' => 'table',
       '#header' => array(
-        t('Party Type'), array('data' => t('Operations'), 'colspan' => '4'),
+        t('Party type'), array('data' => t('Operations'), 'colspan' => '4'),
       ),
       '#rows' => $rows,
     ),
@@ -189,9 +192,9 @@ function crm_party_data_set_admin() {
   $data_sets = crm_party_get_data_set_info();
   
   $header = array(
-    0 => 'Data set name',
+    0 => t('Data set name'),
     1 => array(
-      'data' => 'Operations',
+      'data' => t('Operations'),
       'colspan' => '6',
     ),
   );
