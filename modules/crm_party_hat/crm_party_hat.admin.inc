@@ -1,11 +1,11 @@
 <?php
 /**
  * @file
- * Admin page callback file for the CRM party hats module.
+ * Contains admin page callbacks for the CRM party hats module.
  */
 
 /**
- * Page callback for the hats list page
+ * Page callback for the hats list page.
  */
 function crm_party_hat_manage() {
   $result = db_select('crm_party_hats', 'ph')
@@ -199,7 +199,7 @@ function theme_crm_hat_data_set_rules_form($variables) {
 }
 
 /**
- * Form validation for crm_party_hat_edit_form
+ * Form validation for the hat edit form.
  */
 function crm_party_hat_edit_form_validate($form, &$form_state) {
   $submission = (object) $form_state['values'];
@@ -207,7 +207,7 @@ function crm_party_hat_edit_form_validate($form, &$form_state) {
 }
 
 /**
- * Form submission for crm_party_hat_edit_form
+ * Form submission for the hat edit form.
  */
 function crm_party_hat_edit_form_submit($form, &$form_state) {
   $hat = new CRMPartyHat();
@@ -237,7 +237,7 @@ function crm_party_hat_edit_form_submit($form, &$form_state) {
 }
 
 /**
- * Check whether a machine name already exists
+ * Helper to check whether a machine name already exists.
  */
 function crm_party_hat_hat_machine_name_exists($value) {
   $exists = db_query_range('SELECT 1 FROM {crm_party_hats} WHERE `name` = :name', 0, 1, array(':name' => $value))->fetchField();
@@ -245,7 +245,7 @@ function crm_party_hat_hat_machine_name_exists($value) {
 }
 
 /**
- * Confirm Deletion Form
+ * Confirm deletion form for hat.
  */
 function crm_party_hat_delete_form($form, &$form_state, $hat) {
   $form['hat_id'] = array(
@@ -275,6 +275,9 @@ function crm_party_hat_delete_form($form, &$form_state, $hat) {
   return $form;  
 }
 
+/**
+ * Submit handler for the delete confirmation form.
+ */
 function crm_party_hat_delete_form_submit($form, &$form_state) {
   entity_delete('crm_party_hat', $form_state['values']['hat_id']);
   $form_state['redirect'] = 'admin/community/hats';

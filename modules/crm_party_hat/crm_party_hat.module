@@ -102,7 +102,7 @@ function crm_party_hat_permission() {
 // Party Hats API
 
 /**
- * Save a hat
+ * Save a hat.
  *
  * @param $hat a crm_party_hat object.
  */
@@ -111,7 +111,7 @@ function crm_party_hat_save(&$hat) {
 }
 
 /**
- * Load a hat
+ * Load a hat.
  *
  * @param $hat_name
  *   The machine name of the hat to load.
@@ -140,11 +140,15 @@ function crm_party_hat_load_multiple($hids = array(), $conditions = array(), $re
 }
 
 /**
- * Save a hat data set rule
+ * Save a hat data set rule.
  *
- * @param $hat the hat name
- * @param $set the set type
- * @param $value the value
+ * @param $hat
+ *  The hat name
+ * @param $set
+ *  The set type
+ *  @todo: does this mean the data set name? if so, rename.
+ * @param $value
+ *  The value
  *
  * @todo Refactor so that we don't do 3 queries to update one rule. 
  *       At the moment we do 3 queries when we add a rule and 1 when we update it and 2 when we keep it the same..
@@ -179,10 +183,16 @@ function crm_party_hat_set_data_set_rule($hat, $set, $values = array()) {
 }
 
 /**
- * Get a hat data set rule
+ * Get a hat data set rule.
  *
- * @param $hat the hat name
- * @param $set the set type
+ * @param $hat
+ *  The hat name
+ * @param $set
+ *  The set type
+ *  @todo: does this mean the data set name? if so, rename.
+ *
+ * @return
+ *  @todo write me.
  */
 function crm_party_hat_get_data_set_rule($hat, $set) {
   //select from the table where the hat and data set are right
@@ -210,8 +220,11 @@ function crm_party_hat_get_data_set_rule($hat, $set) {
 }
 
 /**
- * Get all the sets for a Hat
- * This returns an array of sets that a Party Must have or can have multiple of
+ * Get all the sets for a Hat.
+ *
+ * This returns an array of sets that a Party Must have or can have multiple of.
+ *
+ * @todo write params and return.
  */
 function crm_party_hat_get_data_sets($hat, $rule = 'has') {
    
@@ -226,10 +239,12 @@ function crm_party_hat_get_data_sets($hat, $rule = 'has') {
 }
  
 /**
- * Assign a hat to a party
+ * Assign a hat to a party.
  *
- * @param $party the Party Object
- * @param $hat the Hat object or name
+ * @param $party
+ *  The Party Object.
+ * @param $hat
+ *  The Hat object or name.
  *
  * @todo Change Name?
  * @todo Build
@@ -259,21 +274,23 @@ function crm_party_hat_assign($party, $hat) {
 }
 
 /**
- * Unassign a hat from a party
+ * Unassign a hat from a party.
  *
- * @param $party the Party Object
- * @param $hat the Hat object or name
+ * @param $party
+ *  The Party Object.
+ * @param $hat
+ *  The Hat object or name.
  *
  * @todo Change Name?
  * @todo Build
  */
 function crm_party_hat_unassign($party, $hat) {
-  //get the party id out
+  // Get the party id out.
   if (is_object($party)) {
     $party = $party->pid;
   }
   
-  //get hold of the $hat name
+  // Get hold of the $hat name.
   if (is_object($hat)) {
     $hat = $hat->name;
   }
@@ -306,7 +323,7 @@ function crm_party_hat_get_hats($party) {
 }
 
 /**
- * Get all availably hats.
+ * Get all available hats.
  */
 function crm_party_hat_get_all_hats() {
   $query = new EntityFieldQuery();
@@ -335,7 +352,7 @@ function crm_party_hat_theme($existing, $type, $theme, $path) {
 // Field type API
 
 /**
- * Implements hook_field_info()
+ * Implements hook_field_info().
  */
 function crm_party_hat_field_info() {
   return array(
@@ -352,33 +369,33 @@ function crm_party_hat_field_info() {
 }
 
 /**
- * Implements hook_field_settings_form()
+ * Implements hook_field_settings_form().
  */
 function crm_party_hat_field_settings_form($field, $instance, $has_data) {
   return array();
 }
 
 /**
- * Implements hook_field_validate()
+ * Implements hook_field_validate().
  */
 function crm_party_hat_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
 }
 
 /**
- * Implements hook_field_widget_error()
+ * Implements hook_field_widget_error().
  */
 function crm_party_hat_field_widget_error($element, $error, $form, &$form_state) {
 }
 
 /**
- * Implements hook_field_is_empty()
+ * Implements hook_field_is_empty().
  */
 function crm_party_hat_field_is_empty() {
   return FALSE;
 }
 
 /**
- * Implements hook_field_widget_info_alter()
+ * Implements hook_field_widget_info_alter().
  */
 function crm_party_hat_widget_info_alter(&$info) {
   //Use options_select for the options
@@ -386,7 +403,7 @@ function crm_party_hat_widget_info_alter(&$info) {
 }
 
 /**
- * Implements hook_options_list()
+ * Implements hook_options_list().
  */
 function crm_party_hat_options_list($field, $instance = NULL) {
   $hats = crm_party_hat_get_all_hats();
@@ -400,16 +417,14 @@ function crm_party_hat_options_list($field, $instance = NULL) {
 }
 
 /**
- * Implements hook_field_presave()
+ * Implements hook_field_presave().
  */
 function crm_party_hat_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
 
 }
 
 /**
- * Implements hook_field_formatter_info()
- *
- * Returns information about available field formatters.
+ * Implements hook_field_formatter_info().
  */
 function crm_party_hat_field_formatter_info() {
   return array(
@@ -421,7 +436,7 @@ function crm_party_hat_field_formatter_info() {
 }
 
 /**
- * Implements hook_field_formatter_view()
+ * Implements hook_field_formatter_view().
  */
 function crm_party_hat_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $element = array();

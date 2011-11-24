@@ -5,7 +5,7 @@
  */
  
 /**
- * Implements hook_install()
+ * Implements hook_install().
  */
 function crm_party_hat_install() {
   if (!field_info_field('party_hat')) {

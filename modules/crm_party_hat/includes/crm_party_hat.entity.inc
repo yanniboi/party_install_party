@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Contains the controller classes for Party entities.
@@ -13,7 +12,7 @@ class CRMPartyHatController extends EntityAPIController {
 }
   
 /**
- * The class used for model entities.
+ * The class used for hat entities.
  */
 class CRMPartyHat extends Entity {  
   public function __construct($values = array()) {
