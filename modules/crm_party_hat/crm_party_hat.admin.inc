@@ -84,6 +84,21 @@ function crm_party_hat_edit_form($form, &$form_state, $hat) {
     '#disabled' => isset($hat->name),
   );
   
+  $party_entity_info = entity_get_info('crm_party');
+  $party_types = $party_entity_info['bundles'];
+  $options = array();
+  foreach ($party_types as $name => $type) {
+    $options[$name] = $type['label'];
+  }
+  $form['party_types'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Party types'),
+    '#description' => 'The party types this hat may apply to.',
+    '#options' => $options,
+    '#default_value' => (isset($hat->party_types)) ? $hat->party_types : array(),
+    '#required' => TRUE,
+  );
+
   field_attach_form('crm_party_hat', $hat, $form, $form_state);
   
   $form['required'] = array(
