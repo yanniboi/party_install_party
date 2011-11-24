@@ -66,6 +66,13 @@ function crm_party_hat_schema() {
         'length' => '255',
         'not null' => TRUE
       ),
+      'data' => array(
+        'type' => 'blob',
+        'size' => 'big',
+        'not null' => TRUE,
+        'serialize' => TRUE,
+        'description' => 'Serialized data containing the field properties that do not warrant a dedicated column.',
+      ),
       'required' => array(
         'description' => 'This Hat is required',
         'type' => 'int',
@@ -217,4 +224,19 @@ function crm_party_hat_update_7002() {
     ),
   );
   field_create_instance($instance);        
+}
+
+/**
+ * Add the data column to the hat table.
+ */
+function crm_party_hat_update_7003() {
+  $field_spec = array(
+    'type' => 'blob',
+    'size' => 'big',
+    'not null' => TRUE,
+    'initial' => serialize(array()),
+    'serialize' => TRUE,
+    'description' => 'Serialized data containing the field properties that do not warrant a dedicated column.',
+  );
+  db_add_field('crm_party_hats', 'data', $field_spec);
 }
