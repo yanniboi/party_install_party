@@ -411,9 +411,18 @@ function crm_party_hat_widget_info_alter(&$info) {
 function crm_party_hat_options_list($field, $instance = NULL) {
   $hats = crm_party_hat_get_all_hats();
   $options = array();
-
-  foreach ($hats as $hat) {
-    $options[$hat->name] = $hat->label;
+  if (isset($instance)) {
+    $party_type = $instance['bundle'];
+    foreach ($hats as $hat) {
+      if (in_array($party_type, array_filter($hat->data['party_types']))) {
+        $options[$hat->name] = $hat->label;
+      }
+    }
+  }
+  else {
+    foreach ($hats as $hat) {
+      $options[$hat->name] = $hat->label;
+    }
   }
 
   return $options;

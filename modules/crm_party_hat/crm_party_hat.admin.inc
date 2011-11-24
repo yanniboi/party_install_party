@@ -238,6 +238,8 @@ function crm_party_hat_edit_form_submit($form, &$form_state) {
   foreach (array('party_types') as $key) {
     $hat->data[$key] = $form_state['values'][$key];
   }
+  // Party types requires babysitting :(
+  $hat->data['party_type'] = array_filter($hat->data['party_type']);
 
   crm_party_hat_save($hat);
   field_attach_submit('crm_party_hat', $hat, $form, $form_state); 
