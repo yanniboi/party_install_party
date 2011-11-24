@@ -9,26 +9,10 @@
  * Mock up the CRM Party admin interface - this is horrible: do it a better way.
  */
 function crm_party_info() {
-  // @todo: load bundles from entity info.
   // @todo: probably some of this admin UI can be done by EntityAPI.
-  $types = array(
-    'individual' => array(
-      'label' => t('Individual party'),
-      'description' => 'Parties representing individual people',
-      'admin' => array(
-        'path' => 'admin/community/party/manage/individual',
-        'access arguments' => array('administer parties'),
-      ),
-    ),
-    'organisation' => array(
-      'label' => t('Organisation party'),
-      'description' => 'Parties representing organisations or groups of people',
-      'admin' => array(
-        'path' => 'admin/community/party/manage/organisation',
-        'access arguments' => array('administer parties'),
-      ),
-    ),
-  );
+
+  $entity_info = entity_get_info('crm_party');
+  $types = $entity_info['bundles'];
 
   $rows = array();
 
