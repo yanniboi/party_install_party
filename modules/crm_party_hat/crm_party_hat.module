@@ -113,19 +113,21 @@ function crm_party_hat_save(&$hat) {
 /**
  * Load a hat
  *
- * @param the hat name
+ * @param $hat_name
+ *   The machine name of the hat to load.
  */
-function crm_party_hat_load($hat) {
+function crm_party_hat_load($hat_name) {
   $query = db_select('crm_party_hats', 'ph');
   $query->addField('ph', 'hid');
-  $result = $query->condition('name', $hat, '=')
+  $result = $query->condition('name', $hat_name, '=')
     ->execute()
     ->fetchAllAssoc('hid');
   
   $ids = array_keys($result);
   
-  if (count($ids) < 1 && is_numeric($hat)) {
-    $ids = array($hat);
+  // @todo WTF? If $hat_name can be a numeric id it needs to be documented.
+  if (count($ids) < 1 && is_numeric($hat_name)) {
+    $ids = array($hat_name);
   }
   return reset(crm_party_hat_load_multiple($ids));
 }
