@@ -23,10 +23,6 @@ function crm_party_help($path, $arg) {
 /**
  * Implements hook_entity_info().
  *
- * Define 2 entities: 
- *  - The base Party Entity
- *  - The Hat entity
- *
  * @todo: Improve documentation
  * @todo: Party types?!
  */
