@@ -48,6 +48,7 @@ function crm_party_entity_info() {
     'bundles' => array(
       'individual' => array(
         'label' => t('Individual Party'),
+        'description' => 'Parties representing individual people',
         'admin' => array(
           'path' => 'admin/community/party/manage/individual',
           'access arguments' => array('administer parties'),
@@ -55,6 +56,7 @@ function crm_party_entity_info() {
       ),
       'organisation' => array(
         'label' => t('Organisation Party'),
+        'description' => 'Parties representing organisations or groups of people',
         'admin' => array(
           'path' => 'admin/community/party/manage/organisation',
           'access arguments' => array('administer parties'),
