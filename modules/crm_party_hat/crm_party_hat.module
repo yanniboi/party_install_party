@@ -3,6 +3,45 @@
  * @file crm_party_hat.module
  * Provides an extensible access system for CRM parties.
  */
+
+/**
+ * Implements hook_entity_info().
+ */
+function crm_party_hat_entity_info() {
+  // The hat entity.
+  $entity_info['crm_party_hat'] = array(
+    'label' => t('Hat'),
+    'entity class' => 'CRMPartyHat',
+    'controller class' => 'CRMPartyHatController',
+    // We define this so entity module provides us with basic Views data, while
+    // allowing us to define more of our own.
+    // See http://drupal.org/node/1307760.
+    'views controller class' => 'EntityDefaultViewsController',
+    'base table' => 'crm_party_hats',
+    'fieldable' => TRUE,
+    'module' => 'crm_party',
+    'entity keys' => array(
+      'id' => 'hid'
+    ),
+    'exportable' => TRUE,
+    'bundles' => array(
+      'hat' => array(
+        'label' => t('Hat'),
+        'admin' => array(
+          'path' => 'admin/community/hats',
+          'access arguments' => array('administer hats'),
+        ),
+      ),
+    ),
+    'view modes' => array(
+      'full' => array(
+        'label' => t('Full Hat'),
+        'custom settings' =>  FALSE,
+      ),
+    )
+  );
+  return $entity_info;
+}
  
 /**
  * Implements hook_menu().
@@ -57,45 +96,6 @@ function crm_party_hat_permission() {
       'description' => t('TODO write me.'),
     ),
   );
-}
-
-/**
- * Implements hook_entity_info().
- */
-function crm_party_hat_entity_info() {
-  // The hat entity.
-  $entity_info['crm_party_hat'] = array(
-    'label' => t('Hat'),
-    'entity class' => 'CRMPartyHat',
-    'controller class' => 'CRMPartyHatController',
-    // We define this so entity module provides us with basic Views data, while
-    // allowing us to define more of our own.
-    // See http://drupal.org/node/1307760.
-    'views controller class' => 'EntityDefaultViewsController',
-    'base table' => 'crm_party_hats',
-    'fieldable' => TRUE,
-    'module' => 'crm_party',
-    'entity keys' => array(
-      'id' => 'hid'
-    ),
-    'exportable' => TRUE,
-    'bundles' => array(
-      'hat' => array(
-        'label' => t('Hat'),
-        'admin' => array(
-          'path' => 'admin/community/hats',
-          'access arguments' => array('administer hats'),
-        ),
-      ),
-    ),
-    'view modes' => array(
-      'full' => array(
-        'label' => t('Full Hat'),
-        'custom settings' =>  FALSE,
-      ),
-    )
-  );
-  return $entity_info;
 }
 
 // -----------------------------------------------------------------------
