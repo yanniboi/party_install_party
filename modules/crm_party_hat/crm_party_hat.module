@@ -17,7 +17,7 @@ function crm_party_hat_entity_info() {
     // allowing us to define more of our own.
     // See http://drupal.org/node/1307760.
     'views controller class' => 'EntityDefaultViewsController',
-    'base table' => 'crm_party_hats',
+    'base table' => 'crm_party_hat',
     'fieldable' => TRUE,
     'module' => 'crm_party',
     'entity keys' => array(
@@ -117,7 +117,7 @@ function crm_party_hat_save(&$hat) {
  *   The machine name of the hat to load.
  */
 function crm_party_hat_load($hat_name) {
-  $query = db_select('crm_party_hats', 'ph');
+  $query = db_select('crm_party_hat', 'ph');
   $query->addField('ph', 'hid');
   $result = $query->condition('name', $hat_name, '=')
     ->execute()

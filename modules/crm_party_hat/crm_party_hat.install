@@ -44,7 +44,7 @@ function crm_party_hat_install() {
  * Implements hook_schema().
  */
 function crm_party_hat_schema() {
-  $schema['crm_party_hats'] = array(
+  $schema['crm_party_hat'] = array(
     'description' => 'Stores hat definitions',
     'fields' => array(
       'hid' => array(
@@ -240,3 +240,11 @@ function crm_party_hat_update_7003() {
   );
   db_add_field('crm_party_hats', 'data', $field_spec);
 }
+
+/**
+ * Renamed the hat table to singular.
+ */
+function crm_party_hat_update_7004() {
+  db_rename_table('crm_party_hats', 'crm_party_hat');
+}
+

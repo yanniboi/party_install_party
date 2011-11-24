@@ -8,7 +8,7 @@
  * Page callback for the hats list page.
  */
 function crm_party_hat_manage() {
-  $result = db_select('crm_party_hats', 'ph')
+  $result = db_select('crm_party_hat', 'ph')
     ->fields('ph')
     ->execute()
     ->fetchAllAssoc('hid');
@@ -255,7 +255,7 @@ function crm_party_hat_edit_form_submit($form, &$form_state) {
  * Helper to check whether a machine name already exists.
  */
 function crm_party_hat_hat_machine_name_exists($value) {
-  $exists = db_query_range('SELECT 1 FROM {crm_party_hats} WHERE `name` = :name', 0, 1, array(':name' => $value))->fetchField();
+  $exists = db_query_range('SELECT 1 FROM {crm_party_hat} WHERE `name` = :name', 0, 1, array(':name' => $value))->fetchField();
   return $exists;
 }
 
