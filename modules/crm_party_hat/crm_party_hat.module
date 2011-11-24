@@ -362,8 +362,11 @@ function crm_party_hat_field_info() {
       'default_widget' => 'options_buttons',
       'default_formatter' => 'hat_reference_default',
       'module' => 'crm_party_hat',
-      'settings' => array(),
+      'settings' => array(
+        'entity_types' => array('crm_party'),
+      ),
       'instance_settings' => array(),
+      'no_ui' => TRUE,
     )
   );
 }
