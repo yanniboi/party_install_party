@@ -95,7 +95,7 @@ function crm_party_hat_edit_form($form, &$form_state, $hat) {
     '#title' => t('Party types'),
     '#description' => 'The party types this hat may apply to.',
     '#options' => $options,
-    '#default_value' => (isset($hat->party_types)) ? $hat->party_types : array(),
+    '#default_value' => (isset($hat->data['party_types'])) ? $hat->data['party_types'] : array(),
     '#required' => TRUE,
   );
 
@@ -232,6 +232,13 @@ function crm_party_hat_edit_form_submit($form, &$form_state) {
     $hat->hid = $form_state['values']['hid'];
   }
   $hat->required = $form_state['values']['required'];
+
+  // Put values into the serialized data array.
+  $hat->data = array();
+  foreach (array('party_types') as $key) {
+    $hat->data[$key] = $form_state['values'][$key];
+  }
+
   crm_party_hat_save($hat);
   field_attach_submit('crm_party_hat', $hat, $form, $form_state); 
   
