@@ -228,7 +228,7 @@ function crm_party_hat_edit_form_submit($form, &$form_state) {
   $hat = new CRMPartyHat();
   $hat->name = $form_state['values']['name'];
   $hat->label = $form_state['values']['label'];
-  if(isset($form_state['values']['hid'])) {
+  if (isset($form_state['values']['hid'])) {
     $hat->hid = $form_state['values']['hid'];
   }
   $hat->required = $form_state['values']['required'];
@@ -247,8 +247,8 @@ function crm_party_hat_edit_form_submit($form, &$form_state) {
   
   foreach ($form_state['values']['data_set_rules'] as $type => $values) {
     // convert to a 1/0 column. There must be a better way! It probably involves having two different checkboxes
-    foreach($values as $key => $var) {
-      if($key === $var) {
+    foreach ($values as $key => $var) {
+      if ($key === $var) {
         $values[$key] = 1;
       }
     }
