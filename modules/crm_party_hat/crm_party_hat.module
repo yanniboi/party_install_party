@@ -314,9 +314,19 @@ function crm_party_hat_get_hats($party) {
   }
   
   $hats = array();
-  foreach ($party->party_hat['und'] as $hat_name) {
-    $hat = crm_party_hat_load($hat_name);
-    $hats[$hat->hid] = $hat; 
+  if (!isset($party->pid)) {
+    //Get required hats.
+    $options = array(
+      'required' => TRUE,
+      'party_type' => $party->type,
+    );
+    return crm_party_hat_get_all_hats($options);
+  }
+  else {
+    foreach ($party->party_hat['und'] as $hat_name) {
+      $hat = crm_party_hat_load($hat_name);
+      $hats[$hat->hid] = $hat; 
+    }
   }
   
   return $hats;  
@@ -324,10 +334,16 @@ function crm_party_hat_get_hats($party) {
 
 /**
  * Get all available hats.
+ *
+ * @todo: Make filter by party type.
  */
-function crm_party_hat_get_all_hats() {
+function crm_party_hat_get_all_hats($options = array()) {
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'crm_party_hat', '=');
+  if (isset($options['required']) && $options['required']) {
+    // filter the search by whether they're required 
+    $query->propertyCondition('required', 1, '=');
+  }
   $result = $query->execute();
   $hids = array();
   foreach ($result['crm_party_hat'] as $record) {
