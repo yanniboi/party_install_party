@@ -148,21 +148,6 @@ function crm_party_edit_form_submit($form, &$form_state) {
   field_attach_submit('crm_party', $party, $form, $form_state);
   $party = crm_party_save($party);
   
-  //This turns to true if a hat has been added that needs more information
-  $hat_redirect = FALSE;
-  //Do hats
-  foreach ($form_state['values']['hats'] as $hat => $checked) {
-    if ($checked === 0) {
-      crm_party_hat_unassign($party, $hat);
-    }
-    else {
-      crm_party_hat_assign($party, $hat);
-      //check that all the data_sets are present
-      //If they are not, redirect back to the form for them
-      //to be added.
-    }
-  }
-  
   $form_state['crm_party'] = $party;
   $form_state['#party'] = $party;
   $form_state['redirect'] = 'party/' . $party->pid;
@@ -175,7 +160,7 @@ function crm_party_edit_form_submit($form, &$form_state) {
  * @todo: Move to crm_party_hats
  */
 function crm_party_edit_form_hat_check($form, &$form_state) {
-  foreach (crm_party_hat_get_hats($form_state['#party']) as $hat => $checked) {
+  foreach (crm_party_hat_get_hats($form_state['#party']) as $hid => $hat) {
     $data_sets = crm_party_hat_get_data_sets($hat);
         
     foreach($data_sets as $data_set_name) {

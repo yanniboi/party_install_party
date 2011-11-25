@@ -1206,7 +1206,7 @@ function crm_party_attached_entity_attach_form_submit(&$form, &$form_state) {
   // Get all attached entities from $form_state.
   $attached_entities = $form_state['#attached_entities'];
   $party = $form_state['#party'];
-
+  
   foreach ($attached_entities as $hash => $attached_entity) {
     /// @todo explain what $hash is.
     // Get the form callback.
