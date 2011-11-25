@@ -8,6 +8,8 @@
  * Implements hook_install().
  */
 function crm_party_hat_install() {
+  field_associate_fields('crm_party_hat');
+
   if (!field_info_field('party_hat')) {
     $field = array(
       'field_name' => 'party_hat',
