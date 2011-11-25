@@ -385,13 +385,18 @@ function crm_party_data_set_load($data_set_url_string) {
  *
  * @param $op
  *   The operation being performed.
+ *   Currently one of: 'view', 'create'.
+ *   @todo: consider distinguishing $op values for solo party vs attached
+ *   entity, eg 'view attached' / 'view', so that we don't have to keep mucking
+ *   about testing isset($attached_entity).
  * @param $party
  *   A party to check access for.
  * @param $attached_entity
- *   (optional) An attached entity to check access for. If nothing is given,
- *   access for just the party itself is determined.
+ *   (optional) An attached entity to check access for, or a dataset name if the
+ *   $op is 'create'. If nothing is given, access for just the party itself is
+ *   determined.
  * @param $account
- *   The user to check for. Leave it to NULL to check for the global user.
+ *   (optional) The user to check for. Omit to check for the global user.
  *
  * @return boolean
  *   Whether access is allowed or not.
@@ -425,11 +430,19 @@ function crm_party_access($op, $party = NULL, $attached_entity = NULL, $account 
  * WIP: just say yes for now!
  */
 function crm_party_crm_party_access($op, $party = NULL, $attached_entity = NULL, $account = NULL) {
-  // If we're not being asked about attachments, just use plain permissions.
   if (!isset($attached_entity)) {
+    // If we're not being asked about attachments, just use plain permissions.
     switch ($op) {
       case 'view':
         return user_access('view contacts');
+    }
+  }
+  else {
+    // If we're being asked about attachments, grant access only if we are the
+    // only module reacting. This allows a basic operation of the CRM system
+    // where all attached entities can be used.
+    if (count(module_implements('crm_party_access')) == 1) {
+      return TRUE;
     }
   }
 
