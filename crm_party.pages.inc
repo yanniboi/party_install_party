@@ -89,9 +89,11 @@ function crm_party_edit_form($form, &$form_state, $party) {
   // @todo: Get into crm_party_hat module.
   $party_hats = crm_party_hat_get_hats($party);
   $defaults = array();
-  foreach ($party_hats as $ph) {
-    $defaults[] = $ph->name;
-  }   
+  if (!isset($party->pid)) {
+    foreach ($party_hats as $ph) {
+      $party->party_hat['und'][]['hat_name'] = $ph->name;
+    }
+  }    
   
   // Get Party Hat must have data sets
   $data_sets = array();
