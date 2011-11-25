@@ -73,8 +73,7 @@ function crm_party_views_data() {
       'help' => t('The id of attached entities. Will produce multiple rows per party.'),
       'handler' => 'views_handler_field_numeric',
     ),
-    // Todo: field here.
-    /*
+    // Todo: field here
     // WIP!
     'relationship' => array(
       'label' => t('Attached entity'),
@@ -86,7 +85,6 @@ function crm_party_views_data() {
       // @todo: figure this out:
       //'skip base' => array($entity_right_join_info['base table']),
     ),
-    */
   );
 
   $data['crm_party_attached_entity']['entity_type'] = array(

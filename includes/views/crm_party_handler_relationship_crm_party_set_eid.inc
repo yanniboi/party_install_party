@@ -35,8 +35,8 @@ class crm_party_handler_relationship_crm_party_set_eid extends views_handler_rel
   function query() {
     // Call our parent query method to set up all our tables and joins.
     parent::query();
-    //dsm($this->query);
-    //dsm($this);
+    dsm($this->query);
+    dsm($this);
 
     if ($this->options['main']) {
       // This is a little weird.
