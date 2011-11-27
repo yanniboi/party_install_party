@@ -343,3 +343,14 @@ function crm_party_settings_pieces_order_form_submit($form, &$form_state) {
   variable_set('crm_party_name_pieces_weights', $settings);
   menu_rebuild();
 }
+
+/**
+ * Menu callback of development information.
+ */
+function crm_party_devel_info_page() {
+  $info = crm_party_get_data_set_info();
+  $output = kprint_r($info, TRUE, t('Data set info'));
+  $info = crm_party_get_party_piece_info();
+  $output .= kprint_r($info, TRUE, t('Party piece info'));
+  return $output;
+}

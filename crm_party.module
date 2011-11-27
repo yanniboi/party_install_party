@@ -282,6 +282,20 @@ function crm_party_menu() {
     'access arguments' => array('create contacts'),
   );
 
+  // Provide useful information for developers.
+  // This may eventually move to a devel_party module if there's more of it.
+  if (module_exists('devel')) {
+    $items['devel/crm/info'] = array(
+      'title' => 'CRM info',
+      'description' => 'View CRM data.',
+      'page callback' => 'crm_party_devel_info_page',
+      'access arguments' => array('access devel information'),
+      'file' => 'crm_party.admin.inc',
+      'menu_name' => 'devel',
+      'weight' => 10,
+    );
+  }
+
   return $items;
 }
 
