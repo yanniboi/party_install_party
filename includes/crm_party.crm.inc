@@ -419,14 +419,15 @@ abstract class EntityDefaultCRMController {
   }
   
   /**
-   * getEntityIdKey
-   *
-   * REQUIRES PHP 5.3.0
-   * @todo find a way around this requirement
+   * Returns the entity id key of the attached entity.
    */
   private function getEntityIdKey() {
-    $c = get_called_class();
-    return $c::ENTITY_ID_KEY;
+    // @todo: needs a good refactoring as probably horribly slow.
+    $entity_type = $this->getEntityType();
+    $entity_info = entity_get_info($entity_type);
+    $key = $entity_info['entity keys']['id'];
+
+    return $key;
   }
   
   /**
