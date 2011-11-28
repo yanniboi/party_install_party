@@ -270,8 +270,7 @@ function crm_party_data_set_edit_form($form, &$form_state, $attached_entity_cont
     $form['data-set-main'] = array(
       '#type' => 'checkbox',
       '#default_value' => $attached_entity_controller->isMain(),
-      // @todo: WTF: calling a static with the class of the object????
-      '#title' => "This is the main " . EntityDefaultCRMController::getTypeLabel($attached_entity_controller->data_set_name),
+      '#title' => "This is the main " . $attached_entity_controller->getTypeLabel(),
     );
   }
 
@@ -407,7 +406,7 @@ function crm_party_view_data_set($party, $set) {
       '#theme' => 'links',
       '#links' => array(
         'add' => array(
-          'title' => "Add " . EntityDefaultCRMController::getTypeLabel($set),
+          'title' => "Add " . $set_definition['label'],
           'href'  => 'party/' . $party->pid . '/add/' . $set,
         ),
       ),

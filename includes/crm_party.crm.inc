@@ -488,9 +488,8 @@ abstract class EntityDefaultCRMController {
   /**
    * get the data set type label
    */
-  public static function getTypeLabel($type) {
-    $sets = crm_party_get_data_set_info();
-    return $sets[$type]['label'];
+  public function getTypeLabel() {
+    return $this->definition['label'];
   }
   
   /**
