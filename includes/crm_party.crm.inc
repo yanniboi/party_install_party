@@ -6,16 +6,6 @@
 abstract class EntityDefaultCRMController {
   
   /**
-   * ENTITY_TYPE
-   *   The entity type this Data Set Wraps around
-   */
-  // @todo. I'm not sure setting this as class constant is the best way; apart
-  // from the PHP 5.3 requirement it forces, it means that information about
-  // this data set is effectively split between the info hook and the class
-  // definition. 
-  const ENTITY_TYPE = "";
-  
-  /**
    * ENTITY_ID_KEY
    *   The key of the entity unique id
    */
@@ -422,14 +412,10 @@ abstract class EntityDefaultCRMController {
   }
   
   /**
-   * Get Entity Type
-   *
-   * REQUIRES PHP 5.3.0
-   * @todo find a way around this requirement
+   * Get the entity type we work with.
    */
   private function getEntityType() {
-    $c = get_called_class();
-    return $c::ENTITY_TYPE;
+    return $this->definition['entity type'];
   }
   
   /**

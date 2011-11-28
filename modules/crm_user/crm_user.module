@@ -153,7 +153,6 @@ function crm_user_user_edit_form_submit($form, &$form_state) {
  * @todo: move this to an inc file for autoloading.
  */
 class UserCRMController extends EntityDefaultCRMController {
-  const ENTITY_TYPE = "user";
   const ENTITY_ID_KEY = "uid";
   
   // @todo remove

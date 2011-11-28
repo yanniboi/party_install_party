@@ -385,7 +385,6 @@ function _crm_profile_relation_get_related_entities($entity_type, $entity_id, $r
  * @todo: move this to an inc file for autoloading.
  */
 class Profile2CRMController extends EntityDefaultCRMController {
-  const ENTITY_TYPE = "profile2";
   const ENTITY_ID_KEY = "pid";
   
   // @todo Remove somehow.
