@@ -68,6 +68,7 @@ function hook_crm_party_access($op, $party = NULL, $attached_entity = NULL, $acc
  *    - 'view name': (optional) @todo! write the code for this! ;)
  *      The machine name of the view to define in
  *      hook_views_default_views(). This allows multiple default views to exist.
+ *      Defaults to 'crm_party_attached_entities'.
  */
 function hook_crm_party_data_set_info() {
   $sets = array();
