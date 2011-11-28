@@ -42,10 +42,6 @@ function hook_crm_party_access($op, $party = NULL, $attached_entity = NULL, $acc
 /**
  * Defines data sets to be used by parties.
  *
- * Beware of making entity queries from within this hook, as this is called from
- * within crm_party's hook_schema().
- * See http://drupal.org/node/1307506 for background.
- *
  * @return
  *  An array of sets where each key is the unique identifier of that "set type".
  *  - 'label': The human readable name of the data set.
