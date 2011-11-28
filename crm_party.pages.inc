@@ -306,6 +306,7 @@ function crm_party_data_set_edit_form_submit($form, &$form_state) {
     $sets = crm_party_get_data_set_info();
     $class = $sets[$type]['class'];
     
+    // @todo WTF: things should not be at the top level of form state!
     $info['entity'] = $form_state['entity']->{$class::ENTITY_ID_KEY};
   }
   
