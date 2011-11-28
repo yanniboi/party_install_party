@@ -401,7 +401,7 @@ function crm_party_view_data_set($party, $set) {
     $build[$crm_controller->data_set_name . '_' . $crm_controller->id]['view'] = $crm_controller->display($crm_controller::VIEW_MODE);
   }
   
-  $set_definition = EntityDefaultCRMController::getSetDefinition($set);
+  $set_definition = crm_party_get_data_set_info($set);
   if (!isset($set_definition['max cardinality']) || count($attached_entity_controllers) < $set_definition['max cardinality']) {
     $build[$set . '_links'] = array(
       '#theme' => 'links',

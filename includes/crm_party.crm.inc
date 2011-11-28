@@ -509,9 +509,8 @@ abstract class EntityDefaultCRMController {
   /**
    * getTheSetDefinition
    */
-  public static function getSetDefinition($type) {
-    $sets = crm_party_get_data_set_info();
-    return $sets[$type];
+  public static function getSetDefinition() {
+    return $this->definition;
   }
   
   /**
