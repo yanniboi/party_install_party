@@ -68,23 +68,16 @@ function crm_party_views_data() {
   $data['crm_party_attached_entity']['eid'] = array(
     // @todo: give the entity type here as well as the set name?
     'title' => t('Attached entity Id'),
+    // The attached entity field produces multiple rows per party, one per
+    // attached entity. Use this with the 'party_attached_entity' row plugin
+    // for displays showing a single party.
     'field' => array(
       'label' => t('Attached entity Id'),
       'help' => t('The id of attached entities. Will produce multiple rows per party.'),
       'handler' => 'views_handler_field_numeric',
     ),
-    // Todo: field here
-    // WIP!
-    'relationship' => array(
-      'label' => t('Attached entity'),
-      'help' => t('Relates a party to entities within particular data sets.'),
-      // todo: remove.
-      'handler' => 'crm_party_handler_relationship_crm_party_attached_eid',
-      // This allows us to not show this relationship if the base is already
-      // the right hand side so users won't create circular relationships.
-      // @todo: figure this out:
-      //'skip base' => array($entity_right_join_info['base table']),
-    ),
+    // The attached entity relationship can't be added here, as the base of a
+    // relationship cannot be dynamic.
   );
 
   $data['crm_party_attached_entity']['entity_type'] = array(
@@ -117,40 +110,39 @@ function crm_party_views_data() {
     ),
   );
 
-  // Get all defined data sets.
+  // Add relationships to attached entities.
+  // Get data set and entity info.
   $sets = crm_party_get_data_set_info();
-  // Get entity info so we can look up tables, field names, etc.
   $entity_info = entity_get_info();
-  //dsm($sets);
-  //dsm($entity_info);
 
+  // Group data sets by entity type.
+  $data_sets_by_entity = array();
   foreach ($sets as $set_name => $set) {
-    $table = $set['table'];
-    $entity_right_join_info = $entity_info[$set['entity type']];
+    $data_sets_by_entity[$set['entity type']][$set_name] = $set;
+  }
 
-    $data[$table]['table']['group'] = t('Party');
-
-    $data[$table]['table']['join'] = array(
-      'crm_party' => array(
-        'left_field' => 'pid',
-        'field' => 'pid',
-      ),
-    );
-
-    // The eid field provides a relationship to the base table for the entity
-    // involved in this data set.
-    $data[$table]['eid'] = array(
-      // @todo: give the entity type here as well as the set name?
-      'title' => $set['label'],
-      'help' => t('Relates a party to entities within a particular data set.'),
+  foreach ($data_sets_by_entity as $entity_type => $data_sets) {
+    // For each entity, add a fake field based on the 'eid' field.
+    $data['crm_party_attached_entity']['eid_' . $entity_type] = array(
+      'title' => t('Attached !entity-type', array(
+        '!entity-type' => $entity_info[$entity_type]['label'],
+      )),
+      // Give the real field for this fake field.
+      'real field' => 'eid',
       'relationship' => array(
-        'label' => $set['label'],
-        'base' => $entity_right_join_info['base table'],
-        'base field' => $entity_right_join_info['entity keys']['id'],
-        'handler' => 'crm_party_handler_relationship_crm_party_set_eid',
+        'label' => t('Attached !entity-type', array(
+          '!entity-type' => $entity_info[$entity_type]['label'],
+        )),
+        'help' => t('Relates a party to entities within particular data sets.'),
+        'handler' => 'crm_party_handler_relationship_crm_party_attached_eid',
+        // The base has to be set here and can't be dynamic :(
+        'base' => $entity_info[$entity_type]['base table'],
         // This allows us to not show this relationship if the base is already
         // the right hand side so users won't create circular relationships.
-        'skip base' => array($entity_right_join_info['base table']),
+        // @todo: figure this out:
+        //'skip base' => array($entity_right_join_info['base table']),
+        // Some things for our handler to find:
+        'entity_type' => $entity_type,
       ),
     );
   }
