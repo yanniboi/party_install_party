@@ -17,7 +17,7 @@ class crm_party_handler_relationship_crm_party_attached_eid extends views_handle
   }
 
   /**
-   * Extends the relationship's basic options, allowing the user to WRITE ME TODO
+   * Extends the relationship's basic options.
    */
   function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
