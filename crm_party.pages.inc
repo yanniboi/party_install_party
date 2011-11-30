@@ -296,30 +296,39 @@ function crm_party_data_set_edit_form_validate($form, &$form_state) {
  * Submit handler for the data set edit form.
  */
 function crm_party_data_set_edit_form_submit($form, &$form_state) {
-  $type = $form_state['values']['data-set-type'];
+  $data_set_name = $form_state['values']['data-set-type'];
   $info = array(
     'party' => $form_state['values']['data-set-pid'],
     'entity' => $form_state['values']['data-set-eid'],
   );
   
+  /*
+  // TODO: rewrite code below to conform to new pattern:
+  $attached_entity = crm_party_get_crm_controller($data_set);
+  $attached_entity->createAttachedEntity();
+  $attached_entity->setParty($party);
+  $attached_entities[$attached_entity->hash()] = $attached_entity;
+  */
+  
+  // @todo: when might this be the case? No idea!
   if (!is_numeric($info['entity'])) {
-    $sets = crm_party_get_data_set_info();
-    $class = $sets[$type]['class'];
+    $data_set_info = crm_party_get_data_set_info($data_set_name);
+    $class = $data_set_info['class'];
     
-    // @todo WTF: things should not be at the top level of form state!
+    // @todo: replace this. then we can kill ENTITY_ID_KEY
     $info['entity'] = $form_state['entity']->{$class::ENTITY_ID_KEY};
   }
   
   // @todo: this is available in the form.
-  $dataSet = EntityDefaultCRMController::getInstance($type, $info);
+  $attached_entity_controller = EntityDefaultCRMController::getInstance($data_set_name, $info);
   
   $options = array(
     'main' => $form_state['values']['data-set-main'],
   );
-  $dataSet->attach($dataSet->party, $options);
+  $attached_entity_controller->attach($attached_entity_controller->party, $options);
   
   // Redirect to the set piece.
-  $form_state['redirect'] = 'party/' . $dataSet->pid . '/' . $dataSet->getPathArg();
+  $form_state['redirect'] = 'party/' . $attached_entity_controller->pid . '/' . $attached_entity_controller->getPathArg();
 }
 
 /**
