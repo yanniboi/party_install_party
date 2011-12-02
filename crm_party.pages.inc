@@ -189,7 +189,7 @@ function crm_party_page_view_piece_views($party, $view_name, $view_display_id) {
 }
 
 /**
- * The data set edit form.
+ * The attached entity edit form.
  *
  * @param $data_set
  *   A loaded data set.
@@ -201,7 +201,7 @@ function crm_party_page_view_piece_views($party, $view_name, $view_display_id) {
  * @param $eid
  *    The id of the entity
  */
-function crm_party_data_set_edit_form($form, &$form_state, $data_set, $party, $eid = NULL) {
+function crm_party_attached_entity_edit_form($form, &$form_state, $data_set, $party, $eid = NULL) {
   
   // Get the attached entity object
   if (is_object($party)) {
@@ -226,7 +226,7 @@ function crm_party_data_set_edit_form($form, &$form_state, $data_set, $party, $e
     $form_state['#attached_entities'][$attached_entity->hash()] = $attached_entity;
   }
   
-  $form['#submit'][] = 'crm_party_data_set_edit_form_submit';
+  $form['#submit'][] = 'crm_party_attached_entity_edit_form_submit';
   $form_state['#party'] = $attached_entity->party;
   
   crm_party_attached_entity_attach_form($form, $form_state); 
@@ -251,14 +251,14 @@ function crm_party_data_set_edit_form($form, &$form_state, $data_set, $party, $e
 /**
  * Validation handler for the data set edit form.
  */
-function crm_party_data_set_edit_form_validate($form, &$form_state) {
+function crm_party_attached_entity_edit_form_validate($form, &$form_state) {
   return TRUE;
 }
 
 /**
  * Submit handler for the data set edit form.
  */
-function crm_party_data_set_edit_form_submit($form, &$form_state) {
+function crm_party_attached_entity_edit_form_submit($form, &$form_state) {
   
   /*   
   $options = array(
