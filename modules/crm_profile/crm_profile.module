@@ -35,7 +35,7 @@ function crm_profile_crm_party_data_set_info() {
       'entity bundle' => $type,
       //'load callback' => "crm_profile_load_profile", - No Longer needed with class implementation
       //'load arguments' => array($type),
-      'form callback' => "crm_profile_attached_entity_form",
+      //'form callback' => "crm_profile_attached_entity_form",
       'class' => 'Profile2CRMController',
       // Provide details of admin interfaces
       'admin' => array(

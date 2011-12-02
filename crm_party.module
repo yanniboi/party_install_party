@@ -1104,7 +1104,7 @@ function crm_party_default_attached_entity_form_validate($form, &$form_state, &$
 }
 
 /**
- *  The default attached entity form submit callback.
+ * The default attached entity form submit callback.
  *
  * @param $form
  *   The whole form so far
@@ -1123,7 +1123,7 @@ function crm_party_default_attached_entity_form_submit($form, &$form_state, &$at
   
   //submit fields
   field_attach_submit($attached_entity->getEntityType(), $attached_entity->entity, $form[$hash], $form_state);
-  entity_save($attached_entity->entity);
+  entity_save($attached_entity->getEntityType(), $attached_entity->entity);
 }
  
  

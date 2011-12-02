@@ -364,7 +364,7 @@ abstract class EntityDefaultCRMController {
   /**
    * Get the entity type we work with.
    */
-  private function getEntityType() {
+  public function getEntityType() {
     return $this->definition['entity type'];
   }
   

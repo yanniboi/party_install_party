@@ -327,8 +327,6 @@ function crm_party_view_data_set($party, $set) {
     $build[$crm_controller->data_set_name . '_' . $crm_controller->id] = array(
         // @todo: this is sort of an abuse of what fieldsets are meant for... :/
         '#type' => 'fieldset',
-        // @todo: stop this depending on $entity being a drupal entity
-        // really? anything that's not an Entity on D7 isn't worth bothering with!
         '#title' => $crm_controller->getLabel(),
       );
     
