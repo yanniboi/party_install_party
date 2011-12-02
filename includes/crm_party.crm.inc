@@ -126,7 +126,7 @@ abstract class EntityDefaultCRMController {
     
     // If $this->entity looks like an actual entity stored in the database.
     if (isset($this->entity->{$this->getEntityIdKey()})) {
-      $query = db_select($this->getTableName(), 'ds');
+      $query = db_select('crm_party_attached_entity', 'ds');
       $query->fields('ds');
       $query->condition('pid', $this->pid, '=');
       $query->condition('eid', $this->eid, '=');
@@ -172,7 +172,7 @@ abstract class EntityDefaultCRMController {
 
     // If the Party is a Real Party, see if they're attached.
     if (isset($this->party->pid)) {
-      $query = db_select($this->getTableName(), 'ds');
+      $query = db_select('crm_party_attached_entity', 'ds');
       $query->fields('ds');
       $query->condition('pid', $this->pid, '=');
       $query->condition('eid', $this->eid, '=');
@@ -417,16 +417,6 @@ abstract class EntityDefaultCRMController {
     return empty($info['entity keys']['bundle']) ? FALSE : $info['entity keys']['bundle'];
   }
 
-  /**
-   * getTableName
-   *
-   * @todo: finish removing this
-   */
-  private function getTableName() {
-    //return 'crm_party_attached_entity';
-    return 'crm_party_attached_entity';
-  }
-  
   /**
    * get the data set type label
    */
