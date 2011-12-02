@@ -167,7 +167,7 @@ function crm_party_edit_form_hat_check($form, &$form_state) {
       $attached_entities = crm_party_get_attached_entities($form_state['#party'], $data_set_name);
       if (count($attached_entities) < 1) {
         $form_state['redirect'] = 'party/' . $form_state['#party']->pid . '/party/edit';
-        drupal_set_message("$party->label is expected to have a $data_set_name which wasn't present. Please enter the data now");
+        drupal_set_message("{$form_state['#party']->label} is expected to have a $data_set_name which wasn't present. Please enter the data now");
       }
     }
   }

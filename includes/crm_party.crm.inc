@@ -478,14 +478,6 @@ abstract class EntityDefaultCRMController {
   }
   
   /**
-   * getInstanceTable
-   *  static method to get the table containing all the instances
-   */
-  public static function getInstanceTable($type) {
-    return 'crm_party_attached_entity';
-  }
-  
-  /**
    * get the data set type label
    */
   public function getTypeLabel() {
@@ -525,7 +517,7 @@ abstract class EntityDefaultCRMController {
     $instance = new $class($type);    
     switch ($how) {
       case self::FROM_PEID :
-        $result = db_select(EntityDefaultCRMController::getInstanceTable($type), 'ds')
+        $result = db_select('crm_party_attached_entity', 'ds')
           ->fields('ds',array('pid','eid'))
           ->condition('peid', $info, '=')
           ->execute()
@@ -573,14 +565,14 @@ abstract class EntityDefaultCRMController {
     switch($how) {
       case self::FROM_PARTY :
         $info = (is_object($info)) ? $info->pid : $info;
-        $results = db_select(EntityDefaultCRMController::getInstanceTable($type), 'ds')
+        $results = db_select('crm_party_attached_entity', 'ds')
           ->fields('ds',array('peid','pid','eid'))
           ->condition('pid', $info, '=')
           ->execute()
           ->fetchAllAssoc('peid',PDO::FETCH_ASSOC);
         break;
       case self::FROM_ENTITY :
-        $results = db_select(EntityDefaultCRMController::getInstanceTable($type), 'ds')
+        $results = db_select('crm_party_attached_entity', 'ds')
           ->fields('ds',array('peid','pid','eid'))
           ->condition('eid', $info, '=')
           ->execute()
