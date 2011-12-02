@@ -659,6 +659,7 @@ function crm_party_get_data_set_info($data_set_name = NULL) {
         'set_name' => $set_name,
         'module' => $module,
         'singleton' => FALSE,
+        'form callback' => 'crm_party_default_attached_entity_form',
       );
       $sets[$set_name] = $set;
     }
@@ -1062,3 +1063,67 @@ function crm_party_attached_entity_attach_form_submit(&$form, &$form_state) {
     $attached_entity->attach($party);
   }
 }
+
+/**
+ * The default data set form callback.
+ * This returns a $form array for the entity in $attached_entity
+ *
+ * @param $form
+ *   The whole form so far
+ * @param $form_state
+ *   The form state
+ * @param $attached_entity
+ *   The attached entity this form is for
+ * @param $party
+ *   The party the $attached entity is attached to
+ */
+function crm_party_default_attached_entity_form($form, &$form_state, &$attached_entity, $party) {
+  $attached_entity_form = array();
+  
+  $entity = $attached_entity->entity;
+  
+  field_attach_form($attached_entity->getEntityType(), $entity, $attached_entity_form, $form_state); 
+
+  return($attached_entity_form);
+}
+
+/**
+ *  The default attached entity form validate callback.
+ *
+ * @param $form
+ *   The whole form so far
+ * @param $form_state
+ *   The form state
+ * @param $attached_entity
+ *   The attached entity this form is for
+ * @param $party
+ *   The party the $attached entity is attached to
+ */
+function crm_party_default_attached_entity_form_validate($form, &$form_state, &$attached_entity, $party) {
+  return TRUE;
+}
+
+/**
+ *  The default attached entity form submit callback.
+ *
+ * @param $form
+ *   The whole form so far
+ * @param $form_state
+ *   The form state
+ * @param $attached_entity
+ *   The attached entity this form is for
+ * @param $party
+ *   The party the $attached entity is attached to
+ */
+function crm_party_default_attached_entity_form_submit($form, &$form_state, &$attached_entity, $party) {
+  $hash = $attached_entity->hash();
+  
+  //save the profile
+  entity_save($attached_entity->getEntityType(), $attached_entity->entity);
+  
+  //submit fields
+  field_attach_submit($attached_entity->getEntityType(), $attached_entity->entity, $form[$hash], $form_state);
+  entity_save($attached_entity->entity);
+}
+ 
+ 
