@@ -1019,6 +1019,9 @@ function crm_party_attached_entity_form_callback($data_set) {
 
 /**
  * Attach attached entity forms to a form.
+ *
+ * This takes all attached entities in the $form_state['#attached_entity'] array, runs
+ * their form callback and puts it in $form[$attached_entity->hash()]
  */
 function crm_party_attached_entity_attach_form(&$form, &$form_state) {
   // Get all attached entities from $form_state.
@@ -1042,7 +1045,7 @@ function crm_party_attached_entity_attach_form(&$form, &$form_state) {
  * Validate attached entity forms.
  */
 function crm_party_attached_entity_attach_form_validate(&$form, &$form_state) {
-  return TRUE;
+  return TRUE;  
 }
 
 /**
@@ -1100,7 +1103,10 @@ function crm_party_default_attached_entity_form($form, &$form_state, &$attached_
  *   The party the $attached entity is attached to
  */
 function crm_party_default_attached_entity_form_validate($form, &$form_state, &$attached_entity, $party) {
-  return TRUE;
+  //validate fields
+  $pseudo_entity = (object) $form_state['values'][$attached_entity->hash()];
+  $psuedo_entity->type = $attached_entity->getEntityBundle();
+  field_attach_form_validate($attached_entity->getEntityType(), $pseudo_entity, $form[$attached_entity->hash()], $form_state);
 }
 
 /**

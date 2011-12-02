@@ -33,9 +33,6 @@ function crm_profile_crm_party_data_set_info() {
       'label' => $label,
       'entity type' => 'profile2',
       'entity bundle' => $type,
-      //'load callback' => "crm_profile_load_profile", - No Longer needed with class implementation
-      //'load arguments' => array($type),
-      //'form callback' => "crm_profile_attached_entity_form",
       'class' => 'Profile2CRMController',
       // Provide details of admin interfaces
       'admin' => array(
@@ -81,16 +78,7 @@ function crm_profile_profile2_type_delete($type) {
 
 
 /**
- * Load a profile
- *
-function crm_profile_load_profile($party, $set_type, $set_id, $type) {
-  return entity_load('profile2', $set_id);
-}
-
-/**
  * Return the stuff to go inside a party form
- * @todo: Make this have $form and $form_state
- * @todo: finish
  */
 function crm_profile_attached_entity_form($form, &$form_state, &$attached_entity, $party) {
   $attached_entity_form = array();

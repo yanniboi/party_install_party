@@ -50,15 +50,19 @@ function hook_crm_party_access($op, $party = NULL, $attached_entity = NULL, $acc
  *    to. May be omitted to allow any bundle.
  *  - 'singleton': (optional) Whether this set's relationships only have one
  *    entity relating to a party. Default: FALSE.
- *  - 'load callback': The name of the load function. This always gets given
- *    the $party object, set_type, and set_id.
- *  - 'load callback arguments': Any extra args to supply to the load callback
- *    //needed?!
- *  - 'form callback': The name of the form function. This function should
- *    return a set of form fields (but not the submit button).
- *    It gets $party, $set_type, $set_id, $form and $form_state.
+ *  - 'form callback': (optional) This is the name of the form callback function.
+ *    Returns the section of the form to do with this data set. See crm_party_default_attached_entity_form()
  *  - 'module': (optional) The name of the module implementing this data set.
  *    This will be filled in automatically if not supplied.
+ *  - 'admin': An array of admin paths for configuring and managing the piece
+ *    - 'edit'
+ *    - 'manage fields'
+ *    - 'manage display'
+ *    - 'delete'
+ *    - 'create'
+ *    - 'import'
+ *    - 'clone'
+ *    - 'export'
  *  - piece: (optional) Each set may define one party piece. The contents of
  *    this array should be the same as those returned by
  *    hook_party_party_piece_info(), with the addition of:
