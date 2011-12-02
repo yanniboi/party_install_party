@@ -59,11 +59,6 @@ abstract class EntityDefaultCRMController {
    */
   public $main;
   
-  /**
-   * var string $hat
-   */
-  public $hat;
-  
   public $attached = FALSE;
   
   /**
@@ -145,8 +140,6 @@ abstract class EntityDefaultCRMController {
         $this->attached = TRUE;
         $this->id = $result['peid'];
         $this->main = $result['main'];
-        $this->hat = $result['hat'];
-        $this->hat_main = $result['hat_main'];
         $this->id = $result['peid'];
       }  
     }    
@@ -192,8 +185,6 @@ abstract class EntityDefaultCRMController {
         $this->attached = TRUE;
         $this->id = $result['peid'];
         $this->main = $result['main'];
-        $this->hat = $result['hat'];
-        $this->hat_main = $result['hat_main'];
         $this->id = $result['peid'];
       }  
     }
@@ -251,16 +242,12 @@ abstract class EntityDefaultCRMController {
     // WIP: chuck in defaults until I figure out what these do
     $relation += array(
       'main' => isset($options['main']) ? $options['main'] : 0,
-      'hat' => 'trilby',
-      'hat_main' => 0,
     );
 
     // Try update first, and if that fails insert.
     $result = db_update('crm_party_attached_entity')
       ->fields(array(
         'main' => $relation['main'],
-        'hat' => $relation['hat'],
-        'hat_main' => $relation['hat_main'],
         'data_set' => $this->data_set_name,
       ))
       ->condition('pid', $relation['pid'], '=')
@@ -375,17 +362,6 @@ abstract class EntityDefaultCRMController {
    */
   public function isMain() {
     return $this->main;
-  }
-  
-  /**
-   * setHat
-   *   Set the Hat this Data Set Instance is associated wiht
-   *
-   * @param $hat
-   *   The hat identifier
-   */
-  public function setHat() {
-  
   }
   
   /**
