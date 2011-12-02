@@ -40,11 +40,16 @@ function crm_party_edit_page_title($party) {
  */
 function crm_party_add($type = '') {
   if ($type == '') {
-    // @todo: use theme_item_list().
-    return "<ul class=\"admin-list\">
-              <li class=\"leaf\">".l(t('Add Individual'), 'party/add/individual')."<div class=\"description\">Add an individual party</div></li>
-              <li class=\"leaf\">".l(t('Add Organisation'), 'party/add/organisation')."<div class=\"description\">Add an organisation party</div></li>
-            </ul>";
+    $build['add_list'] = array(
+      '#theme' => 'item_list',
+      '#type' => 'item_list',
+      '#items' => array( 
+        l(t('Add Individual'), 'party/add/individual')."<div class=\"description\">Add an individual party</div>",
+        l(t('Add Organisation'), 'party/add/organisation')."<div class=\"description\">Add an organisation party</div>",
+      ),
+    );
+    
+    return $build;
   }
 
   $party = (object) array(
