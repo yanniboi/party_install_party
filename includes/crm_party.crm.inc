@@ -500,6 +500,11 @@ abstract class EntityDefaultCRMController {
    *   - entity_id
    * 
    * @param $how The way to load the instances
+   *  The way to load the instances. This can take one of 2 values:
+   *   - EntityDefaultCRMController::FROM_PARTY
+   *       $info will expect a CRMParty object or id and create an instance of the Controller with a stub entity ready for use.
+   *   - EntityDefaultCRMController::FROM_ENTITY
+   *       $info will expect an entity object or id and will create an instance with the given entity set as the entity to be attached
    */
   public static function getInstances($data_set_name, $info, $how = self::FROM_PARTY) {
     $results = array();
