@@ -107,6 +107,10 @@ abstract class EntityDefaultCRMController {
   /**
    * Set the party this controller works with.
    *
+   * If the entity is already set we check if this party and this entity 
+   * are already attached in the database and load the Id of the attachement
+   * and any other info relating to the attachement. 
+   *
    * @param $party
    *  A Party object or Id.
    */   
@@ -140,7 +144,6 @@ abstract class EntityDefaultCRMController {
         $this->attached = TRUE;
         $this->id = $result['peid'];
         $this->main = $result['main'];
-        $this->id = $result['peid'];
       }  
     }    
   }
