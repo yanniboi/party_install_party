@@ -221,7 +221,8 @@ function crm_party_attached_entity_edit_form($form, &$form_state, $data_set, $pa
     drupal_set_title("Add {$attached_entity->definition['label']} Data Set to {$party->label}");
     $attached_entity->createAttachedEntity();
   }
-
+  
+  //Build form
   if (!isset($form_state['#attached_entities'][$attached_entity->hash()])) {
     $form_state['#attached_entities'][$attached_entity->hash()] = $attached_entity;
   }
@@ -275,35 +276,24 @@ function crm_party_attached_entity_edit_form_submit($form, &$form_state) {
 /**
  * Remove a data set from a party
  */
-function crm_party_data_set_remove($data_set, $pid, $eid) {
+function crm_party_attached_entity_remove($data_set, $pid, $eid) {
   if(is_object($pid)) {
     $pid = $pid->pid;  
   }
   
-  $info = array(
-    'party' => $pid,
-    'entity' => $eid,
-  );
-  
-  $attached_entity_controller = EntityDefaultCRMController::getInstance($data_set['set_name'], $info);
+  $attached_entity = crm_party_get_crm_controller($data_set['set_name']);
+  $attached_entity->setAttachedEntity($eid);
+  $attached_entity->setParty($pid);
   // @todo: fix misuse of t().
-  drupal_set_title(t('Are you sure you want to remove ' . $attached_entity_controller->getLabel() . ' from ' . $attached_entity_controller->party->label . '?'));
-  return drupal_get_form('crm_party_data_set_remove_confirm', $attached_entity_controller);
+  drupal_set_title(t('Are you sure you want to remove ' . $attached_entity->getLabel() . ' from ' . $attached_entity->party->label . '?'));
+  return drupal_get_form('crm_party_attached_entity_remove_confirm', $attached_entity);
 }
 
 /**
  * Data set remove form
  */
-function crm_party_data_set_remove_confirm($form, &$form_state, $dataSet) {
-  $form['data-set-type'] = array(
-    '#type' => 'hidden',
-    '#value' => $dataSet->data_set_name,
-  );   
-  
-  $form['data-set-id'] = array(
-    '#type' => 'hidden',
-    '#value' => $dataSet->id,
-  );
+function crm_party_attached_entity_remove_confirm($form, &$form_state, $attached_entity) {
+  $form_state['#attached_entity'] = $attached_entity;
   
   $form['description'] = array(
     '#markup' => '<p>Are you sure you want to remove this data set from this party?</p>',
@@ -321,15 +311,9 @@ function crm_party_data_set_remove_confirm($form, &$form_state, $dataSet) {
 /**
  * The data set remove submit
  */
-function crm_party_data_set_remove_confirm_submit($form, &$form_state) {
-  $type = $form_state['values']['data-set-type'];
-  $peid = $form_state['values']['data-set-id'];
-  
-  $dataSet = EntityDefaultCRMController::getInstance($type, $peid, EntityDefaultCRMController::FROM_PEID);
-  $pid = $dataSet->pid;
-  $dataSet->detach();
-  
-  $form_state['redirect'] = 'party/' . $pid;
+function crm_party_attached_entity_remove_confirm_submit($form, &$form_state) {
+  $form_state['#attached_entity']->detach();  
+  $form_state['redirect'] = 'party/' . $form_state['#attached_entity']->party->pid;
 }
 
 /**

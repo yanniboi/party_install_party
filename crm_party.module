@@ -247,7 +247,7 @@ function crm_party_menu() {
   ); 
   // Detach an attached entity
   $items['party/%crm_party/%crm_party_data_set/remove/%'] = array(
-    'page callback' => 'crm_party_data_set_remove',
+    'page callback' => 'crm_party_attached_entity_remove',
     'page arguments' => array(2, 1, 4), //3 Arguments, data set name then party then set eid
     'access callback' => TRUE, // todo
     'file' => 'crm_party.pages.inc',
