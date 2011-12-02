@@ -446,11 +446,21 @@ abstract class EntityDefaultCRMController {
    *      - party a party id
    *      - entity an entity id
    * @param $how
-   *  The way to load the instance
-   *  @todo: how? document this properly!!!
+   *  The way to load the instance. This can take one of 4 values:
+   *   - EntityDefaultCRMController::FROM_PEID
+   *       $info will take a PEID - the numeric identifier for a particular attached entity/party attachment
+   *   - EntityDefaultCRMController::FROM_PARTY
+   *       $info will expect a CRMParty object or id and create an instance of the Controller with a stub entity ready for use.
+   *   - EntityDefaultCRMController::FROM_ENTITY
+   *       $info will expect an entity object or id and will create an instance with the given entity set as the entity to be attached
+   *   - EntityDefaulyCRMController::FROM_PARTY_AND_ENTITY
+   *       $info will expect an array with keys 'party' and 'entity' and will create the controller instance. 
+   *
+   * @return 
+   *   A controller instance.
    */
   public static function getInstance($data_set_name, $info, $how = self::FROM_PARTY_AND_ENTITY) {
-    $instance = crm_party_get_crm_controller($data_set_name);    
+    $attached_entity = crm_party_get_crm_controller($data_set_name);    
     switch ($how) {
       case self::FROM_PEID :
         $result = db_select('crm_party_attached_entity', 'ds')
@@ -460,25 +470,23 @@ abstract class EntityDefaultCRMController {
           ->fetchAssoc();
           
         // @todo add error handling for if record doesnt exist
-        $instance->setParty($result['pid']);
-        $instance->setAttachedEntity($result['eid']);
-        return $instance;
+        $attached_entity->setParty($result['pid']);
+        $attached_entity->setAttachedEntity($result['eid']);
         break;
       case self::FROM_PARTY :
-        $instance->setParty($info);
-        $instance->createAttachedEntity();
-        return $instance;
+        $attached_entity->setParty($info);
+        $attached_entity->createAttachedEntity();
         break;
       case self::FROM_ENTITY :
-        $instance->setAttachedEntity($info);
-        return $instance;
+        $attached_entity->setAttachedEntity($info);
         break;
       case self::FROM_PARTY_AND_ENTITY :
-        $instance->setParty($info['party']);
-        $instance->setAttachedEntity($info['entity']);
-        return $instance;
+        $attached_entity->setParty($info['party']);
+        $attached_entity->setAttachedEntity($info['entity']);
         break;
     }
+    
+    return $attached_entity;
   }
   
   /**
