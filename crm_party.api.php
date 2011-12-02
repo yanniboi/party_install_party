@@ -187,3 +187,41 @@ function hook_party_admin_columns_info() {
     ),
   );
 }
+
+/**
+ * Attach an entity to a party.
+ *
+ * @param $party
+ *  The party to assign the entity to.
+ * @param $entity
+ *  The entity to relate to.
+ * @param $data_set
+ *  The name of the data set.
+ *  DX WTF: can we sniff this out given the entity type and the entity object? Yes, but we need to be able to get the entity type from the object.
+ */
+function crm_party_attach_entity($party, $entity, $data_set_name) {
+  $attached_entity = crm_party_get_crm_controller($data_set_name);
+  $attached_entity->setAttachedEntity($entity);  
+  $attached_entity->attach($party);
+}
+
+/**
+ * Detach an entity from a party according to a given data set.
+ *
+ * @param $party
+ *  The party to detach the entity from.
+ * @param $entity
+ *  The entity to detach. This may also be just the entity id.
+ * @param $data_set
+ *  The name of the data set.
+ *  DX WTF: can we sniff this out given the entity type and the entity object?
+ */
+function crm_party_detach_entity($party, $entity, $data_set_name) {
+  /* To Test */
+  $attached_entity = crm_party_get_crm_controller($data_set_name);
+  $attached_entity->setParty($party);
+  $attached_entity->setAttachedEntity($entity);  
+  $attached_entity->detach();
+}
+
+

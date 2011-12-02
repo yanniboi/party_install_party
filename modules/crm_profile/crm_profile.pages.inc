@@ -110,16 +110,4 @@ function profile_edit_form_submit($form, &$form_state) {
   $form_state['redirect'] = 'party/' . $form_state['party']->pid;
 }
 
-/**
- * Add a new profile to the party.
- *
-function profile_add_form_submit($form, &$form_state) {
-  // Relate the party to the new profile
-  $party = $form_state['party'];
-  
-  foreach($form_state['profiles'] as $type => $profile) {
-    crm_party_relate($party, $profile, "profile2_" . $type);
-  }
-  
-  //TODO: break the relation to the null profile for this type.
-}*/
+

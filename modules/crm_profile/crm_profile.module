@@ -6,33 +6,6 @@
  */
  
 /**
- * Implements hook_menu()
- *
- * Define a page to edit a profile in place.
- * DEPRECATED this will now be done with data sets
- */
-function crm_profile_menu() {
-  /* @todo: not sure we should be fiddling with profile's menu stuff!
-  $items['profile/%profile2/edit'] = array(
-    'title' => 'Edit Profile',
-    'page callback' => 'profile_page_edit',
-    'page arguments' => array(1),
-    'access callback' => 'profile2_access',
-    'access arguments' => array('update', 1),
-    'file' => 'crm_profile.pages.inc',
-  );
-  /*$items['party/%crm_party/add/%profile2_type'] = array(
-    'title' => 'Add Profile',
-    'page callback' => 'profile_page_add',
-    'page arguments' => array(1,3),
-    'access callback' => 'profile2_access',
-    'access arguments' => array('create',3),
-    'file' => 'crm_profile.pages.inc',
-  );
-  return $items;*/
-}
-
-/**
  * Implements hook_entity_info_alter()
  *
  * Add a new view mode to profile2's for parties
@@ -155,96 +128,6 @@ function crm_profile_attached_entity_form_validate($form, &$form_state, &$attach
 }
 
 /**
- * Implements hook_form_FORM_ID_alter()
- *
- * Alter Party forms to do things
- */
-function crm_profile_form_crm_party_edit_form_alter(&$form, &$form_state, $form_id) {
-  return; 
-  // Make sure the uid is null. 
-  $form['uid'] = array(
-    '#type' => 'hidden',
-    '#value' => NULL,
-  );  
-  
-  $profiles = array();
-  if (isset($form['pid'])) {
-    $profiles = _crm_profile_load_by_party($form['pid']['#value']);
-  }  
-  
-  // Load appropriate profile2s and attach them to the party form
-  foreach (profile2_get_types() as $type_name => $profile_type) {
-    if (isset($profiles[$type_name])) {
-      $form_state['profiles'][$type_name] = $profiles[$type_name];
-    }
-    
-    if (empty($form_state['profiles'][$type_name])) {
-      $form_state['profiles'][$type_name] = profile_create(array('type' => $type_name));
-    }
-    profile2_attach_form($form, $form_state);
-    // Wrap each profile form in a fieldset.
-    $form['profile_' . $type_name] += array(
-      '#type' => 'fieldset',
-      '#title' => check_plain($profile_type->label),
-    );
-  }
-  
-  $form['#submit'][] = 'crm_profile_post_form_submit_relate';
-}
-
-/**
- * Relate the profile2 entities to the crm_party in form_state
- *
-function crm_profile_post_form_submit_relate($form, &$form_state) {
-  $party = $form_state['crm_party'];
-  $profiles = array();
-  
-  foreach (profile2_get_types() as $type_name => $profile_type) {
-    if (isset($form_state['profiles'][$type_name])) {
-      $profiles[] = $form_state['profiles'][$type_name];
-    } 
-    else {
-      $thisProfile = profile_create(array('type' => $type_name, 'uid' => null));
-      profile2_save($thisProfile);
-      $profiles[] =  $thisProfile;
-    } 
-  }
-  
-  // Foreach profile2 in the form state add a binary relation linking it
-  // to the party
-  foreach ($profiles as $profile) {
-    crm_party_relate($party, $profile, 'profile2_' . $profile->type);
-  }
-}
-
-/**
- * Relate a party entity to a profile2 entity
- *
- * @param $party
- *   A fully loaded party object, from crm_party_load(). Whats important is that the pid is correct.
- * @param $profile
- *   A profile2 object
- *
-function _crm_party_profile_relate($party, $profile) {
-  $endpoints = array();
-  $endpoints[] = array(
-    'entity_type' => 'crm_party',
-    'entity_id' => $party->pid,
-  );
-  $endpoints[] = array(
-    'entity_type' => 'profile2',
-    'entity_id' => $profile->pid,
-  );
-  
-  //create a relation for each party profile2 which is created.
-  $relation = relation_create('party_to_profile2_'.$profile->type, $endpoints);
-  $rid = relation_save($relation);
-
-  //set some nice messages - change
-  drupal_set_message('Party: ' . $party->label . ' has been related to Profile: ' . $profile->pid);
-}
-
-/**
  * Change the Party Details Page
  *
  * @todo: see crm_profile_crm_party_party_pieces() -- this function should
@@ -293,35 +176,6 @@ function crm_profile_crm_party_page_view_alter($party) {
 }
 
 /**
- * Load all the profiles for a given party. 
- *
- * @param $party
- *   Either a party object or the id of a party.
- *
- * @return 
- *  An array of profiles attached to this party of the for ['type'][] = $profile;
- *
-function _crm_profile_load_by_party($party) {
-  // Get the pid from whatever is passed.
-  $pid = is_object($party) ? $party->pid : $party;
-  $profiles = array();
-  
-  foreach (profile2_get_types() as $type_name => $profile_type) {
-    $raw = _crm_profile_relation_get_related_entities('crm_party', $pid, 'party_to_profile2_' . $type_name);
-    foreach ($raw as $relation) {
-      foreach ($relation as $profile) {
-        $profiles[$type_name][] = $profile;
-      }
-    }
-
-    if (isset($profiles[$type_name]) && count($profiles[$type_name]) == 1) {
-      $profiles[$type_name] = reset($profiles[$type_name]);
-    }
-  } 
-  return $profiles;
-}
-
-/**
  * Load all parties related to a given profile.
  *
  * @param $profile
@@ -340,44 +194,6 @@ function _crm_profile_load_parties($profile) {
   
   return $parties;
 }
-
-/**
- * Helper function to get all related entities via relation API.
- *
- * This is just a stand-in until http://drupal.org/node/1288894 gets in, and
- * make developing CRM require one less patch to contrib modules.
- *
-function _crm_profile_relation_get_related_entities($entity_type, $entity_id, $relation_type = NULL, $r_index = NULL) {
-  $query = relation_query($entity_type, $entity_id, $r_index);
-  if ($relation_type) {
-    $query->propertyCondition('relation_type', $relation_type);
-  }
-  $results = $query->execute();
-  $relations = array();
-  foreach($results as $result) {
-    if (empty($result)) {
-      return FALSE;
-    }
-    $relation = relation_load($result->rid);
-    $request_key = $entity_type . ':' . $entity_id;
-    $entities = $relation->endpoints[LANGUAGE_NONE];
-    $first_entity_key = $entities[0]['entity_type'] . ':' . $entities[0]['entity_id'];
-    if (isset($r_index)) {
-      $request_key = $request_key . ':' . $r_index;
-      $first_entity_key = $first_entity_key . ':' . $entities[0]['r_index'];
-    }
-    if ($request_key == $first_entity_key) {
-      $other_endpoints = entity_load($entities[1]['entity_type'], array($entities[1]['entity_id']));
-      $relations[$result->rid] = $other_endpoints;
-    }
-    else {
-      $other_endpoints = entity_load($entities[0]['entity_type'], array($entities[0]['entity_id']));
-      $relations[$result->rid] = $other_endpoints;
-    }
-  }
-  return $relations;
-}
-*/
 
 /**
  * Controller class for CRM integration.

@@ -687,11 +687,10 @@ function crm_party_get_data_set_info($data_set_name = NULL) {
  *  DX WTF: can we sniff this out given the entity type and the entity object?
  *  DX WTF: Lots of sniffing now done BUT do we want the $data_set instance made elsewhere. If so where?
  */
-function crm_party_relate($party, $entity, $data_set) {
-  $sets = crm_party_get_data_set_info();
-  $class = $sets[$data_set]['class'];
-  $dataSet = new $class($data_set, $entity);
-  $dataSet->attach($party);
+function crm_party_attach_entity($party, $entity, $data_set_name) {
+  $attached_entity = crm_party_get_crm_controller($data_set_name);
+  $attached_entity->setAttachedEntity($entity);  
+  $attached_entity->attach($party);
 }
 
 /**
@@ -705,12 +704,12 @@ function crm_party_relate($party, $entity, $data_set) {
  *  The name of the data set.
  *  DX WTF: can we sniff this out given the entity type and the entity object?
  */
-function crm_party_unrelate($party, $entity, $data_set) {
+function crm_party_detach_entity($party, $entity, $data_set_name) {
   /* To Test */
-  $sets = crm_party_get_data_set_info();
-  $class = $sets[$data_set]['class'];
-  $dataSet = new $class($data_set, $entity, $party); 
-  $dataSet->detach();
+  $attached_entity = crm_party_get_crm_controller($data_set_name);
+  $attached_entity->setParty($party);
+  $attached_entity->setAttachedEntity($entity);  
+  $attached_entity->detach();
 }
 
 // -----------------------------------------------------------------------
@@ -775,42 +774,6 @@ function crm_party_data_set_form($party, $set_type, $set_id = FALSE) {
     return FALSE;
   }
   return $result;
-}
-
-/**
- * Attach a data set to a party (or edit the attachment?)
- *
- * @param $party the party object
- * @param $set_type The set type as defined in hook_data_set_info
- * @param $set_id The set id as stored in the related table
- * @param $main Is this the main set of this type
- * @param $hat Not used yet
- * @param $hat_main Not used yet
- */
-function crm_party_data_set_instance_attach($party, $set_type, $set_id, $main = FALSE, $hat = '', $hat_main = FALSE, $null = FALSE) {
-  $data = array(
-    'pid' => $party->pid,
-    'sid' => $set_id,
-    'main' => $main,
-    'hat' => $hat,
-    'hat_main' => $hat_main,
-    'null' => $null,
-  );
-
-  drupal_write_record('crm_party_data_set_' . $set_type, $data);
-}
-
-/**
- * Unattach a data set from a party
- *
- * @param $party the party object
- * @param $set_type The set type as defined in hook_data_set_info
- * @param $set_id The set id as stored in the related table
- *
- * @todo Implement
- */
-function crm_party_data_set_instance_detach($party, $set_type, $set_id) {
-  return TRUE;
 }
 
 /**
