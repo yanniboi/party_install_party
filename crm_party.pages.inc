@@ -134,7 +134,10 @@ function crm_party_edit_form($form, &$form_state, $party) {
     '#weight' => 99,
   );
   
-  $form['#submit'][] = 'crm_party_edit_form_hat_check';
+  if (module_exists('crm_party_hat')) {
+    // @todo: Move this to before the attach function.
+    $form['#submit'][] = 'crm_party_hat_party_form_hat_check';
+  }
   return $form;
 }
 
@@ -152,28 +155,6 @@ function crm_party_edit_form_submit($form, &$form_state) {
   $form_state['#party'] = $party;
   $form_state['redirect'] = 'party/' . $party->pid;
 }
-
-/**
- * This checks if all expected data sets are present and, if not, sends the user
- * back to the form with a nice message.
- *
- * @todo: Move to crm_party_hats
- */
-function crm_party_edit_form_hat_check($form, &$form_state) {
-  foreach (crm_party_hat_get_hats($form_state['#party']) as $hid => $hat) {
-    $data_sets = crm_party_hat_get_data_sets($hat);
-        
-    foreach($data_sets as $data_set_name) {
-      $attached_entities = crm_party_get_attached_entities($form_state['#party'], $data_set_name);
-      if (count($attached_entities) < 1) {
-        $form_state['redirect'] = 'party/' . $form_state['#party']->pid . '/party/edit';
-        drupal_set_message("{$form_state['#party']->label} is expected to have a $data_set_name which wasn't present. Please enter the data now");
-      }
-    }
-  }
-}
-
-
 
 /**
  * Show a View display plugin as a party piece.
