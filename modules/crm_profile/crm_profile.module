@@ -6,17 +6,6 @@
  */
  
 /**
- * Implements hook_entity_info_alter()
- *
- * Add a new view mode to profile2's for parties
- */
-function crm_profile_entity_info_alter(&$entity_info) {
-  $entity_info['profile2']['crm controller class'] = 'Profile2CRMController';
-  // Pass this on to the controller class to make further changes.
-  Profile2CRMController::hook_entity_info_alter($entity_info['profile2']);
-}
-
-/**
  * Implements hook_crm_party_data_set_info().
  */
 function crm_profile_crm_party_data_set_info() {

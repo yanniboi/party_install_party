@@ -80,25 +80,17 @@ function crm_party_entity_info() {
 /**
  * Implements hook_entity_info_alter().
  *
- * We are adding the info about the model types via a hook to avoid a recursion
- * issue as loading the model types requires the entity info as well.
- *
- * @todo This needs to be improved
- *
+ * Add the information about data sets to the entity info
+ */
 function crm_party_entity_info_alter(&$entity_info) {
-  foreach (crm_party_get_types() as $type => $info) {
-    $entity_info['crm_party']['bundles'][$type] = array(
-      'label' => $info->label,
-      'admin' => array(
-        'path' => 'admin/community/structure/party_types/manage/%crm_party_type',
-        'real path' => 'admin/community/structure/party_types/manage/' . $type,
-        'bundle argument' => 4,
-        'access arguments' => array('administer party types'),
-      ),
-    );
+  $sets = crm_party_get_data_set_info();
+  
+  foreach ($sets as $set) {
+    $entity_info[$set['entity type']]['crm controller class'] = $set['class'];
+    //pass this onto the class to make changes
+    $set['class']::hook_entity_info_alter($entity_info[$set['entity type']]);
   }
 }
-*/
 
 /**
  * Implements hook_menu().
