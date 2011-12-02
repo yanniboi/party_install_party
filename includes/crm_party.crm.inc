@@ -262,24 +262,6 @@ abstract class EntityDefaultCRMController {
   }
   
   /**
-   * form
-   *   Return the form for this data set
-   */
-  abstract public function form(&$form, &$form_state);
-  
-  /**
-   * form_validate
-   */
-  public function form_validate($form, &$form_state) {
-    return;
-  }
-  
-  /**
-   * form_submit
-   */
-  //abstract public function form_submit($form, &$form_state);
-  
-  /**
    *  display
    *  Return the renderable array for this dataset
    * 
