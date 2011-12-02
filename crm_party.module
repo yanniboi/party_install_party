@@ -239,8 +239,8 @@ function crm_party_menu() {
   // Attached entity menu items
   // Edit an attached entity
   $items['party/%crm_party/%crm_party_data_set/edit/%'] = array(
-    'page callback' => 'crm_party_data_set_edit',
-    'page arguments' => array(2, 1, 4), //3 Arguments, data set name then party then set eid
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('crm_party_data_set_edit_form', 2, 1, 4), //3 Arguments, data set name then party then set eid
     'access callback' => TRUE, // todo
     'access arguments' => array('edit contacts'),
     'file' => 'crm_party.pages.inc',
@@ -254,8 +254,8 @@ function crm_party_menu() {
   );
   // Add an attached entity
   $items['party/%crm_party/%crm_party_data_set/add'] = array(
-    'page callback' => 'crm_party_data_set_edit',
-    'page arguments' => array(2, 1), // 2 Arguments, data set name then party.
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('crm_party_data_set_edit_form',2, 1), // 2 Arguments, data set name then party.
     'access callback' => TRUE, // todo
     'access arguments' => array('edit contacts'),
     'file' => 'crm_party.pages.inc',

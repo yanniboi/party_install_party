@@ -189,10 +189,7 @@ function crm_party_page_view_piece_views($party, $view_name, $view_display_id) {
 }
 
 /**
- * Show the edit form for an individual data set.
- *
- * @todo: there seems to be no reason why this and crm_party_data_set_edit_form()
- * can't be combined.
+ * The data set edit form.
  *
  * @param $data_set
  *   A loaded data set.
@@ -204,7 +201,9 @@ function crm_party_page_view_piece_views($party, $view_name, $view_display_id) {
  * @param $eid
  *    The id of the entity
  */
-function crm_party_data_set_edit($data_set, $party, $eid = NULL) {
+function crm_party_data_set_edit_form($form, &$form_state, $data_set, $party, $eid = NULL) {
+  
+  // Get the attached entity object
   if (is_object($party)) {
     $pid = $party->pid;  
   }
@@ -220,48 +219,26 @@ function crm_party_data_set_edit($data_set, $party, $eid = NULL) {
   }
   else {
     drupal_set_title("Add {$attached_entity->definition['label']} Data Set to {$party->label}");
+    $attached_entity->createAttachedEntity();
+  }
+
+  if (!isset($form_state['#attached_entities'][$attached_entity->hash()])) {
+    $form_state['#attached_entities'][$attached_entity->hash()] = $attached_entity;
   }
   
-  return drupal_get_form('crm_party_data_set_edit_form', $attached_entity);
-}
-
-/**
- * The data set edit form.
- *
- * @param $attached_entity
- *  An attached entity controller.
- *  @todo: allow this to be NULL for adding new entities.
- */
-function crm_party_data_set_edit_form($form, &$form_state, $attached_entity_controller) {
-  $form['#dataSet'] = $attached_entity_controller;
+  $form['#submit'][] = 'crm_party_data_set_edit_form_submit';
+  $form_state['#party'] = $attached_entity->party;
   
-  $form['data-set-type'] = array(
-    '#type' => 'hidden',
-    '#value' => $attached_entity_controller->data_set_name,
-  );
-
-  $form['data-set-pid'] = array(
-    '#type' => 'hidden',
-    '#value' => $attached_entity_controller->pid,
-  );
+  crm_party_attached_entity_attach_form($form, $form_state); 
   
-  $form['data-set-eid'] = array(
-    '#type' => 'hidden',
-    '#value' => $attached_entity_controller->eid,
-  );
-  
-  $attached_entity_controller->form($form, $form_state);
-  
-  if (!$attached_entity_controller->definition['singleton']) {
+  /*if (!$attached_entity_controller->definition['singleton']) {
     $form['data-set-main'] = array(
       '#type' => 'checkbox',
       '#default_value' => $attached_entity_controller->isMain(),
       '#title' => "This is the main " . $attached_entity_controller->getDataSetLabel(),
     );
-  }
+  }*/
 
-  $form['#submit'][] = 'crm_party_data_set_edit_form_submit';
-  
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
@@ -275,43 +252,21 @@ function crm_party_data_set_edit_form($form, &$form_state, $attached_entity_cont
  * Validation handler for the data set edit form.
  */
 function crm_party_data_set_edit_form_validate($form, &$form_state) {
-  
+  return TRUE;
 }
 
 /**
  * Submit handler for the data set edit form.
  */
 function crm_party_data_set_edit_form_submit($form, &$form_state) {
-  $data_set_name = $form_state['values']['data-set-type'];
-  $info = array(
-    'party' => $form_state['values']['data-set-pid'],
-    'entity' => $form_state['values']['data-set-eid'],
-  );
   
-  /*
-  // TODO: rewrite code below to conform to new pattern:
-  $attached_entity = crm_party_get_crm_controller($data_set);
-  $attached_entity->createAttachedEntity();
-  $attached_entity->setParty($party);
-  $attached_entities[$attached_entity->hash()] = $attached_entity;
-  */
-  
-  // @todo: when might this be the case? No idea!
-  if (!is_numeric($info['entity'])) {
-    $data_set_info = crm_party_get_data_set_info($data_set_name);
-    $class = $data_set_info['class'];
-    
-    // @todo: replace this. then we can kill ENTITY_ID_KEY
-    $info['entity'] = $form_state['entity']->{$class::ENTITY_ID_KEY};
-  }
-  
-  // @todo: this is available in the form.
-  $attached_entity_controller = EntityDefaultCRMController::getInstance($data_set_name, $info);
-  
+  /*   
   $options = array(
     'main' => $form_state['values']['data-set-main'],
   );
-  $attached_entity_controller->attach($attached_entity_controller->party, $options);
+  $attached_entity_controller->attach($attached_entity_controller->party, $options); */
+  
+  $attached_entity_controller = reset($form_state['#attached_entities']);
   
   // Redirect to the set piece.
   $form_state['redirect'] = 'party/' . $attached_entity_controller->pid . '/' . $attached_entity_controller->getPathArg();
