@@ -125,9 +125,6 @@ abstract class EntityDefaultCRMController {
     }
     
     // If $this->entity looks like an actual entity stored in the database.
-    // @todo: what? this method shouldn't be doing entity stuff. It sets
-    // the value of the attaching party, that should be all, no? if it does
-    // more, this needs explaining!
     if (isset($this->entity->{$this->getEntityIdKey()})) {
       $query = db_select($this->getTableName(), 'ds');
       $query->fields('ds');
@@ -151,8 +148,10 @@ abstract class EntityDefaultCRMController {
   /**
    * Set the entity this controller works with. This does not attach the Party to the entity.
    *
-   * @param $entity_type
-   *  The type of the entity.
+   * If the party is already set we check if this party and this entity 
+   * are already attached in the database and load the Id of the attachement
+   * and any other info relating to the attachement. 
+   *
    * @param $entity Object or Id representing the $entity
    */
   public function setAttachedEntity($entity) {
