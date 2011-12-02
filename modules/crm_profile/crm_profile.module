@@ -65,74 +65,6 @@ function crm_profile_crm_party_data_set_info() {
 }
 
 /**
- * Change the Party Details Page
- *
- * @todo: see crm_profile_crm_party_party_pieces() -- this function should
- * be broken up and made into the callback for that. Unless P2 provides us
- * with something we can use.
- * Also, next phase is a Views plugin that provides a party piece.
- *
- * @param $party
- *   A party object.
- *
- * @return 
- *   An array
- */
-function crm_profile_crm_party_page_view_alter($party) {
-  $build = array();
-  // broken right now.
-  return;
-  
-  $allProfiles = _crm_profile_load_by_party($party);
-  
-  foreach ($allProfiles as $type => $profiles) {
-    //as $profiles could be a list of profiles we need to standardise what we're dealing with.
-    if (is_object($profiles)) {
-      $temp = $profiles;
-      $profiles = array();
-      $profiles[] = $temp;
-    }
-    foreach ($profiles as $profile) {
-      if (profile2_access('view', $profile)) {
-        $profile->this_party = $party;
-        
-        $build['profile_' . $profile->pid] = array(
-          '#type' => 'fieldset',
-          '#title' => $profile->label,
-        );
-        $build['profile_' . $profile->pid]['view'] = $profile->view('party');
-      }
-    }
-    $build['profile_' . $type . '_add']['#markup'] = "<div class=\"clearfix\">
-      <div class=\"crm_profile_ops\" style=\"float: right\">" . l("Add " . reset($profiles)->label, 'party/' . $party->pid . '/add/' . $type) . "
-        </div>
-      </div>";
-  }
-  
-  return $build;
-}
-
-/**
- * Load all parties related to a given profile.
- *
- * @param $profile
- *   Either a profile2 object or the id of a profile.
- */
-function _crm_profile_load_parties($profile) {
-  $pid = is_object($profile) ? $profile->pid : $profile;
-  $parties = array();
-  
-  $raw = _crm_profile_relation_get_related_entities('profile2', $pid, 'party_to_profile2_' . $profile->type);
-  foreach ($raw as $relation) {
-    foreach ($relation as $party) {
-      $parties[$party->pid] = $party;
-    }
-  }
-  
-  return $parties;
-}
-
-/**
  * Controller class for CRM integration.
  *
  * @todo: move this to an inc file for autoloading.
@@ -142,24 +74,4 @@ class Profile2CRMController extends EntityDefaultCRMController {
   
   // @todo Remove somehow.
   const VIEW_MODE = 'party';
-  
-  public function form(&$form, &$form_state) {
-    // If we're adding a set
-    if ($this->eid === NULL) {
-      $this->entity = profile_create(array(
-        'type'  => substr($this->type, 9), // @todo get rid of the profile2_ at the beginning
-        // The uid needs to be set even if it is NULL.
-        'uid'   => NULL,
-      ));
-    }
-
-    // @todo: don't stash things in the form state; put them either
-    // in the form as hash properties or values.
-    $form_state['profiles'][$this->entity->type] = $this->entity;
-    $form_state['entity'] = $this->entity;
-    $form_state['party'] = $this->party;
-    profile2_attach_form($form, $form_state);
-
-    return $form;
-  }
 }
