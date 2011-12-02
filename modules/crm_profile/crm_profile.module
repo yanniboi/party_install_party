@@ -65,45 +65,6 @@ function crm_profile_crm_party_data_set_info() {
 }
 
 /**
- * Return the stuff to go inside a party form
- * NO LONGER NEEDED
- */
-function crm_profile_attached_entity_form($form, &$form_state, &$attached_entity, $party) {
-  $attached_entity_form = array();
-  
-  $profile = $attached_entity->entity;
-  
-  field_attach_form('profile2', $profile, $attached_entity_form, $form_state); 
-
-  if (count(field_info_instances('profile2', $profile->type)) == 0) {
-    $attached_entity_form['message'] = array(
-      '#access' => user_access('administer profile types'), 
-      '#markup' => t('No fields have been associated with this profile type. Go to the <a href="!url">Profile types</a> page to add some fields.', array('!url' => url('admin/structure/profiles'))),
-    );
-  }  
-  
-  return($attached_entity_form);
-}
-
-function crm_profile_attached_entity_form_submit($form, &$form_state, &$attached_entity, $party) {
-  $hash = $attached_entity->hash();
-  
-  //save the profile
-  profile2_save($attached_entity->entity);
-  
-  //submit fields
-  field_attach_submit('profile2', $attached_entity->entity, $form[$hash], $form_state);
-  profile2_save($attached_entity->entity);
-}
-
-function crm_profile_attached_entity_form_validate($form, &$form_state, &$attached_entity, $party) {
-  //validate fields
-  $pseudo_entity = (object) $form_state['values'][$attached_entity->hash()];
-  $psuedo_entity->type = $attached_entity->getEntityBundle();
-  field_attach_form_validate('profile2', $pseudo_entity, $form[$attached_entity->hash()], $form_state);
-}
-
-/**
  * Change the Party Details Page
  *
  * @todo: see crm_profile_crm_party_party_pieces() -- this function should
