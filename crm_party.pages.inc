@@ -251,7 +251,7 @@ function crm_party_data_set_edit_form($form, &$form_state, $attached_entity_cont
     $form['data-set-main'] = array(
       '#type' => 'checkbox',
       '#default_value' => $attached_entity_controller->isMain(),
-      '#title' => "This is the main " . $attached_entity_controller->getTypeLabel(),
+      '#title' => "This is the main " . $attached_entity_controller->getDataSetLabel(),
     );
   }
 

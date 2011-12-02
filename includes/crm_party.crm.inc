@@ -27,12 +27,9 @@ abstract class EntityDefaultCRMController {
   public $id;
   
   /**
-   * var string $type
-   *   The data set type (array key in hook_data_set_info)
+   * var string $data_set_name
+   *   The data set name (array key in hook_data_set_info)
    */
-  // $type is obsolete as it is overloaded already in Drupal!
-  // @todo: finish removing.
-  public $type;
   public $data_set_name;
   
   /**
@@ -100,7 +97,6 @@ abstract class EntityDefaultCRMController {
     // it.
     $sets = crm_party_get_data_set_info();
     if (isset($sets[$data_set_name])) {
-      $this->type = $data_set_name;
       $this->data_set_name = $data_set_name;
       // @todo: not sure about this, as it duplicates the set definition over 
       // and over in memory. The data set definitions should be statically cached
@@ -480,7 +476,7 @@ abstract class EntityDefaultCRMController {
   /**
    * get the data set type label
    */
-  public function getTypeLabel() {
+  public function getDataSetLabel() {
     return $this->definition['label'];
   }
   
@@ -495,8 +491,8 @@ abstract class EntityDefaultCRMController {
    * getInstance
    *   Get an instance of the EntityDefaultCRMController class
    *
-   * @param $type
-   *  The type of data set.
+   * @param $data_set_name
+   *  The name of data set.
    * @param $info
    *  The data to load the instance from. One of:
    *   - peid
@@ -509,12 +505,8 @@ abstract class EntityDefaultCRMController {
    *  The way to load the instance
    *  @todo: how? document this properly!!!
    */
-  public static function getInstance($type, $info, $how = self::FROM_PARTY_AND_ENTITY) {
-    $sets = crm_party_get_data_set_info();
-    // @todo: fail gracefull if no class found, eg bad URLs.
-    $class = $sets[$type]['class'];
-    
-    $instance = new $class($type);    
+  public static function getInstance($data_set_name, $info, $how = self::FROM_PARTY_AND_ENTITY) {
+    $instance = crm_party_get_crm_controller($data_set_name);    
     switch ($how) {
       case self::FROM_PEID :
         $result = db_select('crm_party_attached_entity', 'ds')
@@ -549,7 +541,7 @@ abstract class EntityDefaultCRMController {
    * getInstances
    *   Get all instances attached to a party
    *
-   * @param $type the type of data set.
+   * @param $data_set_name the name of data set.
    * @param $info The data to load the instance from
    *   Either a
    *   - party_id
@@ -557,9 +549,7 @@ abstract class EntityDefaultCRMController {
    * 
    * @param $how The way to load the instances
    */
-  public static function getInstances($type, $info, $how = self::FROM_PARTY) {
-    $sets = crm_party_get_data_set_info();
-    $class = $sets[$type]['class'];
+  public static function getInstances($data_set_name, $info, $how = self::FROM_PARTY) {
     $results = array();
     
     switch($how) {
@@ -580,15 +570,16 @@ abstract class EntityDefaultCRMController {
         break;          
     }
     
-    $dataSets = array();
+    $attached_entities = array();
     foreach ($results as $peid => $result) {
       $info = array(
         'party' => $result['pid'],
         'entity' => $result['eid'],
       );
-      $dataSets[$peid] = self::getInstance($type, $info);
+      $attached_entity = self::getInstance($data_set_name, $info);
+      $attached_entities[$attached_entity->hash()] = $attached_entity; 
     }
     
-    return $dataSets;
+    return $attached_entities;
   }
 }
