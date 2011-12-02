@@ -65,20 +65,8 @@ function crm_profile_crm_party_data_set_info() {
 }
 
 /**
- * Implements hook_profile2_type_insert().
- */
-function crm_profile_profile2_type_insert($type) {
-}
-
-/**
- * Implements hook_profile2_type_delete().
- */
-function crm_profile_profile2_type_delete($type) {
-}
-
-
-/**
  * Return the stuff to go inside a party form
+ * NO LONGER NEEDED
  */
 function crm_profile_attached_entity_form($form, &$form_state, &$attached_entity, $party) {
   $attached_entity_form = array();
