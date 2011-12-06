@@ -323,7 +323,7 @@ function crm_party_hat_get_hats($party) {
     return crm_party_hat_get_all_hats($options);
   }
   else {
-    if (is_array($party->party_hat)) {
+    if (isset($party->party_hat) && is_array($party->party_hat)) {
       foreach ($party->party_hat['und'] as $hat_name) {
         $hat = crm_party_hat_load($hat_name);
         $hats[$hat->hid] = $hat; 

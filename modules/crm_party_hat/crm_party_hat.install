@@ -39,6 +39,26 @@ function crm_party_hat_install() {
       ),
     );
     field_create_instance($instance);
+    
+    $instance = array(
+      'field_name' => 'party_hat',
+      'entity_type' => 'crm_party',
+      'bundle' => 'organisation',
+      'label' => t('Hats'),
+      'required' => TRUE,
+      'description' => t("This party's hats"),
+      'widget' => array(
+        'type' => 'options_buttons',
+        'settings' => array(),
+      ),
+      'display' => array(
+        'default' => array(
+          'type' => 'hat_reference_default',
+          'label' => 'inline',
+        ),
+      ),
+    );
+    field_create_instance($instance);
   }
 }
 
@@ -87,6 +107,7 @@ function crm_party_hat_schema() {
   
   // @todo do we need the phid column?
   //       We need a primary key and neither of the two fields would be unique
+  //       We don't need this table at all anymore
   $schema['crm_party_hattings'] = array(
     'description' => 'Stores hattings (relationships between hats and parties)',
     'fields' => array(
@@ -248,5 +269,30 @@ function crm_party_hat_update_7003() {
  */
 function crm_party_hat_update_7004() {
   db_rename_table('crm_party_hats', 'crm_party_hat');
+}
+
+/**
+ * Add the hat field to organisations
+ */
+function crm_party_hat_update_7005() {
+  $instance = array(
+    'field_name' => 'party_hat',
+    'entity_type' => 'crm_party',
+    'bundle' => 'organisaton',
+    'label' => t('Hats'),
+    'required' => TRUE,
+    'description' => t("This party's hats"),
+    'widget' => array(
+      'type' => 'options_buttons',
+      'settings' => array(),
+    ),
+    'display' => array(
+      'default' => array(
+        'type' => 'hat_reference_default',
+        'label' => 'inline',
+      ),
+    ),
+  );
+  field_create_instance($instance);
 }
 
