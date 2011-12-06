@@ -1116,7 +1116,6 @@ function crm_party_default_attached_entity_form_validate($form, &$form_state, &$
  */
 function crm_party_default_attached_entity_form_submit($form, &$form_state, &$attached_entity, $party) {
   $hash = $attached_entity->hash();
-  dsm($form_state['values']);
   
   //save the profile
   entity_save($attached_entity->getEntityType(), $attached_entity->entity);

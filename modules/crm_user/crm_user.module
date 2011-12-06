@@ -6,15 +6,6 @@
  */
 
 /**
- * Implements hook_entity_info_alter().
- */
-function crm_user_entity_info_alter(&$entity_info) {
-  $entity_info['user']['crm controller class'] = 'UserCRMController';
-  // Pass this on to the controller class to make further changes.
-  UserCRMController::hook_entity_info_alter($entity_info['user']);
-}
-
-/**
  * Implements hook_crm_party_data_set_info()
  */
 function crm_user_crm_party_data_set_info() {
@@ -29,7 +20,6 @@ function crm_user_crm_party_data_set_info() {
       'manage fields' => 'admin/config/people/accounts/fields',
       'manage display' => 'admin/config/people/accounts/display',
     ),
-    'load callback' => "crm_user_load_user",
     'form callback' => "crm_user_form_user",
   );
   return $sets;
@@ -74,78 +64,89 @@ function crm_user_party_view_user($party) {
 }
 
 /**
- * Implements hook_form_FORM_ID_alter()
- *
- * Alter Party forms to do things
+ * Build the User Data Set form.
  */
-function crm_user_form_crm_party_edit_form_alter(&$form, &$form_state, $form_id) {
-  $party = $form['#party'];
-  // For an existing party, get the related user account if there is one.
-  if (isset($party->pid)) {
-    $attached_entities = crm_party_get_attached_entities($party, 'user');
-    // We know we're a singleton data set so we can just pop off the one result.
-    $attached_user = array_pop($attached_entities);
-
-    $account = is_object($attached_user) ? $attached_user->entity : NULL;
+function crm_user_form_user($form, &$form_state, &$attached_entity, $party) {
+  $user_form = array();
+  
+  // If the user is set we load the edit account form.
+  if ($attached_entity->eid !== NULL) {
+    module_load_include('inc', 'user', 'user.pages');
+    $user_form['op'] = array(
+      '#type' => 'value',
+      '#value' => 'edit',
+    );
+    
+    $user_form = user_profile_form($user_form, $form_state, $attached_entity->entity);
+    unset($user_form['actions']);
+    
+    // $form['#submit'][] = 'crm_user_user_edit_form_submit'; need to not exist
   }
+  else {
+    // Mark down that we're selecting which user to connect.
+    $user_form['op'] = array(
+      '#type' => 'value',
+      '#value' => 'select',
+    );
+  
+    // Store the account uid so we can check if it changes on submit.
+    $user_form['crm_user_uid'] = array(
+      '#type' => 'value',
+      '#value' => isset($attached_entity->entity->uid) ? $attached_entity->entity->uid : NULL,
+    );
 
-  // Store the account uid so we can check if it changes on submit.
-  $form['crm_user_uid'] = array(
-    '#type' => 'value',
-    '#value' => isset($account) ? $account->uid : NULL,
-  );
-
-  $form['user'] = array(
-    '#type' => 'textfield',
-    '#title' => t('User'),
-    '#maxlength' => 60,
-    '#autocomplete_path' => 'user/autocomplete',
-    '#default_value' => isset($account) ? $account->name : '',
-    '#weight' => -1,
-    '#description' => t('Leave blank for %anonymous.', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
-  );
-
-  $form['#submit'][] = 'crm_user_post_form_submit_relate';
+    $user_form['user'] = array(
+      '#type' => 'textfield',
+      '#title' => t('User'),
+      '#maxlength' => 60,
+      '#autocomplete_path' => 'user/autocomplete',
+      '#default_value' => isset($attached_entity->entity->name) ? $attached_entity->entity->name : '',
+      '#weight' => -1,
+      '#description' => t('Leave blank for %anonymous.', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
+    );
+    
+    // $form['#submit'][] = 'crm_user_user_add_form_submit'; can't rely on this
+  }
+  
+  return $user_form;
 }
 
 /**
- * Relate the user entities to the crm_party in form_state
+ * Validate the user data set form
+ *
+ * @todo: Implement
  */
-function crm_user_post_form_submit_relate($form, &$form_state) {
-  $original_uid = $form_state['values']['crm_user_uid'];
-
-  // Attempt to load a user from the given input.
-  $account = user_load_by_name($form_state['values']['user']);
-  // Fall back to the anonymous user.
-  if (!$account) {
-    $account = user_load(0);
-  }
-
-  // Only alter our records if something has changed.
-  if ($original_uid != $account->uid) {
-    $party = $form_state['crm_party'];
-
-    // Unrelate the original user, then relate the new one.
-    // In both cases, only act on non-anonymous accounts: that is not stored.
-    if ($original_uid) {
-      crm_party_unrelate($party, $original_uid, 'user');
-    }
-    if ($account->uid) {
-      crm_party_relate($party, $account, 'user');
-    }
-  }
+function crm_user_form_user_validate($form, &$form_state, &$attached_entity, $party) {
+  return TRUE;
 }
 
-function crm_user_user_add_form_submit($form, &$form_state) {
-  // Attempt to load a user from the given input.
-  $account = user_load_by_name($form_state['values']['user']);
-  // Put the account in the entity part of the $form state.
-  $form_state['entity'] = $account;  
+/**
+ * Submit the user data set form
+ */
+function crm_user_form_user_submit($form, &$form_state, &$attached_entity, $party) {
+  $hash = $attached_entity->hash();
+  
+  $op = $form_state['values'][$hash]['op'];
+  
+  if ($op == 'select') {
+    // Attempt to load a user from the given input.
+    $account = user_load_by_name($form_state['values'][$hash]['user']);
+    $attached_entity->setAttachedEntity($account);
+  }
+  else if ($op == 'edit') {
+    $account = $attached_entity->entity;
+    $category = $form[$hash]['#user_category'];
+    
+    $edit = array_intersect_key((array) $account, $form_state['values'][$hash]);
+    user_save($account, $edit, $category);
+    
+    if ($category == 'account' && !empty($edit['pass'])) {
+      // Remove the password reset tag since a new password was saved.
+      unset($_SESSION['pass_reset_' . $account->uid]);
+    }
+    cache_clear_all();
+  }
 }
-
-function crm_user_user_edit_form_submit($form, &$form_state) {
-  $form_state['entity'] = $form_state['user'];
-}  
 
 /**
  * Controller class for CRM integration.
@@ -158,35 +159,6 @@ class UserCRMController extends EntityDefaultCRMController {
   // @todo remove
   const VIEW_MODE = "full";
 
-  public function form(&$form, &$form_state) {
-    if ($this->eid !== NULL) {
-      module_load_include('inc', 'user', 'user.pages');
-      $form = user_profile_form($form, $form_state, $this->entity);
-      unset($form['actions']);
-      
-      $form['#submit'][] = 'crm_user_user_edit_form_submit';
-    }
-    else {
-      // Store the account uid so we can check if it changes on submit.
-      $form['crm_user_uid'] = array(
-        '#type' => 'value',
-        '#value' => isset($this->entity) ? $this->entity->uid : NULL,
-      );
-
-      $form['user'] = array(
-        '#type' => 'textfield',
-        '#title' => t('User'),
-        '#maxlength' => 60,
-        '#autocomplete_path' => 'user/autocomplete',
-        '#default_value' => isset($this->entity) ? $this->entity->name : '',
-        '#weight' => -1,
-        '#description' => t('Leave blank for %anonymous.', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
-      );
-      
-      $form['#submit'][] = 'crm_user_user_add_form_submit';
-    }
-  }
-  
   /**
    * Display a user dataSet
    *  This is needed because user doesn't use the entity API

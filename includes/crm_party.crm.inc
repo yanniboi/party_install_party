@@ -388,7 +388,7 @@ abstract class EntityDefaultCRMController {
     if (!$bundle_key) {
       // If there's no bundle key, it's a singleton entity and the bundle is
       // the same as the entity type.
-      $bundle = $entity_type;
+      $bundle = $this->getEntityType();
     }
     else {  
       // @todo: I kept this in, but really, if these two aren't the same something has gone very

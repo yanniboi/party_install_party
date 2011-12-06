@@ -12,7 +12,6 @@
  */
 function crm_party_page_view($party, $view_mode = 'full') {
   global $user;
-  dsm($user);
   
   $party->content = array();
   $build = array();
