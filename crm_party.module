@@ -5,9 +5,6 @@
  * Provides a generic CRM party entity.
  */
 
-// @todo: If these contain only classes they will be autoloaded and these include statements can be dropped.
-include_once("includes/crm_party_type.entity.inc");
-
 /**
  * Implements hook_help().
  */
