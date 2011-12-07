@@ -640,20 +640,29 @@ function crm_party_get_entity_data_set($entity_type, $entity) {
  *  - 'table': The table in which this set's data is stored.
  */
 function crm_party_get_data_set_info($data_set_name = NULL) {
-  // Due to http://drupal.org/node/890660 we can't use module_invoke_all()
-  // because we need to know the provenance of each set.
-  $sets = array();
-  foreach (module_implements('crm_party_data_set_info') as $module) {
-    $sets_module = module_invoke($module, 'crm_party_data_set_info');
-    foreach ($sets_module as $set_name => $set) {
-      // Add in some essential data we need, but allow modules to set this too.
-      $set += array(
-        'set_name' => $set_name,
-        'module' => $module,
-        'singleton' => FALSE,
-        'form callback' => 'crm_party_default_attached_entity_form',
-      );
-      $sets[$set_name] = $set;
+  $sets = &drupal_static(__FUNCTION__);
+  if (!isset($sets)) {
+    if ($cache = cache_get('crm_party:data_set_info', 'cache')) {
+      $sets = $cache->data;
+    }
+    else {
+      $sets = array();
+      foreach (module_implements('crm_party_data_set_info') as $module) {
+        // Due to http://drupal.org/node/890660 we can't use module_invoke_all()
+        // because we need to know the provenance of each set.
+        $sets_module = module_invoke($module, 'crm_party_data_set_info');
+        foreach ($sets_module as $set_name => $set) {
+          // Add in some essential data we need, but allow modules to set this too.
+          $set += array(
+              'set_name' => $set_name,
+              'module' => $module,
+              'singleton' => FALSE,
+              'form callback' => 'crm_party_default_attached_entity_form',
+          );
+          $sets[$set_name] = $set;
+        }
+      }
+      cache_set('crm_party:data_set_info', $sets);
     }
   }
 
