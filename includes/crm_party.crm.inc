@@ -4,13 +4,6 @@
  * The standard data set class
  */
 abstract class EntityDefaultCRMController {
-  
-  /**
-   * ENTITY_ID_KEY
-   *   The key of the entity unique id
-   */
-  const ENTITY_ID_KEY = "";
-  
   /**
    * Used in getInstance() to know how we're loading an
    *   instance.

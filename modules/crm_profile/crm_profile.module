@@ -59,8 +59,6 @@ function crm_profile_crm_party_data_set_info() {
  * @todo: move this to an inc file for autoloading.
  */
 class Profile2CRMController extends EntityDefaultCRMController {
-  const ENTITY_ID_KEY = "pid";
-  
   // @todo Remove somehow.
   const VIEW_MODE = 'party';
 }
