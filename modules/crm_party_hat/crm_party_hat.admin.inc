@@ -200,7 +200,8 @@ function theme_crm_hat_data_set_rules_form($variables) {
     $row = array();
     $row[] = $data_set;
     foreach (array_keys($form[$data_set]['#options']) as $radio_key) {
-      // @todo: move label to headers.
+      // Remove the checkbox label; it's shown in the table header.
+      unset($form[$data_set][$radio_key]['#title']);
       $row[] = drupal_render($form[$data_set][$radio_key]);
     }
 
