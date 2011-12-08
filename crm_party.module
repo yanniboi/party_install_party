@@ -239,8 +239,8 @@ function crm_party_menu() {
   ); 
   // Detach an attached entity
   $items['party/%crm_party/%crm_party_data_set/remove/%'] = array(
-    'page callback' => 'crm_party_attached_entity_remove',
-    'page arguments' => array(1, 2, 4),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('crm_party_attached_entity_remove_confirm', 1, 2, 4),
     'access callback' => TRUE, // todo
     'file' => 'crm_party.pages.inc',
   );

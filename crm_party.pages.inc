@@ -268,34 +268,25 @@ function crm_party_attached_entity_edit_form_submit($form, &$form_state) {
 }
 
 /**
- * Remove a data set from a party
+ * Form to confirm removing a data set from a party.
  */
-function crm_party_attached_entity_remove($party, $data_set, $eid) {
+function crm_party_attached_entity_remove_confirm($form, &$form_state, $party, $data_set, $eid) {
   $attached_entity = crm_party_get_crm_controller($data_set['set_name']);
   $attached_entity->setAttachedEntity($eid);
   $attached_entity->setParty($party->pid);
-  // @todo: fix misuse of t().
-  drupal_set_title(t('Are you sure you want to remove ' . $attached_entity->getLabel() . ' from ' . $attached_entity->party->label . '?'));
-  return drupal_get_form('crm_party_attached_entity_remove_confirm', $attached_entity);
-}
 
-/**
- * Data set remove form
- */
-function crm_party_attached_entity_remove_confirm($form, &$form_state, $attached_entity) {
   $form_state['#attached_entity'] = $attached_entity;
-  
-  $form['description'] = array(
-    '#markup' => '<p>Are you sure you want to remove this data set from this party?</p>',
+
+  return confirm_form($form,
+    t('Are you sure you want to remove %attached from %party?', array(
+      '%attached' => $attached_entity->getLabel(),
+      '%party' =>  $attached_entity->party->label,
+    )),
+    'party/' . $party->pid, // @todo: go back to the dataset page.
+    t('Are you sure you want to remove this data set from this party?') . ' ' . t('This action cannot be undone.'),
+    t('Remove'),
+    t('Cancel')
   );
-  
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Confirm'),
-    '#weight' => 99,
-  );
-  
-  return $form;
 }
 
 /**
