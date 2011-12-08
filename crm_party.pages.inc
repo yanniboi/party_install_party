@@ -193,17 +193,17 @@ function crm_party_page_view_piece_views($party, $view_name, $view_display_id) {
 /**
  * The attached entity edit form.
  *
+ * @param $party
+ *    A loaded party object.
  * @param $data_set
  *   A loaded data set.
  *   We don't actually need this loaded, but we need a menu loader to convert
  *   the path-style string to the machine name, and a menu loader that doesn't
  *   load would be weird too.
- * @param $pid
- *    The id of the party
  * @param $eid
  *    The id of the entity
  */
-function crm_party_attached_entity_edit_form($form, &$form_state, $data_set, $party, $eid = NULL) {
+function crm_party_attached_entity_edit_form($form, &$form_state, $party, $data_set, $eid = NULL) {
   
   // Get the attached entity object
   if (is_object($party)) {
@@ -278,9 +278,12 @@ function crm_party_attached_entity_edit_form_submit($form, &$form_state) {
 /**
  * Remove a data set from a party
  */
-function crm_party_attached_entity_remove($data_set, $pid, $eid) {
-  if(is_object($pid)) {
-    $pid = $pid->pid;  
+function crm_party_attached_entity_remove($party, $data_set, $eid) {
+  if (is_object($party)) {
+    $pid = $party->pid;
+  }
+  else {
+    $pid = $party;
   }
   
   $attached_entity = crm_party_get_crm_controller($data_set['set_name']);
