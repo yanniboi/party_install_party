@@ -220,13 +220,32 @@ function party_hat_get_data_set_rule($hat, $set) {
 }
 
 /**
+ * Implements hook_party_get_party_data_sets().
+ */
+function party_hat_party_get_party_data_sets($party) {
+  // Get the hats for this party
+  $party_hats = party_hat_get_hats($party);
+  
+  // Get the data sets expected for this hat.
+  $data_sets = array();
+  foreach ($party_hats as $hat) {
+    $temp_sets = party_hat_get_hat_data_sets($hat);
+    foreach ($temp_sets as $set) {
+      $data_sets[] = $set;
+    }
+  }
+  
+  return $data_sets;
+}
+
+/**
  * Get all the sets for a Hat.
  *
  * This returns an array of sets that a Party Must have or can have multiple of.
  *
  * @todo write params and return.
  */
-function party_hat_get_data_sets($hat, $rule = 'has') {
+function party_hat_get_hat_data_sets($hat, $rule = 'has') {
    
   $results = db_select('party_hat_data_set_rules', 'c')
     ->fields('c')
@@ -455,7 +474,6 @@ function party_hat_options_list($field, $instance = NULL) {
  * Implements hook_field_presave().
  */
 function party_hat_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
-
 }
 
 /**
@@ -489,10 +507,34 @@ function party_hat_field_formatter_view($entity_type, $entity, $field, $instance
 }
 
 /**
+ * Get Required Hats for Field Values
+ */
+function party_hat_field_get_default($entity_type, $entity, $field, $instance, $langcode = null) {
+  //only works for party at the moment.
+  if ($entity_type != 'party') {
+    return array();
+  }
+  
+  //Get required hats.
+  $options = array(
+    'required' => TRUE,
+    'party_type' => $entity->type,
+  );
+  $hats = party_hat_get_all_hats($options);
+  
+  $values = array();
+  foreach ($hats as $hat) {
+    $values[] = array(
+      'hat_name' => $hat->name,
+    );
+  }
+  
+  return $values;
+}
+
+/**
  * This checks if all expected data sets are present and, if not, sends the user
  * back to the form with a nice message.
- *
- * @todo: Move to party_hats
  */
 function party_hat_party_form_hat_check($form, &$form_state) {
   foreach (party_hat_get_hats($form_state['#party']) as $hid => $hat) {
@@ -507,4 +549,3 @@ function party_hat_party_form_hat_check($form, &$form_state) {
     }
   }
 }
-

@@ -193,6 +193,17 @@ function hook_party_admin_columns_info() {
 }
 
 /**
+ * Return a set of data sets available to a party.
+ *
+ * @param $party
+ *
+ * @return
+ *  an array of data_set_names
+ */
+function hook_party_get_party_data_sets($party) {
+}
+
+/**
  * Attach an entity to a party.
  *
  * @param $party

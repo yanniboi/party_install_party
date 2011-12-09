@@ -54,10 +54,10 @@ function party_add($type = '') {
     return $build;
   }
 
-  $party = (object) array(
+  $party = entity_create('party', array(
     'type' => $type,
     'label' => '',
-  );
+  ));
 
   return drupal_get_form('party_edit_form', $party);
 }
@@ -92,25 +92,8 @@ function party_edit_form($form, &$form_state, $party) {
   $form_state['#party'] = $party;
   $form_state['#attached_entities'] = array();
   
-  //get hats associated with this party
-  // @todo: Get into party_hat module.
-  $party_hats = party_hat_get_hats($party);
-  $defaults = array();
-  if (!isset($party->pid)) {
-    foreach ($party_hats as $ph) {
-      $party->party_hat['und'][]['hat_name'] = $ph->name;
-    }
-  }    
+  $data_sets = party_get_party_data_sets($party);
   
-  // Get Party Hat must have data sets
-  $data_sets = array();
-  foreach ($party_hats as $hat) {
-    $temp_sets = party_hat_get_data_sets($hat);
-    foreach ($temp_sets as $set) {
-      $data_sets[] = $set;
-    }
-  }
-
   foreach ($data_sets as $data_set) {
     $attached_entities = array();
     if (isset($party->pid)) {

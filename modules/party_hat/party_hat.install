@@ -27,6 +27,7 @@ function party_hat_install() {
       'label' => t('Hats'),
       'required' => FALSE,
       'description' => t("This party's hats"),
+      'default_value_function' => 'party_hat_field_get_default',
       'widget' => array(
         'type' => 'options_buttons',
         'settings' => array(),
@@ -47,6 +48,7 @@ function party_hat_install() {
       'label' => t('Hats'),
       'required' => FALSE,
       'description' => t("This party's hats"),
+      'default_value_function' => 'party_hat_field_get_default',
       'widget' => array(
         'type' => 'options_buttons',
         'settings' => array(),
@@ -278,7 +280,7 @@ function party_hat_update_7005() {
   $instance = array(
     'field_name' => 'party_hat',
     'entity_type' => 'party',
-    'bundle' => 'organisaton',
+    'bundle' => 'organisation',
     'label' => t('Hats'),
     'required' => TRUE,
     'description' => t("This party's hats"),
@@ -294,5 +296,26 @@ function party_hat_update_7005() {
     ),
   );
   field_create_instance($instance);
+}
+
+/**
+ * Provide a defualt value function for the field.
+ */
+function party_hat_update_7006() {
+  $instance = array(
+    'field_name' => 'party_hat',
+    'entity_type' => 'party',
+    'bundle' => 'organisation',
+    'default_value_function' => 'party_hat_field_get_default',
+  );
+  field_update_instance($instance);
+  
+  $instance = array(
+    'field_name' => 'party_hat',
+    'entity_type' => 'party',
+    'bundle' => 'individual',
+    'default_value_function' => 'party_hat_field_get_default',
+  );
+  field_update_instance($instance);
 }
 

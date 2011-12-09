@@ -682,6 +682,20 @@ function party_get_data_set_info($data_set_name = NULL) {
   }
 }
 
+/**
+ * Get the data sets expected for a party
+ */
+function party_get_party_data_sets($party) {
+  if (count(module_implements('party_get_party_data_sets')) > 0) {
+    $data_sets = module_invoke_all('party_get_party_data_sets', $party);
+  }
+  else {
+    $data_sets = array_keys(party_get_data_set_info());
+  }
+  
+  return $data_sets;
+}
+
 // -----------------------------------------------------------------------
 // API for relating and unrelating entities to a party.
 
