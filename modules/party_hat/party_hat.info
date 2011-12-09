@@ -1,0 +1,8 @@
+name = Party Hat
+description = Allows access rules to be defined for parties. 
+package = CRM
+dependencies[] = party
+core = 7.x
+files[] = party_hat.module
+files[] = party_hat.admin.inc
+files[] = includes/party_hat.entity.inc

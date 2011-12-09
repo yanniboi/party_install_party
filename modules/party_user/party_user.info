@@ -1,0 +1,6 @@
+name = Party User
+description = Provides things to attach users to parties
+package = CRM
+core = 7.x
+
+dependencies[] = party

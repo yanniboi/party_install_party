@@ -1,0 +1,1145 @@
+<?php
+
+/**
+ * @file
+ * Provides a generic CRM party entity.
+ */
+
+/**
+ * Implements hook_help().
+ */
+function party_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#party':
+      return t("TODO: Create admin help text.");
+    case 'admin/config/crm/labels':
+      return t("Party name label generators save a label whenever a party is created or updated. This lets you form the party's label or name in a variety of methods.");
+  }
+}
+
+/**
+ * Implements hook_entity_info().
+ *
+ * @todo: Improve documentation
+ * @todo: Party types?!
+ */
+function party_entity_info() {
+  $party_info['party'] = array(
+    'label' => t('Party'),
+    'entity class' => 'Party',
+    'controller class' => 'PartyController',
+    // We define this so entity module provides us with basic Views data, while
+    // allowing us to define more of our own.
+    // See http://drupal.org/node/1307760.
+    'views controller class' => 'EntityDefaultViewsController',
+    'base table' => 'party',
+    //'uri callback' => 'party_uri',
+    'fieldable' => TRUE,
+    'module' => 'party',
+    'entity keys' => array(
+      'id' => 'pid',
+      'bundle' => 'type',
+    ),
+    'exportable' => TRUE,
+    //'static cache' => TRUE,
+    'bundles' => array(
+      'individual' => array(
+        'label' => t('Individual Party'),
+        'description' => 'Parties representing individual people',
+        'admin' => array(
+          'path' => 'admin/community/party/manage/individual',
+          'access arguments' => array('administer parties'),
+        ),
+      ),
+      'organisation' => array(
+        'label' => t('Organisation Party'),
+        'description' => 'Parties representing organisations or groups of people',
+        'admin' => array(
+          'path' => 'admin/community/party/manage/organisation',
+          'access arguments' => array('administer parties'),
+        ),
+      ),
+    ),
+    'bundle keys' => array(
+      'bundle' => 'type',
+    ),
+    'view modes' => array(
+      'full' => array(
+        'label' => t('Full Contact'),
+        'custom settings' =>  FALSE,
+      ),
+    )
+  );
+    
+  return $party_info;
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ *
+ * Make standard alterations to entities that declare they work with Parties
+ * via hook_party_data_set_info().
+ *
+ * @see EntityDefaultPartyController::hook_entity_info_alter()
+ */
+function party_entity_info_alter(&$entity_info) {
+  $sets = party_get_data_set_info();
+  
+  foreach ($sets as $set) {
+    $entity_info[$set['entity type']]['crm controller class'] = $set['class'];
+    // Pass this onto the class to make changes.
+    $set['class']::hook_entity_info_alter($entity_info[$set['entity type']]);
+  }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function party_menu() {
+  // CRM settings.
+  // Making up a new config category.
+  // Alternative is to put this all under top-level admin.
+  // But all this structure is rough anyway.
+  $items['admin/config/crm'] = array(
+    'title' => 'CRM',
+    'description' => 'CRM settings.',
+    'position' => 'left',
+    'weight' => -10,
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+  );
+  $items['admin/config/crm/labels'] = array(
+    'title' => 'Labels',
+    'description' => 'Determine how labels for parties are generated.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('party_settings_label_plugin_form'),
+    'access arguments' => array('administer crm settings'),
+    'file' => 'party.admin.inc',
+  );
+  $items['admin/config/crm/piece-order'] = array(
+    'title' => 'Piece order',
+    'description' => 'Rearrange the order of pieces within a party.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('party_settings_pieces_order_form'),
+    'access arguments' => array('administer crm settings'),
+    'file' => 'party.admin.inc',
+  );
+
+  $items['admin/community'] = array(
+    'title' => 'Community',
+    'description' => 'Manage the community',
+    'page callback' => 'party_admin',
+    'page arguments' => array('list'),
+    'access arguments' => array('administer parties'),
+    'position' => 'left',
+    'file' => 'party.admin.inc',
+  );
+  // @todo crib from one of the core modules for how this admin menu pattern should be done, eg 'People'.
+  $items['admin/community/list'] = array(
+    'title' => 'List contacts',
+    'page callback' => 'party_admin',
+    'page arguments' => array('list'),
+    'access arguments' => array('administer parties'),
+    'position' => 'left',
+    'file' => 'party.admin.inc',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['admin/community/datasets'] = array(
+    'title' => 'Manage data sets',
+    'page callback' => 'party_data_set_admin',
+    'access arguments' => array('administer parties'),
+    'file' => 'party.admin.inc',
+    'type' => MENU_LOCAL_TASK,    
+  );
+  $items['admin/community/party/manage'] = array(
+    'title' => 'Party admin',
+    'description' => 'Manage contact information',
+    'page callback' => 'party_info',
+    'access arguments' => array('administer parties'),
+    'file' => 'party.admin.inc',
+  );
+  $items['admin/community/party/manage/individual'] = array(
+    'title' => 'Manage individuals',
+    'description' => 'Manage contact information',
+    'page callback' => 'party_manage',
+    'page arguments' => array('individual'),
+    'access arguments' => array('administer parties'),
+    'file' => 'party.admin.inc',
+  );
+  $items['admin/community/party/manage/organisation'] = array(
+    'title' => 'Manage organisations',
+    'description' => 'Manage contact information',
+    'page callback' => 'party_manage',
+    'page arguments' => array('organisation'),
+    'access arguments' => array('administer parties'),
+    'file' => 'party.admin.inc',
+  );
+  
+  $items['party/%party'] = array(
+    'title callback' => 'party_page_title',
+    'title arguments' => array(1),
+    'page callback' => 'party_page_view',
+    'page arguments' => array(1),
+    'file' => 'party.pages.inc',
+    'access callback' => 'party_access',
+    'access arguments' => array('view', 1),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  // Build the party view first-level tabs.
+  // @todo: Write a contrib module to turn a set of tabs into ajax tabs,
+  // probably using or as part of quicktabs module.
+  $pieces = party_get_party_piece_info();
+  // These come sorted by weight so we know which to make the default tab.
+  foreach ($pieces as $path => $piece) {
+    if (!isset($seen_first_piece)) {
+      $seen_first_piece = TRUE;
+      $piece['type'] = MENU_DEFAULT_LOCAL_TASK;
+    }
+    // Add in some defaults for convenience.
+    // @todo: once these stabilize, document them in the API file.
+    $piece += array(
+      'type' => MENU_LOCAL_TASK,
+      // Make this explicit so it overrides the parent.
+      'access callback' => 'user_access',
+      'access arguments' => array('view contacts'),
+      // @todo: change this to use party_access().
+      // we'll need a dataset loader. @see @todo in party_profile_party_data_set_info().
+      //'access arguments' => array('view', 1),
+    );
+    $items["party/%party/$path"] = $piece;
+  }
+
+  // This is temporary until I figure out a neat way to do tabs below pieces.
+  $items['party/%party/party/view'] = array(
+    'title' => 'View',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  ) + $items['party/%party/party'];
+
+  $items['party/%party/party/edit'] = array(
+    'title' => 'Edit',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('party_edit_form', 1),
+    'file' => 'party.pages.inc',
+    'access arguments' => array('edit contacts'),
+    'type' => MENU_LOCAL_TASK,
+  );
+  // End temporary.
+  
+  // Attached entity menu items
+  // Edit an attached entity
+  $items['party/%party/%party_data_set/edit/%'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('party_attached_entity_edit_form', 1, 2, 4),
+    'access callback' => TRUE, // todo
+    'access arguments' => array('edit contacts'),
+    'file' => 'party.pages.inc',
+  ); 
+  // Detach an attached entity
+  $items['party/%party/%party_data_set/remove/%'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('party_attached_entity_remove_confirm', 1, 2, 4),
+    'access callback' => TRUE, // todo
+    'file' => 'party.pages.inc',
+  );
+  // Add an attached entity
+  $items['party/%party/%party_data_set/add'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('party_attached_entity_edit_form', 1, 2),
+    'access callback' => TRUE, // todo
+    'access arguments' => array('edit contacts'),
+    'file' => 'party.pages.inc',
+  );
+
+  $items['party/add'] = array(
+    'title' => 'Add party',
+    'page callback' => 'party_add',
+    'file' => 'party.pages.inc',
+    'access arguments' => array('create contacts'),
+  );
+  $items['party/add/individual'] = array(
+    'title' => 'Add individual',
+    'page callback' => 'party_add',
+    'page arguments' => array('individual'),
+    'file' => 'party.pages.inc',
+    'access arguments' => array('create contacts'),
+  );
+  $items['party/add/organisation'] = array(
+    'title' => 'Add organisation',
+    'page callback' => 'party_add',
+    'page arguments' => array('organisation'),
+    'file' => 'party.pages.inc',
+    'access arguments' => array('create contacts'),
+  );
+
+  // Provide useful information for developers.
+  // This may eventually move to a devel_party module if there's more of it.
+  if (module_exists('devel')) {
+    $items['devel/crm/info'] = array(
+      'title' => 'CRM info',
+      'description' => 'View CRM data.',
+      'page callback' => 'party_devel_info_page',
+      'access arguments' => array('access devel information'),
+      'file' => 'party.admin.inc',
+      'menu_name' => 'devel',
+      'weight' => 10,
+    );
+  }
+
+  return $items;
+}
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function party_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+  // Add action link to 'party/add' on 'admin/community/list' page.
+  if ($root_path == 'admin/community/list' || $root_path == 'admin/community') {
+    $item = menu_get_item('party/add');
+    if ($item['access']) {
+      $data['actions']['output'][] = array(
+        '#theme' => 'menu_local_action',
+        '#link' => $item,
+      );
+    }
+  }
+  
+  // Add action links to 'admin/community/datasets' page.
+  if ($root_path == 'admin/community/datasets') {
+    $data_sets = party_get_data_set_info();
+    $attached_entity_types = array();
+    foreach ($data_sets as $data_set) {
+      $attached_entity_types[$data_set['entity type']] = $data_set['admin'];
+    }
+
+    foreach ($attached_entity_types as $type => $admin) {
+      $type = entity_get_info($type);
+      if (isset($admin['create'])) {
+        $item = menu_get_item($admin['create']);
+        if ($item['access']) {
+          $item['title'] = 'Add ' . $type['label'] . ' data set';
+          $data['actions']['output'][] = array(
+            '#theme' => 'menu_local_action',
+            '#link' => $item,
+          );
+        }
+      }
+      
+      if (isset($admin['import'])) {
+        $item = menu_get_item($admin['import']);
+        $item['title'] = 'Import ' . $type['label'] . ' data set';
+        if ($item['access']) {
+          $data['actions']['output'][] = array(
+            '#theme' => 'menu_local_action',
+            '#link' => $item,
+          );
+        }
+      }
+    }
+  }
+
+  // Add action links for attaching new entities on party pieces that are built
+  // from data sets.
+  if (substr($root_path, 0, 8) == 'party/%/') {
+    if (!isset($router_item['original_map'][3])) {
+      $piece_subpath = $router_item['original_map'][2];
+      $pieces = party_get_party_piece_info();
+      $piece = $pieces[$piece_subpath];
+
+      if (isset($piece['data_set'])) {
+        $data_set_base_path = implode('/', $router_item['original_map']);
+        $item = menu_get_item($data_set_base_path . '/add');
+        if ($item['access']) {
+          $data_sets = party_get_data_set_info();
+          $data_set = $data_sets[$piece['data_set']];
+          $data['actions']['output'][] = array(
+            '#theme' => 'menu_local_action',
+            '#link' => array(
+              'title' => t('Attach new @data-set', array('@data-set' => $data_set['label'])),
+              'href' => $data_set_base_path . '/add',
+            ),
+          );
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Menu loader for data sets.
+ *
+ * @param $data_set_url_string
+ *  The url-form of a data set name, ie with hyphens instead of underscores.
+ *
+ * @return
+ *  A loaded data set definition.
+ */
+function party_data_set_load($data_set_url_string) {
+  foreach (party_get_data_set_info() as $data_set => $info) {
+    // Match the path string we've been given with the one that's defined in
+    // data sets and return the data set we find.
+    if (isset($info['piece']) && $info['piece']['path'] == $data_set_url_string) {
+      return $info;
+    }
+  }
+}
+
+/**
+ * Determines whether the party may attach the given entity.
+ *
+ * Unlike core Drupal access systems which are all about whether the current
+ * user may perform an action, this function is also about whether the current
+ * party may have actions performed upon it.
+ * For example, this function answers questions such as: 'can party P have an
+ * entity attached to it as part of data set D?', in addition to user-focussed
+ * questions such as 'can user U view the attached entity E belonging to
+ * party P?'.
+ *
+ * @param $op
+ *   The operation being performed.
+ *   Currently one of: 'view', 'create'.
+ *   @todo: consider distinguishing $op values for solo party vs attached
+ *   entity, eg 'view attached' / 'view', so that we don't have to keep mucking
+ *   about testing isset($attached_entity).
+ * @param $party
+ *   A party to check access for.
+ * @param $attached_entity
+ *   (optional) An attached entity to check access for, or a dataset name if the
+ *   $op is 'create'. If nothing is given, access for just the party itself is
+ *   determined.
+ * @param $account
+ *   (optional) The user to check for. Omit to check for the global user.
+ *
+ * @return boolean
+ *   Whether access is allowed or not.
+ *
+ * @see hook_party_access()
+ * @see party_party_access()
+ */
+function party_access($op, $party = NULL, $attached_entity = NULL, $account = NULL) {
+  // Let the admin through when there's no attached entity being considered.
+  if (!isset($attached_entity) && user_access('administer parties', $account)) {
+    return TRUE;
+  }
+
+  // Allow modules to grant / deny access.
+  $access = module_invoke_all('party_access', $op, $party, $attached_entity, $account);
+
+  // Only grant access if at least one module granted access and no one denied
+  // access.
+  if (in_array(FALSE, $access, TRUE)) {
+    return FALSE;
+  }
+  elseif (in_array(TRUE, $access, TRUE)) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+ * Implements hook_party_access().
+ *
+ * WIP: just say yes for now!
+ */
+function party_party_access($op, $party = NULL, $attached_entity = NULL, $account = NULL) {
+  if (!isset($attached_entity)) {
+    // If we're not being asked about attachments, just use plain permissions.
+    switch ($op) {
+      case 'view':
+        return user_access('view contacts');
+    }
+  }
+  else {
+    // If we're being asked about attachments, grant access only if we are the
+    // only module reacting. This allows a basic operation of the CRM system
+    // where all attached entities can be used.
+    if (count(module_implements('party_access')) == 1) {
+      return TRUE;
+    }
+  }
+
+  return TRUE;
+}
+
+/**
+ * Implements hook_admin_paths().
+ */
+function party_admin_paths() {
+  $paths = array(
+    'party/*/*/edit/*' => TRUE,
+    'party/*/*/remove/*' => TRUE,
+    'party/*/*/add' => TRUE,
+  );
+  return $paths;
+}
+
+/**
+ * Page title callback for party view page.
+ *
+ * Has to be in the main module file because it's used by several menu items.
+ */
+function party_page_title($party) {
+  return $party->label;
+}
+
+// -----------------------------------------------------------------------
+// Party pieces: defining extra hook_menu() items according to data structure.
+
+/**
+ * Get all party piece definitions from hook_party_party_pieces().
+ *
+ * This is only used by hook_menu() and an admin page so no need to cache.
+ *
+ * @return
+ *  An array of party pieces, keyed by path and sorted by weight.
+ *  Keys in addition to those defined in hook_party_party_pieces():
+ *  - data_set: The id of a data set if this piece is defined from one.
+ */
+function party_get_party_piece_info() {
+  $pieces = module_invoke_all('party_party_pieces');
+
+  // Add in weights from the admin setting.
+  $weights = variable_get('party_name_pieces_weights', array());
+  foreach ($pieces as $path => $piece) {
+    // The weight setting overrides weights defined in the hook.
+    if (isset($weights[$path])) {
+      $pieces[$path]['weight'] = $weights[$path];
+    }
+  }
+
+  // Sort pieces array by weight for hook_menu() to figure out the default tab
+  // and the admin UI to show them in the right order.
+  // drupal_sort_weight() treats a missing weight key as a 0.
+  uasort($pieces, 'drupal_sort_weight');
+
+  return $pieces;
+}
+
+/**
+ * Implements hook_party_party_pieces().
+ *
+ * Defines:
+ *  - the basic piece for showing a party itself
+ *  - pieces that data sets provide
+ *  - pieces provided by Views as display plugins.
+ */
+function party_party_party_pieces() {
+  $pieces = array(
+    // The main party piece.
+    // By default this is the default tab, but the MENU_DEFAULT_LOCAL_TASK
+    // is supplied in hook_menu() to allow the piece order setting to change
+    // the default tab accordingly.
+    'party' => array(
+      'title' => 'Party',
+      'page callback' => 'party_page_view',
+      'page arguments' => array(1),
+      'file' => 'party.pages.inc',
+      'access arguments' => array('view contacts'),
+      'weight' => -10,
+    ),
+  );
+
+  // Party data sets may provide a piece each.
+  $sets = party_get_data_set_info();
+  foreach ($sets as $set_name => $set) {
+    if (isset($set['piece'])) {
+      // The path becomes the piece's key.
+      $path = $set['piece']['path'];
+      unset($set['piece']['path']);
+      // Add a key to say we came from a dataset.
+      $set['piece']['data_set'] = $set_name;
+
+      $pieces[$path] = $set['piece'];
+    }
+  }
+
+  // Custom pieces can be created as Views plugins.
+  if (module_exists('views')) {
+    // Get all views displays that implement our hook.
+    // There's no need to cache: views_menu() doesn't cache for page displays.
+    $views = views_get_all_views();
+    foreach ($views as $view) {
+      // Disabled views get nothing.
+      if (!empty($view->disabled)) {
+        continue;
+      }
+
+      $view->init_display();
+      foreach ($view->display as $display_id => $display) {
+        if (isset($display->handler) && !empty($display->handler->definition['uses hook party_party_pieces'])) {
+          $result = $display->handler->execute_hook_party_party_pieces();
+          if (is_array($result)) {
+            $pieces = array_merge($pieces, $result);
+          }
+        }
+      }
+    }
+  }
+
+  return $pieces;
+}
+
+// -----------------------------------------------------------------------
+// API for getting and changing data sets.
+
+/**
+ * Get the attached entity controller.
+ *
+ * @param $data_set_name
+ *  The name of the $set definition.
+ */
+function party_get_crm_controller($data_set_name) {
+  $sets = party_get_data_set_info();
+
+  // @todo: error handling
+  $class = $sets[$data_set_name]['class'];
+  return new $class($data_set_name);
+}
+
+/**
+ * Get the data set definition associated with a given entity and bundle.
+ *
+ * @param $entity_type
+ *  The entity type e.g profile2 etc.
+ * @param $entity
+ *  The entity object or id.
+ *
+ * @return
+ *  A data set name if one exists, NULL otherwise.
+ */
+function party_get_entity_data_set($entity_type, $entity) {
+  $data_set_info = party_get_data_set_info();
+
+  // Get bundle.
+  $info = entity_get_info($entity_type);
+  $bundle_key = empty($info['entity keys']['bundle']) ? FALSE : $info['entity keys']['bundle'];
+
+  if (!$bundle_key) {
+    $bundle = $entity_type;
+  }
+  else {
+    $bundle = $entity->{$bundle_key};
+  }
+
+  foreach ($data_set_info as $data_set_name => $data_set) {
+    if ($data_set['entity type'] == $entity_type && $data_set['entity bundle'] == $entity->type) {
+      return $data_set_name;
+    }
+  }
+
+  return NULL;
+}
+
+/**
+ * Get all data sets from hook_party_data_set_info().
+ *
+ * @todo: cache this, either in the DB or using DrupalCacheArray.
+ *
+ * @param $data_set_name
+ *  (optional) The name of the data set to return. If omitted, all are returned.
+ *
+ * @return
+ *  Either a single data set, or an array of data sets keyed by set name.
+ *  Each set is an array whose keys are as returned by
+ *  hook_party_data_set_info(), with in addition:
+ *  - 'module': The module defining this set.
+ *  - 'table': The table in which this set's data is stored.
+ */
+function party_get_data_set_info($data_set_name = NULL) {
+  $sets = &drupal_static(__FUNCTION__);
+  if (!isset($sets)) {
+    if ($cache = cache_get('party:data_set_info', 'cache')) {
+      $sets = $cache->data;
+    }
+    else {
+      $sets = array();
+      foreach (module_implements('party_data_set_info') as $module) {
+        // Due to http://drupal.org/node/890660 we can't use module_invoke_all()
+        // because we need to know the provenance of each set.
+        $sets_module = module_invoke($module, 'party_data_set_info');
+        foreach ($sets_module as $set_name => $set) {
+          // Add in some essential data we need, but allow modules to set this too.
+          $set += array(
+              'set_name' => $set_name,
+              'module' => $module,
+              'singleton' => FALSE,
+              'form callback' => 'party_default_attached_entity_form',
+          );
+          $sets[$set_name] = $set;
+        }
+      }
+      cache_set('party:data_set_info', $sets);
+    }
+  }
+
+  if (isset($data_set_name)) {
+    return $sets[$data_set_name];
+  }
+  else {
+    return $sets;
+  }
+}
+
+// -----------------------------------------------------------------------
+// API for relating and unrelating entities to a party.
+
+/**
+ * Attach an entity to a party according to a given data set.
+ *
+ * @param $party
+ *  The party to assign the entity to.
+ * @param $entity
+ *  The entity to relate to.
+ * @param $data_set
+ *  The name of the data set.
+ *  DX WTF: can we sniff this out given the entity type and the entity object?
+ *  DX WTF: Lots of sniffing now done BUT do we want the $data_set instance made elsewhere. If so where?
+ */
+function party_attach_entity($party, $entity, $data_set_name) {
+  $attached_entity = party_get_crm_controller($data_set_name);
+  $attached_entity->setAttachedEntity($entity);  
+  $attached_entity->attach($party);
+}
+
+/**
+ * Detach an entity from a party according to a given data set.
+ *
+ * @param $party
+ *  The party to detach the entity from.
+ * @param $entity
+ *  The entity to detach. This may also be just the entity id.
+ * @param $data_set
+ *  The name of the data set.
+ *  DX WTF: can we sniff this out given the entity type and the entity object?
+ */
+function party_detach_entity($party, $entity, $data_set_name) {
+  /* To Test */
+  $attached_entity = party_get_crm_controller($data_set_name);
+  $attached_entity->setParty($party);
+  $attached_entity->setAttachedEntity($entity);  
+  $attached_entity->detach();
+}
+
+// -----------------------------------------------------------------------
+// API for loading data about a party.
+
+/**
+ * Return all attached entities of a particular set.
+ *
+ * @param $party
+ *  The party object of the party we're concerned with.
+ * @param $set_name
+ *  The set type as defined in hook_party_data_set_info().
+ *
+ * @return
+ *  An array of the attached entity controllers for the entities attached to the
+ *  party in the given data set, keyed by entity id.
+ *  Each entity additionally has the property 'party_main' set according
+ *  to the 'main' flag in the data set.
+ *  @todo fix the hash this is indexed by!
+ */
+function party_get_attached_entities($party, $data_set_name) {
+  $sets = party_get_data_set_info();
+
+  $items = db_select('party_attached_entity', 'ds')
+    ->fields('ds')
+    ->condition('pid', $party->pid,'=')
+    ->condition('data_set', $data_set_name,'=')
+    ->execute()
+    ->fetchAllAssoc('eid', PDO::FETCH_ASSOC);
+    
+  $attached_entities = array();
+
+  foreach ($items as $eid => $instance) {
+    $attached_entity = party_get_crm_controller($data_set_name);
+    $attached_entity->setParty($party);
+    $attached_entity->setAttachedEntity($eid);
+    $attached_entities[$attached_entity->hash()] = $attached_entity;
+  }
+  
+  return $attached_entities;
+}
+
+/**
+ * Get the form for a data set (more to the point get a set of fields for the data set
+ * might need to work on this).
+ *
+ * @param $party The party object of the party we're concerned with
+ * @param $set_type The set type as defined in hook_data_set_info
+ * @param $set_id The set id as stored in the related table
+ *
+ * @return
+ *   A form array.
+ */
+function party_data_set_form($party, $set_type, $set_id = FALSE) {
+  $sets = party_get_data_set_info();
+  $function = $sets[$set_type]['form callback'];
+  if (function_exists($function)) {
+    $result = call_user_func($function, $party, $set_type, $set_id);
+  }
+  else {
+    return FALSE;
+  }
+  return $result;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function party_permission() {
+  return array(
+    'administer crm settings' => array(
+      'title' => t('Administer CRM settings'),
+      'restrict access' => TRUE,
+    ),
+    'administer party types' => array(
+      'title' => t('Administer party types'),
+      'restrict access' => TRUE,
+    ),
+    'administer parties' =>  array(
+      'title' => t('Administer parties'),
+      'restrict access' => TRUE,
+    ),
+    'create parties' => array(
+      'title' => t('Create parties'),
+    ),
+    'view parties' => array(
+      'title' => t('View parties'),
+    ),
+    'edit parties' => array(
+      'title' => t('Edit parties'),
+    )
+  );
+}
+
+/**
+ * URI callback for contacts.
+ */
+function party_uri($party) {
+  return array('path' => 'party/' . $party->pid, );
+}
+
+/**
+ * Implements hook_theme().
+ */
+function party_theme() {
+  return array(
+    'party_settings_pieces_order_form' => array(
+      'render element' => 'form',
+    ),
+    'party_email' => array(
+      'variables' => array('party_email', 'party' => NULL),
+      'template' => 'party_email',
+    ),
+    'entity__all__party' => array(
+      'render element' => 'elements',
+      'template' => 'entity--all--party',
+      'path' => drupal_get_path('module', 'party') . '/theme',
+    ),
+  );
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ *
+ * Add our own template for party display.
+ */
+function party_preprocess_entity(&$variables) {
+  if ($variables['view_mode'] == 'party') {
+    $entity_type  = $variables['entity_type'];
+    $entity       = $variables['elements']['#entity'];
+    list($eid, ) = entity_extract_ids($entity_type, $entity);
+
+    //dsm($variables);
+    $party_id = $entity->crm_attaching_party;
+
+    // @todo: clean this up -- having to load up the controller all over
+    // again when we probably had it at some earlier point is just messy.
+    $data_set_name = party_get_entity_data_set($entity_type, $entity);
+    $crm_controller = party_get_crm_controller($data_set_name, $party_id);
+    $crm_controller->setParty($party_id);
+    $crm_controller->setAttachedEntity($eid);
+    //dsm($crm_controller);
+
+    // Add the attached entity actions to the build content.
+    // @todo: change these to contextual links?
+    $variables['content']['party_actions'] = array(
+      '#theme' => 'links',
+      '#links' => $crm_controller->actions(),
+      '#attributes' => array(
+        'class' => array('links inline crm-set-action-links'),
+      ),
+      '#weight' => 100,
+    );
+
+    // @todo This would be better off as a new feature in Entity API
+    $variables['theme_hook_suggestions'][] = 'entity__all__party';
+    // @todo Hmmmm how do we let hook_theme() know about this?
+    $variables['theme_hook_suggestions'][] = 'entity__' . $entity_type . '__all__party';
+  }
+}
+
+/**
+ * Load a party entity from the database.
+ *
+ * @param $pid
+ *  The party ID.
+ * @param $reset
+ *  Whether to reset the party_load_multiple cache.
+ *
+ * @return
+ *   A party object.
+ */
+function party_load($pid = NULL, $reset = FALSE) {
+  $pids = (isset($pid) ? array($pid) : array());
+  $party = party_load_multiple($pids, $reset);
+  return $party ? reset($party) : FALSE;
+}
+
+/**
+ * Load party entities from the database.
+ *
+ * @param $pids
+ *  An array of party IDs.
+ * @param $conditions
+ *   (deprecated) An associative array of conditions on the {party}
+ *   table, where the keys are the database fields and the values are the
+ *   values those fields must have. Instead, it is preferable to use
+ *   EntityFieldQuery to retrieve a list of entity IDs loadable by
+ *   this function.
+ * @param $reset
+ *   Whether to reset the cache.
+ *
+ * @return
+ *   An array of party objects indexed by nid.
+ */
+function party_load_multiple($pids = array(), $conditions = array(), $reset = FALSE) {
+  return entity_load('party', $pids, $conditions, $reset);
+}
+
+/**
+ * Delete a party.
+ */
+function party_delete(Party $party) {
+  $party->delete();
+}
+
+/**
+ * Save a party.
+ *
+ *  @param $party
+ *
+ */
+function party_save(&$party) {
+  return entity_get_controller('party')->save($party);
+}
+
+/**
+ * Create a party object ready for saving to the database.
+ *
+ * @param $info
+ *  An array carrying all the important information.
+ *
+ * @return
+ *  A party object that can be passed to party_save().
+ */
+function party_create($info) {
+  if (!is_array($info)) {
+    return FALSE;
+  }
+  if (!isset($info['type'])) {
+    return FALSE;
+  }
+
+  return (object) $info;
+}
+
+/**
+ * Implements hook_party_operations.
+ */
+function party_party_operations() {
+  $operations = array(
+    'merge' => array(
+      'label' => t('Merge parties'),
+      'callback' => 'party_party_operations_merge',
+    ),
+  );
+  return $operations;
+}
+
+/**
+ * Merge multiple users.
+ */
+function party_party_operations_merge($parties) {
+  // @todo: write me!
+}
+
+// -----------------------------------------------------------------------
+// Views hook implementations.
+
+/**
+ * Implements hook_views_api().
+ */
+function party_views_api() {
+  return array(
+    'api' => '3.0-alpha1',
+    'path' => drupal_get_path('module', 'party') . '/includes/views',
+  );
+}
+
+// -----------------------------------------------------------------------
+// CTools hook implementations.
+
+/**
+ * Implements hook_ctools_plugin_type().
+ *
+ * Declare the plugin types we invent.
+ */
+function party_ctools_plugin_type() {
+  // Party name label plugins provide ways to generate a party name label
+  // from a party.
+  $plugins['party_name_label'] = array(
+  );
+
+  return $plugins;
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function party_ctools_plugin_directory($owner, $plugin_type) {
+  if ($owner == 'party') {
+    return "plugins/$plugin_type";
+  }
+}
+
+// --------------------------------------------------------------------------
+// Party Attached Entity Form API
+
+/**
+ * Get the form callback for attached entities.
+ */
+function party_attached_entity_form_callback($data_set) {
+  $sets = party_get_data_set_info();
+  return $sets[$data_set]['form callback'];
+}
+
+/**
+ * Attach attached entity forms to a form.
+ *
+ * This takes all attached entities in the $form_state['#attached_entity'] array, runs
+ * their form callback and puts it in $form[$attached_entity->hash()]
+ */
+function party_attached_entity_attach_form(&$form, &$form_state) {
+  // Get all attached entities from $form_state.
+  $attached_entities = $form_state['#attached_entities'];
+
+  foreach ($attached_entities as $hash => $attached_entity) {
+    // Get the form callback.
+    $callback = party_attached_entity_form_callback($attached_entity->data_set_name);
+    // Execute the form callback.
+    $form[$hash] =  $callback($form, $form_state, $attached_entity, $form_state['#party']);
+    $form[$hash]['#type'] = 'fieldset';
+    $form[$hash]['#title'] = $attached_entity->getLabel();
+    $form[$hash]['#tree'] = TRUE;
+    $form[$hash]['#parents'] = array($hash);
+  }
+
+  $form['#submit'][] = 'party_attached_entity_attach_form_submit';
+  $form['#validate'][] = 'party_attached_entity_attach_form_validate';
+}
+
+/**
+ * Validate attached entity forms.
+ */
+function party_attached_entity_attach_form_validate(&$form, &$form_state) {
+  return TRUE;  
+}
+
+/**
+ * Submit attached entity forms
+ */
+function party_attached_entity_attach_form_submit(&$form, &$form_state) {
+  // Get all attached entities from $form_state.
+  $attached_entities = $form_state['#attached_entities'];
+  $party = $form_state['#party'];
+  
+  foreach ($attached_entities as $hash => $attached_entity) {
+    /// @todo explain what $hash is.
+    // Get the form callback.
+    $callback = party_attached_entity_form_callback($attached_entity->data_set_name) . '_submit';
+    // Execute the form callback.
+    $callback($form, $form_state, $attached_entity, $form_state['#party']);
+
+    $attached_entity->attach($party);
+  }
+}
+
+/**
+ * The default data set form callback.
+ * This returns a $form array for the entity in $attached_entity
+ *
+ * @param $form
+ *   The whole form so far
+ * @param $form_state
+ *   The form state
+ * @param $attached_entity
+ *   The attached entity this form is for
+ * @param $party
+ *   The party the $attached entity is attached to
+ */
+function party_default_attached_entity_form($form, &$form_state, &$attached_entity, $party) {
+  $attached_entity_form = array();
+  
+  $entity = $attached_entity->entity;
+  
+  field_attach_form($attached_entity->getEntityType(), $entity, $attached_entity_form, $form_state); 
+
+  return($attached_entity_form);
+}
+
+/**
+ *  The default attached entity form validate callback.
+ *
+ * @param $form
+ *   The whole form so far
+ * @param $form_state
+ *   The form state
+ * @param $attached_entity
+ *   The attached entity this form is for
+ * @param $party
+ *   The party the $attached entity is attached to
+ */
+function party_default_attached_entity_form_validate($form, &$form_state, &$attached_entity, $party) {
+  // Validate fields.
+  $pseudo_entity = (object) $form_state['values'][$attached_entity->hash()];
+  $psuedo_entity->type = $attached_entity->getEntityBundle();
+  field_attach_form_validate($attached_entity->getEntityType(), $pseudo_entity, $form[$attached_entity->hash()], $form_state);
+}
+
+/**
+ * The default attached entity form submit callback.
+ *
+ * @param $form
+ *   The whole form so far
+ * @param $form_state
+ *   The form state
+ * @param $attached_entity
+ *   The attached entity this form is for
+ * @param $party
+ *   The party the $attached entity is attached to
+ */
+function party_default_attached_entity_form_submit($form, &$form_state, &$attached_entity, $party) {
+  $hash = $attached_entity->hash();
+  
+  // Save the profile.
+  entity_save($attached_entity->getEntityType(), $attached_entity->entity);
+  
+  // Submit fields.
+  field_attach_submit($attached_entity->getEntityType(), $attached_entity->entity, $form[$hash], $form_state);
+  entity_save($attached_entity->getEntityType(), $attached_entity->entity);
+}
+ 
+ 

@@ -1,0 +1,64 @@
+<?php
+
+/**
+ * @file
+ * Support for configurable user profiles which are not attached to users.
+ */
+ 
+/**
+ * Implements hook_party_data_set_info().
+ */
+function party_profile_party_data_set_info() {
+  // Because this hook is invoked from hook_schema(), bad things happen if
+  // we use profile2_get_types(). Hence just grab the type names directly
+  // as that is all we need.
+  // See http://drupal.org/node/1307506 for more details.
+  $result = db_query("SELECT type, label FROM {profile_type}");
+  $types = $result->fetchAllKeyed();
+
+  $sets = array();
+  foreach ($types as $type => $label) {
+    $sets["profile2_" . $type] = array(
+      'label' => $label,
+      'entity type' => 'profile2',
+      'entity bundle' => $type,
+      'class' => 'Profile2PartyController',
+      // Provide details of admin interfaces
+      'admin' => array(
+        'create' => 'admin/structure/profiles/add',
+        'import' => 'admin/structure/profiles/import',
+        'edit' => 'admin/structure/profiles/manage/' . $type,
+        'manage fields' => 'admin/structure/profiles/manage/' . $type . '/fields',
+        'manage display' => 'admin/structure/profiles/manage/' . $type . '/display',
+        'clone' => 'admin/structure/profiles/manage/' . $type . '/clone',
+        'delete' => 'admin/structure/profiles/manage/' . $type . '/delete',
+        'export' => 'admin/structure/profiles/manage/' . $type . '/export',
+      ),
+      // Provide a piece corresponding to each data set.
+      'piece' => array(
+        'path' => 'profile-' . str_replace('_', '-', $type),
+        'title' => $label,
+        'uses views' => TRUE,
+        'page callback' => 'party_view_data_set',
+        'page arguments' => array(1, "profile2_" . $type),
+        // @todo: this needs to tell the access arguments for party_access()
+        // about the argument for loading our attached entities.
+        // In other words, some sort of %wildcard_to_arg() function maybe?
+        'access arguments' => array("view any $type profile"),
+        // File path is relative to implementing module.
+        'file' => 'party.pages.inc',
+      ),
+    );
+  }
+  return $sets;
+}
+
+/**
+ * Controller class for CRM integration.
+ *
+ * @todo: move this to an inc file for autoloading.
+ */
+class Profile2PartyController extends EntityDefaultPartyController {
+  // @todo Remove somehow.
+  const VIEW_MODE = 'party';
+}

@@ -1,0 +1,22 @@
+name = Party
+description = An Entity that helps to manage Contacts
+core = 7.x
+package = CRM
+
+files[] = includes/contact.entity.inc
+files[] = party.pages.inc
+files[] = party.admin.inc
+files[] = includes/party.crm.inc
+files[] = includes/party.entity.inc
+files[] = includes/party_type.entity.inc
+
+; Views files
+files[] = includes/views/party.views.inc
+files[] = includes/views/party_plugin_display_party_piece.inc
+files[] = includes/views/party_plugin_row_attached_entity.inc
+files[] = includes/views/party_handler_relationship_party_attached_eid.inc
+
+dependencies[] = entity
+dependencies[] = ctools
+dependencies[] = views
+
