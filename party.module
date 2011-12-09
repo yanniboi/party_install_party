@@ -47,7 +47,7 @@ function party_entity_info() {
         'label' => t('Individual Party'),
         'description' => 'Parties representing individual people',
         'admin' => array(
-          'path' => 'admin/community/party/manage/individual',
+          'path' => 'admin/community/party/individual',
           'access arguments' => array('administer parties'),
         ),
       ),
@@ -55,9 +55,8 @@ function party_entity_info() {
         'label' => t('Organisation Party'),
         'description' => 'Parties representing organisations or groups of people',
         'admin' => array(
-          'path' => 'admin/community/party/manage/organisation',
+          'path' => 'admin/community/party/organisation',
           'access arguments' => array('administer parties'),
-          'type' => MENU_LOCAL_TASK,
         ),
       ),
     ),
@@ -170,7 +169,7 @@ function party_menu() {
     'file' => 'party.admin.inc',
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );  
-  $items['admin/community/party/individual'] = array(
+  /*$items['admin/community/party/individual'] = array(
     'title' => 'Manage individuals',
     'description' => 'Manage contact information',
     'page callback' => 'party_manage',
@@ -187,7 +186,7 @@ function party_menu() {
     'access arguments' => array('administer parties'),
     'file' => 'party.admin.inc',
     'type' => MENU_LOCAL_TASK,
-  );
+  );*/
   
   $items['party/%party'] = array(
     'title callback' => 'party_page_title',

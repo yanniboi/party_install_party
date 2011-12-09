@@ -23,16 +23,13 @@ function party_info() {
     $rows[] = array(
       $name,
       array(
-        'data' => l(t('edit'), 'admin/community/party/manage/' . $type),
+        'data' => l(t('edit'), 'admin/community/party/' . $type),
       ),
       array(
-        'data' => l(t('Manage fields'), 'admin/community/party/manage/' . $type . '/fields'),
+        'data' => l(t('Manage fields'), 'admin/community/party/' . $type . '/fields'),
       ),
       array(
-        'data' => l(t('Manage fields'), 'admin/community/party/manage/' . $type . '/display'),
-      ),
-      array(
-        'data' => '', //for when we implement custom party types
+        'data' => l(t('Manage display'), 'admin/community/party/' . $type . '/display'),
       ),
     );
   }
@@ -42,7 +39,7 @@ function party_info() {
     'party_table' => array(
       '#theme' => 'table',
       '#header' => array(
-        t('Party type'), array('data' => t('Operations'), 'colspan' => '4'),
+        t('Party type'), array('data' => t('Operations'), 'colspan' => '3'),
       ),
       '#rows' => $rows,
     ),
