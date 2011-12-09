@@ -23,14 +23,14 @@
 $plugin = array(
   'title' => t("Pid example"),
   'description' => t('Form a label from the party id.'),
-  'label callback' => 'crm_party_pid_label',
-  'options form callback' => 'crm_party_pid_options_form',
+  'label callback' => 'party_pid_label',
+  'options form callback' => 'party_pid_options_form',
 );
 
 /**
  * Generate the label for a party.
  */
-function crm_party_pid_label($party) {
+function party_pid_label($party) {
   // @todo. This is broken as inserted parties have no pid at this point!
   return "Party $party->pid";
 }
