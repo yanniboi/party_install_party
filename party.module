@@ -57,6 +57,7 @@ function party_entity_info() {
         'admin' => array(
           'path' => 'admin/community/party/manage/organisation',
           'access arguments' => array('administer parties'),
+          'type' => MENU_LOCAL_TASK,
         ),
       ),
     ),
@@ -153,28 +154,39 @@ function party_menu() {
     'file' => 'party.admin.inc',
     'type' => MENU_LOCAL_TASK,    
   );
-  $items['admin/community/party/manage'] = array(
-    'title' => 'Party admin',
+  $items['admin/community/party'] = array(
+    'title' => 'Manage Parties',
     'description' => 'Manage contact information',
     'page callback' => 'party_info',
     'access arguments' => array('administer parties'),
     'file' => 'party.admin.inc',
+    'type' => MENU_LOCAL_TASK,
   );
-  $items['admin/community/party/manage/individual'] = array(
+  $items['admin/community/party/overview'] = array(
+    'title' => 'Overview',
+    'description' => 'Manage contact information',
+    'page callback' => 'party_info',
+    'access arguments' => array('administer parties'),
+    'file' => 'party.admin.inc',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );  
+  $items['admin/community/party/individual'] = array(
     'title' => 'Manage individuals',
     'description' => 'Manage contact information',
     'page callback' => 'party_manage',
     'page arguments' => array('individual'),
     'access arguments' => array('administer parties'),
     'file' => 'party.admin.inc',
+    'type' => MENU_LOCAL_TASK,
   );
-  $items['admin/community/party/manage/organisation'] = array(
+  $items['admin/community/party/organisation'] = array(
     'title' => 'Manage organisations',
     'description' => 'Manage contact information',
     'page callback' => 'party_manage',
     'page arguments' => array('organisation'),
     'access arguments' => array('administer parties'),
     'file' => 'party.admin.inc',
+    'type' => MENU_LOCAL_TASK,
   );
   
   $items['party/%party'] = array(
