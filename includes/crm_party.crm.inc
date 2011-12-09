@@ -257,11 +257,28 @@ abstract class EntityDefaultCRMController {
   /**
    * Detach this entity from the party.
    */
-  public function detach() {
+  public final function detach() {
+    // Allow extending classes to add change behaviour of detach.
+    $this->preDetach();
+   
     db_delete('crm_party_attached_entity')
     ->condition('peid', $this->id, '=')
     ->condition('data_set', $this->data_set_name,'=')
     ->execute();
+    
+    $this->postDetach();
+  }
+  
+  /**
+   * Do stuff before an entity gets detached
+   */
+  public function preDetach() {
+  }
+  
+  /**
+   * Do stuff after an entity gets detached
+   */
+  public function postDetach() {
   }
   
   /**
