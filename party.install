@@ -6,6 +6,29 @@
  */
 
 /**
+ * Exportable schema fields
+ */
+function party_exportable_schema_fields() {
+  return array(
+    'status' => array(
+      'type' => 'int', 
+      'not null' => TRUE,
+      // Set the default to ENTITY_CUSTOM without using the constant as it is
+      // not safe to use it at this point. 
+      'default' => 0x01, 
+      'size' => 'tiny', 
+      'description' => 'The exportable status of the entity.',
+    ), 
+    'module' => array(
+      'description' => 'The name of the providing module if the entity has been defined in code.', 
+      'type' => 'varchar', 
+      'length' => 255, 
+      'not null' => FALSE,
+    ),
+  );
+}
+ 
+/**
  * Implements hook_schema().
  */
 function party_schema() {
@@ -30,8 +53,8 @@ function party_schema() {
         'type' => 'varchar',
         'length' => '255',
         'not null' => TRUE
-      ) + entity_exportable_schema_fields(),
-    ),
+      ), 
+    ) + party_exportable_schema_fields(),
     'primary key' => array('pid'),
   );
 
@@ -85,49 +108,6 @@ function party_schema() {
     'primary key' => array('instance_id'),
   );
 
-  //This table is how we link party pieces to party types and weight them etc
-
-  /*$schema['party_type'] = array(
-    'description' => 'Stores information about defined party types.',
-    'fields' => array(
-      'id' => array(
-        'type' => 'serial',
-        'not null' => TRUE,
-        'description' => 'Primary Key: Unique model type identifier.',
-      ),
-      'type' => array(
-        'description' => 'The machine-readable name of this crm party type.',
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-      ),
-      'label' => array(
-        'description' => 'The human-readable name of this crm party type.',
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
-      ),
-      'weight' => array(
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-        'size' => 'tiny',
-        'description' => 'The weight of this model type in relation to others.',
-      ),
-      'data' => array(
-        'type' => 'text',
-        'not null' => FALSE,
-        'size' => 'big',
-        'serialize' => TRUE,
-        'description' => 'A serialized array of additional data related to this model type.',
-      ),
-    ) + entity_exportable_schema_fields(),
-    'primary key' => array('id'),
-    'unique keys' => array(
-      'type' => array('type'),
-    ),
-  );*/
 
   // New, WIP table to connect parties to attached entities.
   $schema['party_attached_entity'] = array(
@@ -395,4 +375,26 @@ function party_update_7000() {
   );
   
   db_create_table("party_hats", $schema);
+}
+
+/**
+ * Add exportable schema fields
+ */
+function party_update_7005() {
+  db_add_field('party','status', array(
+      'type' => 'int', 
+      'not null' => TRUE,
+      // Set the default to ENTITY_CUSTOM without using the constant as it is
+      // not safe to use it at this point. 
+      'default' => 0x01, 
+      'size' => 'tiny', 
+      'description' => 'The exportable status of the entity.',
+    ));
+    
+  db_add_field('party','module', array(
+      'description' => 'The name of the providing module if the entity has been defined in code.', 
+      'type' => 'varchar', 
+      'length' => 255, 
+      'not null' => FALSE,
+    ));
 }

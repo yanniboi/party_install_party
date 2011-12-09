@@ -3,7 +3,30 @@
  * @file party_hat.install
  * TODO: Enter file description here.
  */
- 
+
+/**
+ * Exportable schema fields
+ */
+function party_hat_exportable_schema_fields() {
+  return array(
+    'status' => array(
+      'type' => 'int', 
+      'not null' => TRUE,
+      // Set the default to ENTITY_CUSTOM without using the constant as it is
+      // not safe to use it at this point. 
+      'default' => 0x01, 
+      'size' => 'tiny', 
+      'description' => 'The exportable status of the entity.',
+    ), 
+    'module' => array(
+      'description' => 'The name of the providing module if the entity has been defined in code.', 
+      'type' => 'varchar', 
+      'length' => 255, 
+      'not null' => FALSE,
+    ),
+  );
+}
+
 /**
  * Implements hook_install().
  */
@@ -102,8 +125,8 @@ function party_hat_schema() {
         'type' => 'int',
         'not null' => true,
         'default' => 0,
-      ) + entity_exportable_schema_fields(),
-    ),
+      ),
+    ) + party_hat_exportable_schema_fields(),
     'primary key' => array('hid'),
   );
   
@@ -317,5 +340,27 @@ function party_hat_update_7006() {
     'default_value_function' => 'party_hat_field_get_default',
   );
   field_update_instance($instance);
+}
+
+/**
+ * Add exportable schema fields
+ */
+function party_hat_update_7007() {
+  db_add_field('party_hat','status', array(
+      'type' => 'int', 
+      'not null' => TRUE,
+      // Set the default to ENTITY_CUSTOM without using the constant as it is
+      // not safe to use it at this point. 
+      'default' => 0x01, 
+      'size' => 'tiny', 
+      'description' => 'The exportable status of the entity.',
+    ));
+    
+  db_add_field('party_hat','module', array(
+      'description' => 'The name of the providing module if the entity has been defined in code.', 
+      'type' => 'varchar', 
+      'length' => 255, 
+      'not null' => FALSE,
+    ));
 }
 
