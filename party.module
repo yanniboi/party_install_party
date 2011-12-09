@@ -169,7 +169,7 @@ function party_menu() {
     'file' => 'party.admin.inc',
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );  
-  /*$items['admin/community/party/individual'] = array(
+  $items['admin/community/party/individual'] = array(
     'title' => 'Manage individuals',
     'description' => 'Manage contact information',
     'page callback' => 'party_manage',
@@ -186,7 +186,7 @@ function party_menu() {
     'access arguments' => array('administer parties'),
     'file' => 'party.admin.inc',
     'type' => MENU_LOCAL_TASK,
-  );*/
+  );
   
   $items['party/%party'] = array(
     'title callback' => 'party_page_title',
@@ -331,6 +331,7 @@ function party_menu_local_tasks_alter(&$data, $router_item, $root_path) {
         $item = menu_get_item($admin['create']);
         if ($item['access']) {
           $item['title'] = 'Add ' . $type['label'] . ' data set';
+          $item['localized_options'] = array('query' => array('destination' => 'admin/community/datasets'));
           $data['actions']['output'][] = array(
             '#theme' => 'menu_local_action',
             '#link' => $item,
@@ -340,6 +341,7 @@ function party_menu_local_tasks_alter(&$data, $router_item, $root_path) {
       
       if (isset($admin['import'])) {
         $item = menu_get_item($admin['import']);
+        $item['localized_options'] = array('query' => array('destination' => 'admin/community/datasets'));
         $item['title'] = 'Import ' . $type['label'] . ' data set';
         if ($item['access']) {
           $data['actions']['output'][] = array(

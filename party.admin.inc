@@ -189,7 +189,7 @@ function party_data_set_admin() {
     $row = array($name);
     foreach ($ops as $op) {
       $row[] = array(
-        'data' => isset($data_set['admin'][$op]) ? l($op, $data_set['admin'][$op]) : '',
+        'data' => isset($data_set['admin'][$op]) ? l($op, $data_set['admin'][$op], array('query' => array('destination' => 'admin/community/datasets'))) : '',
       );
     }
     
