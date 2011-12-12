@@ -53,7 +53,19 @@ function party_schema() {
         'type' => 'varchar',
         'length' => '255',
         'not null' => TRUE
-      ), 
+      ),
+      'merged' => array(
+        'description' => 'Boolean flag for whether this party has been merged with another',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'merged_party' => array(
+        'description' => 'The pid of the party this has been merged into',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
     ) + party_exportable_schema_fields(),
     'primary key' => array('pid'),
   );
@@ -397,4 +409,22 @@ function party_update_7005() {
       'length' => 255, 
       'not null' => FALSE,
     ));
+}
+
+/**
+ * Add merged and merged_party fields
+ */
+function party_update_7006() {
+  db_add_field('party', 'merged', array(
+    'description' => 'Boolean flag for whether this party has been merged with another',
+    'type' => 'int',
+    'not null' => TRUE,
+    'default' => 0,
+  ));
+  db_add_field('party', 'merged_party', array(
+    'description' => 'The pid of the party this has been merged into',
+    'type' => 'int',
+    'not null' => TRUE,
+    'default' => 0,
+  ));
 }

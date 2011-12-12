@@ -79,8 +79,6 @@ function party_user_form_user($form, &$form_state, &$attached_entity, $party) {
     
     $user_form = user_profile_form($user_form, $form_state, $attached_entity->entity);
     unset($user_form['actions']);
-    
-    // $form['#submit'][] = 'party_user_user_edit_form_submit'; need to not exist
   }
   else {
     // Mark down that we're selecting which user to connect.
@@ -104,8 +102,6 @@ function party_user_form_user($form, &$form_state, &$attached_entity, $party) {
       '#weight' => -1,
       '#description' => t('Leave blank for %anonymous.', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
     );
-    
-    // $form['#submit'][] = 'party_user_user_add_form_submit'; can't rely on this
   }
   
   return $user_form;

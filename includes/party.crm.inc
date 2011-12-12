@@ -225,7 +225,7 @@ abstract class EntityDefaultPartyController {
    * @param $party
    *   The party object we're attaching to.
    */
-  public function attach($party, $options = array()) {    
+  public final function attach($party, $options = array()) {    
     $relation = array(
       'pid' => $party->pid,
       'eid' => $this->entity->{$this->getEntityIdKey()},

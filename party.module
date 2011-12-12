@@ -997,9 +997,19 @@ function party_party_operations() {
 }
 
 /**
- * Merge multiple users.
+ * Merge multiple parties
  */
-function party_party_operations_merge($parties) {
+function party_party_operations_merge($parties = array()) {
+  if (count($parties) < 2) {
+    drupal_set_message("You muset select two or more parties to merge");
+    return FALSE;
+  }
+  // the first party out of the array.
+  $first = array_shift($parties);
+  
+  foreach ($parties as $party) {
+    party_merge($first, $party);
+  }  
   // @todo: write me!
 }
 
@@ -1169,4 +1179,34 @@ function party_default_attached_entity_form_submit($form, &$form_state, &$attach
   entity_save($attached_entity->getEntityType(), $attached_entity->entity);
 }
  
- 
+// --------------------------------------------------------------------------------------------------------------
+// Party Actions & Processes
+
+/**
+ * Merge two parties
+ * 
+ * When running this function, the first party gets all of the second party's attached entities and the second party
+ * becomes a 'ghost' party that points to the first.
+ *
+ * @param $first the first party.
+ * @param $second the second party 
+ */
+function party_merge($first, $second) {
+  $attached_entities = party_get_attached_entities($second);
+  
+  // @todo: Clever logic to work out which data sets to delete and which to keep
+  foreach ($attached_entities as $attached_entity) {
+    $attached_entity->detach();
+    $attached_entity->attach($first);
+  }
+  
+  // @todo: Transfer hats.
+  
+  // @todo: Work out what to do with party fields. 
+  
+  // Make the other party a ghost party
+  $second->merged = 1;
+  $second->merged_party = $first->pid;
+  $second->save();
+}
+
