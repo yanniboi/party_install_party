@@ -127,7 +127,7 @@ function party_user_form_user_submit($form, &$form_state, &$attached_entity, $pa
   $hash = $attached_entity->hash();
   
   $op = $form_state['values'][$hash]['op'];
-  
+    
   if ($op == 'select') {
     // Attempt to load a user from the given input.
     $account = user_load_by_name($form_state['values'][$hash]['user']);
@@ -135,10 +135,25 @@ function party_user_form_user_submit($form, &$form_state, &$attached_entity, $pa
   }
   else if ($op == 'edit') {
     $account = $attached_entity->entity;
+    $account_unchanged = clone $account;
     $category = $form[$hash]['#user_category'];
     
-    $edit = array_intersect_key((array) $account, $form_state['values'][$hash]);
-    user_save($account, $edit, $category);
+    // This code is taken out of entity_form_submit_build_entity
+    // Flatten the $form_state values for the user.
+    $account_values = array();
+    $account_values += isset($form_state['values'][$hash]['account']) ? $form_state['values'][$hash]['account'] : array();
+    $account_values += isset($form_state['values'][$hash]['signature_settings']) ? $form_state['values'][$hash]['signature_settings'] : array();
+    $account_values += isset($form_state['values'][$hash]['picture']) ? $form_state['values'][$hash]['picture'] : array();
+    
+    $values_excluding_fields = array_diff_key($account_values, field_info_instances('user', 'user'));
+    foreach ($values_excluding_fields as $key => $value) {
+      $account->$key = $value;
+    }
+        
+    field_attach_submit('user', $account, $form[$hash], $form_state);
+    
+    $edit = array_intersect_key((array) $account, $account_values);
+    user_save($account_unchanged, $edit, $category);
     
     if ($category == 'account' && !empty($edit['pass'])) {
       // Remove the password reset tag since a new password was saved.
