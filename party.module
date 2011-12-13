@@ -637,7 +637,7 @@ function party_get_entity_data_set($entity_type, $entity) {
   }
 
   foreach ($data_set_info as $data_set_name => $data_set) {
-    if ($data_set['entity type'] == $entity_type && $data_set['entity bundle'] == $entity->type) {
+    if ($data_set['entity type'] == $entity_type && (!isset($data_set['entity bundle']) || $data_set['entity bundle'] == $entity->type)) {
       return $data_set_name;
     }
   }
@@ -980,7 +980,7 @@ function party_create($info) {
     return FALSE;
   }
 
-  return (object) $info;
+  return entity_create('party', $info);
 }
 
 /**

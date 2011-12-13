@@ -153,7 +153,6 @@ abstract class EntityDefaultPartyController {
       $this->entity = reset(entity_load($this->getEntityType(), array($entity)));
     }
     else {
-      dsm($entity);
       $this->entity = $entity;
       $this->eid = $entity->{$this->getEntityIdKey()};
     }
