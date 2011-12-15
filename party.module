@@ -1202,7 +1202,10 @@ function party_merge($first, $second) {
   
   // @todo: Transfer hats.
   
-  // @todo: Work out what to do with party fields. 
+  // @todo: Work out what to do with party fields.
+    // If the field is empty in $first and full in $second copy the value in
+    // If the field has unlimited cardinality or there is space for the values in $first
+    //   then copy the values in.    
   
   // Make the other party a ghost party
   $second->merged = 1;
