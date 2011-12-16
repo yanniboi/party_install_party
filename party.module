@@ -962,6 +962,13 @@ function party_load_multiple($pids = array(), $conditions = array(), $reset = FA
 }
 
 /**
+ * Delete multiple parties
+ */
+function party_delete_multiple($pids = array()) {
+  return entity_delete_multiple('party', $pids);
+}
+
+/**
  * Delete a party.
  */
 function party_delete(Party $party) {
