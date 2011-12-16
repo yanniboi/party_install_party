@@ -84,8 +84,7 @@ function party_hat_edit_form($form, &$form_state, $hat) {
     '#disabled' => isset($hat->name),
   );
   
-  $party_entity_info = entity_get_info('party');
-  $party_types = $party_entity_info['bundles'];
+  $party_types = party_get_party_types();
   $options = array();
   foreach ($party_types as $name => $type) {
     $options[$name] = $type['label'];

@@ -376,6 +376,16 @@ function party_hat_get_all_hats($options = array()) {
     $hids[] = $record->hid;
   }
   $hats = entity_load('party_hat', $hids);
+  
+  if (!isset($options['party_type'])) {
+    return $hats;
+  }
+  
+  foreach ($hats as $id => $hat) {
+    if (!in_array($options['party_type'], $hat->data['party_types'])) {
+      unset($hats[$id]);
+    }
+  }
   return $hats;  
 }
 
