@@ -1,0 +1,6 @@
+name = Party Devel
+description = Devel Generate Integration for Party
+core = 7.x
+
+dependencies[] = devel_generate
+dependencies[] = party

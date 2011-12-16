@@ -231,7 +231,7 @@ abstract class EntityDefaultPartyController {
    * @param $party
    *   The party object we're attaching to.
    */
-  public final function attach($party, $options = array()) {    
+  public final function attach($party, $options = array()) {     
     $relation = array(
       'pid' => $party->pid,
       'eid' => $this->entity->{$this->getEntityIdKey()},
@@ -399,7 +399,7 @@ abstract class EntityDefaultPartyController {
   /**
    * Get the bundle name of the attached entity.
    */
-  private function getEntityBundle() {
+  public function getEntityBundle() {
     $bundle_key = $this->getBundleKey();
     if (!$bundle_key) {
       // If there's no bundle key, it's a singleton entity and the bundle is
