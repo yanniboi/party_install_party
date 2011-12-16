@@ -201,6 +201,13 @@ abstract class EntityDefaultPartyController {
   }
   
   /**
+   * Save the attached entity
+   */
+  function saveAttachedEntity() {
+    return entity_save($this->getEntityType(), $this->entity);
+  }
+  
+  /**
    * loadData
    * Load the information stored in the entity this class wraps around
    *
