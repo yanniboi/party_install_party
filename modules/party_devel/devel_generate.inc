@@ -97,8 +97,8 @@ function party_devel_generate_party_add_party(&$results) {
   // Attach a selection of data sets
   $data_sets = party_get_party_data_sets($party);
   
-  foreach($data_sets as $name => $definition) {
-    if ($name == 'user' || rand(0,3) < 1) {
+  foreach($data_sets as $id => $name) {
+    if ($name == 'user') {
       continue;
     }
     

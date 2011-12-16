@@ -1193,9 +1193,6 @@ function party_default_attached_entity_form_validate($form, &$form_state, &$atta
 function party_default_attached_entity_form_submit($form, &$form_state, &$attached_entity, $party) {
   $hash = $attached_entity->hash();
   
-  // Save the profile.
-  entity_save($attached_entity->getEntityType(), $attached_entity->entity);
-  
   // Submit fields.
   field_attach_submit($attached_entity->getEntityType(), $attached_entity->entity, $form[$hash], $form_state);
   entity_save($attached_entity->getEntityType(), $attached_entity->entity);
