@@ -753,6 +753,21 @@ function party_detach_entity($party, $entity, $data_set_name) {
 // API for loading data about a party.
 
 /**
+ * Get all the Party Types
+ *
+ * Party only comes with two types but it would be possible for a module to
+ * add other bundles programatically so its important we allow for this to happen
+ * by not hardcoding organisation and individual everywhere. 
+ *
+ * @return array() 
+ *   The bundles key of the entity info array.
+ */
+function party_get_party_types() {
+  $party_info = entity_get_info('party');
+  return $party_info['bundles'];  
+}
+
+/**
  * Return all attached entities of a particular set.
  *
  * @param $party
