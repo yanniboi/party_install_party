@@ -120,6 +120,9 @@ class party_plugin_display_party_piece extends views_plugin_display {
         'page arguments' => array(1, $this->view->name, $this->display->id),
         'file' => 'party.pages.inc',
         'access arguments' => array('view contacts'), // todo.
+        // Add a key to say we came from a dataset.
+        // @todo we need to be aware of what dataset we are!
+        //'data_set' => $set_name;
       ),
     );
 

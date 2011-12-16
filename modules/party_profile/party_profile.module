@@ -38,7 +38,7 @@ function party_profile_party_data_set_info() {
       'piece' => array(
         'path' => 'profile-' . str_replace('_', '-', $type),
         'title' => $label,
-        'uses views' => TRUE,
+        'type' => 'view',
         'page callback' => 'party_view_data_set',
         'page arguments' => array(1, "profile2_" . $type),
         // @todo: this needs to tell the access arguments for party_access()

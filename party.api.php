@@ -42,6 +42,9 @@ function hook_party_access($op, $party = NULL, $attached_entity = NULL, $account
 /**
  * Defines data sets to be used by parties.
  *
+ * A data set is a collection of entities of one type (and optionally also one
+ * bundle) from which one or more entities may be attached to a party.
+ *
  * @return
  *  An array of sets where each key is the unique identifier of that "set type".
  *  - 'label': The human readable name of the data set.
@@ -63,12 +66,19 @@ function hook_party_access($op, $party = NULL, $attached_entity = NULL, $account
  *    - 'import'
  *    - 'clone'
  *    - 'export'
- *  - piece: (optional) Each set may define one party piece. The contents of
- *    this array should be the same as those returned by
- *    hook_party_party_piece_info(), with the addition of:
- *    - 'path': The menu path for the provided piece.
- *    - 'uses views': (optional) Indicates that the piece should be generated
- *      with a default view. Default to FALSE.
+ *  - piece: (optional) Each set may define one party piece, which will be
+ *    returned by party_party_party_pieces(). The contents of this array should
+ *    be the same as those returned by hook_party_party_piece_info(), with the
+ *    addition of:
+ *    - 'type': There are currently two ways to define a data set piece:
+ *      - 'callback' means the module provides the callback to display the piece
+ *        and defining it here rather than in hook_party_party_piece_info()
+ *        is mostly just a convenience (though it does produce local action
+ *        links too).
+ *      - 'view' means that Views will handle the display of this piece via our
+ *        default view in party_views_default_views().
+ *    - 'path': (optional) The menu path for the provided piece, if the type
+ *      is 'callback'.
  *    - 'view name': (optional) @todo! write the code for this! ;)
  *      The machine name of the view to define in
  *      hook_views_default_views(). This allows multiple default views to exist.
