@@ -90,8 +90,7 @@ function party_views_data() {
     'filter' => array(
       'label' => t('Attached entity type'),
       'help' => t('The type of attached entities.'),
-      // @todo: write handler that provides a UI to pick entity type based on data sets.
-      'handler' => 'views_handler_filter_string',
+      'handler' => 'party_handler_filter_party_attached_entity_type',
     ),
   );
 
@@ -105,8 +104,7 @@ function party_views_data() {
     'filter' => array(
       'label' => t('Attached entity bundle'),
       'help' => t('The bundle of attached entities.'),
-      // @todo: write handler that provides a UI to pick entity type based on data sets.
-      'handler' => 'views_handler_filter_string',
+      'handler' => 'party_handler_filter_party_attached_entity_bundle',
     ),
   );
 

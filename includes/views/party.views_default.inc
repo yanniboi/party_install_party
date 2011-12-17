@@ -53,14 +53,20 @@ function party_views_default_views() {
   $handler->display->display_options['arguments']['pid']['summary_options']['items_per_page'] = '25';
   $handler->display->display_options['arguments']['pid']['break_phrase'] = 0;
   $handler->display->display_options['arguments']['pid']['not'] = 0;
-  /* Filter criterion: Party: Attached entity bundle */
+  /*
+  // It would be nice to have these to act as a template for subsequent displays
+  // but they fail validation.
+  // Filter criterion: Party: Attached entity bundle
   $handler->display->display_options['filters']['entity_bundle']['id'] = 'entity_bundle';
   $handler->display->display_options['filters']['entity_bundle']['table'] = 'party_attached_entity';
   $handler->display->display_options['filters']['entity_bundle']['field'] = 'entity_bundle';
-  /* Filter criterion: Party: Attached entity type */
+  $handler->display->display_options['filters']['entity_bundle']['value'] = array();
+  // Filter criterion: Party: Attached entity type
   $handler->display->display_options['filters']['entity_type']['id'] = 'entity_type';
   $handler->display->display_options['filters']['entity_type']['table'] = 'party_attached_entity';
   $handler->display->display_options['filters']['entity_type']['field'] = 'entity_type';
+  $handler->display->display_options['filters']['entity_type']['value'] = array();
+  */
 
   // Get all defined data sets.
   $sets = party_get_data_set_info();
@@ -83,7 +89,7 @@ function party_views_default_views() {
     $handler->display->display_options['filters']['entity_type']['id'] = 'entity_type';
     $handler->display->display_options['filters']['entity_type']['table'] = 'party_attached_entity';
     $handler->display->display_options['filters']['entity_type']['field'] = 'entity_type';
-    $handler->display->display_options['filters']['entity_type']['value'] = $set['entity type'];
+    $handler->display->display_options['filters']['entity_type']['value'] = array($set['entity type']);
     $handler->display->display_options['filters']['entity_type']['group'] = 0;
 
     if (isset($set['entity bundle'])) {
@@ -91,7 +97,7 @@ function party_views_default_views() {
       $handler->display->display_options['filters']['entity_bundle']['id'] = 'entity_bundle';
       $handler->display->display_options['filters']['entity_bundle']['table'] = 'party_attached_entity';
       $handler->display->display_options['filters']['entity_bundle']['field'] = 'entity_bundle';
-      $handler->display->display_options['filters']['entity_bundle']['value'] = $set['entity bundle'];
+      $handler->display->display_options['filters']['entity_bundle']['value'] = array($set['entity bundle']);
       $handler->display->display_options['filters']['entity_bundle']['group'] = 0;
     }
   }
