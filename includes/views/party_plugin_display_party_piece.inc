@@ -13,6 +13,9 @@ class party_plugin_display_party_piece extends views_plugin_display {
     $options['party_piece_path'] = array('default' => '');
     $options['party_piece_label'] = array('default' => 'Views');
 
+    // This is not set in the UI, but here for documentation.
+    $options['data_set'] = array('default' => '');
+
     return $options;
   }
 
@@ -120,9 +123,10 @@ class party_plugin_display_party_piece extends views_plugin_display {
         'page arguments' => array(1, $this->view->name, $this->display->id),
         'file' => 'party.pages.inc',
         'access arguments' => array('view contacts'), // todo.
-        // Add a key to say we came from a dataset.
-        // @todo we need to be aware of what dataset we are!
-        //'data_set' => $set_name;
+        // Add a key to say we came from a dataset. This is then handled by
+        // party_party_party_pieces() which in turn enables local tasks for
+        // adding entities within this set in party_menu_local_tasks_alter().
+        'data_set' => $this->options['data_set'],
       ),
     );
 
