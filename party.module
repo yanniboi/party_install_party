@@ -682,6 +682,8 @@ function party_get_data_set_info($data_set_name = NULL) {
               'module' => $module,
               'singleton' => FALSE,
               'form callback' => 'party_default_attached_entity_form',
+              // Singleton entities have no bundle; use the entity type.
+              'entity bundle' => $set['entity type'],
           );
           $sets[$set_name] = $set;
         }

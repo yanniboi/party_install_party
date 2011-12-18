@@ -21,7 +21,7 @@ class party_handler_filter_party_attached_entity_bundle extends views_handler_fi
       $options = array();
       foreach ($data_sets as $data_set => $info) {
         if (in_array($info['entity type'], $entity_types)) {
-          // @todo: handle singleton entity types like user.
+          // @todo: show labels rather than machine names.
           $options[$info['entity bundle']] = $info['entity bundle'];
         }
       }

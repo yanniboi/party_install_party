@@ -92,14 +92,12 @@ function party_views_default_views() {
     $handler->display->display_options['filters']['entity_type']['value'] = array($set['entity type']);
     $handler->display->display_options['filters']['entity_type']['group'] = 0;
 
-    if (isset($set['entity bundle'])) {
-      /* Filter criterion: Party: Attached entity bundle */
-      $handler->display->display_options['filters']['entity_bundle']['id'] = 'entity_bundle';
-      $handler->display->display_options['filters']['entity_bundle']['table'] = 'party_attached_entity';
-      $handler->display->display_options['filters']['entity_bundle']['field'] = 'entity_bundle';
-      $handler->display->display_options['filters']['entity_bundle']['value'] = array($set['entity bundle']);
-      $handler->display->display_options['filters']['entity_bundle']['group'] = 0;
-    }
+    /* Filter criterion: Party: Attached entity bundle */
+    $handler->display->display_options['filters']['entity_bundle']['id'] = 'entity_bundle';
+    $handler->display->display_options['filters']['entity_bundle']['table'] = 'party_attached_entity';
+    $handler->display->display_options['filters']['entity_bundle']['field'] = 'entity_bundle';
+    $handler->display->display_options['filters']['entity_bundle']['value'] = array($set['entity bundle']);
+    $handler->display->display_options['filters']['entity_bundle']['group'] = 0;
   }
 
   $views[$view->name] = $view;
