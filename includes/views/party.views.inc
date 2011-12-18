@@ -80,6 +80,20 @@ function party_views_data() {
     // relationship cannot be dynamic.
   );
 
+  $data['party_attached_entity']['data_set'] = array(
+    'title' => t('Attached entity data set'),
+    'field' => array(
+      'label' => t('Attached entity data set'),
+      'help' => t('The data set of attached entities. Will produce multiple rows per party.'),
+      'handler' => 'views_handler_field',
+    ),
+    'filter' => array(
+      'label' => t('Attached entity data set'),
+      'help' => t('The data set of attached entities.'),
+      'handler' => 'party_handler_filter_party_attached_entity_data_set',
+    ),
+  );
+
   $data['party_attached_entity']['entity_type'] = array(
     'title' => t('Attached entity type'),
     'field' => array(
