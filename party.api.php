@@ -99,6 +99,17 @@ function hook_party_data_set_info() {
 }
 
 /**
+ * Alter data set definitions.
+ *
+ * @param $data_sets
+ *  An array of data sets keyed by set id. Extra items in each definition such
+ *  as 'module' will already have been set.
+ */
+function hook_party_data_set_info_alter(&$data_sets) {
+  $data_sets['user']['label'] = t('A different label');
+}
+
+/**
  * Defines party pieces, that is, components of the party display.
  *
  * @return

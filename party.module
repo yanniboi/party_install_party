@@ -688,6 +688,10 @@ function party_get_data_set_info($data_set_name = NULL) {
           $sets[$set_name] = $set;
         }
       }
+
+      // Alter the data sets with hook_party_data_set_info_alter().
+      drupal_alter('party_data_set_info', $sets);
+
       cache_set('party:data_set_info', $sets);
     }
   }
