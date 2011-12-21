@@ -1111,9 +1111,9 @@ function party_ctools_plugin_directory($owner, $plugin_type) {
  * @param $data_set_name
  *  The name of a data set.
  */
-function party_attached_entity_form_callback($data_set) {
-  $sets = party_get_data_set_info();
-  return $sets[$data_set]['form callback'];
+function party_attached_entity_form_callback($data_set_name) {
+  $data_set_info = party_get_data_set_info($data_set_name);
+  return $data_set_info['form callback'];
 }
 
 /**
