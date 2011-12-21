@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Provides a generic CRM party entity.
@@ -20,7 +19,8 @@ function party_help($path, $arg) {
 /**
  * Implements hook_entity_info().
  *
- * @todo: Improve documentation
+ * Declare our party entity to the entity system.
+ *
  * @todo: Party types?!
  */
 function party_entity_info() {
@@ -454,6 +454,9 @@ function party_access($op, $party = NULL, $attached_entity = NULL, $account = NU
 /**
  * Implements hook_party_access().
  *
+ * Handles basic access to parties, including covering the special case when
+ * there are no other party access modules.
+ *
  * WIP: just say yes for now!
  */
 function party_party_access($op, $party = NULL, $attached_entity = NULL, $account = NULL) {
@@ -604,7 +607,7 @@ function party_party_party_pieces() {
  * Get the attached entity controller.
  *
  * @param $data_set_name
- *  The name of the $set definition.
+ *  The name of a data set.
  */
 function party_get_crm_controller($data_set_name) {
   $sets = party_get_data_set_info();
@@ -817,9 +820,13 @@ function party_get_attached_entities($party, $data_set_name) {
  * Get the form for a data set (more to the point get a set of fields for the data set
  * might need to work on this).
  *
- * @param $party The party object of the party we're concerned with
- * @param $set_type The set type as defined in hook_data_set_info
- * @param $set_id The set id as stored in the related table
+ * @param $party
+ *  The party object of the party we're concerned with.
+ * @param $set_type
+ *  The set type as defined in hook_data_set_info().
+ *  @todo: clerify is this a name or an info array?
+ * @param $set_id
+ *  The set id as stored in the related table
  *
  * @return
  *   A form array.
@@ -971,7 +978,13 @@ function party_load_multiple($pids = array(), $conditions = array(), $reset = FA
 }
 
 /**
- * Delete multiple parties
+ * Delete multiple parties.
+ *
+ * @param $pids
+ *  An array of party IDs.
+ *
+ * @return
+ *  The return value from entity_delete_multiple().
  */
 function party_delete_multiple($pids = array()) {
   return entity_delete_multiple('party', $pids);
@@ -979,6 +992,9 @@ function party_delete_multiple($pids = array()) {
 
 /**
  * Delete a party.
+ *
+ * @param $party
+ *  A party object.
  */
 function party_delete(Party $party) {
   $party->delete();
@@ -987,8 +1003,8 @@ function party_delete(Party $party) {
 /**
  * Save a party.
  *
- *  @param $party
- *
+ * @param $party
+ *  A party object.
  */
 function party_save(&$party) {
   return entity_get_controller('party')->save($party);
@@ -1001,7 +1017,8 @@ function party_save(&$party) {
  *  An array carrying all the important information.
  *
  * @return
- *  A party object that can be passed to party_save().
+ *  A party object that can be passed to party_save(), or FALSE if the array
+ *  was not suitable for creating a party.
  */
 function party_create($info) {
   if (!is_array($info)) {
@@ -1028,7 +1045,9 @@ function party_party_operations() {
 }
 
 /**
- * Merge multiple parties
+ * Merge multiple parties.
+ *
+ * @todo: move this to an inc file; add file inclusion to hook_party_operations().
  */
 function party_party_operations_merge($parties = array()) {
   if (count($parties) < 2) {
@@ -1088,6 +1107,9 @@ function party_ctools_plugin_directory($owner, $plugin_type) {
 
 /**
  * Get the form callback for attached entities.
+ *
+ * @param $data_set_name
+ *  The name of a data set.
  */
 function party_attached_entity_form_callback($data_set) {
   $sets = party_get_data_set_info();
