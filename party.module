@@ -457,19 +457,19 @@ function party_access($op, $party = NULL, $attached_entity = NULL, $account = NU
  * WIP: just say yes for now!
  */
 function party_party_access($op, $party = NULL, $attached_entity = NULL, $account = NULL) {
-  if (!isset($attached_entity)) {
-    // If we're not being asked about attachments, just use plain permissions.
-    switch ($op) {
-      case 'view':
-        return user_access('view contacts');
-    }
-  }
-  else {
+  if (isset($attached_entity)) {
     // If we're being asked about attachments, grant access only if we are the
     // only module reacting. This allows a basic operation of the CRM system
     // where all attached entities can be used.
     if (count(module_implements('party_access')) == 1) {
       return TRUE;
+    }
+  }
+  else {
+    // If we're not being asked about attachments, just use plain permissions.
+    switch ($op) {
+      case 'view':
+        return user_access('view contacts');
     }
   }
 
