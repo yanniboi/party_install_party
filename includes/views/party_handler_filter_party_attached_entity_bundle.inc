@@ -6,8 +6,9 @@
 class party_handler_filter_party_attached_entity_bundle extends views_handler_filter_in_operator {
   function get_value_options() {
     if (!isset($this->value_options)) {
-      $this->value_title = t('Attached entity types');
+      $this->value_title = t('Attached entity bundles');
       $data_sets = party_get_data_set_info();
+      $entity_info = entity_get_info();
 
       // Get the data types from the entity type filter that should also be
       // on this display if it's been set up to make sense.
@@ -21,8 +22,13 @@ class party_handler_filter_party_attached_entity_bundle extends views_handler_fi
       $options = array();
       foreach ($data_sets as $data_set => $info) {
         if (in_array($info['entity type'], $entity_types)) {
-          // @todo: show labels rather than machine names.
-          $options[$info['entity bundle']] = $info['entity bundle'];
+          $this_entity_info = $entity_info[$info['entity type']];
+          $bundle_label = $this_entity_info['bundles'][$info['entity bundle']]['label'];
+          $label = t('@bundle (type @type)', array(
+            '@bundle' => $bundle_label,
+            '@type'   => $this_entity_info['label'],
+          ));
+          $options[$info['entity bundle']] = $label;
         }
       }
 
