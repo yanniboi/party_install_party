@@ -46,6 +46,4 @@ function party_commerce_party_data_set_info() {
  * @todo: move this to an inc file for autoloading.
  */
 class CustomerProfilePartyController extends EntityDefaultPartyController {
-  // @todo Remove somehow.
-  const VIEW_MODE = 'party';
 }

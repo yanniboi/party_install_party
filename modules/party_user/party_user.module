@@ -15,6 +15,7 @@ function party_user_party_data_set_info() {
     'class' => 'UserPartyController',
     'singleton' => TRUE,
     'max cardinality' => 1,
+    'view mode' => 'full',
     'admin' => array(
       'edit' => 'admin/config/people/accounts',
       'manage fields' => 'admin/config/people/accounts/fields',
@@ -186,9 +187,6 @@ function party_user_register_submit($form, &$form_state) {
  * @todo: move this to an inc file for autoloading.
  */
 class UserPartyController extends EntityDefaultPartyController {
-  // @todo remove
-  const VIEW_MODE = "full";
-
   /**
    * Display a user dataSet
    *  This is needed because user doesn't use the entity API

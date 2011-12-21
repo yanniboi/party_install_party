@@ -53,6 +53,10 @@ function hook_party_access($op, $party = NULL, $attached_entity = NULL, $account
  *    to. May be omitted to allow any bundle.
  *  - 'singleton': (optional) Whether this set's relationships only have one
  *    entity relating to a party. Default: FALSE.
+ *  - 'view mode': (optional) The name of one of the entity's view modes, to use
+ *    for displaying entities attached to a party. If omitted, defaults to
+ *    'party', a view mode which is added to data set-enabled entities in
+ *    party_entity_info_alter().
  *  - 'form callback': (optional) This is the name of the form callback function.
  *    Returns the section of the form to do with this data set. See party_default_attached_entity_form()
  *  - 'module': (optional) The name of the module implementing this data set.

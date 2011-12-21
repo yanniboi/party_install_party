@@ -284,6 +284,7 @@ function party_attached_entity_remove_confirm_submit($form, &$form_state) {
  * Page callback to view a data set.
  */
 function party_view_data_set($party, $set) {
+  $set_definition = party_get_data_set_info($set);
   $attached_entity_controllers = party_get_attached_entities($party, $set);
 
   foreach ($attached_entity_controllers as $crm_controller) {
@@ -293,11 +294,11 @@ function party_view_data_set($party, $set) {
         '#type' => 'fieldset',
         '#title' => $crm_controller->getLabel(),
       );
-    
-    $build[$crm_controller->data_set_name . '_' . $crm_controller->id]['view'] = $crm_controller->display($crm_controller::VIEW_MODE);
+
+    $view_mode = $set_definition['view mode'];
+    $build[$crm_controller->data_set_name . '_' . $crm_controller->id]['view'] = $crm_controller->display($view_mode);
   }
   
-  $set_definition = party_get_data_set_info($set);
   if (!isset($set_definition['max cardinality']) || count($attached_entity_controllers) < $set_definition['max cardinality']) {
     $build[$set . '_links'] = array(
       '#theme' => 'links',
