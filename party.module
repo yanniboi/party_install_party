@@ -563,7 +563,7 @@ function party_party_party_pieces() {
   $sets = party_get_data_set_info();
   //dsm($sets);
   foreach ($sets as $set_name => $set) {
-    if (isset($set['piece']) && $set['piece']['type'] == 'callback') {
+    if (isset($set['piece']) && $set['piece']['maker'] == 'callback') {
       // The path becomes the piece's key.
       $path = $set['piece']['path'];
       unset($set['piece']['path']);

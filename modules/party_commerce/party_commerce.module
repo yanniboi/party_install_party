@@ -25,7 +25,7 @@ function party_commerce_party_data_set_info() {
       'piece' => array(
         'path' => 'customer-profile-' . str_replace('_', '-', $type),
         'title' => $label,
-        'type' => 'view',
+        'maker' => 'view',
         'page callback' => 'party_view_data_set',
         'page arguments' => array(1, "commerce_customer_profile_" . $type),
         // @todo: this needs to tell the access arguments for party_access()

@@ -61,7 +61,7 @@ function party_views_default_views() {
   foreach ($sets as $set_id => $set) {
     // Skip those data sets that request neither a piece nor it to be a view.
     // @todo: the second part of this if fails, but I've not yet had breakfast and I can't see why. fixme!
-    if (!isset($set['piece']) || $set['piece']['type'] != 'view') {
+    if (!isset($set['piece']) || $set['piece']['maker'] != 'view') {
       continue;
     }
 

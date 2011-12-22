@@ -37,7 +37,7 @@ function party_profile_party_data_set_info() {
       // Provide a piece corresponding to each data set.
       'piece' => array(
         'path' => 'profile-' . str_replace('_', '-', $type),
-        'type' => 'view',
+        'maker' => 'view',
         // @todo: this needs to tell the access arguments for party_access()
         // about the argument for loading our attached entities.
         // In other words, some sort of %wildcard_to_arg() function maybe?

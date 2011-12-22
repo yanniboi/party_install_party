@@ -74,12 +74,12 @@ function hook_party_access($op, $party = NULL, $attached_entity = NULL, $account
  *    returned by party_party_party_pieces(). The contents of this array should
  *    be the same as those returned by hook_party_party_piece_info(), with the
  *    addition of:
- *    - 'type': There are currently two ways to define a data set piece:
- *      - 'callback' means the module provides the callback to display the piece
+ *    - 'maker': Defines the method for generating the piece. Can be one of:
+ *      - 'callback': The module provides the callback to display the piece
  *        and defining it here rather than in hook_party_party_piece_info()
  *        is mostly just a convenience (though it does produce local action
  *        links too).
- *      - 'view' means that Views will handle the display of this piece via our
+ *      - 'view': The display of this piece is handled by Views, via our
  *        default view in party_views_default_views().
  *    - 'path': (optional) The menu path for the provided piece, if the type
  *      is 'callback'.
