@@ -563,7 +563,21 @@ function party_party_party_pieces() {
   $sets = party_get_data_set_info();
   //dsm($sets);
   foreach ($sets as $set_name => $set) {
-    if (isset($set['piece']) && $set['piece']['maker'] == 'callback') {
+    if (isset($set['piece']) && in_array($set['piece']['maker'], array('callback', 'core'))) {
+      if ($set['piece']['maker'] == 'core') {
+        // 'core' is a special case of 'callback' where we supply the details.
+        $set['piece'] += array(
+          'title' => $set['label'],
+          'page callback' => 'party_view_data_set',
+          'page arguments' => array(1, $set_name),
+           // @todo: this needs to tell the access arguments for party_access()
+           // about the argument for loading our attached entities.
+           // In other words, some sort of %wildcard_to_arg() function maybe?
+           'access arguments' => array("view any party"),
+           'file' => 'party.pages.inc',
+        );
+      }
+
       // The path becomes the piece's key.
       $path = $set['piece']['path'];
       unset($set['piece']['path']);
