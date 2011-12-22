@@ -282,6 +282,11 @@ function party_attached_entity_remove_confirm_submit($form, &$form_state) {
 
 /**
  * Page callback to view a data set.
+ *
+ * @param $party
+ *    A loaded party object.
+ * @param $data_set_name
+ *   A data set name.
  */
 function party_view_data_set($party, $data_set_name) {
   $data_set = party_get_data_set_info($data_set_name);
