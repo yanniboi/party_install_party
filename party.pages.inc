@@ -310,7 +310,7 @@ function party_view_data_set($party, $data_set_name) {
       '#links' => array(
         'add' => array(
           'title' => "Add " . $data_set['label'],
-          'href'  => 'party/' . $party->pid . '/add/' . $data_set_name,
+          'href'  => 'party/' . $party->pid . '/add/' . $crm_controller->getPathArg(),
         ),
       ),
       '#attributes' => array('class' => array('crm-profile-links')),
