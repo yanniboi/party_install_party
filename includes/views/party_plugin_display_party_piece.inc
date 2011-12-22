@@ -115,6 +115,8 @@ class party_plugin_display_party_piece extends views_plugin_display {
   function execute_hook_party_party_pieces() {
     $key = $this->get_option('party_piece_path');
 
+    // Build a piece to return.
+    // Note that access settings are handled by party_party_party_pieces().
     $pieces = array(
       $key => array(
         'title' => $this->get_option('party_piece_label'),
@@ -122,7 +124,6 @@ class party_plugin_display_party_piece extends views_plugin_display {
         // We need to be able to find this view in the page callback.
         'page arguments' => array(1, $this->view->name, $this->display->id),
         'file' => 'party.pages.inc',
-        'access arguments' => array('view contacts'), // todo.
         // Add a key to say we came from a dataset. This is then handled by
         // party_party_party_pieces() which in turn enables local tasks for
         // adding entities within this set in party_menu_local_tasks_alter().

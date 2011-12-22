@@ -460,13 +460,49 @@ function party_access($op, $party = NULL, $attached_entity = NULL, $account = NU
  * WIP: just say yes for now!
  */
 function party_party_access($op, $party = NULL, $attached_entity = NULL, $account = NULL) {
+  //dsm(func_get_args());
+  // Get the attached entity data set.
+  if (is_string($attached_entity)) {
+    $data_set_name = $attached_entity;
+  }
+  else {
+    // Argh, how to get a data set name from an entity?
+    // May have to rethink the parameters here.
+    $data_set_name = NULL; // @todo
+  }
+
   if (isset($attached_entity)) {
-    // If we're being asked about attachments, grant access only if we are the
-    // only module reacting. This allows a basic operation of the CRM system
-    // where all attached entities can be used.
-    if (count(module_implements('party_access')) == 1) {
-      return TRUE;
+    // Determine what the Core permissions system has to say about this.
+    switch ($op) {
+      case 'view':
+        $permission_string = 'view party attached ' . $data_set_name;
+        $permission_access = user_access($permission_string, $account);
+        break;
+      default:
+        // Just say yes to anything else for now.
+        // @todo.
+        $permission_access = TRUE;
     }
+    //dsm("$permission_string -> $permission_access, $data_set_name");
+
+    if (count(module_implements('party_access')) == 1) {
+      // If we're being asked about attachments, grant access only if we are the
+      // only module reacting. This allows a basic operation of the CRM system
+      // where all attached entities can be used.
+      return $permission_access;
+    }
+    else {
+      // If other modules are in the mix, we only deny access with the
+      // permissions, not grant it. In other words, the permission
+      // 'view party attached foo' is necessary, but it is not sufficient.
+      // @todo: add explanation of this to the party_access() docblock.
+      if ($permission_access === FALSE) {
+        return $permission_access;
+      }
+    }
+
+    // If we get here, say nothing.
+    return NULL;
   }
   else {
     // If we're not being asked about attachments, just use plain permissions.
@@ -570,11 +606,9 @@ function party_party_party_pieces() {
           'title' => $set['label'],
           'page callback' => 'party_view_data_set',
           'page arguments' => array(1, $set_name),
-           // @todo: this needs to tell the access arguments for party_access()
-           // about the argument for loading our attached entities.
-           // In other words, some sort of %wildcard_to_arg() function maybe?
-           'access arguments' => array("view any party"),
-           'file' => 'party.pages.inc',
+          'access callback' => 'party_access',
+          'access arguments' => array('view', 1, $set_name),
+          'file' => 'party.pages.inc',
         );
       }
 
@@ -604,6 +638,14 @@ function party_party_party_pieces() {
         if (isset($display->handler) && !empty($display->handler->definition['uses hook party_party_pieces'])) {
           $result = $display->handler->execute_hook_party_party_pieces();
           if (is_array($result)) {
+            // Add in access properties.
+            foreach ($result as $path => $piece) {
+              $result[$path] += array(
+                'access callback' => 'party_access',
+                'access arguments' => array('view', 1, $piece['data_set']),
+              );
+            }
+
             $pieces = array_merge($pieces, $result);
           }
         }
@@ -862,7 +904,7 @@ function party_data_set_form($party, $set_type, $set_id = FALSE) {
  * Implements hook_permission().
  */
 function party_permission() {
-  return array(
+  $permissions = array(
     'administer crm settings' => array(
       'title' => t('Administer CRM settings'),
       'restrict access' => TRUE,
@@ -885,6 +927,17 @@ function party_permission() {
       'title' => t('Edit parties'),
     )
   );
+
+  // Add permissions for each data set.
+  foreach (party_get_data_set_info() as $data_set_name => $data_set) {
+    $permissions['view party attached ' . $data_set_name] = array(
+      'title' => t('View party attached %name', array(
+        '%name' => $data_set['label'],
+      )),
+    );
+  }
+
+  return $permissions;
 }
 
 /**
