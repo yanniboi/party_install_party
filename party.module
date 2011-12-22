@@ -472,7 +472,7 @@ function party_party_access($op, $party = NULL, $attached_entity = NULL, $accoun
     // If we're not being asked about attachments, just use plain permissions.
     switch ($op) {
       case 'view':
-        return user_access('view contacts');
+        return user_access('view parties');
     }
   }
 
