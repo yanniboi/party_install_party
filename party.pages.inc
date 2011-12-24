@@ -282,29 +282,35 @@ function party_attached_entity_remove_confirm_submit($form, &$form_state) {
 
 /**
  * Page callback to view a data set.
+ *
+ * @param $party
+ *    A loaded party object.
+ * @param $data_set_name
+ *   A data set name.
  */
-function party_view_data_set($party, $set) {
-  $attached_entity_controllers = party_get_attached_entities($party, $set);
+function party_view_data_set($party, $data_set_name) {
+  $data_set = party_get_data_set_info($data_set_name);
+  $attached_entity_controllers = party_get_attached_entities($party, $data_set_name);
 
   foreach ($attached_entity_controllers as $crm_controller) {
     $entity = $crm_controller->entity;
-    $build[$crm_controller->data_set_name . '_' . $crm_controller->id] = array(
+    $build[$data_set_name . '_' . $crm_controller->id] = array(
         // @todo: this is sort of an abuse of what fieldsets are meant for... :/
         '#type' => 'fieldset',
         '#title' => $crm_controller->getLabel(),
       );
-    
-    $build[$crm_controller->data_set_name . '_' . $crm_controller->id]['view'] = $crm_controller->display($crm_controller::VIEW_MODE);
+
+    $view_mode = $data_set['view mode'];
+    $build[$data_set_name . '_' . $crm_controller->id]['view'] = $crm_controller->display($view_mode);
   }
   
-  $set_definition = party_get_data_set_info($set);
-  if (!isset($set_definition['max cardinality']) || count($attached_entity_controllers) < $set_definition['max cardinality']) {
-    $build[$set . '_links'] = array(
+  if (!isset($data_set['max cardinality']) || count($attached_entity_controllers) < $data_set['max cardinality']) {
+    $build[$data_set_name . '_links'] = array(
       '#theme' => 'links',
       '#links' => array(
         'add' => array(
-          'title' => "Add " . $set_definition['label'],
-          'href'  => 'party/' . $party->pid . '/add/' . $set,
+          'title' => "Add " . $data_set['label'],
+          'href'  => 'party/' . $party->pid . '/add/' . $crm_controller->getPathArg(),
         ),
       ),
       '#attributes' => array('class' => array('crm-profile-links')),

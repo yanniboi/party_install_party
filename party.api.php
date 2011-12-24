@@ -42,6 +42,9 @@ function hook_party_access($op, $party = NULL, $attached_entity = NULL, $account
 /**
  * Defines data sets to be used by parties.
  *
+ * A data set is a collection of entities of one type (and optionally also one
+ * bundle) from which one or more entities may be attached to a party.
+ *
  * @return
  *  An array of sets where each key is the unique identifier of that "set type".
  *  - 'label': The human readable name of the data set.
@@ -50,6 +53,10 @@ function hook_party_access($op, $party = NULL, $attached_entity = NULL, $account
  *    to. May be omitted to allow any bundle.
  *  - 'singleton': (optional) Whether this set's relationships only have one
  *    entity relating to a party. Default: FALSE.
+ *  - 'view mode': (optional) The name of one of the entity's view modes, to use
+ *    for displaying entities attached to a party. If omitted, defaults to
+ *    'party', a view mode which is added to data set-enabled entities in
+ *    party_entity_info_alter().
  *  - 'form callback': (optional) This is the name of the form callback function.
  *    Returns the section of the form to do with this data set. See party_default_attached_entity_form()
  *  - 'module': (optional) The name of the module implementing this data set.
@@ -63,12 +70,22 @@ function hook_party_access($op, $party = NULL, $attached_entity = NULL, $account
  *    - 'import'
  *    - 'clone'
  *    - 'export'
- *  - piece: (optional) Each set may define one party piece. The contents of
- *    this array should be the same as those returned by
- *    hook_party_party_piece_info(), with the addition of:
- *    - 'path': The menu path for the provided piece.
- *    - 'uses views': (optional) Indicates that the piece should be generated
- *      with a default view. Default to FALSE.
+ *  - piece: (optional) Each set may define one party piece, which will be
+ *    returned by party_party_party_pieces(). The contents of this array should
+ *    be the same as those returned by hook_party_party_piece_info(), with the
+ *    addition of:
+ *    - 'maker': Defines the method for generating the piece. Can be one of:
+ *      - 'view': The display of this piece is handled by Views, via our
+ *        default view in party_views_default_views().
+ *      - 'core': The piece is displayed using Party module's attached entity
+ *        view page callback, party_view_data_set(). No keys other than this
+ *        the path are needed.
+ *      - 'callback': The module provides the callback to display the piece
+ *        and defining it here rather than in hook_party_party_piece_info()
+ *        is mostly just a convenience (though it does produce local action
+ *        links too).
+ *    - 'path': (optional) The menu path for the provided piece, if the type
+ *      is 'callback'.
  *    - 'view name': (optional) @todo! write the code for this! ;)
  *      The machine name of the view to define in
  *      hook_views_default_views(). This allows multiple default views to exist.
@@ -86,6 +103,17 @@ function hook_party_data_set_info() {
     'form callback' => "party_user_form_user",
   );
   return $sets;
+}
+
+/**
+ * Alter data set definitions.
+ *
+ * @param $data_sets
+ *  An array of data sets keyed by set id. Extra items in each definition such
+ *  as 'module' will already have been set.
+ */
+function hook_party_data_set_info_alter(&$data_sets) {
+  $data_sets['user']['label'] = t('A different label');
 }
 
 /**

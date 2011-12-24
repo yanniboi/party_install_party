@@ -80,6 +80,20 @@ function party_views_data() {
     // relationship cannot be dynamic.
   );
 
+  $data['party_attached_entity']['data_set'] = array(
+    'title' => t('Attached entity data set'),
+    'field' => array(
+      'label' => t('Attached entity data set'),
+      'help' => t('The data set of attached entities. Will produce multiple rows per party.'),
+      'handler' => 'views_handler_field',
+    ),
+    'filter' => array(
+      'label' => t('Attached entity data set'),
+      'help' => t('The data set of attached entities.'),
+      'handler' => 'party_handler_filter_party_attached_entity_data_set',
+    ),
+  );
+
   $data['party_attached_entity']['entity_type'] = array(
     'title' => t('Attached entity type'),
     'field' => array(
@@ -90,8 +104,7 @@ function party_views_data() {
     'filter' => array(
       'label' => t('Attached entity type'),
       'help' => t('The type of attached entities.'),
-      // @todo: write handler that provides a UI to pick entity type based on data sets.
-      'handler' => 'views_handler_filter_string',
+      'handler' => 'party_handler_filter_party_attached_entity_type',
     ),
   );
 
@@ -105,8 +118,7 @@ function party_views_data() {
     'filter' => array(
       'label' => t('Attached entity bundle'),
       'help' => t('The bundle of attached entities.'),
-      // @todo: write handler that provides a UI to pick entity type based on data sets.
-      'handler' => 'views_handler_filter_string',
+      'handler' => 'party_handler_filter_party_attached_entity_bundle',
     ),
   );
 

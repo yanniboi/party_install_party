@@ -1,5 +1,6 @@
-name = Party Devel
-description = Devel Generate Integration for Party
+name = Party devel generate
+description = Generate dummy parties.
+package = Development
 core = 7.x
 
 dependencies[] = devel_generate

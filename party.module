@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Provides a generic CRM party entity.
@@ -20,7 +19,8 @@ function party_help($path, $arg) {
 /**
  * Implements hook_entity_info().
  *
- * @todo: Improve documentation
+ * Declare our party entity to the entity system.
+ *
  * @todo: Party types?!
  */
 function party_entity_info() {
@@ -454,22 +454,61 @@ function party_access($op, $party = NULL, $attached_entity = NULL, $account = NU
 /**
  * Implements hook_party_access().
  *
+ * Handles basic access to parties, including covering the special case when
+ * there are no other party access modules.
+ *
  * WIP: just say yes for now!
  */
 function party_party_access($op, $party = NULL, $attached_entity = NULL, $account = NULL) {
-  if (!isset($attached_entity)) {
+  //dsm(func_get_args());
+  // Get the attached entity data set.
+  if (is_string($attached_entity)) {
+    $data_set_name = $attached_entity;
+  }
+  else {
+    // Argh, how to get a data set name from an entity?
+    // May have to rethink the parameters here.
+    $data_set_name = NULL; // @todo
+  }
+
+  if (isset($attached_entity)) {
+    // Determine what the Core permissions system has to say about this.
+    switch ($op) {
+      case 'view':
+        $permission_string = 'view party attached ' . $data_set_name;
+        $permission_access = user_access($permission_string, $account);
+        break;
+      default:
+        // Just say yes to anything else for now.
+        // @todo.
+        $permission_access = TRUE;
+    }
+    //dsm("$permission_string -> $permission_access, $data_set_name");
+
+    if (count(module_implements('party_access')) == 1) {
+      // If we're being asked about attachments, grant access only if we are the
+      // only module reacting. This allows a basic operation of the CRM system
+      // where all attached entities can be used.
+      return $permission_access;
+    }
+    else {
+      // If other modules are in the mix, we only deny access with the
+      // permissions, not grant it. In other words, the permission
+      // 'view party attached foo' is necessary, but it is not sufficient.
+      // @todo: add explanation of this to the party_access() docblock.
+      if ($permission_access === FALSE) {
+        return $permission_access;
+      }
+    }
+
+    // If we get here, say nothing.
+    return NULL;
+  }
+  else {
     // If we're not being asked about attachments, just use plain permissions.
     switch ($op) {
       case 'view':
-        return user_access('view contacts');
-    }
-  }
-  else {
-    // If we're being asked about attachments, grant access only if we are the
-    // only module reacting. This allows a basic operation of the CRM system
-    // where all attached entities can be used.
-    if (count(module_implements('party_access')) == 1) {
-      return TRUE;
+        return user_access('view parties');
     }
   }
 
@@ -554,10 +593,25 @@ function party_party_party_pieces() {
     ),
   );
 
-  // Party data sets may provide a piece each.
+  // Party data sets may provide a piece each. Here we handle those of type
+  // 'callback'; type 'views' is handled by our party_views_default_views()
+  // and our Views display plugin.
   $sets = party_get_data_set_info();
+  //dsm($sets);
   foreach ($sets as $set_name => $set) {
-    if (isset($set['piece'])) {
+    if (isset($set['piece']) && in_array($set['piece']['maker'], array('callback', 'core'))) {
+      if ($set['piece']['maker'] == 'core') {
+        // 'core' is a special case of 'callback' where we supply the details.
+        $set['piece'] += array(
+          'title' => $set['label'],
+          'page callback' => 'party_view_data_set',
+          'page arguments' => array(1, $set_name),
+          'access callback' => 'party_access',
+          'access arguments' => array('view', 1, $set_name),
+          'file' => 'party.pages.inc',
+        );
+      }
+
       // The path becomes the piece's key.
       $path = $set['piece']['path'];
       unset($set['piece']['path']);
@@ -584,6 +638,14 @@ function party_party_party_pieces() {
         if (isset($display->handler) && !empty($display->handler->definition['uses hook party_party_pieces'])) {
           $result = $display->handler->execute_hook_party_party_pieces();
           if (is_array($result)) {
+            // Add in access properties.
+            foreach ($result as $path => $piece) {
+              $result[$path] += array(
+                'access callback' => 'party_access',
+                'access arguments' => array('view', 1, $piece['data_set']),
+              );
+            }
+
             $pieces = array_merge($pieces, $result);
           }
         }
@@ -601,7 +663,7 @@ function party_party_party_pieces() {
  * Get the attached entity controller.
  *
  * @param $data_set_name
- *  The name of the $set definition.
+ *  The name of a data set.
  */
 function party_get_crm_controller($data_set_name) {
   $sets = party_get_data_set_info();
@@ -678,11 +740,18 @@ function party_get_data_set_info($data_set_name = NULL) {
               'set_name' => $set_name,
               'module' => $module,
               'singleton' => FALSE,
+              'view mode' => 'party',
               'form callback' => 'party_default_attached_entity_form',
+              // Singleton entities have no bundle; use the entity type.
+              'entity bundle' => $set['entity type'],
           );
           $sets[$set_name] = $set;
         }
       }
+
+      // Alter the data sets with hook_party_data_set_info_alter().
+      drupal_alter('party_data_set_info', $sets);
+
       cache_set('party:data_set_info', $sets);
     }
   }
@@ -808,9 +877,13 @@ function party_get_attached_entities($party, $data_set_name) {
  * Get the form for a data set (more to the point get a set of fields for the data set
  * might need to work on this).
  *
- * @param $party The party object of the party we're concerned with
- * @param $set_type The set type as defined in hook_data_set_info
- * @param $set_id The set id as stored in the related table
+ * @param $party
+ *  The party object of the party we're concerned with.
+ * @param $set_type
+ *  The set type as defined in hook_data_set_info().
+ *  @todo: clerify is this a name or an info array?
+ * @param $set_id
+ *  The set id as stored in the related table
  *
  * @return
  *   A form array.
@@ -831,7 +904,7 @@ function party_data_set_form($party, $set_type, $set_id = FALSE) {
  * Implements hook_permission().
  */
 function party_permission() {
-  return array(
+  $permissions = array(
     'administer crm settings' => array(
       'title' => t('Administer CRM settings'),
       'restrict access' => TRUE,
@@ -854,6 +927,17 @@ function party_permission() {
       'title' => t('Edit parties'),
     )
   );
+
+  // Add permissions for each data set.
+  foreach (party_get_data_set_info() as $data_set_name => $data_set) {
+    $permissions['view party attached ' . $data_set_name] = array(
+      'title' => t('View party attached %name', array(
+        '%name' => $data_set['label'],
+      )),
+    );
+  }
+
+  return $permissions;
 }
 
 /**
@@ -962,7 +1046,13 @@ function party_load_multiple($pids = array(), $conditions = array(), $reset = FA
 }
 
 /**
- * Delete multiple parties
+ * Delete multiple parties.
+ *
+ * @param $pids
+ *  An array of party IDs.
+ *
+ * @return
+ *  The return value from entity_delete_multiple().
  */
 function party_delete_multiple($pids = array()) {
   return entity_delete_multiple('party', $pids);
@@ -970,6 +1060,9 @@ function party_delete_multiple($pids = array()) {
 
 /**
  * Delete a party.
+ *
+ * @param $party
+ *  A party object.
  */
 function party_delete(Party $party) {
   $party->delete();
@@ -978,8 +1071,8 @@ function party_delete(Party $party) {
 /**
  * Save a party.
  *
- *  @param $party
- *
+ * @param $party
+ *  A party object.
  */
 function party_save(&$party) {
   return entity_get_controller('party')->save($party);
@@ -992,7 +1085,8 @@ function party_save(&$party) {
  *  An array carrying all the important information.
  *
  * @return
- *  A party object that can be passed to party_save().
+ *  A party object that can be passed to party_save(), or FALSE if the array
+ *  was not suitable for creating a party.
  */
 function party_create($info) {
   if (!is_array($info)) {
@@ -1019,7 +1113,9 @@ function party_party_operations() {
 }
 
 /**
- * Merge multiple parties
+ * Merge multiple parties.
+ *
+ * @todo: move this to an inc file; add file inclusion to hook_party_operations().
  */
 function party_party_operations_merge($parties = array()) {
   if (count($parties) < 2) {
@@ -1079,10 +1175,13 @@ function party_ctools_plugin_directory($owner, $plugin_type) {
 
 /**
  * Get the form callback for attached entities.
+ *
+ * @param $data_set_name
+ *  The name of a data set.
  */
-function party_attached_entity_form_callback($data_set) {
-  $sets = party_get_data_set_info();
-  return $sets[$data_set]['form callback'];
+function party_attached_entity_form_callback($data_set_name) {
+  $data_set_info = party_get_data_set_info($data_set_name);
+  return $data_set_info['form callback'];
 }
 
 /**

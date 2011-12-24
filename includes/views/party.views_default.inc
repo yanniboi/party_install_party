@@ -53,14 +53,6 @@ function party_views_default_views() {
   $handler->display->display_options['arguments']['pid']['summary_options']['items_per_page'] = '25';
   $handler->display->display_options['arguments']['pid']['break_phrase'] = 0;
   $handler->display->display_options['arguments']['pid']['not'] = 0;
-  /* Filter criterion: Party: Attached entity bundle */
-  $handler->display->display_options['filters']['entity_bundle']['id'] = 'entity_bundle';
-  $handler->display->display_options['filters']['entity_bundle']['table'] = 'party_attached_entity';
-  $handler->display->display_options['filters']['entity_bundle']['field'] = 'entity_bundle';
-  /* Filter criterion: Party: Attached entity type */
-  $handler->display->display_options['filters']['entity_type']['id'] = 'entity_type';
-  $handler->display->display_options['filters']['entity_type']['table'] = 'party_attached_entity';
-  $handler->display->display_options['filters']['entity_type']['field'] = 'entity_type';
 
   // Get all defined data sets.
   $sets = party_get_data_set_info();
@@ -69,31 +61,23 @@ function party_views_default_views() {
   foreach ($sets as $set_id => $set) {
     // Skip those data sets that request neither a piece nor it to be a view.
     // @todo: the second part of this if fails, but I've not yet had breakfast and I can't see why. fixme!
-    if (!isset($set['piece']) && !isset($set['piece']['uses views'])) {
+    if (!isset($set['piece']) || $set['piece']['maker'] != 'view') {
       continue;
     }
 
     $handler = $view->new_display('party_piece', $set['label'], 'party_piece_' . $set_id);
+    $handler->display->display_options['data_set'] = $set_id;
     $handler->display->display_options['display_description'] = 'Party component - ' . $set['label'];
-    // @todo extra appendings are temporary.
-    $handler->display->display_options['party_piece_label'] = $set['label'] . '(v)';
-    $handler->display->display_options['party_piece_path'] = $set['piece']['path'] . '-view';
+    $handler->display->display_options['party_piece_label'] = $set['label'];
+    $handler->display->display_options['party_piece_path'] = $set['piece']['path'];
     $handler->display->display_options['defaults']['filters'] = FALSE;
-    /* Filter criterion: Party: Attached entity type */
-    $handler->display->display_options['filters']['entity_type']['id'] = 'entity_type';
-    $handler->display->display_options['filters']['entity_type']['table'] = 'party_attached_entity';
-    $handler->display->display_options['filters']['entity_type']['field'] = 'entity_type';
-    $handler->display->display_options['filters']['entity_type']['value'] = $set['entity type'];
-    $handler->display->display_options['filters']['entity_type']['group'] = 0;
 
-    if (isset($set['entity bundle'])) {
-      /* Filter criterion: Party: Attached entity bundle */
-      $handler->display->display_options['filters']['entity_bundle']['id'] = 'entity_bundle';
-      $handler->display->display_options['filters']['entity_bundle']['table'] = 'party_attached_entity';
-      $handler->display->display_options['filters']['entity_bundle']['field'] = 'entity_bundle';
-      $handler->display->display_options['filters']['entity_bundle']['value'] = $set['entity bundle'];
-      $handler->display->display_options['filters']['entity_bundle']['group'] = 0;
-    }
+    // Filter criterion: Party: Attached entity data set.
+    $handler->display->display_options['filters']['entity_type']['id'] = 'data_set';
+    $handler->display->display_options['filters']['entity_type']['table'] = 'party_attached_entity';
+    $handler->display->display_options['filters']['entity_type']['field'] = 'data_set';
+    $handler->display->display_options['filters']['entity_type']['value'] = array($set_id);
+    $handler->display->display_options['filters']['entity_type']['group'] = 0;
   }
 
   $views[$view->name] = $view;
