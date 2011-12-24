@@ -499,7 +499,7 @@ function party_hat_party_form_hat_check($form, &$form_state) {
         
     foreach ($data_sets as $data_set_name) {
       $attached_entities = party_get_attached_entities($form_state['#party'], $data_set_name);
-      if (TRUE || count($attached_entities) < 1) {
+      if (count($attached_entities) < 1) {
         $data_set_info = party_get_data_set_info($data_set_name);
         $form_state['redirect'] = 'party/' . $form_state['#party']->pid . '/party/edit';
         drupal_set_message(t("Party %party is expected to have a %data-set which wasn't present. Please enter the data now.", array(
