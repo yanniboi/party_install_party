@@ -58,10 +58,11 @@ function hook_party_access($op, $party = NULL, $attached_entity = NULL, $account
  *    'party', a view mode which is added to data set-enabled entities in
  *    party_entity_info_alter().
  *  - 'form callback': (optional) This is the name of the form callback function.
- *    Returns the section of the form to do with this data set. See party_default_attached_entity_form()
+ *    Returns the section of the form to do with this data set.
+ *    See party_default_attached_entity_form().
  *  - 'module': (optional) The name of the module implementing this data set.
  *    This will be filled in automatically if not supplied.
- *  - 'admin': An array of admin paths for configuring and managing the piece
+ *  - 'admin': An array of admin paths for configuring and managing the piece:
  *    - 'edit'
  *    - 'manage fields'
  *    - 'manage display'
@@ -79,17 +80,16 @@ function hook_party_access($op, $party = NULL, $attached_entity = NULL, $account
  *        default view in party_views_default_views().
  *      - 'core': The piece is displayed using Party module's attached entity
  *        view page callback, party_view_data_set(). No keys other than this
- *        the path are needed.
+ *        and the path are needed.
  *      - 'callback': The module provides the callback to display the piece
  *        and defining it here rather than in hook_party_party_piece_info()
  *        is mostly just a convenience (though it does produce local action
  *        links too).
- *    - 'path': (optional) The menu path for the provided piece, if the type
- *      is 'callback'.
+ *    - 'path': The menu path for the provided piece.
  *    - 'view name': (optional) @todo! write the code for this! ;)
- *      The machine name of the view to define in
- *      hook_views_default_views(). This allows multiple default views to exist.
- *      Defaults to 'party_attached_entities'.
+ *      The machine name of the view to define in hook_views_default_views().
+ *      This allows multiple default views to exist. Defaults to
+ *      'party_attached_entities'.
  */
 function hook_party_data_set_info() {
   $sets = array();
