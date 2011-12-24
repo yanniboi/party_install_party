@@ -302,7 +302,8 @@ abstract class EntityDefaultPartyController {
    * get the label of the entity this data set wraps    
    */
   public function getLabel() {
-    return isset($this->entity->label) ? $this->entity->label : $this->data_set_name;
+    $label = entity_label($this->definition['entity type'], $this->entity);
+    return $label;
   }
 
   /**
