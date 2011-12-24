@@ -29,7 +29,7 @@ class PartyController extends EntityAPIController {
       field_attach_insert('party', $party);
       module_invoke_all('entity_insert', $party, 'party');
     }
-    return $crmParty;
+    return $party;
   }
 
   /**
