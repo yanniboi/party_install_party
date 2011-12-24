@@ -19,7 +19,7 @@ class PartyController extends EntityAPIController {
     // Set the label on the party.
     $this->setLabel($party);
 
-    if (isset($crmParty->pid)) {
+    if (isset($party->pid)) {
       drupal_write_record('party', $party, 'pid');
       field_attach_update('party', $party);
       module_invoke_all('entity_update', $party, 'party');
