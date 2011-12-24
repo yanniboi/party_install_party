@@ -243,6 +243,10 @@ function party_hat_party_access($op, $party = NULL, $attached_entity = NULL, $ac
         }
       }
       return NULL;
+    case 'view':
+      // @todo: This needs to be written! Just say yes for now.
+      return TRUE;
+
   }
 }
 
