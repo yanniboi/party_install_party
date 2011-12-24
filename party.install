@@ -327,32 +327,8 @@ function party_update_7002() {
  * Do we need the phid column?
  */ 
 function party_update_7001() {
-  $schema = array(
-    'description' => 'Stores hattings (relationships between hats and parties)',
-    'fields' => array(
-      'phid' => array(
-        'description' => 'Primary key for the hatting.',
-        'type' => 'serial',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ),
-      'hat' => array(
-        'description' => 'The machine readable name of the hat',
-        'type' => 'varchar',
-        'length' => '255',
-        'not null' => TRUE,
-        'default' => '',
-      ),
-      'party' => array(
-        'description' => 'The Party Id',
-        'type' => 'int',
-        'not null' => TRUE
-      ),
-    ),
-    'primary key' => array('phid'),
-  );
-  
-  db_create_table("party_hattings", $schema);
+  // Obsolete.
+  // Will be removed in http://drupal.org/node/1383920.
 }
  
 /**

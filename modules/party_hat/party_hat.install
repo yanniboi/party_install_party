@@ -130,34 +130,6 @@ function party_hat_schema() {
     'primary key' => array('hid'),
   );
   
-  // @todo do we need the phid column?
-  //       We need a primary key and neither of the two fields would be unique
-  //       We don't need this table at all anymore
-  $schema['party_hattings'] = array(
-    'description' => 'Stores hattings (relationships between hats and parties)',
-    'fields' => array(
-      'phid' => array(
-        'description' => 'Primary key for the hatting.',
-        'type' => 'serial',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ),
-      'hat' => array(
-        'description' => 'The machine readable name of the hat',
-        'type' => 'varchar',
-        'length' => '255',
-        'not null' => TRUE,
-        'default' => '',
-      ),
-      'party' => array(
-        'description' => 'The Party Id',
-        'type' => 'int',
-        'not null' => TRUE
-      ),
-    ),
-    'primary key' => array('phid'),
-  );
-  
   // Store data set settings for hats
   $schema['party_hat_data_set_rules'] = array(
     'description' => 'Store data set settings for hats',
