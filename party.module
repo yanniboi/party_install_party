@@ -752,6 +752,15 @@ function party_get_data_set_info($data_set_name = NULL) {
         $sets_module = module_invoke($module, 'party_data_set_info');
         foreach ($sets_module as $set_name => $set) {
           // Add in some essential data we need, but allow modules to set this too.
+          if (isset($set['piece'])) {
+            $path_element = $set['piece']['path'];
+          }
+          else {
+            // @todo: fix this, as it's pretty weak and certainly in the case of
+            // the user data set, relies on the piece happening to define its
+            // path the same way.
+            $path_element = str_replace('_', '-', $set_name);
+          }
           $set += array(
               'set_name' => $set_name,
               'module' => $module,
@@ -760,6 +769,7 @@ function party_get_data_set_info($data_set_name = NULL) {
               'form callback' => 'party_default_attached_entity_form',
               // Singleton entities have no bundle; use the entity type.
               'entity bundle' => $set['entity type'],
+              'path element' => $path_element,
           );
           $sets[$set_name] = $set;
         }

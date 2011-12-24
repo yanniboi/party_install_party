@@ -310,14 +310,7 @@ abstract class EntityDefaultPartyController {
    * Get the path argument for this set.
    */
    public function getPathArg() {
-     if (isset($this->definition['piece'])) {
-       $path_element = $this->definition['piece']['path'];
-     }
-     else {
-       // @todo: figure out if this even happens any more.
-       $path_element = str_replace('_', '-', $this->data_set_name);
-     }
-     return $path_element;
+     return $this->definition['path element'];
    }
   
   /**
