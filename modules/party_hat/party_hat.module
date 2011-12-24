@@ -486,18 +486,26 @@ function party_hat_field_get_default($entity_type, $entity, $field, $instance, $
 }
 
 /**
+ * Additional submit handler to check party form for expected attached entities.
+ *
  * This checks if all expected data sets are present and, if not, sends the user
  * back to the form with a nice message.
+ *
+ * @todo: surely this should be a validation handler?
  */
 function party_hat_party_form_hat_check($form, &$form_state) {
   foreach (party_hat_get_hats($form_state['#party']) as $hid => $hat) {
     $data_sets = party_hat_get_hat_data_sets($hat);
         
-    foreach($data_sets as $data_set_name) {
+    foreach ($data_sets as $data_set_name) {
       $attached_entities = party_get_attached_entities($form_state['#party'], $data_set_name);
-      if (count($attached_entities) < 1) {
+      if (TRUE || count($attached_entities) < 1) {
+        $data_set_info = party_get_data_set_info($data_set_name);
         $form_state['redirect'] = 'party/' . $form_state['#party']->pid . '/party/edit';
-        drupal_set_message("{$form_state['#party']->label} is expected to have a $data_set_name which wasn't present. Please enter the data now");
+        drupal_set_message(t("Party %party is expected to have a %data-set which wasn't present. Please enter the data now.", array(
+          '%party' => $form_state['#party']->label,
+          '%data-set' => $data_set_info['label'],
+        )));
       }
     }
   }
