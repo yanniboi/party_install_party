@@ -410,9 +410,16 @@ function party_data_set_load($data_set_url_string) {
  * questions such as 'can user U view the attached entity E belonging to
  * party P?'.
  *
+ * @todo: Much of this remains to be written.
+ * @todo: Write tests!
+ *
  * @param $op
  *   The operation being performed.
- *   Currently one of: 'view', 'create'.
+ *   Currently one of:
+ *    - 'view': Whether the user may view the given party or attached entity.
+ *    - 'create': Whether the user may create a party of the type given by
+ *      $party->type.
+ *    - 'attach': Whether the party may attach an entity in the given data set.
  *   @todo: consider distinguishing $op values for solo party vs attached
  *   entity, eg 'view attached' / 'view', so that we don't have to keep mucking
  *   about testing isset($attached_entity).
@@ -471,6 +478,11 @@ function party_party_access($op, $party = NULL, $attached_entity = NULL, $accoun
     $data_set_name = NULL; // @todo
   }
 
+  // Determine whether we are the only implementation of this hook, in which
+  // case we are more vocal about granting access.
+  $solo = (count(module_implements('party_access')) == 1);
+  //dsm($solo, 'solo');
+
   if (isset($attached_entity)) {
     // Determine what the Core permissions system has to say about this.
     switch ($op) {
@@ -478,6 +490,10 @@ function party_party_access($op, $party = NULL, $attached_entity = NULL, $accoun
         $permission_string = 'view party attached ' . $data_set_name;
         $permission_access = user_access($permission_string, $account);
         break;
+      case 'attach':
+        // If we're the only ones granting access, we allow any data set to be
+        // attached. If other modules are involved, we say nothing.
+        return ($solo ? TRUE : NULL);
       default:
         // Just say yes to anything else for now.
         // @todo.
@@ -485,7 +501,7 @@ function party_party_access($op, $party = NULL, $attached_entity = NULL, $accoun
     }
     //dsm("$permission_string -> $permission_access, $data_set_name");
 
-    if (count(module_implements('party_access')) == 1) {
+    if ($solo) {
       // If we're being asked about attachments, grant access only if we are the
       // only module reacting. This allows a basic operation of the CRM system
       // where all attached entities can be used.
@@ -765,17 +781,28 @@ function party_get_data_set_info($data_set_name = NULL) {
 }
 
 /**
- * Get the data sets expected for a party
+ * Get the data sets expected for a party.
+ *
+ * @todo: rename this function; the name is ambiguous.
+ *
+ * @param $party
+ *  The party object in question.
+ *
+ * @return
+ *  An array of data set names.
  */
 function party_get_party_data_sets($party) {
-  if (count(module_implements('party_get_party_data_sets')) > 0) {
-    $data_sets = module_invoke_all('party_get_party_data_sets', $party);
-  }
-  else {
-    $data_sets = array_keys(party_get_data_set_info());
-  }
+  $data_sets = array_keys(party_get_data_set_info());
   
-  return $data_sets;
+  $allowed_data_sets = array();
+  // Check attaching access for each data set.
+  foreach ($data_sets as $data_set_name) {
+    $access = party_access('attach', $party, $data_set_name);
+    if ($access) {
+      $allowed_data_sets[$data_set_name] = $data_set_name;
+    }
+  }
+  return $allowed_data_sets;
 }
 
 // -----------------------------------------------------------------------

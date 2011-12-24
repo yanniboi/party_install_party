@@ -220,22 +220,30 @@ function party_hat_get_data_set_rule($hat, $set) {
 }
 
 /**
- * Implements hook_party_get_party_data_sets().
+ * Implements hook_party_access().
  */
-function party_hat_party_get_party_data_sets($party) {
-  // Get the hats for this party
-  $party_hats = party_hat_get_hats($party);
-  
-  // Get the data sets expected for this hat.
-  $data_sets = array();
-  foreach ($party_hats as $hat) {
-    $temp_sets = party_hat_get_hat_data_sets($hat);
-    foreach ($temp_sets as $set) {
-      $data_sets[] = $set;
-    }
+function party_hat_party_access($op, $party = NULL, $attached_entity = NULL, $account = NULL) {
+  // We say nothing about access to just the party.
+  if (!isset($attached_entity)) {
+    return NULL;
   }
-  
-  return $data_sets;
+
+  switch ($op) {
+    case 'attach':
+      $data_set_name = $attached_entity;
+
+      $party_hats = party_hat_get_hats($party);
+      $data_sets = array();
+      foreach ($party_hats as $hat) {
+        // Ugh these are values; would be better as keys.
+        $hat_sets = party_hat_get_hat_data_sets($hat);
+        // If any hat has the data set, grant access.
+        if (in_array($data_set_name, $hat_sets)) {
+          return TRUE;
+        }
+      }
+      return NULL;
+  }
 }
 
 /**
