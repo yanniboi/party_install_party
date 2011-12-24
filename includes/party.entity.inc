@@ -15,19 +15,19 @@ class PartyController extends EntityAPIController {
    *
    * The party's label is determined by the currently active name label plugin.
    */
-  public function save($crmParty) {
+  public function save($party) {
     // Set the label on the party.
-    $this->setLabel($crmParty);
+    $this->setLabel($party);
 
     if (isset($crmParty->pid)) {
-      drupal_write_record('party', $crmParty, 'pid');
-      field_attach_update('party', $crmParty);
-      module_invoke_all('entity_update', 'party', $crmParty);
+      drupal_write_record('party', $party, 'pid');
+      field_attach_update('party', $party);
+      module_invoke_all('entity_update', $party, 'party');
     }
     else {
-      drupal_write_record('party', $crmParty);
-      field_attach_insert('party', $crmParty);
-      module_invoke_all('entity_insert', 'party', $crmParty);
+      drupal_write_record('party', $party);
+      field_attach_insert('party', $party);
+      module_invoke_all('entity_insert', $party, 'party');
     }
     return $crmParty;
   }
