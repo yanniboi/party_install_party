@@ -247,7 +247,7 @@ function party_attached_entity_edit_form_submit($form, &$form_state) {
   $attached_entity_controller = reset($form_state['#attached_entities']);
   
   // Redirect to the set piece.
-  $form_state['redirect'] = 'party/' . $attached_entity_controller->pid . '/' . $attached_entity_controller->getPathArg();
+  $form_state['redirect'] = 'party/' . $attached_entity_controller->pid . '/' . $attached_entity_controller->definition['path element'];
 }
 
 /**

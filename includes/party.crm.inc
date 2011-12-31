@@ -307,13 +307,6 @@ abstract class EntityDefaultPartyController {
   }
 
   /**
-   * Get the path argument for this set.
-   */
-   public function getPathArg() {
-     return $this->definition['path element'];
-   }
-  
-  /**
    * Get actions for the attached entity.
    *
    * @return
@@ -323,11 +316,11 @@ abstract class EntityDefaultPartyController {
     $actions = array(
       'edit' => array(
         'title' => 'Edit',
-        'href' => 'party/' . $this->party->pid . '/' . $this->getPathArg() . '/edit/' . $this->entity->{$this->getEntityIdKey()},
+        'href' => 'party/' . $this->party->pid . '/' . $this->definition['path element'] . '/edit/' . $this->entity->{$this->getEntityIdKey()},
       ),
       'remove' => array(
         'title' => 'Remove',
-        'href' => 'party/' . $this->party->pid . '/' . $this->getPathArg() . '/remove/' . $this->entity->{$this->getEntityIdKey()},
+        'href' => 'party/' . $this->party->pid . '/' . $this->definition['path element'] . '/remove/' . $this->entity->{$this->getEntityIdKey()},
       ),
     );
     return $actions;
