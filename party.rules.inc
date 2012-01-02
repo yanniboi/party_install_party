@@ -70,7 +70,8 @@ function party_rules_action_info() {
         'type' => 'entity', 
         'label' => t('Entity'), 
         'description' => t('The Entity to attach to the Party'), 
-        'restriction' => 'selector', 
+        'restriction' => 'selector',
+        'wrapped' => TRUE,        
       ),
       'data_set_name' => array(
         'type' => 'text',
@@ -91,8 +92,8 @@ function party_rules_action_info() {
  * @todo: Get party loading as a Party object not as stdClass
  * @todo: Make sure entity is loaded well
  */
-function party_rules_attach_entity($party, $entity, $data_set_name) {
-  $entity = reset(entity_load($entity->type, array($entity->getIdentifier())));
-  
+function party_rules_attach_entity($party, $wrapper, $data_set_name, $settings, $state, $element) {
+  $entity = $wrapper->value();
+ 
   party_attach_entity($party, $entity, $data_set_name);
 }
