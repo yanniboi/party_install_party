@@ -272,7 +272,8 @@ function party_hat_get_hat_data_sets($hat, $rule = 'has') {
 /**
  * Get all the Hats a Party is Wearing
  *
- * @param $party the Party object or ID
+ * @param $party 
+ *  The Party object or ID
  */
 function party_hat_get_hats($party) {
   if (!is_object($party)) {
@@ -280,8 +281,9 @@ function party_hat_get_hats($party) {
   }
   
   $hats = array();
+  // If this is an unsaved party (one without an ID)...
   if (!isset($party->pid)) {
-    //Get required hats.
+    //Get all the "required"/"default" hats for this party type.
     $options = array(
       'required' => TRUE,
       'party_type' => $party->type,
