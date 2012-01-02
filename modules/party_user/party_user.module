@@ -32,6 +32,7 @@ function party_user_party_data_set_info() {
 function party_user_party_party_pieces() {
   return array(
     'user' => array(
+      'maker' => 'view',
       'title' => 'User',
       'page callback' => 'party_view_data_set',
       'page arguments' => array(1, 'user'),
