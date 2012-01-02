@@ -247,7 +247,7 @@ function party_attached_entity_edit_form_submit($form, &$form_state) {
   $attached_entity_controller = reset($form_state['#attached_entities']);
   
   // Redirect to the set piece.
-  $form_state['redirect'] = 'party/' . $attached_entity_controller->pid . '/' . $attached_entity_controller->getPathArg();
+  $form_state['redirect'] = 'party/' . $attached_entity_controller->pid . '/' . $attached_entity_controller->definition['path element'];
 }
 
 /**
@@ -310,7 +310,7 @@ function party_view_data_set($party, $data_set_name) {
       '#links' => array(
         'add' => array(
           'title' => "Add " . $data_set['label'],
-          'href'  => 'party/' . $party->pid . '/add/' . $crm_controller->getPathArg(),
+          'href'  => 'party/' . $party->pid . '/add/' . $data_set['path element'],
         ),
       ),
       '#attributes' => array('class' => array('crm-profile-links')),

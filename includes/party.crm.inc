@@ -302,23 +302,10 @@ abstract class EntityDefaultPartyController {
    * get the label of the entity this data set wraps    
    */
   public function getLabel() {
-    return isset($this->entity->label) ? $this->entity->label : $this->data_set_name;
+    $label = entity_label($this->definition['entity type'], $this->entity);
+    return $label;
   }
 
-  /**
-   * Get the path argument for this set.
-   */
-   public function getPathArg() {
-     if (isset($this->definition['piece'])) {
-       $path_element = $this->definition['piece']['path'];
-     }
-     else {
-       // @todo: figure out if this even happens any more.
-       $path_element = str_replace('_', '-', $this->data_set_name);
-     }
-     return $path_element;
-   }
-  
   /**
    * Get actions for the attached entity.
    *
@@ -329,11 +316,11 @@ abstract class EntityDefaultPartyController {
     $actions = array(
       'edit' => array(
         'title' => 'Edit',
-        'href' => 'party/' . $this->party->pid . '/' . $this->getPathArg() . '/edit/' . $this->entity->{$this->getEntityIdKey()},
+        'href' => 'party/' . $this->party->pid . '/' . $this->definition['path element'] . '/edit/' . $this->entity->{$this->getEntityIdKey()},
       ),
       'remove' => array(
         'title' => 'Remove',
-        'href' => 'party/' . $this->party->pid . '/' . $this->getPathArg() . '/remove/' . $this->entity->{$this->getEntityIdKey()},
+        'href' => 'party/' . $this->party->pid . '/' . $this->definition['path element'] . '/remove/' . $this->entity->{$this->getEntityIdKey()},
       ),
     );
     return $actions;

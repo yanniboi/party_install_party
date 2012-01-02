@@ -220,22 +220,34 @@ function party_hat_get_data_set_rule($hat, $set) {
 }
 
 /**
- * Implements hook_party_get_party_data_sets().
+ * Implements hook_party_access().
  */
-function party_hat_party_get_party_data_sets($party) {
-  // Get the hats for this party
-  $party_hats = party_hat_get_hats($party);
-  
-  // Get the data sets expected for this hat.
-  $data_sets = array();
-  foreach ($party_hats as $hat) {
-    $temp_sets = party_hat_get_hat_data_sets($hat);
-    foreach ($temp_sets as $set) {
-      $data_sets[] = $set;
-    }
+function party_hat_party_access($op, $party = NULL, $attached_entity = NULL, $account = NULL) {
+  // We say nothing about access to just the party.
+  if (!isset($attached_entity)) {
+    return NULL;
   }
-  
-  return $data_sets;
+
+  switch ($op) {
+    case 'attach':
+      $data_set_name = $attached_entity;
+
+      $party_hats = party_hat_get_hats($party);
+      $data_sets = array();
+      foreach ($party_hats as $hat) {
+        // Ugh these are values; would be better as keys.
+        $hat_sets = party_hat_get_hat_data_sets($hat);
+        // If any hat has the data set, grant access.
+        if (in_array($data_set_name, $hat_sets)) {
+          return TRUE;
+        }
+      }
+      return NULL;
+    case 'view':
+      // @todo: This needs to be written! Just say yes for now.
+      return TRUE;
+
+  }
 }
 
 /**
@@ -255,71 +267,6 @@ function party_hat_get_hat_data_sets($hat, $rule = 'has') {
     ->fetchAllAssoc('data_set');
   
   return array_keys($results);
-}
- 
-/**
- * Assign a hat to a party.
- *
- * @param $party
- *  The Party Object.
- * @param $hat
- *  The Hat object or name.
- *
- * @todo Change Name?
- * @todo Build
- */
-function party_hat_assign($party, $hat) {
-  //get the party id out
-  if (is_object($party)) {
-    $party = $party->pid;
-  }
-  
-  //get hold of the $hat name
-  if (is_object($hat)) {
-    $hat = $hat->id;
-  }
-  
-  $result = db_select('party_hattings', 'ph')
-    ->fields('ph')
-    ->condition('party', $party, '=')
-    ->condition('hat', $hat, '=')
-    ->execute()
-    ->fetchAllAssoc('phid');
-    
-  if ( count($result) < 1 ) {
-    $record = array('party' => $party, 'hat' => $hat);
-    drupal_write_record('party_hattings', $record);
-  }
-}
-
-/**
- * Unassign a hat from a party.
- *
- * @param $party
- *  The Party Object.
- * @param $hat
- *  The Hat object or name.
- *
- * @todo Change Name?
- * @todo Build
- */
-function party_hat_unassign($party, $hat) {
-  // Get the party id out.
-  if (is_object($party)) {
-    $party = $party->pid;
-  }
-  
-  // Get hold of the $hat name.
-  if (is_object($hat)) {
-    $hat = $hat->name;
-  }
-  
-  $num = db_delete('party_hattings')
-    ->condition('party', $party, '=')
-    ->condition('hat', $hat, '=')
-    ->execute();
-  
-  return $num;
 }
 
 /**
@@ -543,18 +490,26 @@ function party_hat_field_get_default($entity_type, $entity, $field, $instance, $
 }
 
 /**
+ * Additional submit handler to check party form for expected attached entities.
+ *
  * This checks if all expected data sets are present and, if not, sends the user
  * back to the form with a nice message.
+ *
+ * @todo: surely this should be a validation handler?
  */
 function party_hat_party_form_hat_check($form, &$form_state) {
   foreach (party_hat_get_hats($form_state['#party']) as $hid => $hat) {
     $data_sets = party_hat_get_hat_data_sets($hat);
         
-    foreach($data_sets as $data_set_name) {
+    foreach ($data_sets as $data_set_name) {
       $attached_entities = party_get_attached_entities($form_state['#party'], $data_set_name);
       if (count($attached_entities) < 1) {
+        $data_set_info = party_get_data_set_info($data_set_name);
         $form_state['redirect'] = 'party/' . $form_state['#party']->pid . '/party/edit';
-        drupal_set_message("{$form_state['#party']->label} is expected to have a $data_set_name which wasn't present. Please enter the data now");
+        drupal_set_message(t("Party %party is expected to have a %data-set which wasn't present. Please enter the data now.", array(
+          '%party' => $form_state['#party']->label,
+          '%data-set' => $data_set_info['label'],
+        )));
       }
     }
   }
