@@ -1203,7 +1203,7 @@ function party_ctools_plugin_type() {
  * Implements hook_ctools_plugin_directory().
  */
 function party_ctools_plugin_directory($owner, $plugin_type) {
-  if ($owner == 'party') {
+  if ($owner == 'party' || ($owner == 'page_manager' && $plugin_type == 'tasks')) {
     return "plugins/$plugin_type";
   }
 }
@@ -1375,9 +1375,7 @@ function party_merge($first, $second) {
  * Implements hook_entity_update($entity, $type);
  */
 function party_entity_update($entity, $type) {
-  dsm("Cheese");
   if($type == "party" && module_exists('rules')) {
-    dsm("Cheese");
     rules_invoke_event('party_update', $entity);
   }
 }
