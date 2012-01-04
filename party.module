@@ -1203,7 +1203,8 @@ function party_ctools_plugin_type() {
  * Implements hook_ctools_plugin_directory().
  */
 function party_ctools_plugin_directory($owner, $plugin_type) {
-  if ($owner == 'party' || ($owner == 'page_manager' && $plugin_type == 'tasks')) {
+  if ($owner == 'party' || ($owner == 'page_manager' && $plugin_type == 'tasks')
+    || ($owner == 'ctools' && $plugin_type == 'relationships')) {
     return "plugins/$plugin_type";
   }
 }
