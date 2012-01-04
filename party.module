@@ -1204,7 +1204,8 @@ function party_ctools_plugin_type() {
  */
 function party_ctools_plugin_directory($owner, $plugin_type) {
   if ($owner == 'party' || ($owner == 'page_manager' && $plugin_type == 'tasks')
-    || ($owner == 'ctools' && $plugin_type == 'relationships')) {
+    || ($owner == 'ctools' && $plugin_type == 'relationships')
+    || ($owner == 'ctools' && $plugin_type == 'content_types')) {
     return "plugins/$plugin_type";
   }
 }
