@@ -291,9 +291,10 @@ function party_hat_get_hats($party) {
     return party_hat_get_all_hats($options);
   }
   else {
-    if (isset($party->party_hat) && is_array($party->party_hat)) {
-      foreach ($party->party_hat['und'] as $hat_name) {
-        $hat = party_hat_load($hat_name);
+    $items = field_get_items('party', $party, 'party_hat');
+    if ($items) {
+      foreach ($items as $item) {
+        $hat = party_hat_load($item['hat_name']);
         $hats[$hat->hid] = $hat; 
       }
     }
@@ -394,7 +395,11 @@ function party_hat_field_widget_error($element, $error, $form, &$form_state) {
 /**
  * Implements hook_field_is_empty().
  */
-function party_hat_field_is_empty() {
+function party_hat_field_is_empty($item, $field) {
+  if (empty($item['hat_name'])) {
+    return TRUE;
+  }
+
   return FALSE;
 }
 

@@ -231,6 +231,8 @@ abstract class EntityDefaultPartyController {
    *
    */
   public final function attach($party, $options = array()) {
+    $this->setParty($party);
+    
     if ($this->attached) {
       $this->oldDelta = $this->delta;
     }
