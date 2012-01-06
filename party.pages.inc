@@ -67,7 +67,7 @@ function party_add($type = '') {
  */
 function party_edit_form($form, &$form_state, $party) {
   $form['#party'] = $party;
-
+  
   if (isset($party->pid)) {
     $form['pid'] = array(
       '#type' => 'value',
@@ -90,6 +90,7 @@ function party_edit_form($form, &$form_state, $party) {
   );
   
   $form_state['#party'] = $party;
+  $form_state['#party_unchanged'] = $party; // So that other modules can react to changes. Must be a better way
   $form_state['#attached_entities'] = array();
   
   $data_sets = party_get_party_data_sets($party);

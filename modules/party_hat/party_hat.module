@@ -295,7 +295,7 @@ function party_hat_get_hats($party) {
     if ($items) {
       foreach ($items as $item) {
         $hat = party_hat_load($item['hat_name']);
-        $hats[$hat->hid] = $hat; 
+        $hats[$hat->name] = $hat; 
       }
     }
   }
@@ -325,7 +325,14 @@ function party_hat_get_all_hats($options = array()) {
   foreach ($result['party_hat'] as $record) {
     $hids[] = $record->hid;
   }
-  $hats = entity_load('party_hat', $hids);
+  
+  // Get the array keayed by hat name.
+  $tempHats = entity_load('party_hat', $hids);
+  $hats = array();
+  foreach ($tempHats as $hat) {
+    $hats[$hat->name] = $hat;
+  }
+  unset($tempHats);
   
   if (!isset($options['party_type'])) {
     return $hats;
@@ -337,6 +344,83 @@ function party_hat_get_all_hats($options = array()) {
     }
   }
   return $hats;  
+}
+
+/**
+ * Assign a number of hats to a party
+ *
+ * @param $party
+ * @param $hats
+ *   An array of hats to assign.
+ */
+function party_hat_assign_hats($party, $hats) {
+  // Get the hat items from the party object
+  $hat_items = field_get_items('party', $party, 'party_hat');
+  
+  foreach ($hats as $hat) {
+    $has_hat = FALSE;
+    foreach ($hat_items as $item) {
+      if ($item['hat_name'] == $hat->name) {
+        $has_hat = TRUE;
+      }
+    }
+    
+    // Don't add the hat if the Party already has it
+    if ($has_hat) {
+      continue;
+    }
+    
+    $assigned_hats[] = $hat->name;
+    $hat_items[]['hat_name'] = $hat->name;   
+  }
+  
+  $party->party_hat[LANGUAGE_NONE] = $hat_items;
+  party_save($party);
+  
+  if (module_exists('rules')) {
+    rules_invoke_all('party_hat_assign_hats', $party, $assigned_hats);
+  }
+  else {
+    module_invoke_all('party_hat_assign_hats', $party, $assigned_hats);
+  }
+}
+
+/**
+ * Unassign hats
+ *
+ * @param $party
+ * @param $hats
+ *   An array of hats to unassign.
+ */
+function party_hats_unassign_hats($party, $hats) {
+  // Get the hat items from the party object
+  $hat_items = field_get_items('party', $party, 'party_hat');
+  
+  foreach ($hats as $hat) {
+    $has_hat = FALSE;
+    foreach ($hat_items as $delta => $item) {
+      if ($item['hat_name'] == $hat->name) {
+        $has_hat = TRUE;
+        unset($hat_items[$delta]);
+      }
+    }
+    
+    // Don't remove the hat if its not assigned
+    if (!$has_hat) {
+      continue;
+    }    
+    $unassigned_hats[] = $hat->name;
+  }
+  
+  $party->party_hat[LANGUAGE_NONE] = $hat_items;
+  party_save($party);
+  
+  if (module_exists('rules')) {
+    rules_invoke_all('party_hat_unassign_hats', $party, $unassigned_hats);
+  }
+  else {
+    module_invoke_all('party_hat_unassign_hats', $party, $unassigned_hats);
+  }
 }
 
 /**
@@ -496,6 +580,9 @@ function party_hat_field_get_default($entity_type, $entity, $field, $instance, $
   return $values;
 }
 
+// ----------------------------------------------------------------------------
+// Form Alterations
+
 /**
  * Additional submit handler to check party form for expected attached entities.
  *
@@ -505,7 +592,44 @@ function party_hat_field_get_default($entity_type, $entity, $field, $instance, $
  * @todo: surely this should be a validation handler?
  */
 function party_hat_party_form_hat_check($form, &$form_state) {
-  foreach (party_hat_get_hats($form_state['#party']) as $hid => $hat) {
+  $party_unchanged = $form_state['#party_unchanged'];
+  $party = $form_state['#party'];
+  
+  $old_hats = array_keys(party_hat_get_hats($party_unchanged));
+  $hats = array_keys(party_hat_get_hats($party));
+  $all_hats = array_merge($old_hats, $hats);
+  
+  $assigned_hats = array();
+  $unassigned_hats = array();
+  foreach (array_diff($old_hats, $hats) as $hat_name) {
+    $unassigned_hats[] = $hat_name;
+  }
+  foreach (array_diff($hats, $old_hats) as $hat_name) {
+    $assigned_hats[] = $hat_name;
+  }    
+  unset($hats, $old_hats);  
+  
+  //invoke hooks and rules to unassign hats
+  if (!empty($unassigned_hats)) {
+    if (module_exists('rules')) {
+      rules_invoke_all('party_hat_unassign_hats', $party, $unassigned_hats);
+    }
+    else {
+      module_invoke_all('party_hat_unassign_hats', $party, $unassigned_hats);
+    }
+  }
+  
+  // invoke hooks and rules to assign hats
+  if (!empty($assigned_hats)) {
+    if (module_exists('rules')) {
+      rules_invoke_all('party_hat_assign_hats', $party, $assigned_hats);
+    }
+    else {
+      module_invoke_all('party_hat_assign_hats', $party, $assigned_hats);
+    }
+  }
+  
+  foreach (party_hat_get_hats($party) as $hid => $hat) {
     $data_sets = party_hat_get_hat_data_sets($hat);
         
     foreach ($data_sets as $data_set_name) {

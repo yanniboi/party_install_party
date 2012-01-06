@@ -7,3 +7,4 @@ files[] = party_hat.module
 files[] = party_hat.admin.inc
 files[] = party_hat.devel_generate.inc
 files[] = includes/party_hat.entity.inc
+files[] = party_hat.rules.inc
