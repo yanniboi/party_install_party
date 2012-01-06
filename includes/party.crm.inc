@@ -254,6 +254,8 @@ abstract class EntityDefaultPartyController {
       $this->delta = $this->getNextDelta();
     }
     
+    $this->preAttach();
+    
     // Build our relation array
     $relation = array(
       'pid' => $party->pid,
@@ -299,6 +301,20 @@ abstract class EntityDefaultPartyController {
       $this->updateAllDeltas($this->delta, 'insert');
       drupal_write_record('party_attached_entity', $relation);      
     }
+    
+    $this->postAttach();
+  }
+  
+  /**
+   * Do stuff before an entity gets attached
+   */
+  public function preAttach() {
+  }
+  
+  /**
+   * Do stuff after an entity gets attached
+   */
+  public function postAttach() {
   }
   
   /**
