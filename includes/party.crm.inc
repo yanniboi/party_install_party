@@ -424,7 +424,7 @@ abstract class EntityDefaultPartyController {
   public function hash() {
     $identifier = (isset($this->entity->{$this->getEntityIdKey()})) ? $this->entity->{$this->getEntityIdKey()} : 'new';
   
-    return $this->data_set_name . '_' . $identifier;
+    return $this->data_set_name . '__' . $identifier;
   }
   
   /**
