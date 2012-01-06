@@ -9,15 +9,14 @@ abstract class EntityDefaultPartyController {
    *   instance.
    */
   const FROM_PARTY_AND_ENTITY = 0;
-  const FROM_PEID = 1;
   const FROM_PARTY = 2;
   const FROM_ENTITY = 3;
   
   /**
-   * var int $id
-   *   A unique identifier for each data set instance
+   * var int $delta
+   *  The delta of this attached entity, the combination of delta, pid and data set name should be unique
    */
-  public $id;
+  public $delta;
   
   /**
    * var string $data_set_name
@@ -46,11 +45,6 @@ abstract class EntityDefaultPartyController {
    *   The Party object we're connected too.
    */
   public $party;
-  
-  /**
-   * var bool $main;
-   */
-  public $main;
   
   public $attached = FALSE;
   
@@ -132,8 +126,7 @@ abstract class EntityDefaultPartyController {
       }
       else {
         $this->attached = TRUE;
-        $this->id = $result['peid'];
-        $this->main = $result['main'];
+        $this->delta = $result['delta'];
       }  
     }    
   }
@@ -177,9 +170,7 @@ abstract class EntityDefaultPartyController {
       }
       else {
         $this->attached = TRUE;
-        $this->id = $result['peid'];
-        $this->main = $result['main'];
-        $this->id = $result['peid'];
+        $this->delta = $result['delta'];
       }  
     }
     
@@ -230,33 +221,83 @@ abstract class EntityDefaultPartyController {
    * 
    * @param $party
    *   The party object we're attaching to.
+   * @param $options
+   *   A key containing the options for attaching this party.
+   *    - delta (optional) Specify the delta, if this is set it will 
+   *      take precedant over the method
+   *    - method (optional) Specify the method, append or prepend. Defaults to append
+   *      - append - put the attached entity at the end of the list
+   *      - prepend - the attached entity will have delta 0   
+   *
    */
-  public final function attach($party, $options = array()) {     
+  public final function attach($party, $options = array()) {
+    if ($this->attached) {
+      $this->oldDelta = $this->delta;
+    }
+    
+    // Get the next delta
+    // If the delta is explicitly set...
+    if (isset($options['delta'])) {
+      $this->delta = $options['delta'];
+    } 
+    // If the method has been set...
+    else if (isset($options['method'])) {
+      if ($options['method'] == 'prepend') {
+        $this->delta = 0;
+      }
+      else if ($option['method'] == 'append') {
+        $this->delta = $this->getNextDelta();
+      }
+    }
+    // Otherwise, as long as we're not already attached, we'll get the next delta available
+    else if (!$this->attached) {      
+      $this->delta = $this->getNextDelta();
+    }
+    
+    // Build our relation array
     $relation = array(
       'pid' => $party->pid,
       'eid' => $this->entity->{$this->getEntityIdKey()},
+      'delta' => $this->delta,
       'data_set' => $this->data_set_name,
       'entity_type' => $this->getEntityType(),
       'entity_bundle' => $this->getEntityBundle(),
     );
-
-    // WIP: chuck in defaults until I figure out what these do
-    $relation += array(
-      'main' => isset($options['main']) ? $options['main'] : 0,
-    );
-
-    // Try update first, and if that fails insert.
-    $result = db_update('party_attached_entity')
-      ->fields(array(
-        'main' => $relation['main'],
-        'data_set' => $this->data_set_name,
-      ))
-      ->condition('pid', $relation['pid'], '=')
-      ->condition('eid', $relation['eid'], '=')
-      ->condition('data_set', $this->data_set_name, '=')
-      ->execute();
-    if ($result == 0 && !is_numeric($this->id)) {
-      drupal_write_record('party_attached_entity', $relation);
+    
+    // If this attached entity has a record stored in the database
+    if ($this->attached) {    
+      $tempDelta = $this->delta;
+      
+      // Make sure the order of deltas is correct after update 
+      if ($this->oldDelta < $this->delta) {
+        $this->updateAllDeltas($this->delta + 1, 'insert');
+        $tempDelta = $this->delta + 1;
+      }
+      if ($this->oldDelta > $this->delta) {
+        $this->updateAllDeltas($this->delta, 'insert');
+      }
+      
+      // Try update first, and if that fails insert.
+      $result = db_update('party_attached_entity')
+        ->fields(array(
+          'delta' => $tempDelta,
+        ))
+        ->condition('pid', $relation['pid'], '=')
+        ->condition('eid', $relation['eid'], '=')
+        ->condition('data_set', $this->data_set_name, '=')
+        ->execute();
+      
+      //Remove the old delta      
+      if ($this->oldDelta < $this->delta) {
+        $this->updateAllDeltas($this->oldDelta, 'remove');
+      }
+      if ($this->oldDelta > $this->delta) {
+        $this->updateAllDeltas($this->oldDelta + 1, 'remove');
+      }
+    }
+    else {
+      $this->updateAllDeltas($this->delta, 'insert');
+      drupal_write_record('party_attached_entity', $relation);      
     }
   }
   
@@ -268,9 +309,13 @@ abstract class EntityDefaultPartyController {
     $this->preDetach();
    
     db_delete('party_attached_entity')
-    ->condition('peid', $this->id, '=')
+    ->condition('eid', $this->eid, '=')
+    ->condition('pid', $this->pid, '=')
     ->condition('data_set', $this->data_set_name,'=')
     ->execute();
+    
+    // Update all deltas
+    $this->updateAllDeltas($this->delta, 'remove');
     
     $this->postDetach();
   }
@@ -329,20 +374,22 @@ abstract class EntityDefaultPartyController {
   /**
    * setMain
    *   set this set instance as the main set of this type
-   * @todo appears to do no such thing!
+   * @todo appears to do no such thing
+   * @todo set the delta to 0
    */
   public function setMain() {
-    return $this->main;
+    drupal_set_message('This code uses ' . __FUNCTION__ . ' which isn\'t implemented yet', 'warning');
+    return FALSE;
   }
   
   /**
    * Determine whether this is the main instance of this set for this party.
    *
    * @return
-   *   True is the Set is the main one, False otherwise.
+   *   True if the delta is 0.
    */
   public function isMain() {
-    return $this->main;
+    return ($this->delta === 0);
   }
   
   /**
@@ -362,6 +409,57 @@ abstract class EntityDefaultPartyController {
     $identifier = (isset($this->entity->{$this->getEntityIdKey()})) ? $this->entity->{$this->getEntityIdKey()} : 'new';
   
     return $this->data_set_name . '_' . $identifier;
+  }
+  
+  /**
+   * Get next delta
+   */
+  public function getNextDelta() {
+    $result = db_select('party_attached_entity', 'pae')
+      ->fields('pae', array('delta'))
+      ->condition('data_set', $this->data_set_name, '=')
+      ->condition('pid', $this->pid, '=')
+      ->orderBy('delta', 'DESC')
+      ->range(0,1)
+      ->execute()
+      ->fetchCol();
+    
+    foreach($result as $delta) {
+      return $delta + 1;
+    }
+    
+    // If there was no results return 0
+    return 0;
+  }
+  
+  /**
+   * Update all deltas
+   * 
+   * @param $delta
+   *   The delta thats been insert or removed
+   * @param $op
+   *   The action (either insert or remove)
+   */
+  public function updateAllDeltas($delta, $op) {
+    if (!in_array($op, array('insert','remove'))) {
+      drupal_set_message("$op is not a recognised operation in " . __FUNCTION__, 'warning');
+      return FALSE;
+    }
+    
+    $query = db_update('party_attached_entity')
+      ->condition('data_set', $this->data_set_name, '=')
+      ->condition('pid', $this->pid, '=');
+    
+    if ($op = 'insert') {
+       $query->expression('delta', 'delta + :one', array(':one' => 1));
+       $query->condition('delta', $delta, '>=');
+    }
+    else if ($op = 'remove') {
+      $query->expression('delta', 'delta - :one', array(':one' => 1));
+      $query->condition('delta', $delta, '>');
+    }
+    
+    $query->execute();
   }
   
   /**
@@ -442,7 +540,6 @@ abstract class EntityDefaultPartyController {
    *  The name of data set.
    * @param $info
    *  The data to load the instance from. One of:
-   *   - peid
    *   - party_id
    *   - entity_id
    *   - Array(
@@ -450,8 +547,6 @@ abstract class EntityDefaultPartyController {
    *      - entity an entity id
    * @param $how
    *  The way to load the instance. This can take one of 4 values:
-   *   - EntityDefaultPartyController::FROM_PEID
-   *       $info will take a PEID - the numeric identifier for a particular attached entity/party attachment
    *   - EntityDefaultPartyController::FROM_PARTY
    *       $info will expect a Party object or id and create an instance of the Controller with a stub entity ready for use.
    *   - EntityDefaultPartyController::FROM_ENTITY
@@ -465,17 +560,6 @@ abstract class EntityDefaultPartyController {
   public static function getInstance($data_set_name, $info, $how = self::FROM_PARTY_AND_ENTITY) {
     $attached_entity = party_get_crm_controller($data_set_name);    
     switch ($how) {
-      case self::FROM_PEID :
-        $result = db_select('party_attached_entity', 'ds')
-          ->fields('ds',array('pid','eid'))
-          ->condition('peid', $info, '=')
-          ->execute()
-          ->fetchAssoc();
-          
-        // @todo add error handling for if record doesnt exist
-        $attached_entity->setParty($result['pid']);
-        $attached_entity->setAttachedEntity($result['eid']);
-        break;
       case self::FROM_PARTY :
         $attached_entity->setParty($info);
         $attached_entity->createAttachedEntity();
@@ -516,22 +600,22 @@ abstract class EntityDefaultPartyController {
       case self::FROM_PARTY :
         $info = (is_object($info)) ? $info->pid : $info;
         $results = db_select('party_attached_entity', 'ds')
-          ->fields('ds',array('peid','pid','eid'))
+          ->fields('ds',array('delta','pid','eid'))
           ->condition('pid', $info, '=')
           ->execute()
-          ->fetchAllAssoc('peid',PDO::FETCH_ASSOC);
+          ->fetchAllAssoc('delta',PDO::FETCH_ASSOC);
         break;
       case self::FROM_ENTITY :
         $results = db_select('party_attached_entity', 'ds')
-          ->fields('ds',array('peid','pid','eid'))
+          ->fields('ds',array('delta','pid','eid'))
           ->condition('eid', $info, '=')
           ->execute()
-          ->fetchAllAssoc('peid',PDO::FETCH_ASSOC);
+          ->fetchAllAssoc('delta',PDO::FETCH_ASSOC);
         break;          
     }
     
     $attached_entities = array();
-    foreach ($results as $peid => $result) {
+    foreach ($results as $delta => $result) {
       $info = array(
         'party' => $result['pid'],
         'entity' => $result['eid'],

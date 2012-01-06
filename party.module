@@ -896,6 +896,7 @@ function party_get_attached_entities($party, $data_set_name) {
     ->fields('ds')
     ->condition('pid', $party->pid,'=')
     ->condition('data_set', $data_set_name,'=')
+    ->orderBy('delta', 'ASC')
     ->execute()
     ->fetchAllAssoc('eid', PDO::FETCH_ASSOC);
     

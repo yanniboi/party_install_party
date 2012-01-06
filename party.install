@@ -125,12 +125,12 @@ function party_schema() {
   $schema['party_attached_entity'] = array(
     'description' => "This links parties to attached entities.",
     'fields' => array(
-      // @todo: do we need this?
-      'peid' => array(
-        'description' => 'The unique ID for this relationship.',
-        'type' => 'serial',
+      'delta' => array(
+        'description' => 'The delta of this attached entity, so that every record in the table is unique',
+        'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
+        'default' => 0,
       ),
       'pid' => array(
         'description' => 'The id of the party entity.',
@@ -162,12 +162,6 @@ function party_schema() {
         'length' => 255,
         'not null' => TRUE,
       ),
-      'main' => array(
-        'description' => 'Flags a relation as being to the main attached entity.',
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-      ),
       'hat_main' => array(
         'description' => 'Is this the main set for this hat.',
         'type' => 'int',
@@ -186,7 +180,7 @@ function party_schema() {
       'party' => array('pid'),
       'entity' => array('eid'),
     ),
-    'primary key' => array('peid'),
+    'primary key' => array('pid', 'data_set', 'delta'),
   );
 
   return $schema;
@@ -403,4 +397,36 @@ function party_update_7006() {
     'not null' => TRUE,
     'default' => 0,
   ));
+}
+
+/**
+ * Add Attached Entity delta field
+ */
+function party_update_7007() {
+  $spec = array(
+    'description' => 'The delta of this attached entity, so that every record in the table is unique',
+    'type' => 'int',
+    'unsigned' => TRUE,
+    'not null' => TRUE,
+    'default' => 0,
+  );
+  
+  $keys = array(
+    'indexes' => array(
+      'party' => array('pid'),
+      'entity' => array('eid'),
+    ),
+    'primary key' => array('pid', 'data_set', 'delta'),
+  );
+  
+  db_drop_field('party_attached_entity', 'peid');
+  db_drop_primary_key('party_attached_entity');
+  db_add_field('party_attached_entity', 'delta', $spec, $keys);
+}
+
+/**
+ * Remove the main field
+ */
+function party_update_7008() {
+  db_drop_field('party_attached_entity', 'main');
 }
