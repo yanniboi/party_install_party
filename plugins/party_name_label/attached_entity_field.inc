@@ -1,0 +1,131 @@
+<?php
+
+/**
+ * @file
+ *
+ * Sample plugin to output just the party id as a label.
+ * This is just a proof of concept / example.
+ */
+
+/**
+ * Plugins are described by creating a $plugin array which will be used
+ * by the system that includes this file.
+ *
+ * @todo: document our plugin settings somewhere!
+ *  - 'title': The admin name of the plugin.
+ *  - 'description': Description for the admin UI.
+ *  - 'label callback': The callback to use for generating a label.
+ *    The signature is $callback($party).
+ *  - 'options form callback': The callback for the settings form.
+ *    Eg, for a FieldAPI label plugin this would let you choose which field(s)
+ *    to take the label text from.
+ */
+$plugin = array(
+  'title' => t("Attached Entity Field"),
+  'description' => t('Form a label from a Field on an Attached Entity.'),
+  'label callback' => 'party_attached_entity_field_label',
+  'options form callback' => 'party_attached_entity_field_options_form',
+);
+
+/**
+ * Generate the label for a party.
+ */
+function party_attached_entity_field_label($party) {
+  $data_set_name = variable_get('party_name_label_data_set', 'party');
+  $field_name = variable_get('party_name_label_field', FALSE);
+  
+  if ($data_set_name != 'party') {
+    $attached_entity = reset($party->data_sets[$data_set_name]);
+    
+    $entity = $attached_entity->entity;
+    $entity_type = $attached_entity->getEntityType();
+    $entity_bundle = $attached_entity->getEntityBundle();
+  }
+  else {
+    $entity = $party;
+    $entity_type = 'party';
+    $entity_bundle = $party->type;
+  }
+  
+  $field = field_info_field($field_name);
+  $instance = field_info_instance($entity_type, $field_name, $entity_bundle);
+  
+  // Get the field Items and limit them to one item
+  $items = array(reset(field_get_items($entity_type, $entity, $field_name)));
+  
+  $return = drupal_render(field_default_view($entity_type, $entity, $field, $instance, LANGUAGE_NONE, $items, 'full'));
+  $return = strip_tags($return);
+  dsm($return);
+  return $return;
+}
+
+/**
+ * the options form
+ */
+function party_attached_entity_field_options_form($form, &$form_state) {
+  $default_data_set = variable_get('party_name_label_data_set', 'party');
+  $default_field = variable_get('party_name_label_field', isset($form_state['values']['field_name']) ? $form_state['values']['field_name'] : FALSE);
+  
+  // Get Data Sets
+  $sets = party_get_data_set_info();
+  
+  $options = array(
+    'party' => 'Party Entity',
+  );
+  foreach ($sets as $data_set_name => $definition) {
+    $options[$data_set_name] = $definition['label'];
+  }
+  
+  $form['data_set_name'] = array(
+    '#type' => 'select',
+    '#default_value' => $default_data_set,
+    '#options' => $options,
+    '#weight' => 1,
+    '#ajax' => array(
+      'wrapper' => 'field',
+      'callback' => 'party_attached_entity_field_field_options',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+  
+  $field_options = array();
+  if ($default_data_set == 'party') {
+    // Do something to set the bundle
+    $fields = field_info_instances('party', 'individual');
+    foreach ($fields as $field) {
+      $field_options[$field['field_name']] = $field['label'];
+    }
+  }
+  else {
+    $data_set_info = $sets[$default_data_set];
+    $fields = field_info_instances($data_set_info['entity type'], $data_set_info['entity bundle']);
+    foreach ($fields as $field) {
+      $field_options[$field['field_name']] = $field['label'];
+    }
+  }
+  
+  if (empty($field_options)) {
+    $field_options[0] = 'No Fields';
+  }
+  
+  $form['field_name'] = array(
+    '#type' => 'select',
+    '#default_value' => $default_field,
+    '#options' => $field_options,
+    '#weight' => 2,
+    '#prefix' => '<div id="field">',
+    '#suffix' => '</div>',
+  );
+  
+  return $form;
+}
+
+function party_attached_entity_field_field_options($form, &$form_state) {
+  return $form['field_name'];
+}
+
+function party_attached_entity_field_options_form_submit($form, &$form_state) {
+  variable_set('party_name_label_data_set', $form_state['values']['data_set_name']);
+  variable_set('party_name_label_field', $form_state['values']['field_name']);
+}
