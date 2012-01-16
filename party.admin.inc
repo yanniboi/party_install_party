@@ -218,13 +218,6 @@ function party_settings_label_plugin_form($form, &$form_state) {
   $setting_plugin_name = variable_get('party_name_label_plugin', 'pid');
   $label_plugins = ctools_get_plugins('party', 'party_name_label');
 
-  // spoofed in extra item for testing.
-  $label_plugins['foo'] = array(
-    'name' => 'foo',
-    'title' => 'Foo',
-    'description' => 'Dummy item for testing multiple radio buttons. Don\t pick me!',
-  );
-
   $form['label'] = array(
     '#type' => 'item',
     '#title' => t('Party name label'),
@@ -253,8 +246,26 @@ function party_settings_label_plugin_form($form, &$form_state) {
  * Submit handler for the party label plugin settings form.
  */
 function party_settings_label_plugin_form_submit($form, &$form_state) {
-  //dsm($form_state['values']);
   variable_set('party_name_label_plugin', $form_state['values']['label']);
+  
+  $form_state['redirect'] = 'admin/config/crm/labels/' . $form_state['values']['label'];
+}
+
+/**
+ * Get the Plugin settings form
+ */
+function party_settings_label_plugin_config_page($plugin_id) {
+  // Get the label plugin.
+  ctools_include('plugins');
+  
+  $label_plugin = ctools_get_plugins('party', 'party_name_label', $plugin_id);
+  
+  if (isset($label_plugin['options form callback'])) {
+    return drupal_get_form($label_plugin['options form callback']);
+  }
+  else {
+    drupal_goto('admin/config/crm/labels');
+  }
 }
 
 /**

@@ -63,7 +63,8 @@ function party_attached_entity_field_label($party) {
  * the options form
  */
 function party_attached_entity_field_options_form($form, &$form_state) {
-  $default_data_set = variable_get('party_name_label_data_set', 'party');
+  print("woof");
+  $default_data_set = variable_get('party_name_label_data_set', isset($form_state['values']['data_set_name']) ? $form_state['values']['data_set_name'] :'party');
   $default_field = variable_get('party_name_label_field', isset($form_state['values']['field_name']) ? $form_state['values']['field_name'] : FALSE);
   
   // Get Data Sets
@@ -78,13 +79,14 @@ function party_attached_entity_field_options_form($form, &$form_state) {
   
   $form['data_set_name'] = array(
     '#type' => 'select',
+    '#title' => 'Data Set',
     '#default_value' => $default_data_set,
     '#options' => $options,
     '#weight' => 1,
     '#ajax' => array(
-      'wrapper' => 'field',
+      'wrapper' => 'field-input',
       'callback' => 'party_attached_entity_field_field_options',
-      'method' => 'replace',
+      'method' => 'append',
       'effect' => 'fade',
     ),
   );
@@ -111,18 +113,24 @@ function party_attached_entity_field_options_form($form, &$form_state) {
   
   $form['field_name'] = array(
     '#type' => 'select',
+    '#title' => 'Field',
     '#default_value' => $default_field,
     '#options' => $field_options,
     '#weight' => 2,
-    '#prefix' => '<div id="field">',
+    '#prefix' => '<div id="field-input">',
     '#suffix' => '</div>',
+  );
+  
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Submit',
   );
   
   return $form;
 }
 
-function party_attached_entity_field_field_options($form, &$form_state) {
-  return $form['field_name'];
+function party_attached_entity_field_field_options($form, $form_state) {
+  return array('#markup' => "cheese"); //$form['field_name'];
 }
 
 function party_attached_entity_field_options_form_submit($form, &$form_state) {

@@ -118,6 +118,14 @@ function party_menu() {
     'access arguments' => array('administer crm settings'),
     'file' => 'party.admin.inc',
   );
+  $items['admin/config/crm/labels/%'] = array(
+    'title' => 'Configure Plugin',
+    'description' => 'Configure the Chosen Label Plugin',
+    'page callback' => 'party_settings_label_plugin_config_page',
+    'page arguments' => array(4),
+    'access arguments' => array('administer crm settings'),
+    'file' => 'party.admin.inc',
+  );
   $items['admin/config/crm/piece-order'] = array(
     'title' => 'Piece order',
     'description' => 'Rearrange the order of pieces within a party.',
