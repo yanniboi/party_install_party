@@ -1245,7 +1245,7 @@ function party_attached_entity_attach_form(&$form, &$form_state) {
     $form[$hash]['#parents'] = array($hash);
   }
 
-  $form['#submit'][] = 'party_attached_entity_attach_form_submit';
+  array_unshift($form['#submit'], 'party_attached_entity_attach_form_submit');
   $form['#validate'][] = 'party_attached_entity_attach_form_validate';
 }
 
@@ -1270,9 +1270,12 @@ function party_attached_entity_attach_form_submit(&$form, &$form_state) {
     $callback = party_attached_entity_form_callback($attached_entity->data_set_name) . '_submit';
     // Execute the form callback.
     $callback($form, $form_state, $attached_entity, $form_state['#party']);
-
-    $attached_entity->attach($party);
+    
+    // Stores the attached entities in an array keyed by data sets and deltas
+    $party->data_sets[$attached_entity->data_set_name][] = $attached_entity;
   }
+  
+  $form_state['#party'] = $party;
 }
 
 /**

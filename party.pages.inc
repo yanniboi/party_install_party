@@ -129,6 +129,8 @@ function party_edit_form($form, &$form_state, $party) {
     // @todo: Move this to before the attach function.
     $form['#submit'][] = 'party_hat_party_form_hat_check';
   }
+  
+  $form['#submit'][] = 'party_edit_form_save';
   return $form;
 }
 
@@ -140,11 +142,24 @@ function party_edit_form_validate($form, &$form_state) {
 function party_edit_form_submit($form, &$form_state) {
   $party = (object) $form_state['values'];
   field_attach_submit('party', $party, $form, $form_state);
-  $party = party_save($party);
   
-  $form_state['party'] = $party;
+  $party->data_sets = array();
+    
   $form_state['#party'] = $party;
   $form_state['redirect'] = 'party/' . $party->pid;
+}
+
+function party_edit_form_save($form, &$form_state) {
+  $party = $form_state['#party'];
+  
+  // Attach all the various entities
+  foreach ($party->data_sets as $attached_entities) {
+    foreach ($attached_entities as $attached_entity) {
+      $attached_entity->attach($party);
+    }
+  }
+  
+  $party = party_save($party);
 }
 
 /**
