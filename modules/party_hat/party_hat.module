@@ -584,14 +584,39 @@ function party_hat_field_get_default($entity_type, $entity, $field, $instance, $
 // Form Alterations
 
 /**
- * Additional submit handler to check party form for expected attached entities.
+ * Additional validate handler to check party form for expected attached entities.
  *
  * This checks if all expected data sets are present and, if not, sends the user
  * back to the form with a nice message.
- *
- * @todo: surely this should be a validation handler?
  */
-function party_hat_party_form_hat_check($form, &$form_state) {
+function party_hat_party_form_hat_validate($form, $form_state) {
+  $expected_data_sets = array();
+  foreach (party_hat_get_hats($form_state['#party']) as $hid => $hat) {
+    $expected_data_sets += party_hat_get_hat_data_sets($hat);
+  }  
+    
+  $attached_entities = $form_state['#attached_entitites'];
+  $existent_data_sets = array();
+  foreach ($attached_entities as $attached_entity) {      
+    if (!in_array($attached_entity->data_set_name, $existant_data_sets)) {
+      $existant_data_sets[] = $attached_entity->data_set_name;
+    }
+  }
+  
+  $missing_data_sets = array_diff($expected_data_sets, $existent_data_sets);
+  foreach ($missing_data_sets as $data_set_name) {
+    $data_set = party_get_data_set_info($data_set_name);
+    form_set_error(NULL, t("Party %party is expected to have a %data-set which wasn't present. Please enter the data now.", array(
+          '%party' => $form_state['#party']->label,
+          '%data-set' => $data_set['label'],
+        )));
+  }
+}
+
+/**
+ * Trigger Rules etc when a hat is assigned. 
+ */
+function party_hat_party_form_hat_submit($form, &$form_state) {
   $party_unchanged = $form_state['#party_unchanged'];
   $party = $form_state['#party'];
   
@@ -628,20 +653,12 @@ function party_hat_party_form_hat_check($form, &$form_state) {
       module_invoke_all('party_hat_assign_hats', $party, $assigned_hats);
     }
   }
-  
-  foreach (party_hat_get_hats($party) as $hid => $hat) {
-    $data_sets = party_hat_get_hat_data_sets($hat);
-        
-    foreach ($data_sets as $data_set_name) {
-      $attached_entities = party_get_attached_entities($form_state['#party'], $data_set_name);
-      if (count($attached_entities) < 1) {
-        $data_set_info = party_get_data_set_info($data_set_name);
-        $form_state['redirect'] = 'party/' . $form_state['#party']->pid . '/party/edit';
-        drupal_set_message(t("Party %party is expected to have a %data-set which wasn't present. Please enter the data now.", array(
-          '%party' => $form_state['#party']->label,
-          '%data-set' => $data_set_info['label'],
-        )));
-      }
-    }
-  }
+}
+
+/**
+ * Imlements hook_form_FORM_ID_alter.
+ */
+function party_hat_form_party_edit_form_alter(&$form, &$form_state) {
+  $form['#validate'][] = 'party_hat_party_form_hat_validate';
+  $form['#submit'][] = 'party_hat_party_form_hat_submit';
 }

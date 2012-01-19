@@ -33,7 +33,7 @@ $plugin = array(
 function party_attached_entity_field_label($party) {
   $data_set_name = variable_get('party_name_label_data_set', 'party');
   $field_name = variable_get('party_name_label_field', FALSE);
-  
+  print_r($party);
   if ($data_set_name != 'party') {
     $attached_entity = reset($party->data_sets[$data_set_name]);
     
@@ -50,10 +50,12 @@ function party_attached_entity_field_label($party) {
   $field = field_info_field($field_name);
   $instance = field_info_instance($entity_type, $field_name, $entity_bundle);
   
+  $instance['display']['default']['label'] = 'hidden';
+  
   // Get the field Items and limit them to one item
   $items = array(reset(field_get_items($entity_type, $entity, $field_name)));
   
-  $return = drupal_render(field_default_view($entity_type, $entity, $field, $instance, LANGUAGE_NONE, $items, 'full'));
+  $return = drupal_render(field_default_view($entity_type, $entity, $field, $instance, LANGUAGE_NONE, $items, 'default'));
   $return = strip_tags($return);
   dsm($return);
   return $return;
@@ -63,9 +65,11 @@ function party_attached_entity_field_label($party) {
  * the options form
  */
 function party_attached_entity_field_options_form($form, &$form_state) {
-  print("woof");
   $default_data_set = variable_get('party_name_label_data_set', isset($form_state['values']['data_set_name']) ? $form_state['values']['data_set_name'] :'party');
   $default_field = variable_get('party_name_label_field', isset($form_state['values']['field_name']) ? $form_state['values']['field_name'] : FALSE);
+  
+  // Set the file to be loaded
+  $form_state['build_info']['files'] = array(drupal_get_path('module', 'party'). '/plugins/party_name_label/attached_entity_field.inc'); 
   
   // Get Data Sets
   $sets = party_get_data_set_info();
@@ -86,7 +90,7 @@ function party_attached_entity_field_options_form($form, &$form_state) {
     '#ajax' => array(
       'wrapper' => 'field-input',
       'callback' => 'party_attached_entity_field_field_options',
-      'method' => 'append',
+      'method' => 'replace',
       'effect' => 'fade',
     ),
   );
@@ -130,7 +134,7 @@ function party_attached_entity_field_options_form($form, &$form_state) {
 }
 
 function party_attached_entity_field_field_options($form, $form_state) {
-  return array('#markup' => "cheese"); //$form['field_name'];
+  return $form['field_name'];
 }
 
 function party_attached_entity_field_options_form_submit($form, &$form_state) {

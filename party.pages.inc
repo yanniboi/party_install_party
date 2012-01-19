@@ -125,12 +125,7 @@ function party_edit_form($form, &$form_state, $party) {
     '#weight' => 99,
   );
   
-  if (module_exists('party_hat')) {
-    // @todo: Move this to before the attach function.
-    $form['#submit'][] = 'party_hat_party_form_hat_check';
-  }
-  
-  $form['#submit'][] = 'party_edit_form_save';
+ $form['#submit'][] = 'party_edit_form_save';
   return $form;
 }
 
@@ -144,13 +139,13 @@ function party_edit_form_submit($form, &$form_state) {
   field_attach_submit('party', $party, $form, $form_state);
   
   $party->data_sets = array();
-    
+  
   $form_state['#party'] = $party;
-  $form_state['redirect'] = 'party/' . $party->pid;
 }
 
 function party_edit_form_save($form, &$form_state) {
   $party = $form_state['#party'];
+  $party = party_save($party);
   
   // Attach all the various entities
   foreach ($party->data_sets as $attached_entities) {
@@ -159,7 +154,7 @@ function party_edit_form_save($form, &$form_state) {
     }
   }
   
-  $party = party_save($party);
+  $form_state['redirect'] = 'party/' . $party->pid;
 }
 
 /**
