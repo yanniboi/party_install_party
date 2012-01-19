@@ -248,7 +248,7 @@ function party_settings_label_plugin_form($form, &$form_state) {
 function party_settings_label_plugin_form_submit($form, &$form_state) {
   variable_set('party_name_label_plugin', $form_state['values']['label']);
   
-  $form_state['redirect'] = 'admin/config/crm/labels/' . $form_state['values']['label'];
+  $form_state['redirect'] = 'admin/config/party/labels/' . $form_state['values']['label'];
 }
 
 /**
@@ -264,7 +264,7 @@ function party_settings_label_plugin_config_page($plugin_id) {
     return drupal_get_form($label_plugin['options form callback']);
   }
   else {
-    drupal_goto('admin/config/crm/labels');
+    drupal_goto('admin/config/party/labels');
   }
 }
 

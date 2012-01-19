@@ -100,9 +100,9 @@ function party_menu() {
   // Making up a new config category.
   // Alternative is to put this all under top-level admin.
   // But all this structure is rough anyway.
-  $items['admin/config/crm'] = array(
-    'title' => 'CRM',
-    'description' => 'CRM settings.',
+  $items['admin/config/party'] = array(
+    'title' => 'Party',
+    'description' => 'Party Settings',
     'position' => 'left',
     'weight' => -10,
     'page callback' => 'system_admin_menu_block_page',
@@ -110,7 +110,7 @@ function party_menu() {
     'file' => 'system.admin.inc',
     'file path' => drupal_get_path('module', 'system'),
   );
-  $items['admin/config/crm/labels'] = array(
+  $items['admin/config/party/labels'] = array(
     'title' => 'Labels',
     'description' => 'Determine how labels for parties are generated.',
     'page callback' => 'drupal_get_form',
@@ -118,7 +118,7 @@ function party_menu() {
     'access arguments' => array('administer crm settings'),
     'file' => 'party.admin.inc',
   );
-  $items['admin/config/crm/labels/%'] = array(
+  $items['admin/config/party/labels/%'] = array(
     'title' => 'Configure Plugin',
     'description' => 'Configure the Chosen Label Plugin',
     'page callback' => 'party_settings_label_plugin_config_page',
@@ -126,7 +126,7 @@ function party_menu() {
     'access arguments' => array('administer crm settings'),
     'file' => 'party.admin.inc',
   );
-  $items['admin/config/crm/piece-order'] = array(
+  $items['admin/config/party/piece-order'] = array(
     'title' => 'Piece order',
     'description' => 'Rearrange the order of pieces within a party.',
     'page callback' => 'drupal_get_form',
