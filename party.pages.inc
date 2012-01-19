@@ -82,13 +82,6 @@ function party_edit_form($form, &$form_state, $party) {
     '#value' => $party->type,
   );
 
-  $form['label'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Party Label'),
-    '#required' => TRUE,
-    '#default_value' => $party->label,
-  );
-  
   $form_state['#party'] = $party;
   $form_state['#party_unchanged'] = $party; // So that other modules can react to changes. Must be a better way
   $form_state['#attached_entities'] = array();
