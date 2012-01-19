@@ -4,3 +4,6 @@ package = CRM
 core = 7.x
 
 dependencies[] = party
+
+files[] = party_user.admin.inc
+files[] = party_user.batch.inc

@@ -27,6 +27,49 @@ function party_user_party_data_set_info() {
 }
 
 /**
+ * Implements hook_menu()
+ */
+function party_user_menu() {
+  $items['admin/config/party/user'] = array(
+    'title' => 'User Integration',
+    'description' => 'Configure Party User Integration',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('party_user_settings_form'),
+    'access arguments' => array('administer crm settings'),
+    'file' => 'party_user.admin.inc',
+  );
+  
+  $items['admin/config/party/user/settings'] = array(
+    'title' => 'User Integration',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('party_user_settings_form'),
+    'access arguments' => array('administer crm settings'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'file' => 'party_user.admin.inc',
+  );
+  
+  $items['admin/config/party/user/sync'] = array(
+    'title' => 'Sync Users',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('party_user_sync_form'),
+    'access arguments' => array('administer crm settings'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'party_user.admin.inc',    
+  );
+  
+  return $items;
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function party_user_ctools_plugin_directory($owner, $plugin_type) {
+  if ($owner == 'party') {
+    return "plugins/$plugin_type";
+  }
+}
+
+/**
  * Implements hook_party_party_pieces().
  */
 function party_user_party_party_pieces() {
@@ -181,6 +224,38 @@ function party_user_register_submit($form, &$form_state) {
   $data_set_name = party_get_entity_data_set('user', $form_state['user']);
   party_attach_entity($party, $form_state['user'], $data_set_name);
 }
+
+// ========================================================================
+// API Functions
+/**
+ * party_user_create_party_for_user
+ *
+ * Create a Party for a user and relate them
+ *
+ * @param mixed $user The user object or ID
+ * @param array $options Hardcoded options to get passed to party_create
+ *
+ * @return Party a Party object
+ *
+ * @see party_create
+ */
+function party_user_create_party_for_user($user, $options = array()) {
+  $default_options = array(
+    'type' => variable_get('party_user_default_party_type', 'individual'),
+  ); 
+  
+  $options += $default_options;
+  
+  $party = party_create($options);
+  $attached_entity = party_get_crm_controller('user');
+  $attached_entity->setAttachedEntity($user);
+  $party->data_sets['user'][] = $attached_entity;  
+  
+  // This will fail if a plugin that relies on anything other than user is used
+  $party = party_save($party);
+  
+  $attached_entity->attach($party);  
+}  
 
 /**
  * Controller class for CRM integration.

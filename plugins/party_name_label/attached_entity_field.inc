@@ -57,7 +57,6 @@ function party_attached_entity_field_label($party) {
   
   $return = drupal_render(field_default_view($entity_type, $entity, $field, $instance, LANGUAGE_NONE, $items, 'default'));
   $return = strip_tags($return);
-  dsm($return);
   return $return;
 }
 
