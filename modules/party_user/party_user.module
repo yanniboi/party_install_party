@@ -255,8 +255,30 @@ function party_user_create_party_for_user($user, $options = array()) {
   $party = party_save($party);
   
   $attached_entity->attach($party);  
-}  
+} 
 
+/**
+ * Get a User's Party
+ *
+ * @param mixed $user The user entity or uid
+ *
+ * @return Party a Party Object
+ */
+function party_user_get_party($user) {
+  if (is_object($user)) {
+    $user = $user->uid;
+  }
+
+  $result = db_select('party_attached_entity', 'pae')
+    ->fields('pae', array('pid'))
+    ->condition('uid', $user, '=')
+    ->execute()
+    ->fetchCol();
+    
+  $party_id = reset($result);  
+  return party_load($party);
+}
+ 
 /**
  * Controller class for CRM integration.
  *
