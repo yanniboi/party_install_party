@@ -129,11 +129,27 @@ function party_edit_form($form, &$form_state, $party) {
   return $form;
 }
 
+/**
+ * Validate the Party Edit Form
+ * 
+ * @todo: Add validation for all the attached entities
+ */
 function party_edit_form_validate($form, &$form_state) {
   $submission = (object) $form_state['values'];
   field_attach_form_validate('party', $submission, $form, $form_state);
 }
 
+/**
+ * Submit the Party Edit Form.
+ *
+ * This is split into 3 sections:
+ *  - party_edit_form_submit - builds the Party object and attaches field values
+ *  - party_attached_entity_attach_form_submit - saves all the attached entities and adds them to 
+ *    the party->data_sets array
+ *  - party_edit_form_save - attaches all the attached entities and saves the party
+ * This decision was made so that plugins could use all of the party data available when deciding on the name
+ * label.
+ */
 function party_edit_form_submit($form, &$form_state) {
   $party = (object) $form_state['values'];
   field_attach_submit('party', $party, $form, $form_state);
@@ -143,6 +159,11 @@ function party_edit_form_submit($form, &$form_state) {
   $form_state['#party'] = $party;
 }
 
+/**
+ * Attach entities and save the party
+ *
+ * @see party_edit_form_submit
+ */
 function party_edit_form_save($form, &$form_state) {
   $party = $form_state['#party'];
   $party = party_save($party);

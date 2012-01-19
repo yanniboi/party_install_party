@@ -1282,8 +1282,6 @@ function party_attached_entity_attach_form_submit(&$form, &$form_state) {
     // Stores the attached entities in an array keyed by data sets and deltas
     $party->data_sets[$attached_entity->data_set_name][] = $attached_entity;
   }
-  print "2";
-  print_r($party);
   $form_state['#party'] = $party;
 }
 
