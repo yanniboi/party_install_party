@@ -1,0 +1,6 @@
+name = Party Node
+description = [Place Holder Module] Allow Parties to Sync with Content Types
+core = 7.x
+package = CRM
+
+dependencies[] = party
