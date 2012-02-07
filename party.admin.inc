@@ -49,8 +49,45 @@ function party_info() {
 /**
  * The management page for each party type.
  */
-function party_manage($type) {
-  return "Welcome to the party type administration page for " . $type;
+function party_type_form($form, &$form_state, $type) {
+  $required_data_sets = variable_get('party_' . $type . '_required_data', array());
+  dsm($required_data_sets);
+  $data_sets = party_get_data_set_info();
+  foreach ($data_sets as $data_set_name => $def) {
+    $options[$data_set_name] = $def['label'];
+  }
+  
+  $form['type'] = array(
+    '#type' => 'value',
+    '#value' => $type,
+  );
+ 
+  $form['required_data_sets'] = array(
+    '#type' => 'checkboxes',
+    '#options' => $options,
+    '#title' => 'Required Data Sets',
+    '#default_value' => $required_data_sets,
+  );
+  
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Submit',
+    '#weight' => 40,
+  );
+  
+  return $form;
+}
+
+function party_type_form_submit($form, &$form_state) {
+  $type = $form_state['values']['type'];
+  $required_data_sets = $form_state['values']['required_data_sets'];
+  foreach ($required_data_sets as $key => $var) {
+    if ($var === 0) {
+      unset($required_data_sets[$key]);
+    }
+  }
+  $required_data_sets = array_keys($required_data_sets);
+  variable_set('party_' . $type . '_required_data', $form_state['values']['required_data_sets']);
 }
 
 /**
