@@ -228,8 +228,13 @@ function party_user_form_user_register_form_alter(&$form, &$form_state) {
     // Get a list of all the data sets we're expecting
     // @todo: add a setting to show these on the registration form
     $data_sets = party_get_party_data_sets($party);
-    // unset user if it exists as we're handling this special case
-    unset($data_sets['user']);
+    // Remove any data sets not in the registration array
+    $reg_data_sets = variable_get('party_user_registration_data_sets', array());
+    foreach ($data_sets as $key => $data_set) {
+      if (!in_array($data_set, $reg_data_sets)) {
+        unset($data_sets[$key]);
+      }
+    }
     // build a list of attached entities based on these data sets to embed
     // into the form
     foreach ($data_sets as $data_set) {
@@ -271,6 +276,20 @@ function party_user_register_submit($form, &$form_state) {
   $attached_entity = party_get_crm_controller('user');
   $attached_entity->setAttachedEntity($form_state['user']);
   $attached_entity->attach($party);  
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter
+ */
+function party_user_form_profile2_type_form_alter(&$form, &$form_state) {
+  if (!module_exists('party_profile')) {
+    return;
+  }
+  
+  unset($form['data']['registration']);
+  $form['registration'] = array(
+    '#markup' => 'To configure the user registration page, ' . l('click here', 'admin/config/party/user') . '.',
+  );
 }
 
 // ========================================================================

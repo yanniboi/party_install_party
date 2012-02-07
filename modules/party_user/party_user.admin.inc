@@ -23,6 +23,20 @@ function party_user_settings_form($form, &$form_state) {
     '#title' => 'Type of party to create when a User Registers',
     '#options' => $options,
     '#default_value' => variable_get('party_user_register_party_type', 'individual'),
+  );
+
+  $options = array();
+  foreach (party_get_data_set_info() as $data_set_name => $def) {
+    if ($data_set_name != 'user') {
+      $options[$data_set_name] = $def['label'];
+    }
+  }
+  
+  $form['registration_data_sets'] = array(
+    '#type' => 'checkboxes',
+    '#options' => $options,
+    '#title' => 'Data Sets to show on User Registration form',
+    '#default_value' => variable_get('party_user_registration_data_sets', array()),
   );    
   
   $form['submit'] = array(
@@ -37,6 +51,15 @@ function party_user_settings_form($form, &$form_state) {
 function party_user_settings_form_submit($form, &$form_state) {
   variable_set('party_user_create_on_register', ($form_state['values']['create_on_register'] == 1));
   variable_set('party_user_register_party_type', $form_state['values']['register_party_type']);
+  
+  $registration_data_sets = $form_state['values']['registration_data_sets'];
+  foreach ($registration_data_sets as $key => $var) {
+    if ($var === 0) {
+      unset($registration_data_sets[$key]);
+    }
+  }
+  $registration_data_sets = array_keys($registration_data_sets);
+  variable_set('party_user_registration_data_sets', $registration_data_sets);
 }
 
 /**
