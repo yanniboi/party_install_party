@@ -51,7 +51,6 @@ function party_info() {
  */
 function party_type_form($form, &$form_state, $type) {
   $required_data_sets = variable_get('party_' . $type . '_required_data', array());
-  dsm($required_data_sets);
   $data_sets = party_get_data_set_info();
   foreach ($data_sets as $data_set_name => $def) {
     $options[$data_set_name] = $def['label'];
