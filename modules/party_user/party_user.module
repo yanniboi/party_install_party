@@ -338,12 +338,13 @@ function party_user_get_party($user) {
 
   $result = db_select('party_attached_entity', 'pae')
     ->fields('pae', array('pid'))
-    ->condition('uid', $user, '=')
+    ->condition('eid', $user, '=')
+    ->condition('data_set', 'user')
     ->execute()
     ->fetchCol();
     
   $party_id = reset($result);  
-  return party_load($party);
+  return party_load($party_id);
 }
  
 /**
