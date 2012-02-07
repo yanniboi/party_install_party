@@ -180,8 +180,8 @@ function party_menu() {
   $items['admin/community/party/individual'] = array(
     'title' => 'Manage individuals',
     'description' => 'Manage contact information',
-    'page callback' => 'party_manage',
-    'page arguments' => array('individual'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('party_type_form', 'individual'),
     'access arguments' => array('administer parties'),
     'file' => 'party.admin.inc',
     'type' => MENU_LOCAL_TASK,
@@ -189,8 +189,8 @@ function party_menu() {
   $items['admin/community/party/organisation'] = array(
     'title' => 'Manage organisations',
     'description' => 'Manage contact information',
-    'page callback' => 'party_manage',
-    'page arguments' => array('organisation'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('party_type_form', 'organisation'),
     'access arguments' => array('administer parties'),
     'file' => 'party.admin.inc',
     'type' => MENU_LOCAL_TASK,
