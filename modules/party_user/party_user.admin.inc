@@ -11,7 +11,19 @@ function party_user_settings_form($form, &$form_state) {
     '#type' => 'checkbox',
     '#title' => 'Create a Party when a User Registers?',
     '#default_value' => variable_get('party_user_create_on_register', FALSE),
-  );  
+  );
+
+  $option = array();
+  foreach (party_get_party_types() as $type => $def) {
+    $options[$type] = $def['label'];
+  }
+  
+  $form['register_party_type'] = array(
+    '#type' => 'select',
+    '#title' => 'Type of party to create when a User Registers',
+    '#options' => $options,
+    '#default_value' => variable_get('party_user_register_party_type', 'individual'),
+  );    
   
   $form['submit'] = array(
     '#type' => 'submit',
@@ -24,6 +36,7 @@ function party_user_settings_form($form, &$form_state) {
 
 function party_user_settings_form_submit($form, &$form_state) {
   variable_set('party_user_create_on_register', ($form_state['values']['create_on_register'] == 1));
+  variable_set('party_user_register_party_type', $form_state['values']['register_party_type']);
 }
 
 /**
