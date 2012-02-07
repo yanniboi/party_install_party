@@ -76,7 +76,7 @@ function party_user_party_party_pieces() {
   return array(
     'user' => array(
       'maker' => 'view',
-      'title' => 'User',
+      'title' => 'Account Details',
       'page callback' => 'party_view_data_set',
       'page arguments' => array(1, 'user'),
       'file' => 'party.pages.inc', 
@@ -173,6 +173,7 @@ function party_user_form_user_submit($form, &$form_state, &$attached_entity, $pa
     // Attempt to load a user from the given input.
     $account = user_load_by_name($form_state['values'][$hash]['user']);
     $attached_entity->setAttachedEntity($account);
+    $attached_entity->attach($party);
   }
   else if ($op == 'edit') {
     $account = $attached_entity->entity;
