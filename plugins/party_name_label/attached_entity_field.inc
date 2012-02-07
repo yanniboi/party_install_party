@@ -33,9 +33,14 @@ $plugin = array(
 function party_attached_entity_field_label($party) {
   $data_set_name = variable_get('party_name_label_data_set', 'party');
   $field_name = variable_get('party_name_label_field', FALSE);
-  print_r($party);
   if ($data_set_name != 'party') {
-    $attached_entity = reset($party->data_sets[$data_set_name]);
+    if (!is_array($party->data_sets[$data_set_name])) {
+      return "Party " . $party->pid;
+    }
+        
+    if (!($attached_entity = reset($party->data_sets[$data_set_name]))) {
+      return "Party " . $party->pid;
+    }
     
     $entity = $attached_entity->entity;
     $entity_type = $attached_entity->getEntityType();

@@ -319,14 +319,14 @@ function party_view_data_set($party, $data_set_name) {
 
   foreach ($attached_entity_controllers as $crm_controller) {
     $entity = $crm_controller->entity;
-    $build[$data_set_name . '_' . $crm_controller->id] = array(
+    $build[$data_set_name . '_' . $crm_controller->delta] = array(
         // @todo: this is sort of an abuse of what fieldsets are meant for... :/
         '#type' => 'fieldset',
         '#title' => $crm_controller->getLabel(),
       );
 
     $view_mode = $data_set['view mode'];
-    $build[$data_set_name . '_' . $crm_controller->id]['view'] = $crm_controller->display($view_mode);
+    $build[$data_set_name . '_' . $crm_controller->delta]['view'] = $crm_controller->display($view_mode);
   }
   
   if (!isset($data_set['max cardinality']) || count($attached_entity_controllers) < $data_set['max cardinality']) {

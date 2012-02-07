@@ -35,10 +35,10 @@ class PartyController extends EntityAPIController {
   /**
    * Set the label on a party object using the current label plugin.
    *
-   * @param $crmParty
+   * @param $party
    *  A party object.
    */
-  public function setLabel($crmParty) {
+  public function setLabel($party) {
     // Get the label plugin.
     ctools_include('plugins');
     $label_plugin_name = variable_get('party_name_label_plugin', 'pid');
@@ -46,7 +46,10 @@ class PartyController extends EntityAPIController {
 
     // Generate the party label from the plugin.
     $label_callback = $label_plugin['label callback'];
-    $crmParty->label = $label_callback($crmParty);
+    $label = $label_callback($party);
+    if ($label != "") {
+      $party->label = $label;
+    }
   }
   
   /**
