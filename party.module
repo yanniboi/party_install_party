@@ -1277,10 +1277,12 @@ function party_attached_entity_attach_form_submit(&$form, &$form_state) {
     // Get the form callback.
     $callback = party_attached_entity_form_callback($attached_entity->data_set_name) . '_submit';
     // Execute the form callback.
-    $callback($form, $form_state, $attached_entity, $form_state['#party']);
+    $return = $callback($form, $form_state, $attached_entity, $form_state['#party']);
     
-    // Stores the attached entities in an array keyed by data sets and deltas
-    $party->data_sets[$attached_entity->data_set_name][] = $attached_entity;
+    if ($return !== FALSE) {
+      // Stores the attached entities in an array keyed by data sets and deltas
+      $party->data_sets[$attached_entity->data_set_name][] = $attached_entity;
+    }
   }
   $form_state['#party'] = $party;
 }

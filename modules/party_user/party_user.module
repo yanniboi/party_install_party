@@ -173,8 +173,11 @@ function party_user_form_user_submit($form, &$form_state, &$attached_entity, $pa
     // Attempt to load a user from the given input.
     $account = user_load_by_name($form_state['values'][$hash]['user']);
     $attached_entity->detach();
-    $attached_entity->setAttachedEntity($account);
-    $attached_entity->attach($party);
+    if ($account->uid != 0) {
+      $attached_entity->setAttachedEntity($account);
+      $attached_entity->attach($party);
+    }
+    return FALSE;
   }
   else if ($op == 'edit') {
     $account = $attached_entity->entity;
