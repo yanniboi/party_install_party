@@ -212,14 +212,65 @@ function party_user_form_user_submit($form, &$form_state, &$attached_entity, $pa
  * Create a Party when Users Register
  */
 function party_user_form_user_register_form_alter(&$form, &$form_state) {
-  // Check Whether this is Set
-  if (variable_get('party_user_create_on_register', FALSE)) {
+  // Check if we're creating parties on registration
+  if (variable_get('party_user_create_on_register', FALSE)) {  
+    // Make sure we include all the neccessary files on submit
+    form_load_include($form_state, 'inc', 'party', 'party.pages');
+    
+    // Create an empty party
+    $party_type = variable_get('party_user_register_party_type', 'individual');
+    $party = party_create(array('type' => $party_type));
+    
+    $form_state['#party'] = $party;
+    $form_state['#party_unchanged'] = $party;
+    $form_state['#attached_entities'] = array();
+    
+    // Get a list of all the data sets we're expecting
+    // @todo: add a setting to show these on the registration form
+    $data_sets = party_get_party_data_sets($party);
+    // unset user if it exists as we're handling this special case
+    unset($data_sets['user']);
+    // build a list of attached entities based on these data sets to embed
+    // into the form
+    foreach ($data_sets as $data_set) {
+      $attached_entities = array();
+      if (isset($party->pid)) {
+        $attached_entities = party_get_attached_entities($party, $data_set);
+      }
+      
+      if (count($attached_entities) < 1) {
+        $attached_entity = party_get_crm_controller($data_set);
+        $attached_entity->createAttachedEntity();
+        $attached_entity->setParty($party);
+        $attached_entities[$attached_entity->hash()] = $attached_entity;
+      }    
+      
+      $form_state['#attached_entities'] = array_merge($form_state['#attached_entities'], $attached_entities);
+    }
+    
+    // Add extra submit handlers
+    $form['#submit'][] = 'party_edit_form_submit';
+    party_attached_entity_attach_form($form, $form_state);
     $form['#submit'][] = 'party_user_register_submit';
   }
 }
 
 function party_user_register_submit($form, &$form_state) {
-  party_user_create_party_for_user($form_state['user'], array('type' => 'individual'));
+  // Get our party from the form_state and save it
+  $party = $form_state['#party'];
+  $party = party_save($party);
+  
+  // Attach all the various entities
+  foreach ($party->data_sets as $attached_entities) {
+    foreach ($attached_entities as $attached_entity) {
+      $attached_entity->attach($party);
+    }
+  }
+  
+  // Attach the user what we just made
+  $attached_entity = party_get_crm_controller('user');
+  $attached_entity->setAttachedEntity($form_state['user']);
+  $attached_entity->attach($party);  
 }
 
 // ========================================================================
@@ -238,7 +289,7 @@ function party_user_register_submit($form, &$form_state) {
  */
 function party_user_create_party_for_user($user, $options = array()) {
   $default_options = array(
-    'type' => variable_get('party_user_default_party_type', 'individual'),
+    'type' => variable_get('party_user_register_party_type', 'individual'),
   ); 
   
   $options += $default_options;
