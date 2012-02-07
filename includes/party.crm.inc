@@ -117,6 +117,7 @@ abstract class EntityDefaultPartyController {
       $query->fields('ds');
       $query->condition('pid', $this->pid, '=');
       $query->condition('eid', $this->eid, '=');
+      $query->condition('data_set', $this->data_set_name);
       $result = $query->execute()->fetchAssoc();
       
       // If there is no attached in the db we unset party and treat this like it
@@ -161,6 +162,7 @@ abstract class EntityDefaultPartyController {
       $query->fields('ds');
       $query->condition('pid', $this->pid, '=');
       $query->condition('eid', $this->eid, '=');
+      $query->condition('data_set', $this->data_set_name);
       $result = $query->execute()->fetchAssoc();
       
       // If there is no attached in the db we unset party and treat this like it
@@ -267,7 +269,7 @@ abstract class EntityDefaultPartyController {
       'entity_type' => $this->getEntityType(),
       'entity_bundle' => $this->getEntityBundle(),
     );
-    
+
     // If this attached entity has a record stored in the database
     if ($this->attached) {    
       $tempDelta = $this->delta;
@@ -334,6 +336,8 @@ abstract class EntityDefaultPartyController {
     
     // Update all deltas
     $this->updateAllDeltas($this->delta, 'remove');
+    
+    $this->attached == false;
     
     $this->postDetach();
   }
