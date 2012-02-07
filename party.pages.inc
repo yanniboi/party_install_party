@@ -144,7 +144,7 @@ function party_edit_form_validate($form, &$form_state) {
  * label.
  */
 function party_edit_form_submit($form, &$form_state) {
-  $party = (object) $form_state['values'];
+  $party = $form_state['#party'];
   field_attach_submit('party', $party, $form, $form_state);
   
   $party->data_sets = array();
