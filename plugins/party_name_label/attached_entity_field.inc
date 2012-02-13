@@ -34,12 +34,12 @@ function party_attached_entity_field_label($party) {
   $data_set_name = variable_get('party_name_label_data_set', 'party');
   $field_name = variable_get('party_name_label_field', FALSE);
   if ($data_set_name != 'party') {
-    if (!is_array($party->data_sets[$data_set_name])) {
-      return "Party " . $party->pid;
+    if (!isset($party->data_sets) || !is_array($party->data_sets[$data_set_name])) {
+      return "Party" . isset($party->pid) ? ' '.$party->pid: '';
     }
         
     if (!($attached_entity = reset($party->data_sets[$data_set_name]))) {
-      return "Party " . $party->pid;
+      return "Party" . isset($party->pid) ? ' '.$party->pid: '';
     }
     
     $entity = $attached_entity->entity;

@@ -367,6 +367,9 @@ function party_menu_local_tasks_alter(&$data, $router_item, $root_path) {
     if (!isset($router_item['original_map'][3])) {
       $piece_subpath = $router_item['original_map'][2];
       $pieces = party_get_party_piece_info();
+      if (!isset($pieces[$piece_subpath])) {
+        return;
+      }
       $piece = $pieces[$piece_subpath];
 
       if (isset($piece['data_set'])) {
@@ -888,6 +891,8 @@ function party_get_party_types() {
  *  The party object of the party we're concerned with.
  * @param $set_name
  *  The set type as defined in hook_party_data_set_info().
+ * @param $create
+ *  Choose to create an entity if there isn't already at least one.
  *
  * @return
  *  An array of the attached entity controllers for the entities attached to the
@@ -896,7 +901,12 @@ function party_get_party_types() {
  *  to the 'main' flag in the data set.
  *  @todo fix the hash this is indexed by!
  */
-function party_get_attached_entities($party, $data_set_name) {
+function party_get_attached_entities($party, $data_set_name, $create = false) {
+  if (!$party) {
+    drupal_set_message(t('Party not set, unable to load attached entities.'), 'error');
+    return array();
+  }
+  
   $sets = party_get_data_set_info();
 
   $items = db_select('party_attached_entity', 'ds')
@@ -913,6 +923,13 @@ function party_get_attached_entities($party, $data_set_name) {
     $attached_entity = party_get_crm_controller($data_set_name);
     $attached_entity->setParty($party);
     $attached_entity->setAttachedEntity($eid);
+    $attached_entities[$attached_entity->hash()] = $attached_entity;
+  }
+  
+  if (empty($attached_entities)) {
+    $attached_entity = party_get_crm_controller($data_set_name);
+    $attached_entity->setParty($party);
+    $attached_entity->createAttachedEntity($eid);
     $attached_entities[$attached_entity->hash()] = $attached_entity;
   }
   
@@ -1065,7 +1082,7 @@ function party_preprocess_entity(&$variables) {
  *   A party object.
  */
 function party_load($pid = NULL, $reset = FALSE) {
-  $pids = (isset($pid) ? array($pid) : array());
+  $pids = (!empty($pid) ? array($pid) : array());
   $party = party_load_multiple($pids, $reset);
   return $party ? reset($party) : FALSE;
 }
