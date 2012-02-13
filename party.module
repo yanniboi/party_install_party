@@ -929,7 +929,7 @@ function party_get_attached_entities($party, $data_set_name, $create = false) {
   if (empty($attached_entities)) {
     $attached_entity = party_get_crm_controller($data_set_name);
     $attached_entity->setParty($party);
-    $attached_entity->createAttachedEntity($eid);
+    $attached_entity->createAttachedEntity();
     $attached_entities[$attached_entity->hash()] = $attached_entity;
   }
   
