@@ -276,21 +276,21 @@ function party_menu() {
     'title' => 'Add party',
     'page callback' => 'party_add',
     'file' => 'party.pages.inc',
-    'access arguments' => array('create contacts'),
+    'access arguments' => array('create parties'),
   );
   $items['party/add/individual'] = array(
     'title' => 'Add individual',
     'page callback' => 'party_add',
     'page arguments' => array('individual'),
     'file' => 'party.pages.inc',
-    'access arguments' => array('create contacts'),
+    'access arguments' => array('create parties'),
   );
   $items['party/add/organisation'] = array(
     'title' => 'Add organisation',
     'page callback' => 'party_add',
     'page arguments' => array('organisation'),
     'file' => 'party.pages.inc',
-    'access arguments' => array('create contacts'),
+    'access arguments' => array('create parties'),
   );
 
   // Provide useful information for developers.
