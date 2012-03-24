@@ -39,6 +39,7 @@ function party_entity_info() {
     'entity keys' => array(
       'id' => 'pid',
       'bundle' => 'type',
+      'label' => 'label',
     ),
     'exportable' => TRUE,
     //'static cache' => TRUE,
