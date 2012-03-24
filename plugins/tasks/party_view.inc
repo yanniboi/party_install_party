@@ -95,6 +95,12 @@ function party_view_page_manager_page($party) {
       break;
     }
   }
+  
+  // If we're falling back to the standard, make sure party.pages.inc is
+  // included
+  if ($function == 'party_page_view') {
+    module_load_include('inc', 'party', 'party.pages');
+  }
 
   // Otherwise, fall back.
   return $function($party);
