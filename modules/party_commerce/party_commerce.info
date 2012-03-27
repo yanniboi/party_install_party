@@ -1,5 +1,5 @@
 name = Party Commerce
-description = Integrates Commerce Customer Profiles with the party module
+description = [Incomplete] Integrates Commerce Customer Profiles with the party module
 package = CRM
 core = 7.x
 

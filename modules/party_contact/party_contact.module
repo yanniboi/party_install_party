@@ -1,1 +1,469 @@
-<?php/** * Implements hook_entity_info() */ function party_contact_entity_info() {  $entity['contact'] = array(    'label' => t('Contact'),    'entity class' => 'Contact',    'controller class' => 'ContactController',    'base table' => 'party_contact',    'fieldable' => TRUE,    'entity keys' => array(      'id' => 'contact_id',      'bundle' => 'type',    ),    'bundles' => array(),    'bundle keys' => array(      'bundle' => 'type',    ),    'label callback' => 'entity_class_label',    'uri callback' => 'entity_class_uri',    'creation callback' => 'contact_create',    'access callback' => 'contact_access',    'module' => 'party_contact',    'admin ui' => array(      'path' => 'admin/community/contacts',      'file' => 'party_contact.admin.inc',      'controller class' => 'ContactUIController',      'menu wildcard' => '%contact',    ),  );  $entity['contact_type'] = array(    'label' => t('Contact Type'),    'entity class' => 'ContactType',    'controller class' => 'ContactTypeController',    'base table' => 'party_contact_type',    'fieldable' => FALSE,    'exportable' => TRUE,    'entity keys' => array(      'id' => 'id',      'name' => 'type',      'label' => 'label',    ),    'access callback' => 'contact_type_access',    'module' => 'contact',    // Enable the entity API's admin UI.    'admin ui' => array(      'path' => 'admin/structure/contact_types',      'file' => 'contact_type.admin.inc',      'controller class' => 'ContactTypeUIController',    ),  );      return $entity}/** * Implements hook_entity_info_alter(). * * We are adding the info about the contact types via a hook to avoid a recursion * issue as loading the contact types requires the entity info as well. * * @todo This needs to be improved */function contact_entity_info_alter(&$entity_info) {  foreach (contact_get_types() as $type => $info) {    $entity_info['contact']['bundles'][$type] = array(      'label' => $info->label,      'admin' => array(        'path' => 'admin/structure/contact_types/manage/%contact_type',        'real path' => 'admin/structure/contact_types/manage/' . $type,        'bundle argument' => 4,        'access arguments' => array('administer contact types'),      ),    );  }}  /** * Implements hook_permission(). */function contact_permission() {  // We set up permisssions to manage entity types, manage all entities and the  // permissions for each individual entity  $permissions = array(    'administer contact types' => array(      'title' => t('Administer contact types'),      'description' => t('Create and delete fields for contact types, and set their permissions.'),    ),    'administer contacts' => array(      'title' => t('Administer contacts'),      'description' => t('Edit and delete all contacts'),    ),    );    //Generate permissions per contact   foreach (contact_get_types() as $type) {    $type_name = check_plain($type->type);    $permissions += array(      "edit any $type_name contact" => array(        'title' => t('%type_name: Edit any contact', array('%type_name' => $type->label)),      ),      "view any $type_name contact" => array(        'title' => t('%type_name: View any contact', array('%type_name' => $type->label)),      ),    );  }  return $permissions;  }/** * Determines whether the given user has access to a contact. * * @param $op *   The operation being performed. One of 'view', 'update', 'create', 'delete' *   or just 'edit' (being the same as 'create' or 'update'). * @param $contact *   Optionally a contact or a contact type to check access for. If nothing is *   given, access for all contacts is determined. * @param $account *   The user to check for. Leave it to NULL to check for the global user. * @return boolean *   Whether access is allowed or not. */function contact_access($op, $contact = NULL, $account = NULL) {  if (user_access('administer contacts', $account)) {    return TRUE;  }  if (isset($contact) && $type_name = $contact->type) {    $op = ($op == 'view') ? 'view' : 'edit';    if (user_access("$op any $type_name contact", $account)) {      return TRUE;    }  }  return FALSE;}/** * Access callback for the entity API. */function contact_type_access($op, $type = NULL, $account = NULL) {  return user_access('administer contact types', $account);}/** * Gets an array of all contact types, keyed by the type name. * * @param $type_name *   If set, the type with the given name is returned. * @return ContactType[] *   Depending whether $type isset, an array of contact types or a single one. */function contact_get_types($type_name = NULL) {  // entity_load will get the Entity controller for our contact entity and call the load  // function of that object - we are loading entities by name here.  $types = entity_load_multiple_by_name('contact_type', isset($type_name) ? array($type_name) : FALSE);  return isset($type_name) ? reset($types) : $types;}/** * Menu argument loader; Load a contact type by string. * * @param $type *   The machine-readable name of a contact type to load. * @return *   A contact type array or FALSE if $type does not exist. */function contact_type_load($type) {  return contact_get_types($type);}/** * Fetch a contact object. Make sure that the wildcard you choose  * in the contact entity definition fits the function name here. * * @param $contact_id *   Integer specifying the contact id. * @param $reset *   A boolean indicating that the internal cache should be reset. * @return *   A fully-loaded $contact object or FALSE if it cannot be loaded. * * @see contact_load_multiple() */function contact_load($contact_id, $reset = FALSE) {  $contacts = contact_load_multiple(array($contact_id), array(), $reset);  return reset($contacts);}/** * Load multiple contacts based on certain conditions. * * @param $contact_ids *   An array of contact IDs. * @param $conditions *   An array of conditions to match against the {contact} table. * @param $reset *   A boolean indicating that the internal cache should be reset. * @return *   An array of contact objects, indexed by contact_id. * * @see entity_load() * @see contact_load() */function contact_load_multiple($contact_ids = array(), $conditions = array(), $reset = FALSE) {  return entity_load('contact', $contact_ids, $conditions, $reset);}/** * Deletes a contact. */function contact_delete(Contact $contact) {  $contact->delete();}/** * Delete multiple contacts. * * @param $contact_ids *   An array of contact IDs. */function contact_delete_multiple(array $contact_ids) {  entity_get_controller('contact')->delete($contact_ids);}/** * Create a contact object. */function contact_create($values = array()) {  return entity_get_controller('contact')->create($values);}/** * Saves a contact to the database. * * @param $contact *   The contact object. */function contact_save(Contact $contact) {  return $contact->save();}/** * Saves a contact type to the db. */function contact_type_save(ContactType $type) {  $type->save();}/** * Deletes a contact type from the db. */function contact_type_delete(ContactType $type) {  $type->delete();}/** * URI callback for contacts */function contact_uri(Contact $contact){  return array(    'path' => 'contact/' . $contact->contact_id,  );}/** * Menu title callback for showing individual entities */function contact_page_title(Contact $contact){  return $contact->name;}/** * Sets up content to show an individual contact * @todo - get rid of drupal_set_title(); */function contact_page_view($contact, $view_mode = 'full') {      $controller = entity_get_controller('contact');    $content = $controller->view(array($contact->contact_id => $contact));  drupal_set_title($contact->name);  return $content;}/** * Implements hook_views_api(). */function contact_views_api() {  return array(    'api' => 3,    'path' => drupal_get_path('module', 'contact') . '/views',  );}/** * Implement hook_theme(). */function contact_theme() {  return array(    'contact_add_list' => array(      'variables' => array('content' => array()),      'file' => 'contact.admin.inc',    ),    'contact' => array(      'render element' => 'elements',      'template' => 'contact',    ),   'contact_sample_data' => array(      'variables' => array('contact_sample_data', 'contact' => NULL),      'template' => 'contact-sample-data',    ),  );}  /** * Implements hook_menu_local_tasks_alter(). */function contact_menu_local_tasks_alter(&$data, $router_item, $root_path) {  // Add action link 'admin/structure/contacts/add' on 'admin/structure/contacts'.  if ($root_path == 'admin/content/contacts') {    $item = menu_get_item('admin/content/contacts/add');    if ($item['access']) {      $data['actions']['output'][] = array(        '#theme' => 'menu_local_action',        '#link' => $item,      );    }  }}/** * The class used for contact entities */class Contact extends Entity {    public function __construct($values = array()) {    parent::__construct($values, 'contact');  }  protected function defaultLabel() {    return $this->name;  }  protected function defaultUri() {    return array('path' => 'contact/' . $this->contact_id);  }    }/** * The class used for contact type entities */class ContactType extends Entity {    public $type;  public $label;    public function __construct($values = array()) {    parent::__construct($values, 'contact_type');  }  }/** * The Controller for Contact entities */class ContactController extends EntityAPIController {  public function __construct($entityType) {    parent::__construct($entityType);  }  /**   * Create a contact - we first set up the values that are specific   * to our contact schema but then also go through the EntityAPIController   * function.   *    * @param $type   *   The machine-readable type of the contact.   *   * @return   *   A contact object with all default fields initialized.   */  public function create(array $values = array()) {    // Add values that are specific to our Contact    $values += array(       'contact_id' => '',      'is_new' => TRUE,      'title' => '',      'created' => '',      'changed' => '',      'data' => '',    );        $contact = parent::create($values);    return $contact;  }    /**   * Overriding the buldContent function to add entity specific fields   */  public function buildContent($entity, $view_mode = 'full', $langcode = NULL, $content = array()) {    $content = parent::buildContent($entity, $view_mode, $langcode, $content);    $content['contact_sample_data'] =  array(      '#markup' => theme('contact_sample_data', array('contact_sample_data' => check_plain($entity->data['sample_data']), 'contact' => $entity)),    );    return $content;  }  }/** * The Controller for Contact entities */class ContactTypeController extends EntityAPIControllerExportable {  public function __construct($entityType) {    parent::__construct($entityType);  }     /**   * Create a contact type - we first set up the values that are specific   * to our contact type schema but then also go through the EntityAPIController   * function.   *    * @param $type   *   The machine-readable type of the contact.   *   * @return   *   A contact type object with all default fields initialized.   */  public function create(array $values = array()) {    // Add values that are specific to our Contact    $values += array(       'id' => '',      'is_new' => TRUE,      'data' => '',    );    $contact_type = parent::create($values);    return $contact_type;  }}
+<?php
+
+/**
+ * Implements hook_entity_info()
+ */ 
+function party_contact_entity_info() {
+  $entity['contact'] = array(
+    'label' => t('Contact'),
+    'entity class' => 'Contact',
+    'controller class' => 'ContactController',
+    'base table' => 'party_contact',
+    'fieldable' => TRUE,
+    'entity keys' => array(
+      'id' => 'contact_id',
+      'bundle' => 'type',
+    ),
+    'bundles' => array(),
+    'bundle keys' => array(
+      'bundle' => 'type',
+    ),
+    'label callback' => 'entity_class_label',
+    'uri callback' => 'entity_class_uri',
+    'creation callback' => 'contact_create',
+    'access callback' => 'contact_access',
+    'module' => 'party_contact',
+    'admin ui' => array(
+      'path' => 'admin/community/contacts',
+      'file' => 'party_contact.admin.inc',
+      'controller class' => 'ContactUIController',
+      'menu wildcard' => '%contact',
+    ),
+  );
+  $entity['contact_type'] = array(
+    'label' => t('Contact Type'),
+    'entity class' => 'ContactType',
+    'controller class' => 'ContactTypeController',
+    'base table' => 'party_contact_type',
+    'fieldable' => FALSE,
+    'exportable' => TRUE,
+    'entity keys' => array(
+      'id' => 'id',
+      'name' => 'type',
+      'label' => 'label',
+    ),
+    'access callback' => 'contact_type_access',
+    'module' => 'contact',
+    // Enable the entity API's admin UI.
+    'admin ui' => array(
+      'path' => 'admin/structure/contact_types',
+      'file' => 'contact_type.admin.inc',
+      'controller class' => 'ContactTypeUIController',
+    ),
+  );
+    
+  return $entity
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ *
+ * We are adding the info about the contact types via a hook to avoid a recursion
+ * issue as loading the contact types requires the entity info as well.
+ *
+ * @todo This needs to be improved
+ */
+function contact_entity_info_alter(&$entity_info) {
+  foreach (contact_get_types() as $type => $info) {
+    $entity_info['contact']['bundles'][$type] = array(
+      'label' => $info->label,
+      'admin' => array(
+        'path' => 'admin/structure/contact_types/manage/%contact_type',
+        'real path' => 'admin/structure/contact_types/manage/' . $type,
+        'bundle argument' => 4,
+        'access arguments' => array('administer contact types'),
+      ),
+    );
+  }
+}
+  
+
+/**
+ * Implements hook_permission().
+ */
+function contact_permission() {
+  // We set up permisssions to manage entity types, manage all entities and the
+  // permissions for each individual entity
+  $permissions = array(
+    'administer contact types' => array(
+      'title' => t('Administer contact types'),
+      'description' => t('Create and delete fields for contact types, and set their permissions.'),
+    ),
+    'administer contacts' => array(
+      'title' => t('Administer contacts'),
+      'description' => t('Edit and delete all contacts'),
+    ),  
+  );
+  
+  //Generate permissions per contact 
+  foreach (contact_get_types() as $type) {
+    $type_name = check_plain($type->type);
+    $permissions += array(
+      "edit any $type_name contact" => array(
+        'title' => t('%type_name: Edit any contact', array('%type_name' => $type->label)),
+      ),
+      "view any $type_name contact" => array(
+        'title' => t('%type_name: View any contact', array('%type_name' => $type->label)),
+      ),
+    );
+  }
+  return $permissions;  
+}
+
+
+/**
+ * Determines whether the given user has access to a contact.
+ *
+ * @param $op
+ *   The operation being performed. One of 'view', 'update', 'create', 'delete'
+ *   or just 'edit' (being the same as 'create' or 'update').
+ * @param $contact
+ *   Optionally a contact or a contact type to check access for. If nothing is
+ *   given, access for all contacts is determined.
+ * @param $account
+ *   The user to check for. Leave it to NULL to check for the global user.
+ * @return boolean
+ *   Whether access is allowed or not.
+ */
+function contact_access($op, $contact = NULL, $account = NULL) {
+  if (user_access('administer contacts', $account)) {
+    return TRUE;
+  }
+  if (isset($contact) && $type_name = $contact->type) {
+    $op = ($op == 'view') ? 'view' : 'edit';
+    if (user_access("$op any $type_name contact", $account)) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+
+/**
+ * Access callback for the entity API.
+ */
+function contact_type_access($op, $type = NULL, $account = NULL) {
+  return user_access('administer contact types', $account);
+}
+
+
+/**
+ * Gets an array of all contact types, keyed by the type name.
+ *
+ * @param $type_name
+ *   If set, the type with the given name is returned.
+ * @return ContactType[]
+ *   Depending whether $type isset, an array of contact types or a single one.
+ */
+function contact_get_types($type_name = NULL) {
+  // entity_load will get the Entity controller for our contact entity and call the load
+  // function of that object - we are loading entities by name here.
+  $types = entity_load_multiple_by_name('contact_type', isset($type_name) ? array($type_name) : FALSE);
+  return isset($type_name) ? reset($types) : $types;
+}
+
+
+/**
+ * Menu argument loader; Load a contact type by string.
+ *
+ * @param $type
+ *   The machine-readable name of a contact type to load.
+ * @return
+ *   A contact type array or FALSE if $type does not exist.
+ */
+function contact_type_load($type) {
+  return contact_get_types($type);
+}
+
+
+/**
+ * Fetch a contact object. Make sure that the wildcard you choose 
+ * in the contact entity definition fits the function name here.
+ *
+ * @param $contact_id
+ *   Integer specifying the contact id.
+ * @param $reset
+ *   A boolean indicating that the internal cache should be reset.
+ * @return
+ *   A fully-loaded $contact object or FALSE if it cannot be loaded.
+ *
+ * @see contact_load_multiple()
+ */
+function contact_load($contact_id, $reset = FALSE) {
+  $contacts = contact_load_multiple(array($contact_id), array(), $reset);
+  return reset($contacts);
+}
+
+
+/**
+ * Load multiple contacts based on certain conditions.
+ *
+ * @param $contact_ids
+ *   An array of contact IDs.
+ * @param $conditions
+ *   An array of conditions to match against the {contact} table.
+ * @param $reset
+ *   A boolean indicating that the internal cache should be reset.
+ * @return
+ *   An array of contact objects, indexed by contact_id.
+ *
+ * @see entity_load()
+ * @see contact_load()
+ */
+function contact_load_multiple($contact_ids = array(), $conditions = array(), $reset = FALSE) {
+  return entity_load('contact', $contact_ids, $conditions, $reset);
+}
+
+
+/**
+ * Deletes a contact.
+ */
+function contact_delete(Contact $contact) {
+  $contact->delete();
+}
+
+
+/**
+ * Delete multiple contacts.
+ *
+ * @param $contact_ids
+ *   An array of contact IDs.
+ */
+function contact_delete_multiple(array $contact_ids) {
+  entity_get_controller('contact')->delete($contact_ids);
+}
+
+
+/**
+ * Create a contact object.
+ */
+function contact_create($values = array()) {
+  return entity_get_controller('contact')->create($values);
+}
+
+
+/**
+ * Saves a contact to the database.
+ *
+ * @param $contact
+ *   The contact object.
+ */
+function contact_save(Contact $contact) {
+  return $contact->save();
+}
+
+
+/**
+ * Saves a contact type to the db.
+ */
+function contact_type_save(ContactType $type) {
+  $type->save();
+}
+
+
+/**
+ * Deletes a contact type from the db.
+ */
+function contact_type_delete(ContactType $type) {
+  $type->delete();
+}
+
+
+/**
+ * URI callback for contacts
+ */
+function contact_uri(Contact $contact){
+  return array(
+    'path' => 'contact/' . $contact->contact_id,
+  );
+}
+
+
+/**
+ * Menu title callback for showing individual entities
+ */
+function contact_page_title(Contact $contact){
+  return $contact->name;
+}
+
+
+/**
+ * Sets up content to show an individual contact
+ * @todo - get rid of drupal_set_title();
+ */
+function contact_page_view($contact, $view_mode = 'full') {    
+  $controller = entity_get_controller('contact');  
+  $content = $controller->view(array($contact->contact_id => $contact));
+  drupal_set_title($contact->name);
+  return $content;
+}
+
+
+/**
+ * Implements hook_views_api().
+ */
+function contact_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'contact') . '/views',
+  );
+}
+
+
+/**
+ * Implement hook_theme().
+ */
+function contact_theme() {
+  return array(
+    'contact_add_list' => array(
+      'variables' => array('content' => array()),
+      'file' => 'contact.admin.inc',
+    ),
+    'contact' => array(
+      'render element' => 'elements',
+      'template' => 'contact',
+    ),
+   'contact_sample_data' => array(
+      'variables' => array('contact_sample_data', 'contact' => NULL),
+      'template' => 'contact-sample-data',
+    ),
+
+
+  );
+}  
+
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function contact_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+  // Add action link 'admin/structure/contacts/add' on 'admin/structure/contacts'.
+  if ($root_path == 'admin/content/contacts') {
+    $item = menu_get_item('admin/content/contacts/add');
+    if ($item['access']) {
+      $data['actions']['output'][] = array(
+        '#theme' => 'menu_local_action',
+        '#link' => $item,
+      );
+    }
+  }
+}
+
+
+/**
+ * The class used for contact entities
+ */
+class Contact extends Entity {
+  
+  public function __construct($values = array()) {
+    parent::__construct($values, 'contact');
+  }
+
+  protected function defaultLabel() {
+    return $this->name;
+  }
+
+  protected function defaultUri() {
+    return array('path' => 'contact/' . $this->contact_id);
+  }
+  
+  
+}
+
+
+/**
+ * The class used for contact type entities
+ */
+class ContactType extends Entity {
+  
+  public $type;
+  public $label;
+  
+  public function __construct($values = array()) {
+    parent::__construct($values, 'contact_type');
+  }
+  
+}
+
+
+/**
+ * The Controller for Contact entities
+ */
+class ContactController extends EntityAPIController {
+  public function __construct($entityType) {
+    parent::__construct($entityType);
+  }
+
+
+  /**
+   * Create a contact - we first set up the values that are specific
+   * to our contact schema but then also go through the EntityAPIController
+   * function.
+   * 
+   * @param $type
+   *   The machine-readable type of the contact.
+   *
+   * @return
+   *   A contact object with all default fields initialized.
+   */
+  public function create(array $values = array()) {
+    // Add values that are specific to our Contact
+    $values += array( 
+      'contact_id' => '',
+      'is_new' => TRUE,
+      'title' => '',
+      'created' => '',
+      'changed' => '',
+      'data' => '',
+    );
+    
+    $contact = parent::create($values);
+    return $contact;
+  }
+  
+  /**
+   * Overriding the buldContent function to add entity specific fields
+   */
+  public function buildContent($entity, $view_mode = 'full', $langcode = NULL, $content = array()) {
+    $content = parent::buildContent($entity, $view_mode, $langcode, $content);
+    $content['contact_sample_data'] =  array(
+      '#markup' => theme('contact_sample_data', array('contact_sample_data' => check_plain($entity->data['sample_data']), 'contact' => $entity)),
+    );
+
+    return $content;
+  }
+  
+}
+
+
+/**
+ * The Controller for Contact entities
+ */
+class ContactTypeController extends EntityAPIControllerExportable {
+  public function __construct($entityType) {
+    parent::__construct($entityType);
+  }
+  
+   /**
+   * Create a contact type - we first set up the values that are specific
+   * to our contact type schema but then also go through the EntityAPIController
+   * function.
+   * 
+   * @param $type
+   *   The machine-readable type of the contact.
+   *
+   * @return
+   *   A contact type object with all default fields initialized.
+   */
+  public function create(array $values = array()) {
+    // Add values that are specific to our Contact
+    $values += array( 
+      'id' => '',
+      'is_new' => TRUE,
+      'data' => '',
+    );
+    $contact_type = parent::create($values);
+    return $contact_type;
+  }
+
+}
