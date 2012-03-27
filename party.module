@@ -795,7 +795,8 @@ function party_get_data_set_info($data_set_name = NULL) {
   }
 
   if (isset($data_set_name)) {
-    return $sets[$data_set_name];
+    // @todo: Throw a big error if the $data_set_name doesn't exist
+    return isset($sets[$data_set_name]) ? $sets[$data_set_name] : FALSE;
   }
   else {
     return $sets;
