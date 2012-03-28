@@ -101,7 +101,16 @@ function party_attached_entity_content_type_render($subtype, $conf, $panel_args,
   // $attached_entities should now be alist of all the ones we want to show so lets convert this into a list of entities
   $entities = array();
   foreach($attached_entities as $attached_entity) {
+    // Hacky fix - check we're loading an actual entity and not just a 0
+    if ($attached_entity->getEntityId() == 0) {
+      continue;
+    }
+    
     $entities[] = $attached_entity->entity;
+  }
+  
+  if (empty($entities)) {
+    return;
   }
   
   $block_delta = $data_set_name;

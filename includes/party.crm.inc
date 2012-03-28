@@ -494,13 +494,28 @@ abstract class EntityDefaultPartyController {
   /**
    * Returns the entity id key of the attached entity.
    */
-  private function getEntityIdKey() {
+  public function getEntityIdKey() {
     // @todo: needs a good refactoring as probably horribly slow.
     $entity_type = $this->getEntityType();
     $entity_info = entity_get_info($entity_type);
     $key = $entity_info['entity keys']['id'];
 
     return $key;
+  }
+  
+  /**
+   * Gets entity id
+   */
+  public function getEntityId() {
+    if (isset($this->eid)) {
+      return $this->eid;
+    }
+    
+    if (isset($this->entity->{$this->getEntityIdKey()})) {
+      return $this->entity->{$this->getEntityIdKey()};
+    }
+    
+    return 0;
   }
   
   /**

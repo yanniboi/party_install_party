@@ -351,6 +351,18 @@ function party_user_get_party($user) {
 }
  
 /**
+ * Implements hook_module_implements_alter()
+ *
+ * We're just going to stop profile 2 from doing anything with the user page
+ * for now. This should supress the thousands of errors we get on that page.
+ */
+function party_user_module_implements_alter(&$implementations, $hook) {
+  if ($hook == 'user_view') {
+    unset($implementations['profile2']);
+  }
+}
+
+/**
  * Controller class for CRM integration.
  *
  * @todo: move this to an inc file for autoloading.
@@ -361,7 +373,7 @@ class UserPartyController extends EntityDefaultPartyController {
    *  This is needed because user doesn't use the entity API
    */
   public function display($mode) {
-    return user_view($this->entity, $mode);
+    return ($this->entity->uid != 0) ? user_view($this->entity, $mode) : FALSE;
   }
   
   /**
