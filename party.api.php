@@ -31,10 +31,9 @@
  *   A party to check access for.
  * @param $data_set
  *   (optional) A dataset definition to check access for. If nothing is given,
- *    access for just the party itself is determined.
+ *   access for just the party itself is determined.
  * @param $account
- *   (optional) The user to check for. Omit to check for the global user.
- *   determined for the global user.
+ *   The user being checked against. Usually the currently logged in user.
  *
  * @return boolean
  *   Return TRUE to grant access, FALSE to explicitly deny access. Return NULL
@@ -47,7 +46,7 @@
  *
  * @see party_access()
  */
-function hook_party_access($op, $party = NULL, $data_set = NULL, $account = NULL) {
+function hook_party_access($op, $party, $data_set, $account) {
 
 }
 

@@ -61,6 +61,130 @@ function party_user_menu() {
 }
 
 /**
+ * Implements hook_permission()
+ *
+ * In this case 'own' means attached to a Party the user is also attached to.
+ */
+function party_user_permission() {
+  $permissions = array(
+    'view own party' => array(
+      'title' => t('View own party'),
+    ),
+    'edit own party' => array(
+      'title' => t('Edit own party'),
+    ),
+  );
+
+  // Add permissions for each data set.
+  foreach (party_get_data_set_info() as $data_set_name => $data_set) {
+    $permissions['view own party attached ' . $data_set_name] = array(
+      'title' => t('View own party attached %name', array(
+        '%name' => $data_set['label'],
+      )),
+    );
+
+    $permissions['edit own party attached ' . $data_set_name] = array(
+      'title' => t('Edit own party attached %name', array(
+        '%name' => $data_set['label'],
+      )),
+    );
+
+    $permissions['detach own party attached ' . $data_set_name] = array(
+      'title' => t('Remove own party attached %name', array(
+        '%name' => $data_set['label'],
+      )),
+    );
+
+    $permissions['attach own party ' . $data_set_name] = array(
+      'title' => t('Add own party attached %name', array(
+        '%name' => $data_set['label'],
+      )),
+    );
+  }
+
+  return $permissions;
+}
+
+/**
+ * Implements hook_party_access()
+ */
+function party_user_party_access($op, $party, $data_set, $account) {
+  // Set the data_set_name
+  if (isset($data_set)) {
+    $data_set_name = $data_set['set_name'];
+  }
+
+  // Check if this is their own party
+  $attached_entities = party_get_attached_entities($party, 'user');
+  if (empty($attached_entities)) {
+    return NULL;
+  }
+
+  // As we could have multiple attached users we're iterate over and check if
+  // one of them is the right account
+  $own = FALSE;
+  foreach ($attached_entities as $attached_entity) {
+    if (isset($attached_entity->entity->uid) && $attached_entity->entity->uid == $account->uid) {
+      $own = TRUE;
+    }
+  }
+
+  // If this the $account doesn't own this party say nothing
+  if (!$own) {
+    return NULL;
+  }
+
+  // If we're looking at permission for a particular data set we check these.
+  if (isset($data_set_name)) {
+    // Determine what the Core permissions system has to say about this.
+    switch ($op) {
+      case 'view':
+        $permission_string = 'view own party attached ' . $data_set_name;
+        $permission_access = user_access($permission_string, $account);
+        break;
+      case 'edit':
+        $permission_string = 'edit own party attached ' . $data_set_name;
+        $permission_access = user_access($permission_string, $account);
+        break;
+      case 'detach':
+        $permission_string = 'detach own party attached ' . $data_set_name;
+        $permission_access = user_access($permission_string, $account);
+        break;
+      case 'attach':
+        $permission_string = 'attach own party ' . $data_set_name;
+        $permission_access = user_access($permission_string, $account);
+        break;
+      default:
+        // Reject anything else
+        $permission_access = FALSE;
+    }
+  }
+  else {
+    // If we're not being asked about attachments, just use plain permissions.
+    switch ($op) {
+      case 'view':
+        $permission_access = user_access('view own party');
+        break;
+      case 'edit':
+        $permission_access = user_access('edit own party');
+        break;
+    }
+  }
+
+  // In this hook we only grant access with the permissions, not deny it. In
+  // other words, the permission 'view party attached foo' is sufficient but
+  // not neccessary, it is advisable to use these blanket permissions
+  // sparingly.
+  // @todo: add explanation of this to the party_access() docblock.
+  if ($permission_access === TRUE) {
+    return $permission_access;
+  }
+
+  // If we get here - say nothing.
+  return NULL;
+}
+
+/**
  * Implements hook_ctools_plugin_directory().
  */
 function party_user_ctools_plugin_directory($owner, $plugin_type) {

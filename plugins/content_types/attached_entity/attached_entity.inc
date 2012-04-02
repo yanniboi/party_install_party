@@ -73,6 +73,10 @@ function party_attached_entity_content_type_render($subtype, $conf, $panel_args,
   $data_set_name = $subtype;
   $data_set = party_get_data_set_info($data_set_name);
 
+  if (!party_access('view', $party, $data_set)) {
+    return;
+  }
+
   // Get the attached entities in this data set
   $attached_entities = party_get_attached_entities($party, $data_set_name);
 

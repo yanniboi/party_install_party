@@ -472,6 +472,10 @@ function party_access($op, $party = NULL, $data_set = NULL, $account = NULL) {
     $data_set = party_get_data_set_info($data_set);
   }
 
+  if (!isset($account)) {
+    $account = $GLOBALS['user'];
+  }
+
   // Allow modules to grant / deny access.
   $access = module_invoke_all('party_access', $op, $party, $data_set, $account);
 
@@ -949,22 +953,29 @@ function party_get_attached_entities($party, $data_set_name, $create = false) {
 
 /**
  * Get the form for a data set (more to the point get a set of fields for the data set
- * might need to work on this).
+ * might need to work on this). This function checks the edit party attached data set
+ * permission.
  *
  * @param $party
  *  The party object of the party we're concerned with.
- * @param $set_type
- *  The set type as defined in hook_data_set_info().
- *  @todo: clerify is this a name or an info array?
+ * @param $data_set_name
+ *  The data set name as defined in hook_data_set_info().
  * @param $set_id
  *  The set id as stored in the related table
  *
  * @return
  *   A form array.
+ *
+ * @todo: On adding a party work well.
  */
-function party_data_set_form($party, $set_type, $set_id = FALSE) {
-  $sets = party_get_data_set_info();
-  $function = $sets[$set_type]['form callback'];
+function party_data_set_form($party, $data_set_name, $set_id = FALSE) {
+  // Check that the user has access to this form
+  if (!party_access('edit', $party, $data_set_name)) {
+    return FALSE;
+  }
+
+  $set = party_get_data_set_info($data_set_name);
+  $function = $set['form callback'];
   if (function_exists($function)) {
     $result = call_user_func($function, $party, $set_type, $set_id);
   }
