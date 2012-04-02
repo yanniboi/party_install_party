@@ -411,7 +411,8 @@ function party_menu_local_tasks_alter(&$data, $router_item, $root_path) {
 }
 
 /**
- * Menu loader for data sets.
+ * Menu loader for data sets. First check against pieces, and if nothings found
+ * check against the $data_set_names themselves.
  *
  * @param $data_set_url_string
  *  The url-form of a data set name, ie with hyphens instead of underscores.
@@ -427,6 +428,9 @@ function party_data_set_load($data_set_url_string) {
       return $info;
     }
   }
+
+  // If nothings been found yet, check up the data set names
+  return party_get_data_set_info($data_set_url_string);
 }
 
 /**
@@ -1081,22 +1085,20 @@ function party_preprocess_entity(&$variables) {
     $entity       = $variables['elements']['#entity'];
     list($eid, ) = entity_extract_ids($entity_type, $entity);
 
-    //dsm($variables);
     $party_id = $entity->crm_attaching_party;
 
     // @todo: clean this up -- having to load up the controller all over
     // again when we probably had it at some earlier point is just messy.
     $data_set_name = party_get_entity_data_set($entity_type, $entity);
-    $crm_controller = party_get_crm_controller($data_set_name, $party_id);
-    $crm_controller->setParty($party_id);
-    $crm_controller->setAttachedEntity($eid);
-    //dsm($crm_controller);
+    $attached_entity = party_get_crm_controller($data_set_name);
+    $attached_entity->setParty($party_id);
+    $attached_entity->setAttachedEntity($eid);
 
     // Add the attached entity actions to the build content.
     // @todo: change these to contextual links?
     $variables['content']['party_actions'] = array(
       '#theme' => 'links',
-      '#links' => $crm_controller->actions(),
+      '#links' => $attached_entity->actions(),
       '#attributes' => array(
         'class' => array('links inline crm-set-action-links'),
       ),

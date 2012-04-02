@@ -217,7 +217,8 @@ function party_attached_entity_edit_form($form, &$form_state, $party, $data_set,
 
   if ($eid !== NULL) {
     $attached_entity->setAttachedEntity($eid);
-    drupal_set_title("Edit Data Set: " . $attached_entity->entity->label);
+    $form_title = "Edit " . $data_set['label'] . " (" . entity_label($data_set['entity type'], $attached_entity->entity) . ")";
+    drupal_set_title($form_title);
   }
   else {
     drupal_set_title("Add {$attached_entity->definition['label']} Data Set to {$party->label}");
@@ -234,20 +235,11 @@ function party_attached_entity_edit_form($form, &$form_state, $party, $data_set,
 
   party_attached_entity_attach_form($form, $form_state);
 
-  /*if (!$attached_entity_controller->definition['singleton']) {
-    $form['data-set-main'] = array(
-      '#type' => 'checkbox',
-      '#default_value' => $attached_entity_controller->isMain(),
-      '#title' => "This is the main " . $attached_entity_controller->getDataSetLabel(),
-    );
-  }*/
-
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
     '#weight' => 99,
   );
-
   return $form;
 }
 
@@ -262,13 +254,6 @@ function party_attached_entity_edit_form_validate($form, &$form_state) {
  * Submit handler for the data set edit form.
  */
 function party_attached_entity_edit_form_submit($form, &$form_state) {
-
-  /*
-  $options = array(
-    'main' => $form_state['values']['data-set-main'],
-  );
-  $attached_entity_controller->attach($attached_entity_controller->party, $options); */
-
   $attached_entity_controller = reset($form_state['#attached_entities']);
 
   // Redirect to the set piece.

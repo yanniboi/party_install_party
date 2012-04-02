@@ -374,22 +374,25 @@ abstract class EntityDefaultPartyController {
   }
 
   /**
-   * Get actions for the attached entity.
+   * Get actions for the attached entity. Check party access in each case.
    *
    * @return
    *  An array of links suitable for theme_links().
    */
   public function actions() {
-    $actions = array(
-      'edit' => array(
+    $actions = array();
+    if (party_access('edit', $this->party, $this->data_set_name)) {
+      $actions['edit'] = array(
         'title' => 'Edit',
         'href' => 'party/' . $this->party->pid . '/' . $this->definition['path element'] . '/edit/' . $this->entity->{$this->getEntityIdKey()},
-      ),
-      'remove' => array(
+      );
+    }
+    if (party_access('detach', $this->party, $this->data_set_name)) {
+      $actions['remove'] = array(
         'title' => 'Remove',
         'href' => 'party/' . $this->party->pid . '/' . $this->definition['path element'] . '/remove/' . $this->entity->{$this->getEntityIdKey()},
-      ),
-    );
+      );
+    }
     return $actions;
   }
 
