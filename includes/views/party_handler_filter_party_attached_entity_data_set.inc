@@ -8,7 +8,7 @@ class party_handler_filter_party_attached_entity_data_set extends views_handler_
     if (!isset($this->value_options)) {
       $this->value_title = t('Attached entity data sets');
       $data_sets = party_get_data_set_info();
-      
+
       foreach ($data_sets as $data_set => $info) {
         $options[$data_set] = $info['label'];
       }

@@ -19,7 +19,7 @@ class ContactUIController extends EntityDefaultUIController {
    * parent class hook_menu() is optimized for entity type administration.
    */
   public function hook_menu() {
-    
+
     $items = array();
     $id_count = count(explode('/', $this->path));
     $wildcard = isset($this->entityInfo['admin ui']['menu wildcard']) ? $this->entityInfo['admin ui']['menu wildcard'] : '%' . $this->entityType;
@@ -32,10 +32,10 @@ class ContactUIController extends EntityDefaultUIController {
       'file path' => drupal_get_path('module', 'system'),
       'file' => 'system.admin.inc',
     );
-    
+
     // Change the overview menu type for the list of contacts.
     $items[$this->path]['type'] = MENU_LOCAL_TASK;
-    
+
     // Change the add page menu to multiple types of entities
     $items[$this->path . '/add'] = array(
       'title' => 'Add a contact',
@@ -49,7 +49,7 @@ class ContactUIController extends EntityDefaultUIController {
       'file path' => drupal_get_path('module', $this->entityInfo['module'])
 
     );
-    
+
     // Add menu items to add each different type of entity.
     foreach (contact_get_types() as $type) {
       $items[$this->path . '/add/' . $type->type] = array(
@@ -80,7 +80,7 @@ class ContactUIController extends EntityDefaultUIController {
       'weight' => -10,
       'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     );
-    
+
     $items[$this->path . '/contact/' . $wildcard . '/delete'] = array(
       'title' => 'Delete',
       'page callback' => 'contact_delete_form_wrapper',
@@ -93,7 +93,7 @@ class ContactUIController extends EntityDefaultUIController {
       'file' => 'contact.admin.inc',
       'file path' => drupal_get_path('module', $this->entityInfo['module'])
     );
-    
+
     // Menu item for viewing contacts
     $items['contact/' . $wildcard] = array(
       //'title' => 'Title',
@@ -107,12 +107,12 @@ class ContactUIController extends EntityDefaultUIController {
     );
     return $items;
   }
-  
-  
+
+
   /**
    * Create the markup for the add Contact Entities page within the class
    * so it can easily be extended/overriden.
-   */ 
+   */
   public function addPage() {
     $item = menu_get_item();
     $content = system_admin_menu_block($item);
@@ -120,11 +120,11 @@ class ContactUIController extends EntityDefaultUIController {
     if (count($content) == 1) {
       $item = array_shift($content);
       drupal_goto($item['href']);
-    }    
-        
+    }
+
     return theme('contact_add_list', array('content' => $content));
   }
-  
+
 }
 
 
@@ -175,7 +175,7 @@ function contact_edit_form($form, &$form_state, $contact) {
     '#required' => TRUE,
     '#weight' => -5,
   );
-  
+
   $form['data']['#tree'] = TRUE;
   $form['data']['sample_data'] = array(
     '#type' => 'checkbox',
@@ -206,7 +206,7 @@ function contact_edit_form($form, &$form_state, $contact) {
     '#value' => t('Save contact'),
     '#submit' => $submit + array('contact_edit_form_submit'),
   );
-  
+
   if (!empty($contact->name)) {
     $form['actions']['delete'] = array(
       '#type' => 'submit',
@@ -229,7 +229,7 @@ function contact_edit_form($form, &$form_state, $contact) {
  */
 function contact_edit_form_validate(&$form, &$form_state) {
   $contact = $form_state['contact'];
-  
+
   // Notify field widgets to validate their data.
   field_attach_form_validate('contact', $contact, $form, $form_state);
 }
@@ -237,28 +237,28 @@ function contact_edit_form_validate(&$form, &$form_state) {
 
 /**
  * Form API submit callback for the contact form.
- * 
+ *
  * @todo remove hard-coded link
  */
 function contact_edit_form_submit(&$form, &$form_state) {
-  
+
   $contact = entity_ui_controller('contact')->entityFormSubmitBuildEntity($form, $form_state);
   // Save the contact and go back to the list of contacts
-  
+
   // Add in created and changed times.
   if ($contact->is_new = isset($contact->is_new) ? $contact->is_new : 0){
     $contact->created = time();
   }
 
   $contact->changed = time();
-  
+
   $contact->save();
   $form_state['redirect'] = 'admin/content/contacts';
 }
 
 /**
  * Form API submit callback for the delete button.
- * 
+ *
  * @todo Remove hard-coded path
  */
 function contact_form_submit_delete(&$form, &$form_state) {
@@ -287,7 +287,7 @@ function contact_delete_form($form, &$form_state, $contact) {
     t('Cancel'),
     'confirm'
   );
-  
+
   return $form;
 }
 

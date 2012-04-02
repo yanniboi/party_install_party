@@ -42,11 +42,11 @@ function party_hat_entity_info() {
   );
   return $entity_info;
 }
- 
+
 /**
  * Implements hook_menu().
  */
-function party_hat_menu() { 
+function party_hat_menu() {
   $items['admin/community/hats'] = array(
     'title' => 'Manage Hats',
     'description' => 'Manage hats',
@@ -79,8 +79,8 @@ function party_hat_menu() {
     'access arguments' => array('administer hats'),
     'file' => 'party_hat.admin.inc',
   );
-  
-  
+
+
 
   return $items;
 }
@@ -92,7 +92,7 @@ function party_hat_menu() {
 function party_hat_permission() {
   return array(
     'administer hats' => array(
-      'title' => t('Administer CRM party hats'), 
+      'title' => t('Administer CRM party hats'),
       'description' => t('TODO write me.'),
     ),
   );
@@ -122,9 +122,9 @@ function party_hat_load($hat_name) {
   $result = $query->condition('name', $hat_name, '=')
     ->execute()
     ->fetchAllAssoc('hid');
-  
+
   $ids = array_keys($result);
-  
+
   // @todo WTF? If $hat_name can be a numeric id it needs to be documented.
   if (count($ids) < 1 && is_numeric($hat_name)) {
     $ids = array($hat_name);
@@ -150,7 +150,7 @@ function party_hat_load_multiple($hids = array(), $conditions = array(), $reset 
  * @param $value
  *  The value
  *
- * @todo Refactor so that we don't do 3 queries to update one rule. 
+ * @todo Refactor so that we don't do 3 queries to update one rule.
  *       At the moment we do 3 queries when we add a rule and 1 when we update it and 2 when we keep it the same..
  *       Is this better than 2 queries for both?
  */
@@ -161,7 +161,7 @@ function party_hat_set_data_set_rule($hat, $set, $values = array()) {
     ->condition('hat', $hat, '=')
     ->condition('data_set', $set, '=')
     ->execute();
-    
+
   if ($num_affected < 1) {
     // We have to check that we haven't kept the row the same.
     // @todo: refactor this so that we don't do 3 queries
@@ -171,8 +171,8 @@ function party_hat_set_data_set_rule($hat, $set, $values = array()) {
       ->condition('data_set', $set, '=')
       ->execute()
       ->rowCount();
-    
-    if ($count < 1) {  
+
+    if ($count < 1) {
       $data = array(
         'hat' => $hat,
         'data_set' => $set,
@@ -202,7 +202,7 @@ function party_hat_get_data_set_rule($hat, $set) {
     ->condition('data_set', $set, '=')
     ->execute()
     ->fetchAllAssoc('phdsid');
-  
+
   //if the rule doesn't exist yet return a default.
   if (count($results) < 1) {
     return array(
@@ -210,7 +210,7 @@ function party_hat_get_data_set_rule($hat, $set) {
       'multiple' => 0,
     );
   }
-  
+
   //get the first $result (there should only ever be one)
   $result = reset($results);
   return array(
@@ -258,28 +258,28 @@ function party_hat_party_access($op, $party = NULL, $attached_entity = NULL, $ac
  * @todo write params and return.
  */
 function party_hat_get_hat_data_sets($hat, $rule = 'has') {
-   
+
   $results = db_select('party_hat_data_set_rules', 'c')
     ->fields('c')
     ->condition('hat', $hat->name, '=')
     ->condition($rule, 1, '=')
     ->execute()
     ->fetchAllAssoc('data_set');
-  
+
   return array_keys($results);
 }
 
 /**
  * Get all the Hats a Party is Wearing
  *
- * @param $party 
+ * @param $party
  *  The Party object or ID
  */
 function party_hat_get_hats($party) {
   if (!is_object($party)) {
     $party = party_load($party);
   }
-  
+
   $hats = array();
   // If this is an unsaved party (one without an ID)...
   if (!isset($party->pid)) {
@@ -295,12 +295,12 @@ function party_hat_get_hats($party) {
     if ($items) {
       foreach ($items as $item) {
         $hat = party_hat_load($item['hat_name']);
-        $hats[$hat->name] = $hat; 
+        $hats[$hat->name] = $hat;
       }
     }
   }
-  
-  return $hats;  
+
+  return $hats;
 }
 
 /**
@@ -312,20 +312,20 @@ function party_hat_get_all_hats($options = array()) {
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'party_hat', '=');
   if (isset($options['required']) && $options['required']) {
-    // filter the search by whether they're required 
+    // filter the search by whether they're required
     $query->propertyCondition('required', 1, '=');
   }
   $result = $query->execute();
   $hids = array();
-  
+
   if (!isset($result['party_hat']) || !is_array($result['party_hat'])) {
     return array();
   }
-  
+
   foreach ($result['party_hat'] as $record) {
     $hids[] = $record->hid;
   }
-  
+
   // Get the array keayed by hat name.
   $tempHats = entity_load('party_hat', $hids);
   $hats = array();
@@ -333,17 +333,17 @@ function party_hat_get_all_hats($options = array()) {
     $hats[$hat->name] = $hat;
   }
   unset($tempHats);
-  
+
   if (!isset($options['party_type'])) {
     return $hats;
   }
-  
+
   foreach ($hats as $id => $hat) {
     if (!in_array($options['party_type'], $hat->data['party_types'])) {
       unset($hats[$id]);
     }
   }
-  return $hats;  
+  return $hats;
 }
 
 /**
@@ -356,7 +356,7 @@ function party_hat_get_all_hats($options = array()) {
 function party_hat_assign_hats($party, $hats) {
   // Get the hat items from the party object
   $hat_items = field_get_items('party', $party, 'party_hat');
-  
+
   foreach ($hats as $hat) {
     $has_hat = FALSE;
     foreach ($hat_items as $item) {
@@ -364,19 +364,19 @@ function party_hat_assign_hats($party, $hats) {
         $has_hat = TRUE;
       }
     }
-    
+
     // Don't add the hat if the Party already has it
     if ($has_hat) {
       continue;
     }
-    
+
     $assigned_hats[] = $hat->name;
-    $hat_items[]['hat_name'] = $hat->name;   
+    $hat_items[]['hat_name'] = $hat->name;
   }
-  
+
   $party->party_hat[LANGUAGE_NONE] = $hat_items;
   party_save($party);
-  
+
   if (module_exists('rules')) {
     rules_invoke_all('party_hat_assign_hats', $party, $assigned_hats);
   }
@@ -395,7 +395,7 @@ function party_hat_assign_hats($party, $hats) {
 function party_hats_unassign_hats($party, $hats) {
   // Get the hat items from the party object
   $hat_items = field_get_items('party', $party, 'party_hat');
-  
+
   foreach ($hats as $hat) {
     $has_hat = FALSE;
     foreach ($hat_items as $delta => $item) {
@@ -404,17 +404,17 @@ function party_hats_unassign_hats($party, $hats) {
         unset($hat_items[$delta]);
       }
     }
-    
+
     // Don't remove the hat if its not assigned
     if (!$has_hat) {
       continue;
-    }    
+    }
     $unassigned_hats[] = $hat->name;
   }
-  
+
   $party->party_hat[LANGUAGE_NONE] = $hat_items;
   party_save($party);
-  
+
   if (module_exists('rules')) {
     rules_invoke_all('party_hat_unassign_hats', $party, $unassigned_hats);
   }
@@ -562,21 +562,21 @@ function party_hat_field_get_default($entity_type, $entity, $field, $instance, $
   if ($entity_type != 'party') {
     return array();
   }
-  
+
   //Get required hats.
   $options = array(
     'required' => TRUE,
     'party_type' => $entity->type,
   );
   $hats = party_hat_get_all_hats($options);
-  
+
   $values = array();
   foreach ($hats as $hat) {
     $values[] = array(
       'hat_name' => $hat->name,
     );
   }
-  
+
   return $values;
 }
 
@@ -593,16 +593,16 @@ function party_hat_party_form_hat_validate($form, $form_state) {
   $expected_data_sets = array();
   foreach (party_hat_get_hats($form_state['#party']) as $hid => $hat) {
     $expected_data_sets += party_hat_get_hat_data_sets($hat);
-  }  
-    
+  }
+
   $attached_entities = $form_state['#attached_entitites'];
   $existent_data_sets = array();
-  foreach ($attached_entities as $attached_entity) {      
+  foreach ($attached_entities as $attached_entity) {
     if (!in_array($attached_entity->data_set_name, $existant_data_sets)) {
       $existant_data_sets[] = $attached_entity->data_set_name;
     }
   }
-  
+
   $missing_data_sets = array_diff($expected_data_sets, $existent_data_sets);
   foreach ($missing_data_sets as $data_set_name) {
     $data_set = party_get_data_set_info($data_set_name);
@@ -614,16 +614,16 @@ function party_hat_party_form_hat_validate($form, $form_state) {
 }
 
 /**
- * Trigger Rules etc when a hat is assigned. 
+ * Trigger Rules etc when a hat is assigned.
  */
 function party_hat_party_form_hat_submit($form, &$form_state) {
   $party_unchanged = $form_state['#party_unchanged'];
   $party = $form_state['#party'];
-  
+
   $old_hats = array_keys(party_hat_get_hats($party_unchanged));
   $hats = array_keys(party_hat_get_hats($party));
   $all_hats = array_merge($old_hats, $hats);
-  
+
   $assigned_hats = array();
   $unassigned_hats = array();
   foreach (array_diff($old_hats, $hats) as $hat_name) {
@@ -631,9 +631,9 @@ function party_hat_party_form_hat_submit($form, &$form_state) {
   }
   foreach (array_diff($hats, $old_hats) as $hat_name) {
     $assigned_hats[] = $hat_name;
-  }    
-  unset($hats, $old_hats);  
-  
+  }
+  unset($hats, $old_hats);
+
   //invoke hooks and rules to unassign hats
   if (!empty($unassigned_hats)) {
     if (module_exists('rules')) {
@@ -643,7 +643,7 @@ function party_hat_party_form_hat_submit($form, &$form_state) {
       module_invoke_all('party_hat_unassign_hats', $party, $unassigned_hats);
     }
   }
-  
+
   // invoke hooks and rules to assign hats
   if (!empty($assigned_hats)) {
     if (module_exists('rules')) {

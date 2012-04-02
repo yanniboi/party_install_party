@@ -19,7 +19,7 @@ class contact_handler_contact_operations_field extends views_handler_field {
   function render($values) {
 
     $links = menu_contextual_links('contact', 'admin/content/contacts/contact', array($this->get_value($values, 'contact_id')));
-    
+
     if (!empty($links)) {
       return theme('links', array('links' => $links, 'attributes' => array('class' => array('links', 'inline', 'operations'))));
     }

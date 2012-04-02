@@ -8,13 +8,13 @@
  * The API controller class for the Party Hat entity.
  */
 class PartyHatController extends EntityAPIController {
-  
+
 }
-  
+
 /**
  * The class used for hat entities.
  */
-class PartyHat extends Entity {  
+class PartyHat extends Entity {
   public function __construct($values = array()) {
     parent::__construct($values, 'party_hat');
   }
@@ -25,5 +25,5 @@ class PartyHat extends Entity {
 
   protected function defaultUri() {
     return array('path' => 'party-hat/' . $this->id);
-  }   
+  }
 }

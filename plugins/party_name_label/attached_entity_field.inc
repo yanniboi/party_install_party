@@ -37,11 +37,11 @@ function party_attached_entity_field_label($party) {
     if (!isset($party->data_sets) || !is_array($party->data_sets[$data_set_name])) {
       return "Party" . isset($party->pid) ? ' '.$party->pid: '';
     }
-        
+
     if (!($attached_entity = reset($party->data_sets[$data_set_name]))) {
       return "Party" . isset($party->pid) ? ' '.$party->pid: '';
     }
-    
+
     $entity = $attached_entity->entity;
     $entity_type = $attached_entity->getEntityType();
     $entity_bundle = $attached_entity->getEntityBundle();
@@ -51,15 +51,15 @@ function party_attached_entity_field_label($party) {
     $entity_type = 'party';
     $entity_bundle = $party->type;
   }
-  
+
   $field = field_info_field($field_name);
   $instance = field_info_instance($entity_type, $field_name, $entity_bundle);
-  
+
   $instance['display']['default']['label'] = 'hidden';
-  
+
   // Get the field Items and limit them to one item
   $items = array(reset(field_get_items($entity_type, $entity, $field_name)));
-  
+
   $return = drupal_render(field_default_view($entity_type, $entity, $field, $instance, LANGUAGE_NONE, $items, 'default'));
   $return = strip_tags($return);
   return $return;
@@ -71,20 +71,20 @@ function party_attached_entity_field_label($party) {
 function party_attached_entity_field_options_form($form, &$form_state) {
   $default_data_set = variable_get('party_name_label_data_set', isset($form_state['values']['data_set_name']) ? $form_state['values']['data_set_name'] :'party');
   $default_field = variable_get('party_name_label_field', isset($form_state['values']['field_name']) ? $form_state['values']['field_name'] : FALSE);
-  
+
   // Set the file to be loaded
-  $form_state['build_info']['files'] = array(drupal_get_path('module', 'party'). '/plugins/party_name_label/attached_entity_field.inc'); 
-  
+  $form_state['build_info']['files'] = array(drupal_get_path('module', 'party'). '/plugins/party_name_label/attached_entity_field.inc');
+
   // Get Data Sets
   $sets = party_get_data_set_info();
-  
+
   $options = array(
     'party' => 'Party Entity',
   );
   foreach ($sets as $data_set_name => $definition) {
     $options[$data_set_name] = $definition['label'];
   }
-  
+
   $form['data_set_name'] = array(
     '#type' => 'select',
     '#title' => 'Data Set',
@@ -98,7 +98,7 @@ function party_attached_entity_field_options_form($form, &$form_state) {
       'effect' => 'fade',
     ),
   );
-  
+
   $field_options = array();
   if ($default_data_set == 'party') {
     // Do something to set the bundle
@@ -114,11 +114,11 @@ function party_attached_entity_field_options_form($form, &$form_state) {
       $field_options[$field['field_name']] = $field['label'];
     }
   }
-  
+
   if (empty($field_options)) {
     $field_options[0] = 'No Fields';
   }
-  
+
   $form['field_name'] = array(
     '#type' => 'select',
     '#title' => 'Field',
@@ -128,12 +128,12 @@ function party_attached_entity_field_options_form($form, &$form_state) {
     '#prefix' => '<div id="field-input">',
     '#suffix' => '</div>',
   );
-  
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Submit',
   );
-  
+
   return $form;
 }
 

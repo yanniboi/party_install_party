@@ -16,16 +16,16 @@ class contact_handler_delete_link_field extends contact_handler_link_field {
 
   function render($values) {
     $type = $values->{$this->aliases['type']};
-    
+
     //Creating a dummy contact to check access against
     $dummy_contact = (object) array('type' => $type);
     if (!contact_access('edit', $dummy_contact)) {
       return;
     }
-    
+
     $text = !empty($this->options['text']) ? $this->options['text'] : t('delete');
     $contact_id = $values->{$this->aliases['contact_id']};
-    
+
     return l($text, 'admin/content/contacts/contact/' . $contact_id . '/delete');
   }
 }

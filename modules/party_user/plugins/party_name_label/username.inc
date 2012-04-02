@@ -31,6 +31,6 @@ $plugin = array(
 function party_user_username_label($party) {
   $attached_entity = reset($party->data_sets['user']);
   $user = $attached_entity->entity;
-  
+
   return $user->name;
 }

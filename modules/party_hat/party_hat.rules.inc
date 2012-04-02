@@ -35,7 +35,7 @@ function party_hat_rules_event_info() {
       ),
     ),
   );
-  
+
   return $events;
 }
 
@@ -56,9 +56,9 @@ function party_hat_rules_action_info() {
         'hat_name' => array(
           'type' => 'party_hat_name',
           'label' => t('Hat'),
-          'description' => t('The Hat to Assign'), 
-        ),        
-      ),    
+          'description' => t('The Hat to Assign'),
+        ),
+      ),
       //'access callback' => 'rules_user_integration_access'
       'base' => 'party_hat_rules_assign_hat',
     ),
@@ -74,14 +74,14 @@ function party_hat_rules_action_info() {
         'hat_name' => array(
           'type' => 'party_hat_name',
           'label' => t('Hat'),
-          'description' => t('The Hat to Unassign'), 
-        ),        
-      ),    
+          'description' => t('The Hat to Unassign'),
+        ),
+      ),
       //'access callback' => 'rules_user_integration_access'
       'base' => 'party_hat_rules_unassign_hat',
     ),
   );
-  
+
   return $actions;
 }
 
@@ -94,7 +94,7 @@ function party_hat_rules_assign_hat($party, $hat_name, $settings, $state, $eleme
   $hats = array(
     $hat_name => party_hat_load($hat_name),
   );
-  
+
   party_hat_assign_hats($party, $hats);
 }
 
@@ -107,7 +107,7 @@ function party_hat_rules_unassign_hat($party, $hat_name, $settings, $state, $ele
   $hats = array(
     $hat_name => party_hat_load($hat_name),
   );
-  
+
   party_hat_unassign_hats($party, $hats);
 }
 
@@ -122,13 +122,13 @@ class RulesDataUIPartyHatName extends RulesDataUI implements RulesDataDirectInpu
   public static function inputForm($name, $info, $settings, RulesPlugin $element) {
     // Get a list of all the hats.
     $options = party_hat_options_list();
-    
+
     $form[$name] = array(
-      '#type' => 'select', 
+      '#type' => 'select',
       '#options' => $options,
       '#default_value' => $settings[$name],
       '#required' => empty($info['optional']),
-    );     
+    );
 
     return $form;
   }

@@ -2,7 +2,7 @@
 
 /**
  * Implements hook_entity_info()
- */ 
+ */
 function party_contact_entity_info() {
   $entity['contact'] = array(
     'label' => t('Contact'),
@@ -51,7 +51,7 @@ function party_contact_entity_info() {
       'controller class' => 'ContactTypeUIController',
     ),
   );
-    
+
   return $entity
 }
 
@@ -76,7 +76,7 @@ function contact_entity_info_alter(&$entity_info) {
     );
   }
 }
-  
+
 
 /**
  * Implements hook_permission().
@@ -92,10 +92,10 @@ function contact_permission() {
     'administer contacts' => array(
       'title' => t('Administer contacts'),
       'description' => t('Edit and delete all contacts'),
-    ),  
+    ),
   );
-  
-  //Generate permissions per contact 
+
+  //Generate permissions per contact
   foreach (contact_get_types() as $type) {
     $type_name = check_plain($type->type);
     $permissions += array(
@@ -107,7 +107,7 @@ function contact_permission() {
       ),
     );
   }
-  return $permissions;  
+  return $permissions;
 }
 
 
@@ -177,7 +177,7 @@ function contact_type_load($type) {
 
 
 /**
- * Fetch a contact object. Make sure that the wildcard you choose 
+ * Fetch a contact object. Make sure that the wildcard you choose
  * in the contact entity definition fits the function name here.
  *
  * @param $contact_id
@@ -291,8 +291,8 @@ function contact_page_title(Contact $contact){
  * Sets up content to show an individual contact
  * @todo - get rid of drupal_set_title();
  */
-function contact_page_view($contact, $view_mode = 'full') {    
-  $controller = entity_get_controller('contact');  
+function contact_page_view($contact, $view_mode = 'full') {
+  $controller = entity_get_controller('contact');
   $content = $controller->view(array($contact->contact_id => $contact));
   drupal_set_title($contact->name);
   return $content;
@@ -330,7 +330,7 @@ function contact_theme() {
 
 
   );
-}  
+}
 
 
 /**
@@ -354,7 +354,7 @@ function contact_menu_local_tasks_alter(&$data, $router_item, $root_path) {
  * The class used for contact entities
  */
 class Contact extends Entity {
-  
+
   public function __construct($values = array()) {
     parent::__construct($values, 'contact');
   }
@@ -366,8 +366,8 @@ class Contact extends Entity {
   protected function defaultUri() {
     return array('path' => 'contact/' . $this->contact_id);
   }
-  
-  
+
+
 }
 
 
@@ -375,14 +375,14 @@ class Contact extends Entity {
  * The class used for contact type entities
  */
 class ContactType extends Entity {
-  
+
   public $type;
   public $label;
-  
+
   public function __construct($values = array()) {
     parent::__construct($values, 'contact_type');
   }
-  
+
 }
 
 
@@ -399,7 +399,7 @@ class ContactController extends EntityAPIController {
    * Create a contact - we first set up the values that are specific
    * to our contact schema but then also go through the EntityAPIController
    * function.
-   * 
+   *
    * @param $type
    *   The machine-readable type of the contact.
    *
@@ -408,7 +408,7 @@ class ContactController extends EntityAPIController {
    */
   public function create(array $values = array()) {
     // Add values that are specific to our Contact
-    $values += array( 
+    $values += array(
       'contact_id' => '',
       'is_new' => TRUE,
       'title' => '',
@@ -416,11 +416,11 @@ class ContactController extends EntityAPIController {
       'changed' => '',
       'data' => '',
     );
-    
+
     $contact = parent::create($values);
     return $contact;
   }
-  
+
   /**
    * Overriding the buldContent function to add entity specific fields
    */
@@ -432,7 +432,7 @@ class ContactController extends EntityAPIController {
 
     return $content;
   }
-  
+
 }
 
 
@@ -443,12 +443,12 @@ class ContactTypeController extends EntityAPIControllerExportable {
   public function __construct($entityType) {
     parent::__construct($entityType);
   }
-  
+
    /**
    * Create a contact type - we first set up the values that are specific
    * to our contact type schema but then also go through the EntityAPIController
    * function.
-   * 
+   *
    * @param $type
    *   The machine-readable type of the contact.
    *
@@ -457,7 +457,7 @@ class ContactTypeController extends EntityAPIControllerExportable {
    */
   public function create(array $values = array()) {
     // Add values that are specific to our Contact
-    $values += array( 
+    $values += array(
       'id' => '',
       'is_new' => TRUE,
       'data' => '',

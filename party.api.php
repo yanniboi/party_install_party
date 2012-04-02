@@ -38,7 +38,7 @@
 function hook_party_access($op, $party = NULL, $attached_entity = NULL, $account = NULL) {
 
 }
- 
+
 /**
  * Defines data sets to be used by parties.
  *
@@ -93,7 +93,7 @@ function hook_party_access($op, $party = NULL, $attached_entity = NULL, $account
  */
 function hook_party_data_set_info() {
   $sets = array();
-  
+
   // A user data set.
   $sets['user'] = array(
     'label' => t("User account"),
@@ -233,7 +233,7 @@ function hook_party_admin_columns_info() {
  */
 function party_attach_entity($party, $entity, $data_set_name) {
   $attached_entity = party_get_crm_controller($data_set_name);
-  $attached_entity->setAttachedEntity($entity);  
+  $attached_entity->setAttachedEntity($entity);
   $attached_entity->attach($party);
 }
 
@@ -252,7 +252,7 @@ function party_detach_entity($party, $entity, $data_set_name) {
   /* To Test */
   $attached_entity = party_get_crm_controller($data_set_name);
   $attached_entity->setParty($party);
-  $attached_entity->setAttachedEntity($entity);  
+  $attached_entity->setAttachedEntity($entity);
   $attached_entity->detach();
 }
 

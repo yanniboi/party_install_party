@@ -52,7 +52,7 @@ function hook_party_hat_unassign_hats($party, $hats) {
 function party_hat_assign_hats($party, $hats) {
   // Get the hat items from the party object
   $hat_items = field_get_items('party', $party, 'party_hat');
-  
+
   foreach ($hats as $hat) {
     $has_hat = FALSE;
     foreach ($hat_items as $item) {
@@ -60,19 +60,19 @@ function party_hat_assign_hats($party, $hats) {
         $has_hat = TRUE;
       }
     }
-    
+
     // Don't add the hat if the Party already has it
     if ($has_hat) {
       continue;
     }
-    
+
     $assigned_hats[$hat->name] = $hat;
-    $hat_items[]['hat_name'] = $hat->name;   
+    $hat_items[]['hat_name'] = $hat->name;
   }
-  
+
   $party->party_hat[LANGUAGE_NONE] = $hat_items;
   party_save($party);
-  
+
   if (module_exists('rules') {
     rules_invoke_all('party_hat_assign_hats', $party, $assigned_hats);
   }
@@ -91,7 +91,7 @@ function party_hat_assign_hats($party, $hats) {
 function party_hats_unassign_hats($party, $hats) {
   // Get the hat items from the party object
   $hat_items = field_get_items('party', $party, 'party_hat');
-  
+
   foreach ($hats as $hat) {
     $has_hat = FALSE;
     foreach ($hat_items as $delta => $item) {
@@ -100,18 +100,18 @@ function party_hats_unassign_hats($party, $hats) {
         unset($hat_items[$delta]);
       }
     }
-    
+
     // Don't remove the hat if its not assigned
     if (!$has_hat) {
       continue;
-    }    
+    }
     $unassigned_hats[$hat->name] = $hat;
-       
+
   }
-  
+
   $party->party_hat[LANGUAGE_NONE] = $hat_items;
   party_save($party);
-  
+
   if (module_exists('rules') {
     rules_invoke_all('party_hat_unassign_hats', $party, $unassigned_hats);
   }
@@ -119,4 +119,3 @@ function party_hats_unassign_hats($party, $hats) {
     module_invoke_all('party_hat_unassign_hats', $party, $unassigned_hats);
   }
 }
- 

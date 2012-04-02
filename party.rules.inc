@@ -5,8 +5,8 @@
 function party_rules_data_info() {
   return array(
     'party' => array(
-      'label' => t('party'), 
-      'parent' => 'entity', 
+      'label' => t('party'),
+      'parent' => 'entity',
       'group' => t('Party'),
     ),
   );
@@ -67,22 +67,22 @@ function party_rules_action_info() {
         'save' => TRUE,
       ),
       'entity' => array(
-        'type' => 'entity', 
-        'label' => t('Entity'), 
-        'description' => t('The Entity to attach to the Party'), 
+        'type' => 'entity',
+        'label' => t('Entity'),
+        'description' => t('The Entity to attach to the Party'),
         'restriction' => 'selector',
-        'wrapped' => TRUE,        
+        'wrapped' => TRUE,
       ),
       'data_set_name' => array(
         'type' => 'text',
         'label' => t('Data Set Name'),
-        'description' => t('The Data Set definition for this entity'), 
-      ),        
-    ),    
+        'description' => t('The Data Set definition for this entity'),
+      ),
+    ),
     //'access callback' => 'rules_user_integration_access'
     'base' => 'party_rules_attach_entity',
   );
-  
+
   $items['party_detach_entity'] = array(
     'label' => t('Detach an Entity from a Party'),
     'group' => t('Party'),
@@ -93,22 +93,22 @@ function party_rules_action_info() {
         'save' => TRUE,
       ),
       'entity' => array(
-        'type' => 'entity', 
-        'label' => t('Entity'), 
-        'description' => t('The Entity to detach from the Party'), 
+        'type' => 'entity',
+        'label' => t('Entity'),
+        'description' => t('The Entity to detach from the Party'),
         'restriction' => 'selector',
-        'wrapped' => TRUE,        
+        'wrapped' => TRUE,
       ),
       'data_set_name' => array(
         'type' => 'text',
         'label' => t('Data Set Name'),
-        'description' => t('The Data Set definition for this entity'), 
-      ),        
-    ),    
+        'description' => t('The Data Set definition for this entity'),
+      ),
+    ),
     //'access callback' => 'rules_user_integration_access'
     'base' => 'party_rules_attach_entity',
   );
-  
+
   return $items;
 }
 
@@ -119,7 +119,7 @@ function party_rules_action_info() {
  */
 function party_rules_attach_entity($party, $wrapper, $data_set_name, $settings, $state, $element) {
   $entity = $wrapper->value();
- 
+
   party_attach_entity($party, $entity, $data_set_name);
 }
 
@@ -128,6 +128,6 @@ function party_rules_attach_entity($party, $wrapper, $data_set_name, $settings, 
  */
 function party_rules_detach_entity($party, $wrapper, $data_set_name, $settings, $state, $element) {
   $entity = $wrapper->value();
-  
+
   party_detach_entity($party, $entity, $data_set_name);
 }

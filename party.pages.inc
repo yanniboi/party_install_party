@@ -12,7 +12,7 @@
  */
 function party_page_view($party, $view_mode = 'full') {
   global $user;
-  
+
   $party->content = array();
   $build = array();
 
@@ -45,12 +45,12 @@ function party_add($type = '') {
     $build['add_list'] = array(
       '#theme' => 'item_list',
       '#type' => 'item_list',
-      '#items' => array( 
+      '#items' => array(
         l(t('Add Individual'), 'party/add/individual')."<div class=\"description\">Add an individual party</div>",
         l(t('Add Organisation'), 'party/add/organisation')."<div class=\"description\">Add an organisation party</div>",
       ),
     );
-    
+
     return $build;
   }
 
@@ -67,7 +67,7 @@ function party_add($type = '') {
  */
 function party_edit_form($form, &$form_state, $party) {
   $form['#party'] = $party;
-  
+
   if (isset($party->pid)) {
     $form['pid'] = array(
       '#type' => 'value',
@@ -85,31 +85,31 @@ function party_edit_form($form, &$form_state, $party) {
   $form_state['#party'] = $party;
   $form_state['#party_unchanged'] = $party; // So that other modules can react to changes. Must be a better way
   $form_state['#attached_entities'] = array();
-  
+
   $data_sets = party_get_party_data_sets($party);
-  
+
   foreach ($data_sets as $data_set) {
     $attached_entities = array();
     if (isset($party->pid)) {
       $attached_entities = party_get_attached_entities($party, $data_set);
     }
-    
+
     if (count($attached_entities) < 1) {
       $attached_entity = party_get_crm_controller($data_set);
       $attached_entity->createAttachedEntity();
       $attached_entity->setParty($party);
       $attached_entities[$attached_entity->hash()] = $attached_entity;
-    }    
-    
+    }
+
     $form_state['#attached_entities'] = array_merge($form_state['#attached_entities'], $attached_entities);
   }
-  // Everything between the last @todo and here needs to be in a hook so that other modules can change it.  
-  
+  // Everything between the last @todo and here needs to be in a hook so that other modules can change it.
+
   $form['#validate'][] = 'party_edit_form_validate';
   $form['#submit'][] = 'party_edit_form_submit';
-  
+
   party_attached_entity_attach_form($form, $form_state);
-  
+
   field_attach_form('party', $party, $form, $form_state);
 
   $form['submit'] = array(
@@ -117,14 +117,14 @@ function party_edit_form($form, &$form_state, $party) {
     '#value' => t('Save'),
     '#weight' => 99,
   );
-  
+
  $form['#submit'][] = 'party_edit_form_save';
   return $form;
 }
 
 /**
  * Validate the Party Edit Form
- * 
+ *
  * @todo: Add validation for all the attached entities
  */
 function party_edit_form_validate($form, &$form_state) {
@@ -137,7 +137,7 @@ function party_edit_form_validate($form, &$form_state) {
  *
  * This is split into 3 sections:
  *  - party_edit_form_submit - builds the Party object and attaches field values
- *  - party_attached_entity_attach_form_submit - saves all the attached entities and adds them to 
+ *  - party_attached_entity_attach_form_submit - saves all the attached entities and adds them to
  *    the party->data_sets array
  *  - party_edit_form_save - attaches all the attached entities and saves the party
  * This decision was made so that plugins could use all of the party data available when deciding on the name
@@ -146,9 +146,9 @@ function party_edit_form_validate($form, &$form_state) {
 function party_edit_form_submit($form, &$form_state) {
   $party = $form_state['#party'];
   field_attach_submit('party', $party, $form, $form_state);
-  
+
   $party->data_sets = array();
-  
+
   $form_state['#party'] = $party;
 }
 
@@ -160,14 +160,14 @@ function party_edit_form_submit($form, &$form_state) {
 function party_edit_form_save($form, &$form_state) {
   $party = $form_state['#party'];
   $party = party_save($party);
-  
+
   // Attach all the various entities
   foreach ($party->data_sets as $attached_entities) {
     foreach ($attached_entities as $attached_entity) {
       $attached_entity->attach($party);
     }
   }
-  
+
   $form_state['redirect'] = 'party/' . $party->pid;
 }
 
@@ -214,7 +214,7 @@ function party_page_view_piece_views($party, $view_name, $view_display_id) {
 function party_attached_entity_edit_form($form, &$form_state, $party, $data_set, $eid = NULL) {
   $attached_entity = party_get_crm_controller($data_set['set_name']);
   $attached_entity->setParty($party->pid);
-  
+
   if ($eid !== NULL) {
     $attached_entity->setAttachedEntity($eid);
     drupal_set_title("Edit Data Set: " . $attached_entity->entity->label);
@@ -223,17 +223,17 @@ function party_attached_entity_edit_form($form, &$form_state, $party, $data_set,
     drupal_set_title("Add {$attached_entity->definition['label']} Data Set to {$party->label}");
     $attached_entity->createAttachedEntity();
   }
-  
+
   //Build form
   if (!isset($form_state['#attached_entities'][$attached_entity->hash()])) {
     $form_state['#attached_entities'][$attached_entity->hash()] = $attached_entity;
   }
-  
+
   $form['#submit'][] = 'party_attached_entity_edit_form_submit';
   $form_state['#party'] = $attached_entity->party;
-  
-  party_attached_entity_attach_form($form, $form_state); 
-  
+
+  party_attached_entity_attach_form($form, $form_state);
+
   /*if (!$attached_entity_controller->definition['singleton']) {
     $form['data-set-main'] = array(
       '#type' => 'checkbox',
@@ -247,7 +247,7 @@ function party_attached_entity_edit_form($form, &$form_state, $party, $data_set,
     '#value' => t('Save'),
     '#weight' => 99,
   );
-  
+
   return $form;
 }
 
@@ -262,15 +262,15 @@ function party_attached_entity_edit_form_validate($form, &$form_state) {
  * Submit handler for the data set edit form.
  */
 function party_attached_entity_edit_form_submit($form, &$form_state) {
-  
-  /*   
+
+  /*
   $options = array(
     'main' => $form_state['values']['data-set-main'],
   );
   $attached_entity_controller->attach($attached_entity_controller->party, $options); */
-  
+
   $attached_entity_controller = reset($form_state['#attached_entities']);
-  
+
   // Redirect to the set piece.
   $form_state['redirect'] = 'party/' . $attached_entity_controller->pid . '/' . $attached_entity_controller->definition['path element'];
 }
@@ -301,7 +301,7 @@ function party_attached_entity_remove_confirm($form, &$form_state, $party, $data
  * The data set remove submit
  */
 function party_attached_entity_remove_confirm_submit($form, &$form_state) {
-  $form_state['#attached_entity']->detach();  
+  $form_state['#attached_entity']->detach();
   $form_state['redirect'] = 'party/' . $form_state['#attached_entity']->party->pid;
 }
 
@@ -328,7 +328,7 @@ function party_view_data_set($party, $data_set_name) {
     $view_mode = $data_set['view mode'];
     $build[$data_set_name . '_' . $crm_controller->delta]['view'] = $crm_controller->display($view_mode);
   }
-  
+
   if (!isset($data_set['max cardinality']) || count($attached_entity_controllers) < $data_set['max cardinality']) {
     $build[$data_set_name . '_links'] = array(
       '#theme' => 'links',
@@ -342,6 +342,6 @@ function party_view_data_set($party, $data_set_name) {
       '#weight' => 1,
     );
   }
-  
+
   return $build;
 }

@@ -30,12 +30,12 @@ function party_attached_entity_from_party_context($context, $conf) {
   if (empty($context->data)) {
     return ctools_context_create_empty('entity:'.$entity_type, NULL);
   }
-  
-  // Load attached entity from party ID 
+
+  // Load attached entity from party ID
   // @todo: Do this without loading all the entities? For performance?
   $attached_entities = party_get_attached_entities($context->data, $conf['data_set_name']);
   $attached_entity = array_shift($attached_entities);
-  
+
   if ($attached_entity !== NULL) {
     $entity = $attached_entity->entity;
     return ctools_context_create('entity:'.$entity_type, $entity);

@@ -10,18 +10,18 @@
 function party_hat_exportable_schema_fields() {
   return array(
     'status' => array(
-      'type' => 'int', 
+      'type' => 'int',
       'not null' => TRUE,
       // Set the default to ENTITY_CUSTOM without using the constant as it is
-      // not safe to use it at this point. 
-      'default' => 0x01, 
-      'size' => 'tiny', 
+      // not safe to use it at this point.
+      'default' => 0x01,
+      'size' => 'tiny',
       'description' => 'The exportable status of the entity.',
-    ), 
+    ),
     'module' => array(
-      'description' => 'The name of the providing module if the entity has been defined in code.', 
-      'type' => 'varchar', 
-      'length' => 255, 
+      'description' => 'The name of the providing module if the entity has been defined in code.',
+      'type' => 'varchar',
+      'length' => 255,
       'not null' => FALSE,
     ),
   );
@@ -63,7 +63,7 @@ function party_hat_install() {
       ),
     );
     field_create_instance($instance);
-    
+
     $instance = array(
       'field_name' => 'party_hat',
       'entity_type' => 'party',
@@ -129,7 +129,7 @@ function party_hat_schema() {
     ) + party_hat_exportable_schema_fields(),
     'primary key' => array('hid'),
   );
-  
+
   // Store data set settings for hats
   $schema['party_hat_data_set_rules'] = array(
     'description' => 'Store data set settings for hats',

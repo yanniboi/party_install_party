@@ -9,7 +9,7 @@
 /**
  * Implements hook_views_data()
  */
-function contact_views_data_alter(&$data) { 
+function contact_views_data_alter(&$data) {
   $data['contact']['link_contact'] = array(
     'field' => array(
       'title' => t('Link'),
@@ -58,7 +58,7 @@ function contact_views_default_views() {
   $view->core = 7;
   $view->api_version = '3.0-alpha1';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
-  
+
   /* Display: Master */
   $handler = $view->new_display('default', 'Master', 'default');
   $handler->display->display_options['title'] = 'Contacts';
@@ -176,7 +176,7 @@ function contact_views_default_views() {
   $handler->display->display_options['fields']['operations']['element_default_classes'] = 1;
   $handler->display->display_options['fields']['operations']['hide_empty'] = 0;
   $handler->display->display_options['fields']['operations']['empty_zero'] = 0;
-  
+
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'contacts_admin_page');
   $handler->display->display_options['path'] = 'admin/content/contacts/list';

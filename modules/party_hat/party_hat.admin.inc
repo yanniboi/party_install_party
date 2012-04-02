@@ -12,7 +12,7 @@ function party_hat_manage() {
     ->fields('ph')
     ->execute()
     ->fetchAllAssoc('hid');
-  
+
   $header = array(t('Hat'), array(
     'data' => t('Operations'),
     'colspan' => '2',
@@ -25,17 +25,17 @@ function party_hat_manage() {
     )));
     $row[] = array('data' => l(t('edit'), 'admin/community/hats/' . $hat->name . '/edit'));
     $row[] = array('data' => l(t('delete'), 'admin/community/hats/' . $hat->name . '/delete'));
-    
+
     $rows[] = $row;
   }
-  
+
   $build['hat_table'] = array(
     '#theme' => 'table',
     '#header' => $header,
     '#rows' => $rows,
     '#empty' => t('No hats have been defined. <a href="@link">Add a hat</a>', array('@link' => url('admin/community/hats/add'))),
   );
-  
+
   return $build;
 }
 
@@ -44,7 +44,7 @@ function party_hat_manage() {
  */
 function party_hat_add() {
   $hat = new stdClass();
-  return drupal_get_form('party_hat_edit_form', $hat); 
+  return drupal_get_form('party_hat_edit_form', $hat);
 }
 
 /**
@@ -55,7 +55,7 @@ function party_hat_add() {
  */
 function party_hat_edit_form($form, &$form_state, $hat) {
   $form['#hat'] = $hat;
-  
+
   if (isset($hat->hid)) {
     $form['hid'] = array(
       '#type' => 'hidden',
@@ -64,14 +64,14 @@ function party_hat_edit_form($form, &$form_state, $hat) {
     // @todo missing t().
     drupal_set_title('Edit hat: ' . $hat->label);
   }
-  
+
   $form['label'] = array(
     '#type' => 'textfield',
     '#title' => t('Hat name'),
     '#required' => TRUE,
     '#default_value' => isset($hat->label) ? $hat->label : '',
   );
-  
+
   $form['name'] = array(
     '#type' => 'machine_name',
     '#title' => t('Hat machine name'),
@@ -83,7 +83,7 @@ function party_hat_edit_form($form, &$form_state, $hat) {
     ),
     '#disabled' => isset($hat->name),
   );
-  
+
   $party_types = party_get_party_types();
   $options = array();
   foreach ($party_types as $name => $type) {
@@ -99,7 +99,7 @@ function party_hat_edit_form($form, &$form_state, $hat) {
   );
 
   field_attach_form('party_hat', $hat, $form, $form_state);
-  
+
   $form['required'] = array(
     '#type' => 'checkbox',
     '#title' => t('Required'),
@@ -107,7 +107,7 @@ function party_hat_edit_form($form, &$form_state, $hat) {
     '#description' => 'Whether (individual) parties require this hat.',
     '#weight' => 1,
   );
-  
+
   $form['data_set_rules'] = array(
     '#type' => 'fieldset',
     '#title' => t('Data rules'),
@@ -116,7 +116,7 @@ function party_hat_edit_form($form, &$form_state, $hat) {
     '#tree' => TRUE,
     '#theme' => 'crm_hat_data_set_rules_form',
   );
-  
+
   foreach (party_get_data_set_info() as $type => $set) {
     // Get the rule.
     if (isset($hat->name)) {
@@ -130,7 +130,7 @@ function party_hat_edit_form($form, &$form_state, $hat) {
     else {
       $default = array('has' => 0, 'multiple' => 0);
     }
-    
+
     $form['data_set_rules'][$type] = array(
       '#type' => 'checkboxes',
       '#title' => t($set['label']),
@@ -141,7 +141,7 @@ function party_hat_edit_form($form, &$form_state, $hat) {
         'has'   => t('Has'),
         'multiple'  => t('Can have Multiple'),
       ),
-    );      
+    );
   }
 
   $form['data_set_access'] = array(
@@ -151,29 +151,29 @@ function party_hat_edit_form($form, &$form_state, $hat) {
     '#weight' => 5,
     '#tree' => TRUE,
   );
-  
+
   $form['data_set_access']['placeholder'] = array(
     '#markup' => '<i>This is a placeholder, in future hats will be able to define who can see the data of the party they\'re attached too</i>',
   );
-  
+
   $form['party_piece_settings'] = array(
     '#type' => 'fieldset',
     '#title' => t('Party piece settings'),
     '#weight' => 10,
     '#tree' => true,
   );
-  
+
   $form['party_piece_settings']['placeholder'] = array(
     '#markup' => '<i>This is a placeholder, in future hats will be able to define party pieces that can have views & data sets inside them.</i>',
   );
-  
+
   $form['associated_roles'] = array(
     '#type' => 'fieldset',
     '#title' => t('Associated roles'),
     '#weight' => 20,
     '#tree' => true,
   );
-  
+
   $form['associated_roles']['placeholder'] = array(
     '#markup' => '<i>This is a placeholder, in future hats will be able to define associated roles that get added to the User when this hat is assigned to the party</i>',
   );
@@ -184,7 +184,7 @@ function party_hat_edit_form($form, &$form_state, $hat) {
     '#weight' => 99,
   );
 
-  return $form;  
+  return $form;
 }
 
 /**
@@ -242,10 +242,10 @@ function party_hat_edit_form_submit($form, &$form_state) {
   $hat->data['party_types'] = array_filter($hat->data['party_types']);
 
   party_hat_save($hat);
-  field_attach_submit('party_hat', $hat, $form, $form_state); 
-  
+  field_attach_submit('party_hat', $hat, $form, $form_state);
+
   // @todo: fix this with the new values.
-  
+
   foreach ($form_state['values']['data_set_rules'] as $type => $values) {
     // convert to a 1/0 column. There must be a better way! It probably involves having two different checkboxes
     foreach ($values as $key => $var) {
@@ -255,8 +255,8 @@ function party_hat_edit_form_submit($form, &$form_state) {
     }
     party_hat_set_data_set_rule($hat->name, $type, $values);
   }
-  
-  //$form_state['redirect'] = 'admin/community/hats';  
+
+  //$form_state['redirect'] = 'admin/community/hats';
 }
 
 /**
@@ -275,27 +275,27 @@ function party_hat_delete_form($form, &$form_state, $hat) {
     '#type' => 'hidden',
     '#value' => $hat->hid,
   );
-  
+
   $form['description'] = array(
     '#markup' => 'Are you shure you want to delete ' . $hat->label . '?',
   );
-  
+
   $form['actions'] = array(
     '#type' => 'actions',
   );
-  
+
   $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Delete',
   );
-  
+
   $form['actions']['cancel'] = array(
     '#type' => 'link',
     '#title' => 'Cancel',
     '#href' => 'admin/community/hats',
   );
 
-  return $form;  
+  return $form;
 }
 
 /**
@@ -305,4 +305,3 @@ function party_hat_delete_form_submit($form, &$form_state) {
   entity_delete('party_hat', $form_state['values']['hat_id']);
   $form_state['redirect'] = 'admin/community/hats';
 }
- 

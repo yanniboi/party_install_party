@@ -9,7 +9,7 @@
  * The API controller class for the Party entity.
  */
 class PartyController extends EntityAPIController {
-  
+
   /**
    * Save a party.
    *
@@ -51,7 +51,7 @@ class PartyController extends EntityAPIController {
       $party->label = $label;
     }
   }
-  
+
   /**
    * Overriding the buildContent function to add entity specific fields.
    */
@@ -60,12 +60,12 @@ class PartyController extends EntityAPIController {
     return $content;
   }
 }
-  
+
 /**
  * The class used for model entities.
  */
 class Party extends Entity {
-  
+
   public function __construct($values = array()) {
     parent::__construct($values, 'party');
   }
@@ -76,5 +76,5 @@ class Party extends Entity {
 
   protected function defaultUri() {
     return array('path' => 'party/' . $this->id);
-  }   
+  }
 }

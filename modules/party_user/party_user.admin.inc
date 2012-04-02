@@ -17,7 +17,7 @@ function party_user_settings_form($form, &$form_state) {
   foreach (party_get_party_types() as $type => $def) {
     $options[$type] = $def['label'];
   }
-  
+
   $form['register_party_type'] = array(
     '#type' => 'select',
     '#title' => 'Type of party to create when a User Registers',
@@ -31,27 +31,27 @@ function party_user_settings_form($form, &$form_state) {
       $options[$data_set_name] = $def['label'];
     }
   }
-  
+
   $form['registration_data_sets'] = array(
     '#type' => 'checkboxes',
     '#options' => $options,
     '#title' => 'Data Sets to show on User Registration form',
     '#default_value' => variable_get('party_user_registration_data_sets', array()),
-  );    
-  
+  );
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Submit',
     '#weight' => 40,
   );
-  
+
   return $form;
 }
 
 function party_user_settings_form_submit($form, &$form_state) {
   variable_set('party_user_create_on_register', ($form_state['values']['create_on_register'] == 1));
   variable_set('party_user_register_party_type', $form_state['values']['register_party_type']);
-  
+
   $registration_data_sets = $form_state['values']['registration_data_sets'];
   foreach ($registration_data_sets as $key => $var) {
     if ($var === 0) {
@@ -74,7 +74,7 @@ function party_user_sync_form($form, &$form_state) {
     '#type' => 'submit',
     '#value' => 'Synchronise Users',
   );
-  
+
   return $form;
 }
 
@@ -85,7 +85,7 @@ function party_user_sync_form_submit($form, &$form_state) {
     ->condition('uid', 0, '<>')
     ->execute()
     ->fetchAllAssoc('uid', PDO::FETCH_ASSOC);
-  
+
   $batch = array(
     'operations' => array(),
     'finished' => 'party_user_sync_finished',
@@ -95,12 +95,12 @@ function party_user_sync_form_submit($form, &$form_state) {
     'error_message' => t('User Sync Encountered an Error'),
     'file' => drupal_get_path('module', 'party_user') . '/party_user.batch.inc',
   );
-  
+
   foreach ($users as $user) {
     $batch['operations'][] = array('party_user_batch_user_sync', array($user, array('type' => 'individual')));
   }
-  
+
   batch_set($batch);
-  
+
   $form_state['redirect'] = 'admin/config/party/user/sync';
 }

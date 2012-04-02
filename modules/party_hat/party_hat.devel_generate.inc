@@ -11,7 +11,7 @@ function party_hat_devel_generate($object, $field, $instance, $bundle) {
 
 function _party_hat_devel_generate($object, $field, $instance, $bundle) {
   $object_field = array();
-  
+
   // Get All hats
   $hats = party_hat_get_all_hats();
   $id = array_rand($hats);

@@ -55,25 +55,25 @@ function party_type_form($form, &$form_state, $type) {
   foreach ($data_sets as $data_set_name => $def) {
     $options[$data_set_name] = $def['label'];
   }
-  
+
   $form['type'] = array(
     '#type' => 'value',
     '#value' => $type,
   );
- 
+
   $form['required_data_sets'] = array(
     '#type' => 'checkboxes',
     '#options' => $options,
     '#title' => 'Required Data Sets',
     '#default_value' => $required_data_sets,
   );
-  
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Submit',
     '#weight' => 40,
   );
-  
+
   return $form;
 }
 
@@ -99,11 +99,11 @@ function party_admin($callback_arg = '') {
   $op = (isset($_POST['op'])) ? $_POST['op'] : $callback_arg;
 
   switch ($op) {
-    default: 
+    default:
       //$build['party_filter_form'] = drupal_get_form('party_filter_form');
       $build['party_admin_form'] = drupal_get_form('party_admin_form');
   }
-  
+
   return $build;
 }
 
@@ -121,10 +121,10 @@ function party_admin_form() {
     'label' => array('data' => t('Label'), 'field' => 'cp.label'),
     'type' => array('data' => t('Party type'), 'field' => 'cp.type'),
   );
-  
+
   $query = db_select('party','cp');
   $query->condition('cp.pid', 0, '<>');
-  
+
   $count_query = clone $query;
   $count_query->addExpression('COUNT(cp.pid)');
 
@@ -135,7 +135,7 @@ function party_admin_form() {
     ->orderByHeader($header)
     ->setCountQuery($count_query);
   $result = $query->execute();
-    
+
   // This gives us the bulk operations form element
   $form['options'] = array(
     '#type' => 'fieldset',
@@ -207,7 +207,7 @@ function party_admin_form() {
  */
 function party_data_set_admin() {
   $data_sets = party_get_data_set_info();
-  
+
   $header = array(
     0 => t('Data set name'),
     1 => array(
@@ -215,30 +215,30 @@ function party_data_set_admin() {
       'colspan' => '6',
     ),
   );
-  
+
   $rows = array();
   foreach ($data_sets as $key => $data_set) {
     $name = check_plain($data_set['label']);
     $name .= ' <small>' . t('(Machine name: @set-name)', array('@set-name' => $key)) . '</small>';
     $ops = array('edit', 'manage fields', 'manage display', 'clone', 'export', 'delete');
-    
+
     $row = array($name);
     foreach ($ops as $op) {
       $row[] = array(
         'data' => isset($data_set['admin'][$op]) ? l($op, $data_set['admin'][$op], array('query' => array('destination' => 'admin/community/datasets'))) : '',
       );
     }
-    
+
     $rows[] = $row;
   }
-  
+
   $build['dataset_table'] = array(
     '#theme' => 'table',
     '#header' => $header,
     '#rows' => $rows,
     '#empty' => t('No data sets available'),
   );
-  
+
   return $build;
 }
 
@@ -283,7 +283,7 @@ function party_settings_label_plugin_form($form, &$form_state) {
  */
 function party_settings_label_plugin_form_submit($form, &$form_state) {
   variable_set('party_name_label_plugin', $form_state['values']['label']);
-  
+
   $form_state['redirect'] = 'admin/config/party/labels/' . $form_state['values']['label'];
 }
 
@@ -293,9 +293,9 @@ function party_settings_label_plugin_form_submit($form, &$form_state) {
 function party_settings_label_plugin_config_page($plugin_id) {
   // Get the label plugin.
   ctools_include('plugins');
-  
+
   $label_plugin = ctools_get_plugins('party', 'party_name_label', $plugin_id);
-  
+
   if (isset($label_plugin['options form callback'])) {
     return drupal_get_form($label_plugin['options form callback']);
   }

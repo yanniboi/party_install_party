@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * @file
  * Define pages needed for the party_profile module
@@ -12,7 +12,7 @@ function party_profile_party_view_profile_set($party, $profile_type) {
 
   // Load the profiles in this data set.
   $sets = EntityDefaultPartyController::getInstances("profile2_" . $profile_type, $party);
-  
+
   // Output each profile provided the user has view access.
   foreach ($sets as $set) {
     $profile = $set->entity;
