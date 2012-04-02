@@ -430,18 +430,8 @@ function party_data_set_load($data_set_url_string) {
 }
 
 /**
- * Determines whether the party may attach the given entity.
- *
- * Unlike core Drupal access systems which are all about whether the current
- * user may perform an action, this function is also about whether the current
- * party may have actions performed upon it.
- * For example, this function answers questions such as: 'can party P have an
- * entity attached to it as part of data set D?', in addition to user-focussed
- * questions such as 'can user U view the attached entity E belonging to
- * party P?'.
- *
- * @todo: Much of this remains to be written.
- * @todo: Write tests!
+ * Determines whether operations are permissable on a Party and it's
+ * attached entities.
  *
  * @param $op
  *   The operation being performed.

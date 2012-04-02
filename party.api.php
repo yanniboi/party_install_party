@@ -18,24 +18,36 @@
  *
  * @param $op
  *   The operation being performed.
+ *   Currently one of:
+ *    - 'view': Whether the user may view the given party or data set.
+ *    - 'edit': Whether the user may edit the given party or data set.
+ *    - 'attach': Whether the user may attach the given data set to the
+ *      party.
+ *    - 'detach': Whether the user may detach the given data set from the
+ *      party.
+ *    - 'create': Whether the user may create a party of the type given by
+ *      $party->type.
  * @param $party
  *   A party to check access for.
- * @param $attached_entity
- *   (optional) An attached entity to check access for. If nothing is given,
- *   access for just the party itself is determined.
+ * @param $data_set
+ *   (optional) A dataset definition to check access for. If nothing is given,
+ *    access for just the party itself is determined.
  * @param $account
- *   (optional) The user to check for. If no account is passed, access is
+ *   (optional) The user to check for. Omit to check for the global user.
  *   determined for the global user.
  *
  * @return boolean
  *   Return TRUE to grant access, FALSE to explicitly deny access. Return NULL
- *   or nothing to not affect the operation.
- *   Access is granted as soon as a module grants access and no one denies
- *   access. Thus if no module explicitly grants access, access will be denied.
+ *   or nothing to not affect the operation. The return values of each
+ *   implentation of this hook are collected and analysed:
+ *   - If an implementation returns FALSE access is always denied.
+ *   - If no implementations return FALSE and atleast one implementation
+ *     returns TRUE access is granted.
+ *   - If all implementations return NULL, access is denied.
  *
  * @see party_access()
  */
-function hook_party_access($op, $party = NULL, $attached_entity = NULL, $account = NULL) {
+function hook_party_access($op, $party = NULL, $data_set = NULL, $account = NULL) {
 
 }
 
