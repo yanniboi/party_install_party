@@ -223,8 +223,8 @@ function party_menu() {
     $piece += array(
       'type' => MENU_LOCAL_TASK,
       // Make this explicit so it overrides the parent.
-      'access callback' => 'party_access',
-      'access arguments' => array('view', 1),
+      'access callback' => 'user_access',
+      'access arguments' => array('view contacts'),
       // @todo: change this to use party_access().
       // we'll need a dataset loader. @see @todo in party_profile_party_data_set_info().
       //'access arguments' => array('view', 1),
@@ -232,18 +232,35 @@ function party_menu() {
     $items["party/%party/$path"] = $piece;
   }
 
+  $items['party/%party/party'] = array(
+    'title' => 'Overview',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'access callback' => 'party_access',
+    'access arguments' => array('view', 1),
+    'page callback' => 'party_page_view',
+    'page arguments' => array(1),
+    'file' => 'party.pages.inc',
+    'weight' => -20,
+  );
+
   // This is temporary until I figure out a neat way to do tabs below pieces.
   $items['party/%party/party/view'] = array(
     'title' => 'View',
+    'page callback' => 'party_page_view',
+    'page arguments' => array(1),
+    'file' => 'party.pages.inc',
     'type' => MENU_DEFAULT_LOCAL_TASK,
-  ) + $items['party/%party/party'];
+    'access callback' => TRUE,
+  );
 
   $items['party/%party/party/edit'] = array(
     'title' => 'Edit',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('party_edit_form', 1),
+    'access callback' => 'party_access',
+    'access arguments' => array('edit', 1),
     'file' => 'party.pages.inc',
-    'access arguments' => array('edit contacts'),
+    'access callback' => TRUE,
     'type' => MENU_LOCAL_TASK,
   );
   // End temporary.
@@ -253,23 +270,24 @@ function party_menu() {
   $items['party/%party/%party_data_set/edit/%'] = array(
     'page callback' => 'drupal_get_form',
     'page arguments' => array('party_attached_entity_edit_form', 1, 2, 4),
-    'access callback' => TRUE, // todo
-    'access arguments' => array('edit contacts'),
+    'access callback' => 'party_access',
+    'access arguments' => array('edit', 1, 2),
     'file' => 'party.pages.inc',
   );
   // Detach an attached entity
   $items['party/%party/%party_data_set/remove/%'] = array(
     'page callback' => 'drupal_get_form',
     'page arguments' => array('party_attached_entity_remove_confirm', 1, 2, 4),
-    'access callback' => TRUE, // todo
+    'access callback' => 'party_access',
+    'access arguments' => array('detach', 1, 2),
     'file' => 'party.pages.inc',
   );
   // Add an attached entity
   $items['party/%party/%party_data_set/add'] = array(
     'page callback' => 'drupal_get_form',
     'page arguments' => array('party_attached_entity_edit_form', 1, 2),
-    'access callback' => TRUE, // todo
-    'access arguments' => array('edit contacts'),
+    'access callback' => 'party_access',
+    'access arguments' => array('attach', 1, 2),
     'file' => 'party.pages.inc',
   );
 
@@ -428,19 +446,22 @@ function party_data_set_load($data_set_url_string) {
  * @param $op
  *   The operation being performed.
  *   Currently one of:
- *    - 'view': Whether the user may view the given party or attached entity.
+ *    - 'view': Whether the user may view the given party or data set.
+ *    - 'edit': Whether the user may edit the given party or data set.
+ *    - 'attach': Whether the user may attach the given data set to the
+ *      party.
+ *    - 'detach': Whether the user may detach the given data set from the
+ *      party.
  *    - 'create': Whether the user may create a party of the type given by
  *      $party->type.
- *    - 'attach': Whether the party may attach an entity in the given data set.
  *   @todo: consider distinguishing $op values for solo party vs attached
  *   entity, eg 'view attached' / 'view', so that we don't have to keep mucking
  *   about testing isset($attached_entity).
  * @param $party
  *   A party to check access for.
- * @param $attached_entity
- *   (optional) An attached entity to check access for, or a dataset name if the
- *   $op is 'create'. If nothing is given, access for just the party itself is
- *   determined.
+ * @param $data_set
+ *   (optional) A dataset name or full definition to check access for. If
+ *   nothing is given, access for just the party itself is determined.
  * @param $account
  *   (optional) The user to check for. Omit to check for the global user.
  *
@@ -450,14 +471,19 @@ function party_data_set_load($data_set_url_string) {
  * @see hook_party_access()
  * @see party_party_access()
  */
-function party_access($op, $party = NULL, $attached_entity = NULL, $account = NULL) {
+function party_access($op, $party = NULL, $data_set = NULL, $account = NULL) {
   // Let the admin through when there's no attached entity being considered.
-  if (!isset($attached_entity) && user_access('administer parties', $account)) {
+  if (!isset($data_set) && user_access('administer parties', $account)) {
     return TRUE;
   }
 
+  // If we've been passed a data set name we change it into an array.
+  if (isset($data_set) && is_string($data_set)) {
+    $data_set = party_get_data_set_info($data_set);
+  }
+
   // Allow modules to grant / deny access.
-  $access = module_invoke_all('party_access', $op, $party, $attached_entity, $account);
+  $access = module_invoke_all('party_access', $op, $party, $data_set, $account);
 
   // Only grant access if at least one module granted access and no one denied
   // access.
@@ -476,71 +502,64 @@ function party_access($op, $party = NULL, $attached_entity = NULL, $account = NU
  * Handles basic access to parties, including covering the special case when
  * there are no other party access modules.
  *
- * WIP: just say yes for now!
+ * This hook only ever grants access, it never outright deny's it. This is safe
+ * as if it is the only access hook in use and returns null party_access will
+ * return false.
  */
-function party_party_access($op, $party = NULL, $attached_entity = NULL, $account = NULL) {
-  //dsm(func_get_args());
-  // Get the attached entity data set.
-  if (is_string($attached_entity)) {
-    $data_set_name = $attached_entity;
-  }
-  else {
-    // Argh, how to get a data set name from an entity?
-    // May have to rethink the parameters here.
-    $data_set_name = NULL; // @todo
+function party_party_access($op, $party = NULL, $data_set = NULL, $account = NULL) {
+  // Set the data_set_name
+  if (isset($data_set)) {
+    $data_set_name = $data_set['set_name'];
   }
 
-  // Determine whether we are the only implementation of this hook, in which
-  // case we are more vocal about granting access.
-  $solo = (count(module_implements('party_access')) == 1);
-  //dsm($solo, 'solo');
-
-  if (isset($attached_entity)) {
+  // If we're looking at permission for a particular data set we check these.
+  if (isset($data_set_name)) {
     // Determine what the Core permissions system has to say about this.
     switch ($op) {
       case 'view':
         $permission_string = 'view party attached ' . $data_set_name;
         $permission_access = user_access($permission_string, $account);
         break;
+      case 'edit':
+        $permission_string = 'edit party attached ' . $data_set_name;
+        $permission_access = user_access($permission_string, $account);
+        break;
+      case 'detach':
+        $permission_string = 'detach party attached ' . $data_set_name;
+        $permission_access = user_access($permission_string, $account);
+        break;
       case 'attach':
-        // If we're the only ones granting access, we allow any data set to be
-        // attached. If other modules are involved, we say nothing.
-        return ($solo ? TRUE : NULL);
+        $permission_string = 'attach party ' . $data_set_name;
+        $permission_access = user_access($permission_string, $account);
+        break;
       default:
-        // Just say yes to anything else for now.
-        // @todo.
-        $permission_access = TRUE;
+        // Reject anything else
+        $permission_access = FALSE;
     }
-    //dsm("$permission_string -> $permission_access, $data_set_name");
-
-    if ($solo) {
-      // If we're being asked about attachments, grant access only if we are the
-      // only module reacting. This allows a basic operation of the CRM system
-      // where all attached entities can be used.
-      return $permission_access;
-    }
-    else {
-      // If other modules are in the mix, we only deny access with the
-      // permissions, not grant it. In other words, the permission
-      // 'view party attached foo' is necessary, but it is not sufficient.
-      // @todo: add explanation of this to the party_access() docblock.
-      if ($permission_access === FALSE) {
-        return $permission_access;
-      }
-    }
-
-    // If we get here, say nothing.
-    return NULL;
   }
   else {
     // If we're not being asked about attachments, just use plain permissions.
     switch ($op) {
       case 'view':
-        return user_access('view parties');
+        $permission_access = user_access('view parties');
+        break;
+      case 'edit':
+        $permission_access = user_access('edit parties');
+        break;
     }
   }
 
-  return TRUE;
+  // In this hook we only grant access with the permissions, not deny it. In
+  // other words, the permission 'view party attached foo' is sufficient but
+  // not neccessary, it is advisable to use these blanket permissions
+  // sparingly.
+  // @todo: add explanation of this to the party_access() docblock.
+  if ($permission_access === TRUE) {
+    return $permission_access;
+  }
+
+  // If we get here - say nothing.
+  return NULL;
 }
 
 /**
@@ -997,6 +1016,24 @@ function party_permission() {
   foreach (party_get_data_set_info() as $data_set_name => $data_set) {
     $permissions['view party attached ' . $data_set_name] = array(
       'title' => t('View party attached %name', array(
+        '%name' => $data_set['label'],
+      )),
+    );
+
+    $permissions['edit party attached ' . $data_set_name] = array(
+      'title' => t('Edit party attached %name', array(
+        '%name' => $data_set['label'],
+      )),
+    );
+
+    $permissions['detach party attached ' . $data_set_name] = array(
+      'title' => t('Remove party attached %name', array(
+        '%name' => $data_set['label'],
+      )),
+    );
+
+    $permissions['attach party ' . $data_set_name] = array(
+      'title' => t('Add party attached %name', array(
         '%name' => $data_set['label'],
       )),
     );
