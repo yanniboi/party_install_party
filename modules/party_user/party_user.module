@@ -188,7 +188,7 @@ function party_user_party_access($op, $party, $data_set, $account) {
  * Implements hook_ctools_plugin_directory().
  */
 function party_user_ctools_plugin_directory($owner, $plugin_type) {
-  if ($owner == 'party') {
+  if ($owner == 'party' || ($owner == 'ctools' && $plugin_type == 'relationships')) {
     return "plugins/$plugin_type";
   }
 }
