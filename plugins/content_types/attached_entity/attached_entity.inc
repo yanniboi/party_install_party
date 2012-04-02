@@ -72,15 +72,15 @@ function party_attached_entity_content_type_render($subtype, $conf, $panel_args,
   $party = $context->data;
   $data_set_name = $subtype;
   $data_set = party_get_data_set_info($data_set_name);
-  
+
   // Get the attached entities in this data set
   $attached_entities = party_get_attached_entities($party, $data_set_name);
-  
+
   // If there are none, do not render anything
   if (empty($attached_entities)) {
     return;
   }
-  
+
   // Remove all unneccesary attached entities if we're not showing them all
   if ($conf['delta'] != -1) {
     $attached_entity_list = array_values($attached_entities);
@@ -101,18 +101,18 @@ function party_attached_entity_content_type_render($subtype, $conf, $panel_args,
   // $attached_entities should now be alist of all the ones we want to show so lets convert this into a list of entities
   $entities = array();
   foreach($attached_entities as $attached_entity) {
-    // Hacky fix - check we're loading an actual entity and not just a 0
+    // Hacky fix - check we're loading an actual entity and not just a 0.
     if ($attached_entity->getEntityId() == 0) {
       continue;
     }
-    
+
     $entities[] = $attached_entity->entity;
   }
-  
+
   if (empty($entities)) {
     return;
   }
-  
+
   $block_delta = $data_set_name;
   if ($conf['delta'] != -1) {
     $block_delta .= '_'.$conf['delta'];
@@ -136,7 +136,7 @@ function party_attached_entity_content_type_options($form, &$form_state) {
   $subtype = $form_state['subtype_name'];
   $data_set_name = $subtype;
   $data_set = party_get_data_set_info($data_set_name);
-  
+
   $delta_options = array();
   $delta_options['-1'] = 'Show All';
   for ($i = 0; $i < 20; $i++) {
@@ -154,7 +154,7 @@ function party_attached_entity_content_type_options($form, &$form_state) {
   $view_mode_options = array();
   foreach ($entity['view modes'] as $mode => $option) {
     $view_mode_options[$mode] = $option['label'];
-  }  
+  }
   $form['view_mode'] = array(
     '#title' => t('View mode'),
     '#type' => 'select',

@@ -71,7 +71,7 @@ function party_entity_info() {
       ),
     )
   );
-    
+
   return $party_info;
 }
 
@@ -85,7 +85,7 @@ function party_entity_info() {
  */
 function party_entity_info_alter(&$entity_info) {
   $sets = party_get_data_set_info();
-  
+
   foreach ($sets as $set) {
     $entity_info[$set['entity type']]['crm controller class'] = $set['class'];
     // Pass this onto the class to make changes.
@@ -160,7 +160,7 @@ function party_menu() {
     'page callback' => 'party_data_set_admin',
     'access arguments' => array('administer parties'),
     'file' => 'party.admin.inc',
-    'type' => MENU_LOCAL_TASK,    
+    'type' => MENU_LOCAL_TASK,
   );
   $items['admin/community/party'] = array(
     'title' => 'Manage Parties',
@@ -177,7 +177,7 @@ function party_menu() {
     'access arguments' => array('administer parties'),
     'file' => 'party.admin.inc',
     'type' => MENU_DEFAULT_LOCAL_TASK,
-  );  
+  );
   $items['admin/community/party/individual'] = array(
     'title' => 'Manage individuals',
     'description' => 'Manage contact information',
@@ -196,7 +196,7 @@ function party_menu() {
     'file' => 'party.admin.inc',
     'type' => MENU_LOCAL_TASK,
   );
-  
+
   $items['party/%party'] = array(
     'title callback' => 'party_page_title',
     'title arguments' => array(1),
@@ -223,8 +223,8 @@ function party_menu() {
     $piece += array(
       'type' => MENU_LOCAL_TASK,
       // Make this explicit so it overrides the parent.
-      'access callback' => 'user_access',
-      'access arguments' => array('view contacts'),
+      'access callback' => 'party_access',
+      'access arguments' => array('view', 1),
       // @todo: change this to use party_access().
       // we'll need a dataset loader. @see @todo in party_profile_party_data_set_info().
       //'access arguments' => array('view', 1),
@@ -247,7 +247,7 @@ function party_menu() {
     'type' => MENU_LOCAL_TASK,
   );
   // End temporary.
-  
+
   // Attached entity menu items
   // Edit an attached entity
   $items['party/%party/%party_data_set/edit/%'] = array(
@@ -256,7 +256,7 @@ function party_menu() {
     'access callback' => TRUE, // todo
     'access arguments' => array('edit contacts'),
     'file' => 'party.pages.inc',
-  ); 
+  );
   // Detach an attached entity
   $items['party/%party/%party_data_set/remove/%'] = array(
     'page callback' => 'drupal_get_form',
@@ -325,7 +325,7 @@ function party_menu_local_tasks_alter(&$data, $router_item, $root_path) {
       );
     }
   }
-  
+
   // Add action links to 'admin/community/datasets' page.
   if ($root_path == 'admin/community/datasets') {
     $data_sets = party_get_data_set_info();
@@ -347,7 +347,7 @@ function party_menu_local_tasks_alter(&$data, $router_item, $root_path) {
           );
         }
       }
-      
+
       if (isset($admin['import'])) {
         $item = menu_get_item($admin['import']);
         $item['localized_options'] = array('query' => array('destination' => 'admin/community/datasets'));
@@ -816,7 +816,7 @@ function party_get_data_set_info($data_set_name = NULL) {
  */
 function party_get_party_data_sets($party) {
   $data_sets = array_keys(party_get_data_set_info());
-  
+
   $allowed_data_sets = array();
   // Check attaching access for each data set.
   foreach ($data_sets as $data_set_name) {
@@ -845,7 +845,7 @@ function party_get_party_data_sets($party) {
  */
 function party_attach_entity($party, $entity, $data_set_name) {
   $attached_entity = party_get_crm_controller($data_set_name);
-  $attached_entity->setAttachedEntity($entity);  
+  $attached_entity->setAttachedEntity($entity);
   $attached_entity->attach($party);
 }
 
@@ -864,7 +864,7 @@ function party_detach_entity($party, $entity, $data_set_name) {
   /* To Test */
   $attached_entity = party_get_crm_controller($data_set_name);
   $attached_entity->setParty($party);
-  $attached_entity->setAttachedEntity($entity);  
+  $attached_entity->setAttachedEntity($entity);
   $attached_entity->detach();
 }
 
@@ -876,14 +876,14 @@ function party_detach_entity($party, $entity, $data_set_name) {
  *
  * Party only comes with two types but it would be possible for a module to
  * add other bundles programatically so its important we allow for this to happen
- * by not hardcoding organisation and individual everywhere. 
+ * by not hardcoding organisation and individual everywhere.
  *
- * @return array() 
+ * @return array()
  *   The bundles key of the entity info array.
  */
 function party_get_party_types() {
   $party_info = entity_get_info('party');
-  return $party_info['bundles'];  
+  return $party_info['bundles'];
 }
 
 /**
@@ -908,7 +908,7 @@ function party_get_attached_entities($party, $data_set_name, $create = false) {
     drupal_set_message(t('Party not set, unable to load attached entities.'), 'error');
     return array();
   }
-  
+
   $sets = party_get_data_set_info();
 
   $items = db_select('party_attached_entity', 'ds')
@@ -918,7 +918,7 @@ function party_get_attached_entities($party, $data_set_name, $create = false) {
     ->orderBy('delta', 'ASC')
     ->execute()
     ->fetchAllAssoc('eid', PDO::FETCH_ASSOC);
-    
+
   $attached_entities = array();
 
   foreach ($items as $eid => $instance) {
@@ -927,14 +927,14 @@ function party_get_attached_entities($party, $data_set_name, $create = false) {
     $attached_entity->setAttachedEntity($eid);
     $attached_entities[$attached_entity->hash()] = $attached_entity;
   }
-  
+
   if (empty($attached_entities)) {
     $attached_entity = party_get_crm_controller($data_set_name);
     $attached_entity->setParty($party);
     $attached_entity->createAttachedEntity();
     $attached_entities[$attached_entity->hash()] = $attached_entity;
   }
-  
+
   return $attached_entities;
 }
 
@@ -1189,10 +1189,10 @@ function party_party_operations_merge($parties = array()) {
   }
   // the first party out of the array.
   $first = array_shift($parties);
-  
+
   foreach ($parties as $party) {
     party_merge($first, $party);
-  }  
+  }
   // @todo: write me!
 }
 
@@ -1280,7 +1280,7 @@ function party_attached_entity_attach_form(&$form, &$form_state) {
  * Validate attached entity forms.
  */
 function party_attached_entity_attach_form_validate(&$form, &$form_state) {
-  return TRUE;  
+  return TRUE;
 }
 
 /**
@@ -1290,14 +1290,14 @@ function party_attached_entity_attach_form_submit(&$form, &$form_state) {
   // Get all attached entities from $form_state.
   $attached_entities = $form_state['#attached_entities'];
   $party = $form_state['#party'];
-  
+
   foreach ($attached_entities as $hash => $attached_entity) {
     /// @todo explain what $hash is.
     // Get the form callback.
     $callback = party_attached_entity_form_callback($attached_entity->data_set_name) . '_submit';
     // Execute the form callback.
     $return = $callback($form, $form_state, $attached_entity, $form_state['#party']);
-    
+
     if ($return !== FALSE) {
       // Stores the attached entities in an array keyed by data sets and deltas
       $party->data_sets[$attached_entity->data_set_name][] = $attached_entity;
@@ -1321,10 +1321,10 @@ function party_attached_entity_attach_form_submit(&$form, &$form_state) {
  */
 function party_default_attached_entity_form($form, &$form_state, &$attached_entity, $party) {
   $attached_entity_form = array();
-  
+
   $entity = $attached_entity->entity;
-  
-  field_attach_form($attached_entity->getEntityType(), $entity, $attached_entity_form, $form_state); 
+
+  field_attach_form($attached_entity->getEntityType(), $entity, $attached_entity_form, $form_state);
 
   return($attached_entity_form);
 }
@@ -1362,40 +1362,40 @@ function party_default_attached_entity_form_validate($form, &$form_state, &$atta
  */
 function party_default_attached_entity_form_submit($form, &$form_state, &$attached_entity, $party) {
   $hash = $attached_entity->hash();
-  
+
   // Submit fields.
   field_attach_submit($attached_entity->getEntityType(), $attached_entity->entity, $form[$hash], $form_state);
   entity_save($attached_entity->getEntityType(), $attached_entity->entity);
 }
- 
+
 // --------------------------------------------------------------------------------------------------------------
 // Party Actions & Processes
 
 /**
  * Merge two parties
- * 
+ *
  * When running this function, the first party gets all of the second party's attached entities and the second party
  * becomes a 'ghost' party that points to the first.
  *
  * @param $first the first party.
- * @param $second the second party 
+ * @param $second the second party
  */
 function party_merge($first, $second) {
   $attached_entities = party_get_attached_entities($second);
-  
+
   // @todo: Clever logic to work out which data sets to delete and which to keep
   foreach ($attached_entities as $attached_entity) {
     $attached_entity->detach();
     $attached_entity->attach($first);
   }
-  
+
   // @todo: Transfer hats.
-  
+
   // @todo: Work out what to do with party fields.
     // If the field is empty in $first and full in $second copy the value in
     // If the field has unlimited cardinality or there is space for the values in $first
-    //   then copy the values in.    
-  
+    //   then copy the values in.
+
   // Make the other party a ghost party
   $second->merged = 1;
   $second->merged_party = $first->pid;
@@ -1403,7 +1403,7 @@ function party_merge($first, $second) {
 }
 
 // --------------------------------------------------------------------------------------------
-// Trigger 
+// Trigger
 /**
  * Implements hook_entity_update($entity, $type);
  */

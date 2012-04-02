@@ -38,7 +38,7 @@ function party_user_menu() {
     'access arguments' => array('administer crm settings'),
     'file' => 'party_user.admin.inc',
   );
-  
+
   $items['admin/config/party/user/settings'] = array(
     'title' => 'User Integration',
     'page callback' => 'drupal_get_form',
@@ -47,16 +47,16 @@ function party_user_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'file' => 'party_user.admin.inc',
   );
-  
+
   $items['admin/config/party/user/sync'] = array(
     'title' => 'Sync Users',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('party_user_sync_form'),
     'access arguments' => array('administer crm settings'),
     'type' => MENU_LOCAL_TASK,
-    'file' => 'party_user.admin.inc',    
+    'file' => 'party_user.admin.inc',
   );
-  
+
   return $items;
 }
 
@@ -79,7 +79,7 @@ function party_user_party_party_pieces() {
       'title' => 'Account Details',
       'page callback' => 'party_view_data_set',
       'page arguments' => array(1, 'user'),
-      'file' => 'party.pages.inc', 
+      'file' => 'party.pages.inc',
       'access callback' => TRUE,
       'access arguments' => array(1),
       'weight' => -8,
@@ -95,7 +95,7 @@ function party_user_party_view_user_access($party) {
   // - check user_access() for viewing user accounts
   // - check there actually is a user account to show
   // @todo:
-  // nice touch, maybe: if there is no user account to show, instead offer a 
+  // nice touch, maybe: if there is no user account to show, instead offer a
   // form to connect one?
   return TRUE;
 }
@@ -113,7 +113,7 @@ function party_user_party_view_user($party) {
  */
 function party_user_form_user($form, &$form_state, &$attached_entity, $party) {
   $user_form = array();
-  
+
   // If the user is set we load the edit account form.
   if ($attached_entity->eid !== NULL && $attached_entity->eid != 0) {
     module_load_include('inc', 'user', 'user.pages');
@@ -121,7 +121,7 @@ function party_user_form_user($form, &$form_state, &$attached_entity, $party) {
       '#type' => 'value',
       '#value' => 'edit',
     );
-    
+
     $user_form = user_profile_form($user_form, $form_state, $attached_entity->entity);
     unset($user_form['actions']);
   }
@@ -131,7 +131,7 @@ function party_user_form_user($form, &$form_state, &$attached_entity, $party) {
       '#type' => 'value',
       '#value' => 'select',
     );
-  
+
     // Store the account uid so we can check if it changes on submit.
     $user_form['party_user_uid'] = array(
       '#type' => 'value',
@@ -148,7 +148,7 @@ function party_user_form_user($form, &$form_state, &$attached_entity, $party) {
       '#description' => t('Leave blank for %anonymous.', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
     );
   }
-  
+
   return $user_form;
 }
 
@@ -166,9 +166,9 @@ function party_user_form_user_validate($form, &$form_state, &$attached_entity, $
  */
 function party_user_form_user_submit($form, &$form_state, &$attached_entity, $party) {
   $hash = $attached_entity->hash();
-  
+
   $op = $form_state['values'][$hash]['op'];
-    
+
   if ($op == 'select') {
     // Attempt to load a user from the given input.
     $account = user_load_by_name($form_state['values'][$hash]['user']);
@@ -183,24 +183,24 @@ function party_user_form_user_submit($form, &$form_state, &$attached_entity, $pa
     $account = $attached_entity->entity;
     $account_unchanged = clone $account;
     $category = $form[$hash]['#user_category'];
-    
+
     // This code is taken out of entity_form_submit_build_entity
     // Flatten the $form_state values for the user.
     $account_values = array();
     $account_values += isset($form_state['values'][$hash]['account']) ? $form_state['values'][$hash]['account'] : array();
     $account_values += isset($form_state['values'][$hash]['signature_settings']) ? $form_state['values'][$hash]['signature_settings'] : array();
     $account_values += isset($form_state['values'][$hash]['picture']) ? $form_state['values'][$hash]['picture'] : array();
-    
+
     $values_excluding_fields = array_diff_key($account_values, field_info_instances('user', 'user'));
     foreach ($values_excluding_fields as $key => $value) {
       $account->$key = $value;
     }
-        
+
     field_attach_submit('user', $account, $form[$hash], $form_state);
-    
+
     $edit = array_intersect_key((array) $account, $account_values);
     user_save($account_unchanged, $edit, $category);
-    
+
     if ($category == 'account' && !empty($edit['pass'])) {
       // Remove the password reset tag since a new password was saved.
       unset($_SESSION['pass_reset_' . $account->uid]);
@@ -211,23 +211,23 @@ function party_user_form_user_submit($form, &$form_state, &$attached_entity, $pa
 
 /**
  * Implements hook_form_FORM_ID_alter.
- * 
+ *
  * Create a Party when Users Register
  */
 function party_user_form_user_register_form_alter(&$form, &$form_state) {
   // Check if we're creating parties on registration
-  if (variable_get('party_user_create_on_register', FALSE)) {  
+  if (variable_get('party_user_create_on_register', FALSE)) {
     // Make sure we include all the neccessary files on submit
     form_load_include($form_state, 'inc', 'party', 'party.pages');
-    
+
     // Create an empty party
     $party_type = variable_get('party_user_register_party_type', 'individual');
     $party = party_create(array('type' => $party_type));
-    
+
     $form_state['#party'] = $party;
     $form_state['#party_unchanged'] = $party;
     $form_state['#attached_entities'] = array();
-    
+
     // Get a list of all the data sets we're expecting
     // @todo: add a setting to show these on the registration form
     $data_sets = party_get_party_data_sets($party);
@@ -245,17 +245,17 @@ function party_user_form_user_register_form_alter(&$form, &$form_state) {
       if (isset($party->pid)) {
         $attached_entities = party_get_attached_entities($party, $data_set);
       }
-      
+
       if (count($attached_entities) < 1) {
         $attached_entity = party_get_crm_controller($data_set);
         $attached_entity->createAttachedEntity();
         $attached_entity->setParty($party);
         $attached_entities[$attached_entity->hash()] = $attached_entity;
-      }    
-      
+      }
+
       $form_state['#attached_entities'] = array_merge($form_state['#attached_entities'], $attached_entities);
     }
-    
+
     // Add extra submit handlers
     $form['#submit'][] = 'party_edit_form_submit';
     party_attached_entity_attach_form($form, $form_state);
@@ -267,18 +267,18 @@ function party_user_register_submit($form, &$form_state) {
   // Get our party from the form_state and save it
   $party = $form_state['#party'];
   $party = party_save($party);
-  
+
   // Attach all the various entities
   foreach ($party->data_sets as $attached_entities) {
     foreach ($attached_entities as $attached_entity) {
       $attached_entity->attach($party);
     }
   }
-  
+
   // Attach the user what we just made
   $attached_entity = party_get_crm_controller('user');
   $attached_entity->setAttachedEntity($form_state['user']);
-  $attached_entity->attach($party);  
+  $attached_entity->attach($party);
 }
 
 /**
@@ -288,7 +288,7 @@ function party_user_form_profile2_type_form_alter(&$form, &$form_state) {
   if (!module_exists('party_profile')) {
     return;
   }
-  
+
   unset($form['data']['registration']);
   $form['registration'] = array(
     '#markup' => 'To configure the user registration page, ' . l('click here', 'admin/config/party/user') . '.',
@@ -312,20 +312,20 @@ function party_user_form_profile2_type_form_alter(&$form, &$form_state) {
 function party_user_create_party_for_user($user, $options = array()) {
   $default_options = array(
     'type' => variable_get('party_user_register_party_type', 'individual'),
-  ); 
-  
+  );
+
   $options += $default_options;
-  
+
   $party = party_create($options);
   $attached_entity = party_get_crm_controller('user');
   $attached_entity->setAttachedEntity($user);
-  $party->data_sets['user'][] = $attached_entity;  
-  
+  $party->data_sets['user'][] = $attached_entity;
+
   // This will fail if a plugin that relies on anything other than user is used
   $party = party_save($party);
-  
-  $attached_entity->attach($party);  
-} 
+
+  $attached_entity->attach($party);
+}
 
 /**
  * Get a User's Party
@@ -345,15 +345,15 @@ function party_user_get_party($user) {
     ->condition('data_set', 'user')
     ->execute()
     ->fetchCol();
-    
-  $party_id = reset($result);  
+
+  $party_id = reset($result);
   return party_load($party_id);
 }
- 
+
 /**
  * Implements hook_module_implements_alter()
  *
- * We're just going to stop profile 2 from doing anything with the user page
+ * We're just going to stop profile2 from doing anything with the user page
  * for now. This should supress the thousands of errors we get on that page.
  */
 function party_user_module_implements_alter(&$implementations, $hook) {
@@ -375,7 +375,7 @@ class UserPartyController extends EntityDefaultPartyController {
   public function display($mode) {
     return ($this->entity->uid != 0) ? user_view($this->entity, $mode) : FALSE;
   }
-  
+
   /**
    * Get the entity label
    */
