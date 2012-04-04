@@ -9,7 +9,7 @@
 function party_user_settings_form($form, &$form_state) {
   $form['create_on_register'] = array(
     '#type' => 'checkbox',
-    '#title' => 'Create a Party when a User Registers?',
+    '#title' => 'Create a party when a user registers.',
     '#default_value' => variable_get('party_user_create_on_register', FALSE),
   );
 
@@ -20,7 +20,7 @@ function party_user_settings_form($form, &$form_state) {
 
   $form['register_party_type'] = array(
     '#type' => 'select',
-    '#title' => 'Type of party to create when a User Registers',
+    '#title' => 'Type of party to create when a user registers',
     '#options' => $options,
     '#default_value' => variable_get('party_user_register_party_type', 'individual'),
   );
@@ -35,13 +35,13 @@ function party_user_settings_form($form, &$form_state) {
   $form['registration_data_sets'] = array(
     '#type' => 'checkboxes',
     '#options' => $options,
-    '#title' => 'Data Sets to show on User Registration form',
+    '#title' => 'Data sets to show on user registration form',
     '#default_value' => variable_get('party_user_registration_data_sets', array()),
   );
 
   $form['submit'] = array(
     '#type' => 'submit',
-    '#value' => 'Submit',
+    '#value' => 'Save configuration',
     '#weight' => 40,
   );
 
