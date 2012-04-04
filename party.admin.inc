@@ -245,46 +245,125 @@ function party_data_set_admin() {
 /**
  * Settings form for choosing the active party label plugin.
  */
-function party_settings_label_plugin_form($form, &$form_state) {
+function party_settings_label_plugins_form($form, &$form_state) {
   // @todo: hook_help text for this page.
+  $label_plugins = party_settings_get_party_label_plugins();
 
-  // Get the label plugin.
-  ctools_include('plugins');
+  $form['#tree'] = TRUE;
+  foreach ($label_plugins as $path => $label_plugin) {
+    $form['label_plugins'][$path]['name'] = array(
+      '#markup' => check_plain($label_plugin['title'])
+    );
+    $form['label_plugins'][$path]['weight'] = array(
+      '#type' => 'weight',
+      '#title' => t('Weight for @title', array('@title' => $label_plugin['title'])),
+      '#title_display' => 'invisible',
+      '#delta' => 10,
+      '#default_value' => isset($label_plugin['weight']) ? $label_plugin['weight'] : 0,
+    );
 
-  $setting_plugin_name = variable_get('party_name_label_plugin', 'pid');
-  $label_plugins = ctools_get_plugins('party', 'party_name_label');
-
-  $form['label'] = array(
-    '#type' => 'item',
-    '#title' => t('Party name label'),
-    '#description' => t('Choose which method to use to generate a label for each party.'),
-  );
-
-  foreach ($label_plugins as $plugin_name => $plugin) {
-    $form['label'][$plugin_name] = array(
-      '#type' => 'radio',
-      // Strings from the plugin are already translated.
-      '#title' => $plugin['title'],
-      '#description' => $plugin['description'],
-      '#return_value' => $plugin_name,
-      '#default_value' => ($plugin_name == $setting_plugin_name),
-      // The #parents property lets single radio buttons behave as a set.
-      '#parents' => array('label'),
+    // Generate the edit link if the 'options_form_callback' is set.
+    if (isset($label_plugin['options form callback'])) {
+      $link = l('Edit', 'admin/config/party/labels/' . $path);
+    }
+    else {
+      $link = '';
+    }
+    $form['label_plugins'][$path]['edit_link'] = array(
+        '#markup' => $link,
     );
   }
 
-  $form['submit'] = array('#type' => 'submit', '#value' => t('Save'));
+  // Include a submit button and weight if more than one label plugin exists.
+  if (count($label_plugins) > 1) {
+    $form['actions'] = array('#type' => 'actions');
+    $form['actions']['submit'] = array('#type' => 'submit', '#value' => t('Save'));
+  }
+  elseif (isset($label_plugin)) {
+    unset($form['label_plugins'][$path]['weight']);
+  }
 
   return $form;
 }
 
 /**
+ * This routine gets the available party label plugins from ctools and then
+ * adds a 'weight' property based on weight values previously saved in a
+ * persistent variable.
+ *
+ * Weights can be set at: admin/config/party/labels.
+ *
+ * @return
+ *  An array of party label plugins sorted by weight.
+ *
+ */
+function party_settings_get_party_label_plugins() {
+  // Get an array of the available label plugins.
+  ctools_include('plugins');
+  $label_plugins = ctools_get_plugins('party', 'party_name_label');
+
+  // Add in weights saved previously
+  $weights = variable_get('party_label_plugins', array());
+  foreach ($label_plugins as $path => $label_plugin) {
+     if (isset($weights[$path])) {
+       $label_plugins[$path]['weight'] = $weights[$path]['weight'];
+     }
+  }
+
+  // Sort label plugins array by weight for hook_menu() to figure out the default tab
+  // and the admin UI to show them in the right order.
+  // drupal_sort_weight() treats a missing weight key as a 0.
+  uasort($label_plugins, 'drupal_sort_weight');
+  return $label_plugins;
+}
+
+/**
  * Submit handler for the party label plugin settings form.
  */
-function party_settings_label_plugin_form_submit($form, &$form_state) {
-  variable_set('party_name_label_plugin', $form_state['values']['label']);
+function party_settings_label_plugins_form_submit($form, &$form_state) {
+  variable_set('party_label_plugins', $form_state['values']['label_plugins']);
+}
 
-  $form_state['redirect'] = 'admin/config/party/labels/' . $form_state['values']['label'];
+/**
+ * Returns HTML for the vocabulary overview form as a sortable list of vocabularies.
+ *
+ * @param $variables
+ *   An associative array containing:
+ *   - form: A render element representing the form.
+ *
+ * @see taxonomy_overview_vocabularies()
+ * @ingroup themeable
+ */
+function theme_party_settings_label_plugins_form($variables) {
+  $form = $variables['form'];
+
+  $rows = array();
+
+  foreach (element_children($form['label_plugins']) as $key) {
+    $label_plugin = &$form['label_plugins'][$key];
+    $row = array();
+    $row[] = drupal_render($label_plugin['name']);
+    $row[] = drupal_render($label_plugin['edit_link']);
+    if (isset($label_plugin['weight'])) {
+      $label_plugin['weight']['#attributes']['class'] = array('label-plugin-weight');
+      $row[] = drupal_render($label_plugin['weight']);
+    }
+    $rows[] = array('data' => $row, 'class' => array('draggable'));
+  }
+
+  $header = array(t('Label Plugins'),t(''));
+  if (isset($form['actions'])) {
+    $header[] = t('Weight');
+    drupal_add_tabledrag('crm-party-label-plugins', 'order', 'sibling', 'label-plugin-weight');
+  }
+
+  $output = theme('table', array(
+      'header' => $header,
+      'rows' => $rows,
+      'attributes' => array('id' => 'crm-party-label-plugins'))
+  ) . drupal_render_children($form);
+
+  return $output;
 }
 
 /**
@@ -323,8 +402,7 @@ function party_settings_pieces_order_form($form, &$form_state) {
     );
   }
 
-  // Only make this form include a submit button and weight if more than one
-  // piece exists.
+  // Include a submit button and weight if more than one piece exists.
   if (count($pieces) > 1) {
     $form['actions'] = array('#type' => 'actions');
     $form['actions']['submit'] = array('#type' => 'submit', '#value' => t('Save'));

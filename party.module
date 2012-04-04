@@ -112,10 +112,10 @@ function party_menu() {
     'file path' => drupal_get_path('module', 'system'),
   );
   $items['admin/config/party/labels'] = array(
-    'title' => 'Labels',
+    'title' => 'Label Plugins',
     'description' => 'Determine how labels for parties are generated.',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('party_settings_label_plugin_form'),
+    'page arguments' => array('party_settings_label_plugins_form'),
     'access arguments' => array('administer crm settings'),
     'file' => 'party.admin.inc',
   );
@@ -1060,6 +1060,9 @@ function party_uri($party) {
 function party_theme() {
   return array(
     'party_settings_pieces_order_form' => array(
+      'render element' => 'form',
+    ),
+    'party_settings_label_plugins_form' => array(
       'render element' => 'form',
     ),
     'party_email' => array(

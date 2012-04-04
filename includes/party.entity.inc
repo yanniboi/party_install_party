@@ -13,12 +13,9 @@ class PartyController extends EntityAPIController {
   /**
    * Save a party.
    *
-   * The party's label is determined by the currently active name label plugin.
+   * After the Party is saved we try and generate a label for it.
    */
   public function save($party) {
-    // Set the label on the party.
-    $this->setLabel($party);
-
     if (isset($party->pid)) {
       drupal_write_record('party', $party, 'pid');
       field_attach_update('party', $party);
@@ -29,27 +26,51 @@ class PartyController extends EntityAPIController {
       field_attach_insert('party', $party);
       module_invoke_all('entity_insert', $party, 'party');
     }
+
+    // Set the party label
+    $this->setLabel($party);
     return $party;
   }
 
   /**
-   * Set the label on a party object using the current label plugin.
+   * Set the label on a Party object using the first label plugin
+   * (when ordered by weight) that returns a non-empty value.
+   *
+   * This method saves the label to the database as well as generating it,
+   * this allows the function to be called independantly of party save. Also,
+   * as most Party label plugins require the party to be saved to function
+   * correctly, this avoids having to go through the Party::save() method
+   * multiple times.
    *
    * @param $party
    *  A party object.
    */
   public function setLabel($party) {
-    // Get the label plugin.
-    ctools_include('plugins');
-    $label_plugin_name = variable_get('party_name_label_plugin', 'pid');
-    $label_plugin = ctools_get_plugins('party', 'party_name_label', $label_plugin_name);
+    module_load_include('inc', 'party', 'party.admin');
 
-    // Generate the party label from the plugin.
-    $label_callback = $label_plugin['label callback'];
-    $label = $label_callback($party);
-    if ($label != "") {
-      $party->label = $label;
+    // Get the label plugins.
+    $label_plugins = party_settings_get_party_label_plugins();
+
+    // Try each plugin, lowest weight first, until a plugin is
+    // found that returns a non-empty value.
+    foreach ($label_plugins as $path => $label_plugin) {
+      $label_callback = $label_plugin['label callback'];
+      $label = $label_callback($party);
+      if (!empty($label)) {
+        $party->label = $label;
+        break;
+      }
     }
+
+    // No label plugins returned a label, use the party id.
+    if (empty($label)) {
+      $party->label = $party->id;
+    }
+
+    // Save the label to the database.
+    // @todo: if drupal_write_record incurs too much overhead replace with a
+    // simple update query.
+    drupal_write_record('party', $party, 'pid');
   }
 
   /**
