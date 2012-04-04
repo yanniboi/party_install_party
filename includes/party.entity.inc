@@ -83,7 +83,7 @@ class PartyController extends EntityAPIController {
 }
 
 /**
- * The class used for model entities.
+ * The class used for party entities.
  */
 class Party extends Entity {
 
@@ -92,10 +92,10 @@ class Party extends Entity {
   }
 
   protected function defaultLabel() {
-    return $this->name;
+    return $this->label;
   }
 
   protected function defaultUri() {
-    return array('path' => 'party/' . $this->id);
+    return array('path' => 'party/' . $this->pid);
   }
 }
