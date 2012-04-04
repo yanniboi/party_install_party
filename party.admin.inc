@@ -114,7 +114,7 @@ function party_admin($callback_arg = '') {
  * @see party_admin_form_validate()
  * @see party_admin_form_submit()
  */
-function party_admin_form() {
+function party_admin_form($form, &$form_state) {
   // Header for the tableselect element.
   $header = array(
     'pid' => array('data' => t('Party id'), 'field' => 'cp.pid'),
