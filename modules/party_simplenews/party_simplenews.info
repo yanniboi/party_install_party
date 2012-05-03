@@ -1,0 +1,7 @@
+name = Party Simplenews Integration
+description = Integration with the SimpleNews module. Hopefully most of the code in here will eventually be generalised into a Party Mail module.
+core = 7.x
+
+dependencies[] = email
+dependencies[] = party
+dependencies[] = simplenews

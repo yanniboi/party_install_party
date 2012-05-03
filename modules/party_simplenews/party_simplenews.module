@@ -1,0 +1,303 @@
+<?php
+/**
+ * @file Main module file for Party Simplenews integration
+ */
+
+/**
+ * Implements hook_form_FORM_ID_alter()
+ */
+function party_simplenews_form_simplenews_admin_settings_subscription_alter(&$form, &$form_state) {
+  $form['party'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Party'),
+    '#collapsible' => FALSE,
+    '#weight' => -1,
+  );
+  $form['party']['simplenews_sync_party'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Synchronize with party'),
+    '#default_value' => variable_get('simplenews_sync_party', TRUE),
+    '#description' => t('When checked subscriptions will be synchronized with the Party. When Parties are deleted, subscriptions with the same email address will be removed. When not checked subscriptions will be unchanged when associated accounts are deleted or blocked.'),
+  );
+}
+
+/**
+ * Load a subscriber by party_id
+ *
+ * @param $pid Party
+ * @param $ref The field ref of the email field. Normally takes the form
+ *   DATA_SET_NAME__ENTITY_ID__FIELD_NAME__DELTA
+ */
+function party_simplenews_subscriber_load_by_pid($party = NULL, $ref = NULL) {
+  $query = db_select('party_simplenews_subscriber', 'pss');
+  $query->leftJoin('simplenews_subscriber', 'ss', 'pss.snid = ss.snid');
+  $query->fields('ss')
+    ->fields('pss', array('party_id', 'party_field_ref'));
+
+  if (!empty($party)) {
+	  $query->condition('pss.party_id', $party);
+  }
+
+  if (!empty($ref)) {
+    $query->condition('pss.party_field_ref', $ref);
+  }
+
+  $subscribers = $query->execute()->fetchAllAssoc('snid');
+
+  if (!empty($ref)) {
+    return $subscribers ? reset($subscribers) : FALSE;
+  }
+
+  return $subscribers ? $subscribers : FALSE;
+}
+
+/**
+ * Implements hook_simplenews_subscriber_update.
+ *
+ * Because simplenews uses a custom query object rather than calling
+ * drupal_write_record, we have to manually save our extra fields. This can
+ * stay in the update hook, as our implementation of the insert hook will end
+ * up calling this anyway.
+ */
+function party_simplenews_simplenews_subscriber_update($subscriber) {
+  db_merge('party_simplenews_subscriber')
+    ->key(array('snid' => $subscriber->snid))
+	  ->fields(array(
+      'party_field_ref' => $subscriber->party_field_ref,
+      'party_id' => $subscriber->party_id,
+    ))
+	  ->execute();
+}
+
+/**
+ * Implements hook_simplenews_subscriber_delete().
+ */
+function party_simplenews_simplenews_subscriber_delete($subscriber) {
+  db_delete('party_simplenews_subscriber')
+    ->condition('snid', $subscriber->snid)
+	  ->execute();
+}
+
+/**
+ * Implements hook_simplenews_subscriber_insert.
+ */
+function party_simplenews_simplenews_subscriber_insert($subscriber) {
+  // Firstly, if the account id is not 0, see if that user has a party and
+  // attach it.
+  if (module_exists('party_user') && $subscriber->uid != 0) {
+    $party = party_user_get_party($subscriber->uid);
+    $field_ref = 'user__0__mail__0';
+
+    $subscriber->party_id = $party->pid;
+    $subscriber->party_field_ref = $field_ref;
+    simplenews_subscriber_save($subscriber);
+
+    return;
+  }
+
+  // Get a list of all email fields.
+  $fields = party_get_email_fields();
+
+  // Iterate over email fields and use an EFQ to try and find matches.
+  $found = FALSE;
+  foreach ($fields as $data_set_name => $fields) {
+    $definition = party_get_data_set_info($data_set_name);
+    $entity_type = $definition['entity type'];
+    $bundle = $definition['entity bundle'];
+
+    foreach ($fields as $field_name) {
+      $query = new EntityFieldQuery();
+        $entities = $query->entityCondition('entity_type', $entity_type)
+        ->entityCondition('bundle', $bundle)
+        ->fieldCondition($field_name, 'email', $subscriber->mail)
+        ->execute();
+
+      // If we don't find an entity with this email address on it, skip the
+      // rest.
+      if (empty($entities[$entity_type])) {
+        continue;
+      }
+
+      // The output of EFQ::execute are stub entities keyed by entity_id so we
+      // can get the entity_id like this:
+      $entity_id = reset(array_keys($entities[$entity_type]));
+
+      // Now we need to find the party id. This code is taken from
+      // party_user_get_party
+      $result = db_select('party_attached_entity', 'pae')
+        ->fields('pae', array('pid'))
+        ->condition('eid', $entity_id, '=')
+        ->condition('data_set', $data_set_name)
+        ->execute()
+        ->fetchCol();
+
+      $party_id = reset($result);
+
+      // If we don't find a party keep looking.
+      if (!$party_id) {
+        continue;
+      }
+
+      // We've found a party, so lets save everything
+      // Here we're assuming that the delta of the field is 0.
+      // @todo: don't assume the delta is 0
+      $subscriber->party_id = $party_id;
+      $subscriber->party_field_ref = $data_set_name . '__' . $entity_id . '__' . $field_name . '__0';
+      simplenews_subscriber_save($subscriber);
+      $found = TRUE;
+      break;
+    }
+
+    if ($found) {
+      break;
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_update.
+ */
+function party_simplenews_entity_update($entity, $type) {
+  // Get necessary entity info.
+  $wrapper = entity_metadata_wrapper($type, $entity);
+
+  // Get data sets.
+  $data_sets = party_get_data_set_info();
+
+  // Is this entity party of a data set?
+  $data_set_name = FALSE;
+  foreach ($data_sets as $name => $def) {
+    if ($def['entity type'] == $type && $def['entity bundle'] == $wrapper->getBundle()) {
+      $data_set_name = $name;
+      break;
+    }
+  }
+
+  // If it's not part of a data set do nothing else
+  if (!$data_set_name) {
+    return;
+  }
+
+  // Iterate over email fields on this data set
+  foreach (party_get_email_fields($data_set_name) as $field_name) {
+    // Get the items for this field.
+    $items = field_get_items($type, $entity, $field_name);
+
+    foreach ($items as $delta => $item) {
+      // Get the subscriber with the right party_field_ref. Note, at the moment the
+      // party_field_ref has the attached entity id in it, so we don't need to
+      // check the party_id.
+      $ref = $data_set_name . '__' . $wrapper->getIdentifier() . '__' . $field_name . '__' . $delta;
+      $subscriber = party_simplenews_subscriber_load_by_pid(NULL, $ref);
+
+      if ($subscriber) {
+        $subscriber->mail = $item['email'];
+        simplenews_subscriber_save($subscriber);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_delete()
+ */
+function party_simplenews_entity_delete($entity, $type) {
+  if ($type == 'party') {
+    $subscribers = party_simplenews_subscriber_load_by_pid($entity->pid);
+
+    foreach ($subscribers as $subscriber) {
+      simplenews_subscriber_delete($subscriber);
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter.
+ */
+function party_simplenews_form_simplenews_admin_subscription_alter(&$form, &$form_state) {
+  $table = &$form['admin']['subscribers'];
+
+  $new_header = array();
+  foreach ($table['#header'] as $key => $array) {
+    $new_header[$key] = $array;
+
+    if ($key == 'username') {
+      $new_header['party'] = array(
+        'data' => 'Party',
+        'field' => 'sn.party_id',
+      );
+    }
+  }
+  $table['#header'] = $new_header;
+
+  // Do a query to get the party ID's from the table
+  $query = db_select('party_simplenews_subscriber', 'sn');
+  $query->leftJoin('party', 'p', 'sn.party_id = p.pid');
+  $party_ids = $query->fields('sn', array('snid', 'party_id'))
+	->fields('p',array('label'))
+    ->execute()
+    ->fetchAllAssoc('snid', PDO::FETCH_ASSOC);
+
+  foreach ($table['#options'] as $key => $row) {
+    //$party = party_load($party_ids[$key]['party_id']);
+	if (!empty($party_ids[$key])) {
+      $row['party'] = l($party_ids[$key]['label'], 'party/' . $party_ids[$key]['party_id']);
+	}
+	else {
+	  $row['party'] = '';
+	}
+
+    $table['#options'][$key] = $row;
+  }
+}
+
+/**
+ * Get all the email fields set up on data set entities
+ *
+ * @param $data_set_name If this is set, the function will return a list of
+ *   email fields on that data set.
+ *
+ * @todo:
+ *  - Drupal Cache
+ *  - Put in a standard party_mail api.
+ */
+function party_get_email_fields($data_set_name = NULL) {
+  $email_fields = &drupal_static(__FUNCTION__, array());
+
+  // If we have a cached set of fields, return this.
+  if (!empty($email_fields)) {
+    if (!empty($data_set_name)) {
+      return empty($email_fields[$data_set_name]) ? array() : $email_fields[$data_set_name];
+    }
+
+    return $email_fields;
+  }
+
+  $fields = field_info_fields();
+  $data_sets = party_get_data_set_info();
+
+  foreach($fields as $field_name => $field) {
+    // Is it an email field?
+    if ($field['type'] != 'email') {
+      continue;
+    }
+
+    // Is it on an attached entity?
+    foreach ($field['bundles'] as $entity_type => $bundles) {
+      foreach ($bundles as $bundle) {
+        foreach ($data_sets as $name => $def) {
+          if ($def['entity type'] == $entity_type && $def['entity bundle'] == $bundle) {
+            // Put it in an array keyed by data set name and field name
+            $email_fields[$name][] = $field_name;
+          }
+        }
+      }
+    }
+  }
+
+  if (!empty($data_set_name)) {
+    return empty($email_fields[$data_set_name]) ? array() : $email_fields[$data_set_name];
+  }
+
+  return $email_fields;
+}

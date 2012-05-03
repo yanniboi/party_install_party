@@ -1,0 +1,115 @@
+<?php
+/**
+ * @file Install information for Party Simplenews module
+ */
+
+/**
+ * Implements hook_schema()
+ */
+function party_simplenews_schema() {
+  $schema['party_simplenews_subscriber'] = array(
+    'description' => 'A table of party ids to subscriber ids',
+	'fields' => array(
+	  'snid' => array(
+	    'description' => 'Primary key: Unique subscriber ID.',
+        'type' => 'serial',
+        'not null' => TRUE,
+	  ),
+	  'party_id' => array(
+		'description' => 'The {party}.pid that has the same email address.',
+		'type' => 'int',
+		'not null' => TRUE,
+		'default' => 0,
+	  ),
+	  'party_field_ref' => array(
+		'description' => 'The reference of the field on the party this refers to. Of the form DATA_SET_NAME__ENTITY_ID__FIELD_NAME__DELTA',
+		'type' => 'varchar',
+		'length' => 255,
+		'not null' => TRUE,
+		'default' => '',
+	  ),
+	),
+	'primary key' => array('snid'),
+    'indexes' => array(
+      'party_mail' => array('party_id', 'party_field_ref'),
+    ),
+    'foreign keys' => array(
+      'party_id' => array(
+        'table' => 'party',
+        'columns' => array('party_id' => 'pid'),
+      ),
+    ),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_schema_alter()
+ *
+ * Add party_id field
+ */
+function party_simplenews_schema_alter(&$schema) {
+  $schema['simplenews_subscriber']['fields']['party_id'] = array(
+    'description' => 'The {party}.pid that has the same email address.',
+    'type' => 'int',
+    'not null' => TRUE,
+    'default' => 0,
+  );
+  $schema['simplenews_subscriber']['fields']['party_field_ref'] = array(
+    'description' => 'The referene of the field on the party this refers to. Of the form DATA_SET_NAME__ENTITY_ID__FIELD_NAME__DELTA',
+    'type' => 'varchar',
+    'length' => 255,
+    'not null' => TRUE,
+    'default' => '',
+  );
+}
+
+/**
+ * Remove fields
+ */
+function party_simplenews_update_7002() {
+  db_drop_field("simplenews_subscriber", "party_id");
+  db_drop_field("simplenews_subscriber", "party_field_ref");
+}
+
+/**
+ * Add relationship table
+ */
+function party_simplenews_update_7001() {
+  $table = array(
+    'description' => 'A table of party ids to subscriber ids',
+	'fields' => array(
+	  'snid' => array(
+	    'description' => 'Primary key: Unique subscriber ID.',
+        'type' => 'serial',
+        'not null' => TRUE,
+	  ),
+	  'party_id' => array(
+		'description' => 'The {party}.pid that has the same email address.',
+		'type' => 'int',
+		'not null' => TRUE,
+		'default' => 0,
+	  ),
+	  'party_field_ref' => array(
+		'description' => 'The reference of the field on the party this refers to. Of the form DATA_SET_NAME__ENTITY_ID__FIELD_NAME__DELTA',
+		'type' => 'varchar',
+		'length' => 255,
+		'not null' => TRUE,
+		'default' => '',
+	  ),
+	),
+	'primary key' => array('snid'),
+    'indexes' => array(
+      'party_mail' => array('party_id', 'party_field_ref'),
+    ),
+    'foreign keys' => array(
+      'party_id' => array(
+        'table' => 'party',
+        'columns' => array('party_id' => 'pid'),
+      ),
+    ),
+  );
+
+  db_create_table('party_simplenews_subscriber', $table);
+}
