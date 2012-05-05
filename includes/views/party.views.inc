@@ -53,6 +53,18 @@ function party_views_plugins() {
 function party_views_data() {
   $data = array();
 
+  // Some field handlers for views
+  // Delete Link
+  // @todo: use entity properties?
+  $data['party']['delete_party'] = array(
+    'title' => t('Delete Link'),
+    'help' => t('Provide a link to delete the party.'),
+    'field' => array(
+      'real field' => 'pid',
+      'handler' => 'party_handler_field_delete_link',
+    ),
+  );
+
   // The unified attached entity table.
   // @todo: put this into its own group?
   $data['party_attached_entity']['table']['group'] = t('Party');

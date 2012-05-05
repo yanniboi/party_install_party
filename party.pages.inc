@@ -172,6 +172,31 @@ function party_edit_form_save($form, &$form_state) {
 }
 
 /**
+ * Party delete form
+ */
+function party_delete_form($form, &$form_state, $party) {
+  $form_state['party'] = $party;
+
+  $form = confirm_form($form,
+    t('Are you sure you want to delete party %label (%id)?', array('%label' => $party->label, '%id' => $party->pid)),
+    'admin/community',
+    '<p>' . t('This action cannot be undone.') . '</p>',
+    t('Delete'),
+    t('Cancel'),
+    'confirm'
+  );
+
+  return $form;
+}
+
+/**
+ * Submit the party delete form
+ */
+function party_delete_form_submit($form, &$form_state) {
+  $form_state['party']->delete();
+}
+
+/**
  * Show a View display plugin as a party piece.
  *
  * @param $party
