@@ -2,6 +2,63 @@
 /**
  * @file Main module file for Party Simplenews integration
  */
+ 
+/**
+ * Load includes
+ */ 
+module_load_include('inc', 'party_simplenews', 'party_subscription_settings.api');
+module_load_include('inc', 'party_simplenews', 'party_subscription_settings.entity');
+ 
+/**
+ * Implements hook_entity_info()
+ */
+function party_simplenews_entity_info() {
+  // A realy simple entity so we can hang an extra field off of it and treat it as a data set
+  $info['party_subscription_settings'] = array(
+    'label' => 'Party Mail Subscription Settings',
+    'entity class' => 'PartySubscriptionSettings',
+    'controller class' => 'PartySubscriptionSettingsController',
+    'base table' => 'party_subscription_settings',
+    'fieldable' => TRUE,
+    'entity keys' => array(
+      'id' => 'subscription_settings_id',
+    ),
+    'module' => 'party_simplenews',
+    'view modes' => array(
+      'full' => array(
+        'label' => t('Full'),
+        'custom settings' => FALSE,
+      ),
+    ),
+    'bundles' => array(
+      'party_subscription_settings' => array(
+        'label' => t('Simplenews Subscription Settings'),
+        'admin' => array(
+          'path' => 'admin/config/party/subscriptions',
+        ),
+      ),
+    ),
+  );
+  
+  return $info;
+}
+
+/**
+ * Implements hook_party_data_set_info() {
+ */
+function party_simplenews_party_data_set_info() {
+  $sets['subscription_settings'] = array(
+    'label' => t("Subscription Settings"),
+    'entity type' => 'party_subscription_settings',
+    'class' => 'PartySubscriptionSettingsPartyController',
+    'singleton' => TRUE,
+    'max cardinality' => 1,
+    'view mode' => 'party',
+    'form callback' => 'party_subscription_settings_edit_form',
+  );
+  return $sets;
+}
+ 
 
 /**
  * Implements hook_form_FORM_ID_alter()
@@ -31,8 +88,8 @@ function party_simplenews_form_simplenews_admin_settings_subscription_alter(&$fo
 function party_simplenews_subscriber_load_by_pid($party = NULL, $ref = NULL) {
   $query = db_select('party_simplenews_subscriber', 'pss');
   $query->leftJoin('simplenews_subscriber', 'ss', 'pss.snid = ss.snid');
-  $query->fields('ss')
-    ->fields('pss', array('party_id', 'party_field_ref'));
+  $query->fields('ss', array('snid'))
+        ->fields('pss', array('party_id', 'party_field_ref'));
 
   if (!empty($party)) {
 	  $query->condition('pss.party_id', $party);
@@ -42,8 +99,18 @@ function party_simplenews_subscriber_load_by_pid($party = NULL, $ref = NULL) {
     $query->condition('pss.party_field_ref', $ref);
   }
 
-  $subscribers = $query->execute()->fetchAllAssoc('snid');
-
+  $extras = $query->execute()->fetchAllAssoc('snid');
+  
+  if (empty($extras)) {
+    return FALSE;
+  }
+  
+  $subscribers = simplenews_subscriber_load_multiple(array_keys($extras));
+  foreach ($subscribers as $subscriber) {
+    $subscriber->party_id = $extras[$subscriber->snid]->party_id;
+    $subscriber->party_field_ref = $extras[$subscriber->snid]->party_field_ref;
+  }  
+  
   if (!empty($ref)) {
     return $subscribers ? reset($subscribers) : FALSE;
   }
@@ -82,6 +149,17 @@ function party_simplenews_simplenews_subscriber_delete($subscriber) {
  * Implements hook_simplenews_subscriber_insert.
  */
 function party_simplenews_simplenews_subscriber_insert($subscriber) {
+  // If the party is set add the sniff out a potential user and create a subscription
+  // @todo: not actually subscribing user for now as multiple user
+  // subscriptions may cause problems for simplenews
+  if (!empty($subscriber->party_id) && !empty($subscriber->party_field_ref)) {
+    simplenews_subscriber_save($subscriber);
+    
+    $party = party_load($subscriber->party_id);
+    party_simplenews_add_subsciption_settings_attached_entity($party);
+    return;
+  }
+  
   // Firstly, if the account id is not 0, see if that user has a party and
   // attach it.
   if (module_exists('party_user') && $subscriber->uid != 0) {
@@ -92,6 +170,8 @@ function party_simplenews_simplenews_subscriber_insert($subscriber) {
     $subscriber->party_field_ref = $field_ref;
     simplenews_subscriber_save($subscriber);
 
+    party_simplenews_add_subsciption_settings_attached_entity($party);
+    
     return;
   }
 
@@ -144,6 +224,7 @@ function party_simplenews_simplenews_subscriber_insert($subscriber) {
       $subscriber->party_id = $party_id;
       $subscriber->party_field_ref = $data_set_name . '__' . $entity_id . '__' . $field_name . '__0';
       simplenews_subscriber_save($subscriber);
+      party_simplenews_add_subsciption_settings_attached_entity(party_load($party_id));
       $found = TRUE;
       break;
     }
@@ -300,4 +381,124 @@ function party_get_email_fields($data_set_name = NULL) {
   }
 
   return $email_fields;
+}
+
+/**
+ * Get all the emails on a Party
+ *
+ * @param $party an party object
+ *
+ * @return
+ *   An array of emails keyed by field reference
+ *
+ * @todo: build in special case for user mail
+ */
+function party_get_all_emails($party) {
+  $fields = party_get_email_fields();
+  $emails = array();
+  
+  foreach ($fields as $data_set_name => $fields) {
+    $attached_entities = party_get_attached_entities($party, $data_set_name);
+    $data_set_def = party_get_data_set_info($data_set_name);
+    
+    foreach ($attached_entities as $attached_entity) {
+      foreach ($fields as $field_name) {
+        $items = field_get_items($data_set_def['entity type'], $attached_entity->entity, $field_name);
+        if (!$items) {
+          continue;
+        }
+
+        foreach ($items as $delta => $item) {
+           $field_ref = $data_set_name . '__' . $attached_entity->getEntityId() . '__' . $field_name . '__' . $delta;
+           $emails[$field_ref] = $item['email'];
+        }
+      }
+    }
+  }
+  
+  return $emails;
+}
+
+/**
+ * Implements hook_field_extra_fields().
+ */
+function party_simplenews_field_extra_fields() {
+  $return['party_subscription_settings']['party_subscription_settings'] = array(
+    'display' => array(
+      'subscriptions' => array(
+        'label' => 'Newsletters',
+        'description' => t('Newsletter subscriptions of the party'),
+        'weight' => 5,
+      ),
+    ),
+  );
+  return $return;
+}
+
+/**
+ * Implements hook_party_subscription_settings_view()
+ */
+function party_simplenews_party_subscription_settings_view($entity) {
+  $party = party_subscription_settings_get_party($entity);
+  
+  $entity->content['subscriptions'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Newsletters'),
+  );
+  
+  // Collect newsletter to which the current user is subscribed.
+  // 'hidden' newsletters are not listed.
+  $newsletters = simplenews_category_get_visible();
+  $subscribers = party_simplenews_subscriber_load_by_pid($party->pid);
+  
+  // For each newsletter, ascertain if the party is subscribed to it
+  foreach ($newsletters as $newsletter) {
+    $subscribed_emails = array();
+    // In theory, a Party could be subscribed to a newsletter multiple times, 
+    // Iterate over all the party's subscribers and check if they're subscribed to
+    // the newsletter.
+    foreach ($subscribers as $subscriber) {
+      if (isset($subscriber->newsletter_subscription[$newsletter->tid]) && $subscriber->newsletter_subscription[$newsletter->tid]->status == TRUE) {
+        $subscribed_emails[] = $subscriber->mail;
+      }
+    }
+    
+    // If atleast one of the party's addresses is subscribed to the newsletter
+    // add the newsletter to the list of links with a list of subscribed emails
+    // next to it.
+    if (!empty($subscribed_emails)) {
+      $emails = ' <small>(' . implode($subscribed_emails, ',') . ')</small>'; 
+      $links[] = l(_simplenews_newsletter_name($newsletter), 'taxonomy/term/' . $newsletter->tid) . $emails;
+    }
+  }
+    
+  if (empty($links)) {
+    $entity->content['subscriptions']['subscriptions'] = array(
+      '#title' => t('Subscribed to'),
+      '#markup' => t('None'),
+    );
+  }
+  else {
+    $entity->content['subscriptions']['subscriptions'] = array(
+      '#theme' => 'item_list',
+      '#type' => 'item_list',
+      '#title' => t('Subscribed to'),
+      '#items' => $links,
+    );
+  }
+}
+
+class PartySubscriptionSettingsPartyController extends EntityDefaultPartyController {
+  public function label() {
+    return 'Newsletters';
+  }
+  
+  public function actions() {
+    $actions = parent::actions();
+    if (isset($actions['edit'])) {
+      $actions['edit']['title'] = 'Manage Subscriptions';
+    }
+    
+    return $actions;
+  }
 }
