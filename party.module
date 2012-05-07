@@ -1082,10 +1082,6 @@ function party_theme() {
     'party_settings_label_plugins_form' => array(
       'render element' => 'form',
     ),
-    'party_email' => array(
-      'variables' => array('party_email', 'party' => NULL),
-      'template' => 'party_email',
-    ),
     'entity__all__party' => array(
       'render element' => 'elements',
       'template' => 'entity--all--party',
