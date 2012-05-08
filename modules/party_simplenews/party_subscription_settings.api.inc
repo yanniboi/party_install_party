@@ -1,11 +1,11 @@
 <?php
 /**
  * @file party_subscription_settings.api.inc
- *   Helper functions etc for the subscription settings 
+ *   Helper functions etc for the subscription settings
  */
 
  /**
- * Fetch a party_subscription_settings object. Make sure that the wildcard you choose 
+ * Fetch a party_subscription_settings object. Make sure that the wildcard you choose
  * in the party_subscription_settings entity definition fits the function name here.
  *
  * @param $subscription_settings_id
@@ -85,7 +85,7 @@ function party_subscription_settings_save(PartySubscriptionSettings $party_subsc
  */
 function party_subscription_settings_get_party(PartySubscriptionSettings $party_subscription_settings) {
   $id = $party_subscription_settings->subscription_settings_id;
-  
+
   $result = db_select('party_attached_entity', 'pae')
     ->fields('pae', array('pid'))
     ->condition('eid', $id, '=')
@@ -114,15 +114,19 @@ function party_simplenews_add_subsciption_settings_attached_entity($party) {
  * Party subscription settings edit form
  */
 function party_subscription_settings_edit_form($form, &$form_state, &$attached_entity, $party) {
+  if (empty($party->pid)) {
+    return FALSE;
+  }
+
   $simplenews_form = array();
   // Get all the emails on the party
   $emails = party_get_all_emails($party);
-  
+
   foreach ($emails as $key => $email) {
     $emails[$key] .= ' (Primary)';
     break;
   }
-  
+
   $hash = $attached_entity->hash();
   $current_ref = !empty($form_state['values'][$hash]['field_ref']) ? $form_state['values'][$hash]['field_ref'] : reset(array_keys($emails));
   if (!empty($form_state['triggering_element']) && $form_state['triggering_element']['#name'] == $attached_entity->hash() . '[field_ref]') {
@@ -145,7 +149,7 @@ function party_subscription_settings_edit_form($form, &$form_state, &$attached_e
       'autocomplete' => 'off',
     ),
   );
-  
+
   module_load_include('inc', 'simplenews', 'includes/simplenews.subscription');
   $subscriber = party_simplenews_subscriber_load_by_pid($party->pid, $current_ref);
   // If this email doesn't have a subscriber yet, create one
@@ -157,16 +161,16 @@ function party_subscription_settings_edit_form($form, &$form_state, &$attached_e
     $subscriber->uid = 0;
     $subscriber->party_id = $party->pid;
     $subscriber->party_field_ref = $current_ref;
-    
+
     simplenews_subscriber_save($subscriber);
-  }  
- 
+  }
+
   simplenews_subscriptions_account_form($simplenews_form, $form_state, $subscriber);
   unset($simplenews_form['#submit']);
-  
+
   $simplenews_form['subscriptions']['#prefix'] = '<div id="simplenews-subscriptions">';
   $simplenews_form['subscriptions']['#suffix'] = '</div>';
-  
+
   return $simplenews_form;
 }
 
@@ -189,7 +193,7 @@ function party_subscription_settings_edit_form_submit($form, &$form_state, &$att
   $hash = $attached_entity->hash();
   $emails = party_get_all_emails($party);
   $values = &$form_state['values'][$hash];
-  
+
   $field_ref = $values['field_ref'];
   $mail = $emails[$field_ref];
   // We first subscribe, then unsubscribe. This prevents deletion of subscriptions
@@ -204,6 +208,6 @@ function party_subscription_settings_edit_form_submit($form, &$form_state, &$att
       simplenews_unsubscribe_user($mail, $tid, FALSE, 'website');
     }
   }
-  
+
   drupal_set_message(t('The newsletter subscriptions for %party &lt;%email&gt; have been updated.', array('%party' => $party->label, '%email' => $mail)));
 }
