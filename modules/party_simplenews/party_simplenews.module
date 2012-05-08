@@ -44,6 +44,20 @@ function party_simplenews_entity_info() {
 }
 
 /**
+ * Implements hook_entity_property_info_alter()
+ */
+function party_simplenews_entity_property_info_alter(&$info) {
+  $properties = &$info['party']['properties'];
+    
+  $properties['primary_email'] = array(
+    'label' => t('Primary Email Address'),
+    'type' => 'text',
+    'description' => t('The primary email address of this party'),
+    'getter callback' => 'party_simplenews_party_get_properties',
+  );  
+}
+
+/**
  * Implements hook_party_data_set_info() {
  */
 function party_simplenews_party_data_set_info() {
@@ -59,7 +73,16 @@ function party_simplenews_party_data_set_info() {
   return $sets;
 }
  
-
+/**
+ * Implements hook_views_api().
+ */
+function party_simplenews_views_api() {
+  return array(
+    'api' => 3, 
+    'path' => drupal_get_path('module', 'party_simplenews') . '/includes/views', 
+  );
+}
+ 
 /**
  * Implements hook_form_FORM_ID_alter()
  */
@@ -500,5 +523,15 @@ class PartySubscriptionSettingsPartyController extends EntityDefaultPartyControl
     }
     
     return $actions;
+  }
+}
+
+/**
+ * Get email related properties
+ */
+function party_simplenews_party_get_properties($party, array $options, $name, $entity_type) {
+  switch ($name) {
+    case 'primary_email':
+      return reset(party_get_all_emails($party));
   }
 }
