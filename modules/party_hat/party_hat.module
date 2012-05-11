@@ -222,15 +222,15 @@ function party_hat_get_data_set_rule($hat, $set) {
 /**
  * Implements hook_party_access().
  */
-function party_hat_party_access($op, $party = NULL, $attached_entity = NULL, $account = NULL) {
+function party_hat_party_access($op, $party = NULL, $data_set = NULL, $account = NULL) {
   // We say nothing about access to just the party.
-  if (!isset($attached_entity)) {
+  if (!isset($data_set)) {
     return NULL;
   }
 
   switch ($op) {
     case 'attach':
-      $data_set_name = $attached_entity;
+      $data_set_name = $data_set['set_name'];
 
       $party_hats = party_hat_get_hats($party);
       $data_sets = array();
@@ -242,7 +242,7 @@ function party_hat_party_access($op, $party = NULL, $attached_entity = NULL, $ac
           return TRUE;
         }
       }
-      return NULL;
+      return FALSE;
     case 'view':
       // @todo: This needs to be written! Just say yes for now.
       return TRUE;
@@ -258,7 +258,6 @@ function party_hat_party_access($op, $party = NULL, $attached_entity = NULL, $ac
  * @todo write params and return.
  */
 function party_hat_get_hat_data_sets($hat, $rule = 'has') {
-
   $results = db_select('party_hat_data_set_rules', 'c')
     ->fields('c')
     ->condition('hat', $hat->name, '=')
@@ -595,11 +594,11 @@ function party_hat_party_form_hat_validate($form, $form_state) {
     $expected_data_sets += party_hat_get_hat_data_sets($hat);
   }
 
-  $attached_entities = $form_state['#attached_entitites'];
+  $attached_entities = $form_state['#attached_entities'];
   $existent_data_sets = array();
   foreach ($attached_entities as $attached_entity) {
-    if (!in_array($attached_entity->data_set_name, $existant_data_sets)) {
-      $existant_data_sets[] = $attached_entity->data_set_name;
+    if (!in_array($attached_entity->data_set_name, $existent_data_sets)) {
+      $existent_data_sets[] = $attached_entity->data_set_name;
     }
   }
 
