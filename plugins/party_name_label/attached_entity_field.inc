@@ -31,15 +31,15 @@ $plugin = array(
  * Generate the label for a party.
  */
 function party_attached_entity_field_label($party) {
+  if (empty($party->pid)) {
+    return;
+  }
+
   $data_set_name = variable_get('party_name_label_data_set', 'party');
   $field_name = variable_get('party_name_label_field', FALSE);
   if ($data_set_name != 'party') {
-    if (!isset($party->data_sets) || !is_array($party->data_sets[$data_set_name])) {
-      return "Party" . isset($party->pid) ? ' '.$party->pid: '';
-    }
-
-    if (!($attached_entity = reset($party->data_sets[$data_set_name]))) {
-      return "Party" . isset($party->pid) ? ' '.$party->pid: '';
+    if (!($attached_entity = reset(party_get_attached_entities($party, $data_set_name)))) {
+      return;
     }
 
     $entity = $attached_entity->entity;
