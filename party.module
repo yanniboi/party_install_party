@@ -934,7 +934,7 @@ function party_get_party_types() {
  *  to the 'main' flag in the data set.
  *  @todo fix the hash this is indexed by!
  */
-function party_get_attached_entities($party, $data_set_name, $create = false) {
+function party_get_attached_entities($party, $data_set_name, $create = FALSE) {
   if (!$party) {
     drupal_set_message(t('Party not set, unable to load attached entities.'), 'error');
     return array();
@@ -959,7 +959,7 @@ function party_get_attached_entities($party, $data_set_name, $create = false) {
     $attached_entities[$attached_entity->hash()] = $attached_entity;
   }
 
-  if (empty($attached_entities)) {
+  if (empty($attached_entities)  && $create) {
     $attached_entity = party_get_crm_controller($data_set_name);
     $attached_entity->setParty($party);
     $attached_entity->createAttachedEntity();
