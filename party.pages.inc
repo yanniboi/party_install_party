@@ -84,24 +84,34 @@ function party_form($form, &$form_state, $party, $op = 'edit') {
 
   $form_state['#party'] = $party;
   $form_state['#party_unchanged'] = $party; // So that other modules can react to changes. Must be a better way
-  $form_state['#attached_entities'] = array();
+  $form_state['#data_set_controllers'] =
+    $form_state['#attached_entities'] = array();
 
   $data_sets = party_get_party_data_sets($party);
 
   foreach ($data_sets as $data_set) {
+    // Get our controller
+    $controller = party_get_crm_controller($data_set, $party);
     $attached_entities = array();
+    
+    // See if we can load any entities
     if (isset($party->pid)) {
-      $attached_entities = party_get_attached_entities($party, $data_set);
+      $attached_entities = $controller->getEntities();
+      
+      // If not, let's create one
+      if (count($attached_entities) == 0) {
+        $attached_entities[] = $controller->getEntity(0, TRUE);
+      }
     }
-
-    if (count($attached_entities) < 1) {
-      $attached_entity = party_get_crm_controller($data_set);
-      $attached_entity->createAttachedEntity();
-      $attached_entity->setParty($party);
-      $attached_entities[$attached_entity->hash()] = $attached_entity;
+    else {
+      // No party so this has to be a little different, we'll attach
+      // after the party is saved.
+      $attached_entities[] = $controller->createEntity();
     }
-
-    $form_state['#attached_entities'] = array_merge($form_state['#attached_entities'], $attached_entities);
+    
+    foreach ($attached_entities as $delta => $entity) {
+      $form_state['#attached_entities'][$data_set . ':' . $delta] = $entity;
+    }
   }
   // Everything between the last @todo and here needs to be in a hook so that other modules can change it.
 
@@ -146,7 +156,8 @@ function party_edit_form_validate($form, &$form_state) {
 function party_edit_form_submit($form, &$form_state) {
   $party = $form_state['#party'];
   field_attach_submit('party', $party, $form, $form_state);
-
+  party_save($party);
+  
   $party->data_sets = array();
 
   $form_state['#party'] = $party;
@@ -159,12 +170,18 @@ function party_edit_form_submit($form, &$form_state) {
  */
 function party_edit_form_save($form, &$form_state) {
   $party = $form_state['#party'];
-  $party = party_save($party);
+  
+  // Load our attached data sets
+  $data_sets = party_get_party_data_sets($party);
+  $data_set_info = party_get_data_set_info();
 
-  // Attach all the various entities
-  foreach ($party->data_sets as $attached_entities) {
-    foreach ($attached_entities as $attached_entity) {
-      $attached_entity->attach($party);
+  foreach ($data_sets as $data_set) {
+    if (!empty($party->data_sets[$data_set])) {
+      $controller = party_get_crm_controller($data_set, $party);
+      foreach ($party->data_sets[$data_set] as $entity) {
+        $controller->attachEntity($entity);
+      }
+      $controller->save();
     }
   }
 
