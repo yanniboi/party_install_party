@@ -6,7 +6,7 @@
  * This stores the entities list and party information for each Party-PartyData
  * couple.
  */
-class PartyData {
+class PartyDefaultDataSet {
 
   /**
    * var string $data_set_name

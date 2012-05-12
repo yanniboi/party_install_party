@@ -22,7 +22,7 @@ function party_profile_party_data_set_info() {
       'label' => $label,
       'entity type' => 'profile2',
       'entity bundle' => $type,
-      'class' => 'PartyData',
+      'class' => 'PartyDefaultDataSet',
       // Provide details of admin interfaces
       'admin' => array(
         'create' => 'admin/structure/profiles/add',
