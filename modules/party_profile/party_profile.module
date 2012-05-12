@@ -22,7 +22,7 @@ function party_profile_party_data_set_info() {
       'label' => $label,
       'entity type' => 'profile2',
       'entity bundle' => $type,
-      'class' => 'Profile2PartyController',
+      'class' => 'PartyData',
       // Provide details of admin interfaces
       'admin' => array(
         'create' => 'admin/structure/profiles/add',
@@ -60,12 +60,4 @@ function party_profile_profile2_type_insert($type) {
  */
 function party_profile_profile2_type_update($type) {
   cache_clear_all('party:data_set_info','cache');
-}
-
-/**
- * Controller class for CRM integration.
- *
- * @todo: move this to an inc file for autoloading.
- */
-class Profile2PartyController extends EntityDefaultPartyController {
 }
