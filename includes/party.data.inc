@@ -1,35 +1,41 @@
 <?php
+/**
+ * @file
+ * Provides the default class for managing party - Attached entity
+ * relationships.
+ */
 
 /**
- * Class PartyData
+ * Class PartyDefaultDataSet
  *
- * This stores the entities list and party information for each Party-PartyData
- * couple.
+ * This class manages the attachement of entities to a party, including
+ * loading, ordering, attaching and detaching entities. It also provides
+ * a helper for creating new attached entities.
  */
 class PartyDefaultDataSet {
 
   /**
-   * var string $data_set_name
+   * var string $data_set
    *   The data set name (array key in hook_data_set_info)
    */
-  protected $data_set_name;
+  protected $data_set;
 
   /**
    * var array $entities
-   *   An array of attatched entities, key'd by delta
+   *   An array of attatched entities, keyed by delta
    */
   protected $entities = array();
 
   /**
-   * var Party $party
-   *   The Party object we're connected to.
+   * var party $party
+   *   The party object we're connected to.
    */
   protected $party;
 
   /**
    * Alters entity info for entities requesting CRM integration.
    *
-   * @param $entity_info
+   * @param array $entity_info
    *  The info array for a single entity.
    *  Apparently, you can pass this in from the original array in an
    *  implementation of hook_entity_info_alter, thus:
@@ -37,7 +43,7 @@ class PartyDefaultDataSet {
    */
   static function hook_entity_info_alter(&$entity_info) {
     $entity_info['view modes']['party'] = array(
-      'label' => t('Party display'),
+      'label' => t('party display'),
       'custom settings' => FALSE,
     );
   }
@@ -45,38 +51,33 @@ class PartyDefaultDataSet {
   /**
    * Constructor
    *
-   * @param string $data_set_name
+   * @param string $data_set
    *   The data set name.
-   * @param Party $party
+   * @param party $party
    *   The party object.
    */
-  public function __construct($data_set_name, Party $party) {
+  public function __construct($data_set, party $party) {
     // Check that this is a valid data set
-    if (party_get_data_set_info($data_set_name)) {
-      $this->data_set_name = $data_set_name;
+    if (party_get_data_set_info($data_set)) {
+      $this->data_set = $data_set;
     }
     else {
       // Return
       return;
     }
 
-    // Check that this is a valid party
-    if (!empty($party->pid)) {
-      $this->party = $party;
+    $this->party = $party;
+    
+    if (!empty($this->party->pid)) {    
+      // This is useless without knowing what is attached so let's load the
+      // stubs.
+      $query = db_select('party_attached_entity', 'ae');
+      $query->fields('ae', array('delta', 'eid'));
+      $query->condition('pid', $this->party->pid, '=');
+      $query->condition('data_set', $this->data_set);
+      $result = $query->execute();
+      $this->entities = $result->fetchAllKeyed();
     }
-    else {
-      // Return
-      return;
-    }
-
-    // This is useless without knowing what is attached so let's load the
-    // stubs.
-    $query = db_select('party_attached_entity', 'ae');
-    $query->fields('ae', array('delta', 'eid'));
-    $query->condition('pid', $this->party->pid, '=');
-    $query->condition('data_set', $this->data_set_name);
-    $result = $query->execute();
-    $this->entities = $result->fetchAllKeyed();
   }
 
   /**
@@ -87,25 +88,25 @@ class PartyDefaultDataSet {
   }
 
   /**
-   * Method to get part the entity info
+   * Get information from the data set or entity definition.
    *
-   * @param $key
+   * @param string $key
    *   This is the information you want:
-   *     - 'type' the data set entity type
-   *     - 'bundle' the data set entity bundle
-   *     - 'id key' the entity id key
-   *     - 'bundle key' the entity bundle key
+   *   - 'type': the data set entity type.
+   *   - 'bundle': the data set entity bundle.
+   *   - 'id key': the entity id key.
+   *   - 'bundle key': the entity bundle key.
    */
-  public function getDataInfo($key) {
+  final public function getDataInfo($key) {
     // Get our info
-    $party_data_info = party_get_data_set_info($this->data_set_name);
+    $party_data_info = party_get_data_set_info($this->data_set);
     $entity_info = entity_get_info($party_data_info['entity type']);
 
     // Return the relevant information
     switch ($key) {
       // Data Set Info
       case 'name':
-        return $this->data_set_name;
+        return $this->data_set;
       break;
       case 'entity type':
         return $party_data_info['entity type'];
@@ -114,7 +115,7 @@ class PartyDefaultDataSet {
         return $party_data_info['entity bundle'];
       break;
 
-      // Entity Info
+      // entity Info
       case 'id key':
         return $entity_info['entity keys']['id'];
       break;
@@ -125,13 +126,22 @@ class PartyDefaultDataSet {
   }
 
   /**
-   * Method to load full entities
+   * Get the delta from an entity object
+   */
+  public function getEntityDelta($entity) {
+    // Flip our entity ids array so it's delta keyed by id.
+    $deltas = array_flip($this->getEntityIds());
+    $entity_id = $entity->{$this->getDataInfo('id key')};
+    return isset($deltas[$entity_id]) ? $deltas[$entity_id]: FALSE;
+  }
+  
+  /**
+   * Load the full entities
    *
-   * @param mixed $deltas
+   * @param array|null $deltas
    *   (optional) An array of delta(s) to load or NULL to load all entities.
    *
-   * @return this
-   *   For chaining.
+   * @return $this
    */
   public function loadEntities($deltas = NULL) {
     // Get our array of deltas
@@ -145,7 +155,7 @@ class PartyDefaultDataSet {
       if (isset($this->entities[$delta]) && !is_object($this->entities[$delta])) {
         // This entity needs loading
         $this->entities[$delta] = reset(entity_load($this->getDataInfo('entity type'), array($this->entities[$delta])));
-        $this->entities[$delta]->data_set_name = $this->data_set_name;
+        $this->entities[$delta]->data_set_name = $this->data_set;
       }
     }
 
@@ -153,11 +163,11 @@ class PartyDefaultDataSet {
   }
 
   /**
-   * Method to get an attached entity
+   * Get a particular attached entity
    *
-   * @param $delta
+   * @param int $delta
    *   (optional) A delta to get. Defaults to 0.
-   * @param boolean $create
+   * @param bool $create
    *   (optional) Create an entity if it doesn't exist. Defaults to FALSE.
    *
    * @return mixed
@@ -190,7 +200,10 @@ class PartyDefaultDataSet {
   }
 
   /**
-   * Method to return all attached entities
+   * Get all attached entities
+   *
+   * @return array
+   *   An array of all this data set's entities keyed by their delta.
    */
   public function getEntities() {
     $this->loadEntities();
@@ -199,13 +212,14 @@ class PartyDefaultDataSet {
   }
 
   /**
-   * Method to get entity ids
+   * Get entity ids/deltas
    *
-   * This allows you to get the ids of all the entities without having to load
-   * them. If they are already loaded, we extract the id.
+   * This allows you to get the entity ids and deltas of all the entities
+   * without having to load them. If they are already loaded, we extract the
+   * entity's id from the object.
    *
    * @return array
-   *   Array of entity ids key'd by delta
+   *   Array of entity ids and delta, keyed as specified by $ids.
    */
   public function getEntityIds() {
     $ids = array();
@@ -224,7 +238,13 @@ class PartyDefaultDataSet {
   }
 
   /**
-   * Method to create a new entity
+   * Create a new entity
+   *
+   * This method provides a helper to create a new attached entity for the data
+   * set without having to figure out the entity type and bundle.
+   *
+   * @return object
+   *   A newly created unsaved entity of the correct type and bundle.
    */
   public function createEntity() {
    // Create a placeholder entity
@@ -233,46 +253,74 @@ class PartyDefaultDataSet {
       $values[$this->getDataInfo('bundle key')] = $this->getDataInfo('entity bundle');
     }
 
+    // Create the entity, set our data set and return
     $entity = entity_create($this->getDataInfo('entity type'), $values);
-    $entity->data_set_name = $this->data_set_name;
+    $entity->data_set_name = $this->data_set;
     return $entity;
   }
 
   /**
-   * Method to attach an entity
+   * Attach an entity to the party
    *
-   * Attach an Entity to the Party. This method puts the entity in the right
-   * place in the $entities array and this is then saved with the "commit" method.
+   * This method puts the entity in the right place in the $entities array.
+   * NB: This does not save the new order, you must call
+   * PartyDefaultData::save() to do that. This method cannot be overloaded
+   * and any extensions of this class can make use of
+   * PartyDefaultDataSet::preAttach() and PartyDefaultDataSet::postAttach()
+   * to perform any additional logic required.
    *
-   * @param $entity
-   *   The $entity we're attaching
-   * @param $method
-   *   The $method we're using can be one of
-   *   - append (default) - the entity will be added to the end of the list
-   *   - prepend
-   *   - insert
-   * @param $delta
-   *   If the $method is set to insert. This is the delta of the attahced
-   *   entity
+   * @param object $entity
+   *   The entity we're attaching.
+   * @param string $method
+   *   The $method we're using can be one of:
+   *   - 'append' (default): the entity will be added to the end of the list.
+   *   - 'prepend': the entity will be added at the front of the list.
+   *   - 'insert': the entity will be inserted at $delta.
+   * @param bool $reattach
+   *   If this entity is already attached, should we remove it and then
+   *   reattach using the requested method. Defaults to FALSE.
+   * @param int $delta
+   *   If the $method is set to insert. This is the target delta of the
+   *   attached entity.
    *
-   * @return this
-   *   For chaining.
+   * @return $this
+   *
+   * @see PartyDefaultDataSet::preAttach()
+   * @see PartyDefaultDataSet::postAttach()
    */
-  final public function attachEntity($entity, $method = 'append', $delta = 0) {
+  final public function attachEntity($entity, $method = 'append', $reattach = FALSE, $delta = 0) {
     // Fire any pre attach logic
     $this->preAttach($entity, $method, $delta);
 
-    switch ($method) {
-      case 'append':
-        $this->entities[] = $entity;
-        break;
-      case 'prepend':
-        array_unshift($this->entities, $entity);
-        break;
-      case 'insert':
-        // Put the entity and its availability in the right place
-        array_splice($this->entities, $delta, 0, $entity);
-        break;
+    // Check if this entity is already attached
+    $delta = $this->getEntityDelta($entity);
+    if ($delta !== FALSE) {
+      if ($reattach) {
+        // Do this manually as we don't want to trigger the pre/post callbacks.
+        unset($this->entities[$delta]);
+        $this->entities = array_values($this->entities);
+        $delta = FALSE;
+      }
+      else {
+        // Let's make sure our attached entity if fully loaded and update it if necessary
+        $this->entities[$delta] = $entity;
+      }
+    }
+    
+    // Only attach if it wasn't already and hasn't been detached.
+    if ($delta === FALSE) {
+      switch ($method) {
+        case 'append':
+          $this->entities[] = $entity;
+          break;
+        case 'prepend':
+          array_unshift($this->entities, $entity);
+          break;
+        case 'insert':
+          // Put the entity and its availability in the right place
+          array_splice($this->entities, $delta, 0, $entity);
+          break;
+      }
     }
 
     // Fire any post attach logic
@@ -282,39 +330,79 @@ class PartyDefaultDataSet {
   }
 
   /**
-   * Method for overloading of any pre attach logic
+   * Overload any pre attach logic
    *
-   * @param $entity
-   * @param $method
-   * @param $delta
+   * Both $method and $delta can be taken by reference, allowing you to make
+   * alterations to the attach behaviour.
+   *
+   * @param object $entity
+   * @param string $method
+   * @param int $delta
    *
    * @see PartyData::attachEntity()
    */
   protected function preAttach($entity, &$method, &$delta) {}
 
   /**
-   * Method for overloading of any post attach logic
+   * Overload any post attach logic
    *
-   * @param $entity
-   * @param $method
-   * @param $delta
+   * @param object $entity
+   * @param string $method
+   * @param int $delta
    *
    * @see PartyData::attachEntity()
    */
   protected function postAttach($entity, $method, $delta) {}
 
   /**
-   * Method for detaching entities
+   * Detach an entity
    *
-   * @param $delta
+   * This is a helper method to detach an entity when you have it's object.
+   * This method cannot be overloaded and any extensions of this class can
+   * make use of PartyDefaultDataSet::preAttach() and
+   * PartyDefaultDataSet::postAttach() to perform any additional logic
+   * required.
+   *
+   * @param int $delta
    *   The delta of the entity to detach
-   * @param boolean $return
-   *   Whether you want to return the detached entity or $this for chaining.
    *
-   * @return mixed
-   *   Depending on $return, either the detached entity or this for chaining.
+   * @return $this
+   *
+   * @see PartyDefaultDataSet::detchEntityByDelta()
+   * @see PartyDefaultDataSet::preDetach()
+   * @see PartyDefaultDataSet::postDetach()
    */
-  final public function detachEntity($delta, $return = FALSE) {
+  final public function detachEntity($entity) {
+    // Figure out our delta
+    $delta = $this->getEntityDelta($entity);
+    
+    // Pass this onto the detachEntityByDelta method to actually detach
+    $this->detachEntityByDelta($delta);
+    
+    return $this;
+  }
+
+  /**
+   * Detatch an entity by delta
+   *
+   * This method cannot be overloaded and any extensions of this class can
+   * make use of PartyDefaultDataSet::preAttach() and
+   * PartyDefaultDataSet::postAttach() to perform any additional logic
+   * required.
+   *
+   * @param int $delta
+   *   The delta of the entity to detach
+   * @param bool $return
+   *   Whether you want to return the detached entity or $this for chaining.
+   *   Defaults to FALSE.
+   *
+   * @return object|$this
+   *   Depending on $return, either the detached entity or this for chaining.
+   *
+   * @see PartyDefaultDataSet::preDetach()
+   * @see PartyDefaultDataSet::postDetach()
+   */
+  final public function detachEntityByDetla($delta, $return = FALSE) {
     // Fire any pre attach logic
     $this->preDetach($delta);
 
@@ -343,21 +431,23 @@ class PartyDefaultDataSet {
       return $this;
     }
   }
-
-
+  
   /**
-   * Method for overloading of any pre detach logic
+   * Overload any pre detach logic
    *
-   * @param $delta
+   * $delta can be taken by reference, allowing you to make alterations to the
+   * detach behaviour.
+   *
+   * @param int $delta
    *
    * @see PartyData::detachEntity()
    */
   protected function preDetach($entity, &$method, &$delta) {}
 
   /**
-   * Method for overloading of any post detach logic
+   * Overload any post detach logic
    *
-   * @param $delta
+   * @param int $delta
    *
    * @see PartyData::detachEntity()
    */
@@ -365,22 +455,31 @@ class PartyDefaultDataSet {
 
 
   /**
-   * Method to save the attached entities info
+   * Save the attached entities information
    *
-   * @param boolean $save_entities
+   * This method cannot be overloaded and any extensions of this class can
+   * make use of PartyDefaultDataSet::preSave() and
+   * PartyDefaultDataSet::postSave() to perform any additional logic required.
+   *
+   * @param bool $save_entities
    *   Whether or not to save entities as we go through them.
    *
-   * @return this
-   *   For chaining.
+   * @return $this
+   *
+   * @todo Remove the need to save entity type and bundle, as it's easy to
+   *   sniff our from the data set.
+   *
+   * @see PartyDefaultDataSet::preSave()
+   * @see PartyDefaultDataSet::postSave()
    */
   final public function save($save_entities = FALSE) {
     // Fire any pre attach logic
-    $this->preSave();
+    $this->preSave($save_entities);
 
     // Clear out our old bits
     $query = db_delete('party_attached_entity');
     $query->condition('pid', $this->party->pid, '=');
-    $query->condition('data_set', $this->data_set_name);
+    $query->condition('data_set', $this->data_set);
     $query->execute();
 
     // Insert our entities
@@ -392,39 +491,46 @@ class PartyDefaultDataSet {
         entity_save($this->getDataInfo('entity type'), $entity);
       }
 
+      // Add our record
       $query->values(array(
         'pid' => $this->party->pid,
         'eid' => $entity->{$this->getDataInfo('id key')},
         'delta' => $delta,
-        'data_set' => $this->data_set_name,
-        'entity_type' => 'blah',
-        'entity_bundle' => 'BLAH!',
+        'data_set' => $this->data_set,
+        'entity_type' => $this->getDataInfo('entity type'),
+        'entity_bundle' => $this->getDataInfo('entity bundle'),
       ));
     }
     $query->execute();
 
     // Fire any post attach logic
-    $this->postSave();
+    $this->postSave($save_entities);
 
     return $this;
   }
 
   /**
-   * Method for overloading of any pre save logic
+   * Overload any pre save logic
+   *
+   * @param bool $save_entities
+   *   Whether or not to save entities as we go through them.
    *
    * @see PartyData::save()
    */
-  protected function preSave() {}
+  protected function preSave($save_entities) {}
 
   /**
-   * Method for overloading of any post save logic
+   * Overload any post save logic
+   *
+   * @param bool $save_entities
+   *   Whether or not to save entities as we go through them.
    *
    * @see PartyData::save()
    */
-  protected function postSave() {}
+  protected function postSave($save_entities) {}
 
   /**
-   * Method to re-order attached entities
+   * Re-order attached entities
    *
    * This will re-order any entities to match the order specified in $order.
    * Any entities that are left out of $order will be appended to the new
@@ -433,8 +539,7 @@ class PartyDefaultDataSet {
    * @param array $order
    *   A numeric array of old deltas in the new order
    *
-   * @return this
-   *   For chaining.
+   * @return $this
    */
   final public function reorderEntities($order) {
     // First we need to collect missed entities
@@ -460,9 +565,9 @@ class PartyDefaultDataSet {
   }
 
   /**
-   * Method to shift a particular entity in the order
+   * Shift a particular entity in the order
    *
-   * @param $delta
+   * @param int $delta
    *   The delta of the item we're shifting
    * @param string $method
    *   The method of shift we want:
@@ -470,12 +575,11 @@ class PartyDefaultDataSet {
    *    - 'down' Shifts the entity down by $target
    *    - 'insert' Moves the entity to that position, shifting everything else
    *    - 'swap' Swaps the entity with the entity in $target
-   * @param $target
-   *   If method is 'up' or 'down', shift the elemnt up or down by this target.
-   *   If method is 'swap', swap the entitiy with the entity at this delta.
+   * @param int $target
+   *   If method is 'up' or 'down', shift the element by this amount.
+   *   If method is 'swap', swap the entity with the entity at this delta.
    *
-   * @return this
-   *   For chaining.
+   * @return $this
    */
   final public function shiftEntity($delta, $method, $target = 1) {
     if (isset($this->entities[$delta])) {
