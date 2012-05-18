@@ -42,6 +42,7 @@ function party_entity_info() {
       'label' => 'label',
     ),
     'exportable' => TRUE,
+    'access callback' => 'party_entity_access',
     //'static cache' => TRUE,
     'bundles' => array(
       'individual' => array(
@@ -442,6 +443,26 @@ function party_data_set_load($data_set_url_string) {
 
   // If nothings been found yet, check up the data set names
   return party_get_data_set_info($data_set_url_string);
+}
+
+/**
+ * Wrap around the party_access function for the entity api 'access callback'
+ * setting.
+ *
+ * @param $op
+ *   The operation being performed.
+ * @param $party
+ *   A party to check access for.
+ * @param $account
+ *   (optional) The user to check access for. Omit to check for the global user.
+ *
+ * @return
+ *   Boolean; TRUE to grant access, FALSE to deny it.
+ *
+ * @see party_access
+ */
+function party_entity_access($op, $party = NULL, $account = NULL) {
+  return party_access($op, $party, NULL, $account);
 }
 
 /**
