@@ -43,6 +43,7 @@ function party_entity_info() {
     ),
     'exportable' => TRUE,
     'access callback' => 'party_entity_access',
+    'uri callback' => 'party_uri',
     //'static cache' => TRUE,
     'bundles' => array(
       'individual' => array(
