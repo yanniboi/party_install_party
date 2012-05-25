@@ -244,6 +244,8 @@ function party_hat_edit_form_submit($form, &$form_state) {
   party_hat_save($hat);
   field_attach_submit('party_hat', $hat, $form, $form_state);
 
+  drupal_set_message(t("Party hat has been saved."));
+
   // @todo: fix this with the new values.
 
   foreach ($form_state['values']['data_set_rules'] as $type => $values) {
