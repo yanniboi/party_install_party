@@ -26,6 +26,7 @@ function party_help($path, $arg) {
 function party_entity_info() {
   $party_info['party'] = array(
     'label' => t('Party'),
+    'plural label' => t('Parties'),
     'entity class' => 'Party',
     'controller class' => 'PartyController',
     // We define this so entity module provides us with basic Views data, while
@@ -43,6 +44,12 @@ function party_entity_info() {
     ),
     'access callback' => 'party_entity_access',
     'uri callback' => 'party_uri',
+    // Entity API admin UI.
+    'admin ui' => array(
+      'controller class' => 'PartyUIController',
+      'path' => 'admin/community',
+      'file' => 'party.admin.inc',
+    ),
     //'static cache' => TRUE,
     'bundles' => array(
       'individual' => array(
