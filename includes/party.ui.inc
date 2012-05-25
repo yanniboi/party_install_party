@@ -54,4 +54,41 @@ class PartyUIController extends EntityDefaultUIController {
     return $form;
   }
 
+  /**
+   * Generates the table headers for the overview table.
+   */
+  protected function overviewTableHeaders($conditions, $rows, $additional_header = array()) {
+    $header = $additional_header;
+    array_unshift($header, t('Id'), t('Label'));
+    if (!empty($this->entityInfo['exportable'])) {
+      $header[] = t('Status');
+    }
+
+    $header[] = t('Type');
+
+    // Add operations with the right colspan.
+    $header[] = array('data' => t('Operations'), 'colspan' => $this->operationCount());
+    return $header;
+  }
+
+  /**
+   * Generates the row for the passed entity and may be overridden in order to
+   * customize the rows.
+   */
+  protected function overviewTableRow($conditions, $id, $party, $additional_cols = array()) {
+    // Get the basic row from the parent class.
+    $row = parent::overviewTableRow($conditions, $id, $party, $additional_cols);
+
+    // Take off the label so we can rearrange things.
+    $label = array_shift($row);
+
+    array_unshift($row,
+      $id,
+      $label,
+      $this->entityInfo['bundles'][$party->type]['label']
+    );
+
+    return $row;
+  }
+
 }
