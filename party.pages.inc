@@ -59,13 +59,13 @@ function party_add($type = '') {
     'label' => '',
   ));
 
-  return drupal_get_form('party_edit_form', $party);
+  return drupal_get_form('party_form', $party);
 }
 
 /**
  * Party edit form.
  */
-function party_edit_form($form, &$form_state, $party) {
+function party_form($form, &$form_state, $party, $op = 'edit') {
   $form['#party'] = $party;
 
   if (isset($party->pid)) {

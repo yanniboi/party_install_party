@@ -48,7 +48,9 @@ function party_entity_info() {
     'admin ui' => array(
       'controller class' => 'PartyUIController',
       'path' => 'admin/community',
-      'file' => 'party.admin.inc',
+      // Urgh. Our admin UI is split between admin.inc and pages.inc!
+      // @todo untangle and fix.
+      'file' => 'party.pages.inc',
     ),
     //'static cache' => TRUE,
     'bundles' => array(
@@ -245,7 +247,7 @@ function party_menu() {
   $items['party/%party/party/edit'] = array(
     'title' => 'Edit',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('party_edit_form', 1),
+    'page arguments' => array('party_form', 1),
     'access callback' => 'party_access',
     'access arguments' => array('edit', 1),
     'file' => 'party.pages.inc',
