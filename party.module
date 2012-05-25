@@ -41,7 +41,6 @@ function party_entity_info() {
       'bundle' => 'type',
       'label' => 'label',
     ),
-    'exportable' => TRUE,
     'access callback' => 'party_entity_access',
     'uri callback' => 'party_uri',
     //'static cache' => TRUE,
