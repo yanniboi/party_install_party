@@ -84,24 +84,34 @@ function party_form($form, &$form_state, $party, $op = 'edit') {
 
   $form_state['#party'] = $party;
   $form_state['#party_unchanged'] = $party; // So that other modules can react to changes. Must be a better way
+  $form_state['#data_set_controllers'] =
   $form_state['#attached_entities'] = array();
 
   $data_sets = party_get_party_data_sets($party);
 
   foreach ($data_sets as $data_set) {
+    // Get our controller
+    $partyData = party_get_crm_controller($data_set, $party);
     $attached_entities = array();
+
+    // See if we can load any entities
     if (isset($party->pid)) {
-      $attached_entities = party_get_attached_entities($party, $data_set);
+      $attached_entities = $controller->getEntities();
+
+      // If not, let's create one
+      if (count($attached_entities) == 0) {
+        $attached_entities[] = $controller->getEntity(0, TRUE);
+      }
+    }
+    else {
+      // No party so this has to be a little different, we'll attach
+      // after the party is saved.
+      $attached_entities[] = $controller->createEntity();
     }
 
-    if (count($attached_entities) < 1) {
-      $attached_entity = party_get_crm_controller($data_set);
-      $attached_entity->createAttachedEntity();
-      $attached_entity->setParty($party);
-      $attached_entities[$attached_entity->hash()] = $attached_entity;
+    foreach ($attached_entities as $delta => $entity) {
+      $form_state['#attached_entities'][$data_set . ':' . $delta] = $entity;
     }
-
-    $form_state['#attached_entities'] = array_merge($form_state['#attached_entities'], $attached_entities);
   }
   // Everything between the last @todo and here needs to be in a hook so that other modules can change it.
 
@@ -146,6 +156,7 @@ function party_edit_form_validate($form, &$form_state) {
 function party_edit_form_submit($form, &$form_state) {
   $party = $form_state['#party'];
   field_attach_submit('party', $party, $form, $form_state);
+  party_save($party);
 
   $party->data_sets = array();
 
@@ -159,12 +170,18 @@ function party_edit_form_submit($form, &$form_state) {
  */
 function party_edit_form_save($form, &$form_state) {
   $party = $form_state['#party'];
-  $party = party_save($party);
 
-  // Attach all the various entities
-  foreach ($party->data_sets as $attached_entities) {
-    foreach ($attached_entities as $attached_entity) {
-      $attached_entity->attach($party);
+  // Load our attached data sets
+  $data_sets = party_get_party_data_sets($party);
+  $data_set_info = party_get_data_set_info();
+
+  foreach ($data_sets as $data_set) {
+    if (!empty($party->data_sets[$data_set])) {
+      $controller = party_get_crm_controller($data_set, $party);
+      foreach ($party->data_sets[$data_set] as $entity) {
+        $controller->attachEntity($entity);
+      }
+      $controller->save();
     }
   }
 
@@ -238,30 +255,35 @@ function party_page_view_piece_views($party, $view_name, $view_display_id) {
  *   load would be weird too.
  * @param $eid
  *    The id of the entity
+ *
+ * @todo: Reimplement actions and edit overlay stuff
  */
 function party_attached_entity_edit_form($form, &$form_state, $party, $data_set, $eid = NULL) {
-  $attached_entity = party_get_crm_controller($data_set['set_name']);
-  $attached_entity->setParty($party->pid);
+  $partyData = party_get_crm_controller($data_set['set_name'], $party);
+
 
   if ($eid !== NULL) {
-    $attached_entity->setAttachedEntity($eid);
-    $form_title = "Edit " . $data_set['label'] . " (" . entity_label($data_set['entity type'], $attached_entity->entity) . ")";
+    $entity = reset(entity_load($partyData->getDataInfo('entity type'), array($eid)));
+    $form_title = "Edit " . $data_set['label'] . " (" . entity_label($data_set['entity type'], $entity) . ")";
     drupal_set_title($form_title);
   }
   else {
-    drupal_set_title("Add {$attached_entity->definition['label']} Data Set to {$party->label}");
-    $attached_entity->createAttachedEntity();
+    drupal_set_title("Add {$partyData->getDataInfo('label')} Data Set to {$party->label}");
+    $entity = $partyData->createEntity();
   }
 
-  //Build form
-  if (!isset($form_state['#attached_entities'][$attached_entity->hash()])) {
-    $form_state['#attached_entities'][$attached_entity->hash()] = $attached_entity;
+  // Save the data set object in the form state
+  $form_state['#partyData'] = $partyData;
+
+  // Build form
+  if (!isset($form_state['#attached_entities'][$partyData->getDataInfo('entity type') . ':' . $eid])) {
+    $form_state['#attached_entities'][$partyData->getDataInfo('entity type') . ':' . $eid] = $entity;
   }
 
-  $form['#submit'][] = 'party_attached_entity_edit_form_submit';
-  $form_state['#party'] = $attached_entity->party;
+  $form_state['#party'] = $party;
 
   party_attached_entity_attach_form($form, $form_state);
+  $form['#submit'][] = 'party_attached_entity_edit_form_submit';
 
   $form['submit'] = array(
     '#type' => 'submit',
@@ -282,10 +304,17 @@ function party_attached_entity_edit_form_validate($form, &$form_state) {
  * Submit handler for the data set edit form.
  */
 function party_attached_entity_edit_form_submit($form, &$form_state) {
-  $attached_entity_controller = reset($form_state['#attached_entities']);
+  $entity = reset($form_state['#attached_entities']);
+  $party = $form_state['#party'];
+  $partyData = $form_state['#partyData'];
+
+  if (!in_array($entity->{$partyData->getDataInfo('id key')}, $partyData->getEntityIds())) {
+    $partyData->attachEntity($entity);
+    $partyData->save();
+  }
 
   // Redirect to the set piece.
-  $form_state['redirect'] = 'party/' . $attached_entity_controller->pid . '/' . $attached_entity_controller->definition['path element'];
+  $form_state['redirect'] = 'party/' . $party->pid . '/' . $partyData->getDataInfo('path element');
 }
 
 /**
@@ -325,6 +354,8 @@ function party_attached_entity_remove_confirm_submit($form, &$form_state) {
  *    A loaded party object.
  * @param $data_set_name
  *   A data set name.
+ *
+ * @todo: remove
  */
 function party_view_data_set($party, $data_set_name) {
   $data_set = party_get_data_set_info($data_set_name);

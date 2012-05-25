@@ -38,13 +38,10 @@ function party_attached_entity_field_label($party) {
   $data_set_name = variable_get('party_name_label_data_set', 'party');
   $field_name = variable_get('party_name_label_field', FALSE);
   if ($data_set_name != 'party') {
-    if (!($attached_entity = reset(party_get_attached_entities($party, $data_set_name)))) {
-      return;
-    }
-
-    $entity = $attached_entity->entity;
-    $entity_type = $attached_entity->getEntityType();
-    $entity_bundle = $attached_entity->getEntityBundle();
+    $controller = party_get_crm_controller($data_set_name, $party);
+    $entity = $controller->getEntity();
+    $entity_type = $controller->getDataInfo('entity type');
+    $entity_bundle = $controller->getDataInfo('entity bundle');
   }
   else {
     $entity = $party;
@@ -52,16 +49,31 @@ function party_attached_entity_field_label($party) {
     $entity_bundle = $party->type;
   }
 
-  $field = field_info_field($field_name);
-  $instance = field_info_instance($entity_type, $field_name, $entity_bundle);
+  if ($entity) {
+    // Get our field and instance settings
+    $field = field_info_field($field_name);
+    $instance = field_info_instance($entity_type, $field_name, $entity_bundle);
+    $instance['display']['default']['label'] = 'hidden';
 
-  $instance['display']['default']['label'] = 'hidden';
+    // Get the field ittems and limit them to one item
+    $items = array(reset(field_get_items($entity_type, $entity, $field_name)));
 
-  // Get the field Items and limit them to one item
-  $items = array(reset(field_get_items($entity_type, $entity, $field_name)));
-
-  $return = drupal_render(field_default_view($entity_type, $entity, $field, $instance, LANGUAGE_NONE, $items, 'default'));
-  $return = strip_tags($return);
+    // Get our rendered version of it
+    $return = drupal_render(field_default_view($entity_type, $entity, $field, $instance, LANGUAGE_NONE, $items, 'default'));
+    
+    // Convert html entities back into real input
+    $return = html_entity_decode(strip_tags($return));
+  }
+  
+  if (empty($return)) {
+    if (!empty($party->pid)) {
+      $return = t('Party !pid', array('!pid' => $party->pid));
+    }
+    else {
+      $return = t('New Party');
+    }
+  }
+  
   return $return;
 }
 

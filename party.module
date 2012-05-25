@@ -735,12 +735,12 @@ function party_party_party_pieces() {
  * @param $data_set_name
  *  The name of a data set.
  */
-function party_get_crm_controller($data_set_name) {
+function party_get_crm_controller($data_set_name, $party) {
   $sets = party_get_data_set_info();
 
   // @todo: error handling
   $class = $sets[$data_set_name]['class'];
-  return new $class($data_set_name);
+  return new $class($data_set_name, $party);
 }
 
 /**
@@ -886,9 +886,9 @@ function party_get_party_data_sets($party) {
  *  DX WTF: Lots of sniffing now done BUT do we want the $data_set instance made elsewhere. If so where?
  */
 function party_attach_entity($party, $entity, $data_set_name) {
-  $attached_entity = party_get_crm_controller($data_set_name);
-  $attached_entity->setAttachedEntity($entity);
-  $attached_entity->attach($party);
+  $controller = party_get_crm_controller($data_set_name, $party);
+  $controller->attachEntity($entity);
+  $controller->save();
 }
 
 /**
@@ -904,10 +904,9 @@ function party_attach_entity($party, $entity, $data_set_name) {
  */
 function party_detach_entity($party, $entity, $data_set_name) {
   /* To Test */
-  $attached_entity = party_get_crm_controller($data_set_name);
-  $attached_entity->setParty($party);
-  $attached_entity->setAttachedEntity($entity);
-  $attached_entity->detach();
+  $controller = party_get_crm_controller($data_set_name, $party);
+  $controller->detachEntity($entity);
+  $controller->save();
 }
 
 // -----------------------------------------------------------------------
@@ -929,6 +928,37 @@ function party_get_party_types() {
 }
 
 /**
+ * Return a Data Set object containing all the attached entities in a given
+ * data set for a particular party.
+ *
+ * @param $party
+ *  The party object of the party we're concerned with.
+ * @param $set_name
+ *  The set type as defined in hook_party_data_set_info().
+ * @param $create
+ *  Choose to create an entity if there isn't already at least one.
+ *
+ * @return
+ *  A party data set object with attached entities available
+ */
+function party_get_data_set($party, $data_set_name, $create = FALSE) {
+  if (!$party) {
+    drupal_set_message(t('Party not set, unable to load attached entities.'), 'error');
+    return array();
+  }
+
+  $partyData = party_get_crm_controller($data_set_name, $party);
+
+  $entityIds = $partyData->getEntityIds();
+  if ($create && empty($entityIds)) {
+    $entity = $partyData->createEntity();
+    $partyData->attach($entity);
+  }
+
+  return $partyData;
+}
+
+/**
  * Return all attached entities of a particular set.
  *
  * @param $party
@@ -940,44 +970,12 @@ function party_get_party_types() {
  *
  * @return
  *  An array of the attached entity controllers for the entities attached to the
- *  party in the given data set, keyed by entity id.
- *  Each entity additionally has the property 'party_main' set according
- *  to the 'main' flag in the data set.
- *  @todo fix the hash this is indexed by!
+ *  party in the given data set, keyed by attached entity delta.
  */
 function party_get_attached_entities($party, $data_set_name, $create = FALSE) {
-  if (!$party) {
-    drupal_set_message(t('Party not set, unable to load attached entities.'), 'error');
-    return array();
-  }
+  $partyData = party_get_data_set($party, $data_set_name, $create);
 
-  $sets = party_get_data_set_info();
-
-  $items = db_select('party_attached_entity', 'ds')
-    ->fields('ds')
-    ->condition('pid', $party->pid,'=')
-    ->condition('data_set', $data_set_name,'=')
-    ->orderBy('delta', 'ASC')
-    ->execute()
-    ->fetchAllAssoc('eid', PDO::FETCH_ASSOC);
-
-  $attached_entities = array();
-
-  foreach ($items as $eid => $instance) {
-    $attached_entity = party_get_crm_controller($data_set_name);
-    $attached_entity->setParty($party);
-    $attached_entity->setAttachedEntity($eid);
-    $attached_entities[$attached_entity->hash()] = $attached_entity;
-  }
-
-  if (empty($attached_entities)  && $create) {
-    $attached_entity = party_get_crm_controller($data_set_name);
-    $attached_entity->setParty($party);
-    $attached_entity->createAttachedEntity();
-    $attached_entities[$attached_entity->hash()] = $attached_entity;
-  }
-
-  return $attached_entities;
+  return $partyData->getEntities();
 }
 
 /**
@@ -1117,20 +1115,19 @@ function party_preprocess_entity(&$variables) {
     // @todo: clean this up -- having to load up the controller all over
     // again when we probably had it at some earlier point is just messy.
     $data_set_name = party_get_entity_data_set($entity_type, $entity);
-    $attached_entity = party_get_crm_controller($data_set_name);
-    $attached_entity->setParty($party_id);
-    $attached_entity->setAttachedEntity($eid);
+    $controller = party_get_crm_controller($data_set_name, party_load($party_id));
+    //$attached_entity->setAttachedEntity($eid);
 
     // Add the attached entity actions to the build content.
     // @todo: change these to contextual links?
-    $variables['content']['party_actions'] = array(
+    /*$variables['content']['party_actions'] = array(
       '#theme' => 'links',
       '#links' => $attached_entity->actions(),
       '#attributes' => array(
         'class' => array('links inline crm-set-action-links'),
       ),
       '#weight' => 100,
-    );
+    );*/
 
     // @todo This would be better off as a new feature in Entity API
     $variables['theme_hook_suggestions'][] = 'entity__all__party';
@@ -1331,10 +1328,11 @@ function party_attached_entity_attach_form(&$form, &$form_state) {
   foreach ($attached_entities as $hash => $attached_entity) {
     // Get the form callback.
     $callback = party_attached_entity_form_callback($attached_entity->data_set_name);
+    $data_set_info = party_get_data_set_info($attached_entity->data_set_name);
     // Execute the form callback.
     $form[$hash] =  $callback($form, $form_state, $attached_entity, $form_state['#party']);
     $form[$hash]['#type'] = 'fieldset';
-    $form[$hash]['#title'] = $attached_entity->getLabel();
+    $form[$hash]['#title'] = entity_label($data_set_info['entity type'], $attached_entity);
     $form[$hash]['#tree'] = TRUE;
     $form[$hash]['#parents'] = array($hash);
   }
@@ -1355,15 +1353,15 @@ function party_attached_entity_attach_form_validate(&$form, &$form_state) {
  */
 function party_attached_entity_attach_form_submit(&$form, &$form_state) {
   // Get all attached entities from $form_state.
-  $attached_entities = $form_state['#attached_entities'];
+  $attached_entities = &$form_state['#attached_entities'];
   $party = $form_state['#party'];
 
-  foreach ($attached_entities as $hash => $attached_entity) {
+  foreach ($attached_entities as $hash => &$attached_entity) {
     /// @todo explain what $hash is.
     // Get the form callback.
     $callback = party_attached_entity_form_callback($attached_entity->data_set_name) . '_submit';
     // Execute the form callback.
-    $return = $callback($form, $form_state, $attached_entity, $form_state['#party']);
+    $return = $callback($form, $form_state, $hash, $attached_entity, $form_state['#party']);
 
     if ($return !== FALSE) {
       // Stores the attached entities in an array keyed by data sets and deltas
@@ -1389,11 +1387,11 @@ function party_attached_entity_attach_form_submit(&$form, &$form_state) {
 function party_default_attached_entity_form($form, &$form_state, &$attached_entity, $party) {
   $attached_entity_form = array();
 
-  $entity = $attached_entity->entity;
+  $data_set_info = party_get_data_set_info($attached_entity->data_set_name);
 
-  field_attach_form($attached_entity->getEntityType(), $entity, $attached_entity_form, $form_state);
+  field_attach_form($data_set_info['entity type'], $attached_entity, $attached_entity_form, $form_state);
 
-  return($attached_entity_form);
+  return $attached_entity_form;
 }
 
 /**
@@ -1427,12 +1425,11 @@ function party_default_attached_entity_form_validate($form, &$form_state, &$atta
  * @param $party
  *   The party the $attached entity is attached to
  */
-function party_default_attached_entity_form_submit($form, &$form_state, &$attached_entity, $party) {
-  $hash = $attached_entity->hash();
-
+function party_default_attached_entity_form_submit($form, &$form_state, $hash, &$attached_entity, $party) {
   // Submit fields.
-  field_attach_submit($attached_entity->getEntityType(), $attached_entity->entity, $form[$hash], $form_state);
-  entity_save($attached_entity->getEntityType(), $attached_entity->entity);
+  $data_set_info = party_get_data_set_info($attached_entity->data_set_name);
+  field_attach_submit($data_set_info['entity type'], $attached_entity, $form[$hash], $form_state);
+  entity_save($data_set_info['entity type'], $attached_entity);
 }
 
 // --------------------------------------------------------------------------------------------------------------
