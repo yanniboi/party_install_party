@@ -244,6 +244,33 @@ class PartyDefaultDataSet {
   }
 
   /**
+   * Get actions for the attached entity. Check party access in each case.
+   *
+   * @return
+   *  An array of links suitable for theme_links().
+   */
+  public function getActions($party_id, $entity_id) {
+    $party_data_info = party_get_data_set_info($this->data_set);
+    dsm($party_data_info);
+
+    $actions = array();
+
+    if (party_access('edit', $this->party, $this->data_set)) {
+      $actions['edit'] = array(
+        'title' => 'Edit',
+        'href' => 'party/' . $party_id . '/' . $party_data_info['path element'] . '/edit/' . $entity_id,
+      );
+    }
+    if (party_access('detach', $this->party, $this->data_set)) {
+      $actions['remove'] = array(
+        'title' => 'Remove',
+        'href' => 'party/' . $party_id . '/' . $party_data_info['path element'] . '/remove/' . $entity_id,
+      );
+    }
+    return $actions;
+  }
+
+  /**
    * Create a new entity
    *
    * This method provides a helper to create a new attached entity for the data
