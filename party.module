@@ -144,25 +144,6 @@ function party_menu() {
     'file' => 'party.admin.inc',
   );
 
-  $items['admin/community'] = array(
-    'title' => 'Community',
-    'description' => 'Manage the community',
-    'page callback' => 'party_admin',
-    'page arguments' => array('list'),
-    'access arguments' => array('administer parties'),
-    'position' => 'left',
-    'file' => 'party.admin.inc',
-  );
-  // @todo crib from one of the core modules for how this admin menu pattern should be done, eg 'People'.
-  $items['admin/community/list'] = array(
-    'title' => 'List contacts',
-    'page callback' => 'party_admin',
-    'page arguments' => array('list'),
-    'access arguments' => array('administer parties'),
-    'position' => 'left',
-    'file' => 'party.admin.inc',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-  );
   $items['admin/community/datasets'] = array(
     'title' => 'Manage data sets',
     'page callback' => 'party_data_set_admin',
