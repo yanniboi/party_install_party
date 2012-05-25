@@ -26,6 +26,7 @@ function party_help($path, $arg) {
 function party_entity_info() {
   $party_info['party'] = array(
     'label' => t('Party'),
+    'plural label' => t('Parties'),
     'entity class' => 'Party',
     'controller class' => 'PartyController',
     // We define this so entity module provides us with basic Views data, while
@@ -43,6 +44,12 @@ function party_entity_info() {
     ),
     'access callback' => 'party_entity_access',
     'uri callback' => 'party_uri',
+    // Entity API admin UI.
+    'admin ui' => array(
+      'controller class' => 'PartyUIController',
+      'path' => 'admin/community',
+      'file' => 'party.admin.inc',
+    ),
     //'static cache' => TRUE,
     'bundles' => array(
       'individual' => array(
@@ -137,25 +144,6 @@ function party_menu() {
     'file' => 'party.admin.inc',
   );
 
-  $items['admin/community'] = array(
-    'title' => 'Community',
-    'description' => 'Manage the community',
-    'page callback' => 'party_admin',
-    'page arguments' => array('list'),
-    'access arguments' => array('administer parties'),
-    'position' => 'left',
-    'file' => 'party.admin.inc',
-  );
-  // @todo crib from one of the core modules for how this admin menu pattern should be done, eg 'People'.
-  $items['admin/community/list'] = array(
-    'title' => 'List contacts',
-    'page callback' => 'party_admin',
-    'page arguments' => array('list'),
-    'access arguments' => array('administer parties'),
-    'position' => 'left',
-    'file' => 'party.admin.inc',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-  );
   $items['admin/community/datasets'] = array(
     'title' => 'Manage data sets',
     'page callback' => 'party_data_set_admin',
