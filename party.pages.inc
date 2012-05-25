@@ -91,7 +91,7 @@ function party_form($form, &$form_state, $party, $op = 'edit') {
 
   foreach ($data_sets as $data_set) {
     // Get our controller
-    $partyData = party_get_crm_controller($data_set, $party);
+    $controller = party_get_crm_controller($data_set, $party);
     $attached_entities = array();
 
     // See if we can load any entities
