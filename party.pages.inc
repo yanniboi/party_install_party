@@ -93,11 +93,11 @@ function party_form($form, &$form_state, $party, $op = 'edit') {
     // Get our controller
     $partyData = party_get_crm_controller($data_set, $party);
     $attached_entities = array();
-    
+
     // See if we can load any entities
     if (isset($party->pid)) {
       $attached_entities = $controller->getEntities();
-      
+
       // If not, let's create one
       if (count($attached_entities) == 0) {
         $attached_entities[] = $controller->getEntity(0, TRUE);
@@ -108,7 +108,7 @@ function party_form($form, &$form_state, $party, $op = 'edit') {
       // after the party is saved.
       $attached_entities[] = $controller->createEntity();
     }
-    
+
     foreach ($attached_entities as $delta => $entity) {
       $form_state['#attached_entities'][$data_set . ':' . $delta] = $entity;
     }
@@ -157,7 +157,7 @@ function party_edit_form_submit($form, &$form_state) {
   $party = $form_state['#party'];
   field_attach_submit('party', $party, $form, $form_state);
   party_save($party);
-  
+
   $party->data_sets = array();
 
   $form_state['#party'] = $party;
@@ -170,7 +170,7 @@ function party_edit_form_submit($form, &$form_state) {
  */
 function party_edit_form_save($form, &$form_state) {
   $party = $form_state['#party'];
-  
+
   // Load our attached data sets
   $data_sets = party_get_party_data_sets($party);
   $data_set_info = party_get_data_set_info();
@@ -260,8 +260,8 @@ function party_page_view_piece_views($party, $view_name, $view_display_id) {
  */
 function party_attached_entity_edit_form($form, &$form_state, $party, $data_set, $eid = NULL) {
   $partyData = party_get_crm_controller($data_set['set_name'], $party);
-  
-  
+
+
   if ($eid !== NULL) {
     $entity = reset(entity_load($partyData->getDataInfo('entity type'), array($eid)));
     $form_title = "Edit " . $data_set['label'] . " (" . entity_label($data_set['entity type'], $entity) . ")";
@@ -274,7 +274,7 @@ function party_attached_entity_edit_form($form, &$form_state, $party, $data_set,
 
   // Save the data set object in the form state
   $form_state['#partyData'] = $partyData;
-  
+
   // Build form
   if (!isset($form_state['#attached_entities'][$partyData->getDataInfo('entity type') . ':' . $eid])) {
     $form_state['#attached_entities'][$partyData->getDataInfo('entity type') . ':' . $eid] = $entity;
@@ -284,7 +284,7 @@ function party_attached_entity_edit_form($form, &$form_state, $party, $data_set,
 
   party_attached_entity_attach_form($form, $form_state);
   $form['#submit'][] = 'party_attached_entity_edit_form_submit';
-  
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
@@ -307,12 +307,12 @@ function party_attached_entity_edit_form_submit($form, &$form_state) {
   $entity = reset($form_state['#attached_entities']);
   $party = $form_state['#party'];
   $partyData = $form_state['#partyData'];
-  
+
   if (!in_array($entity->{$partyData->getDataInfo('id key')}, $partyData->getEntityIds())) {
     $partyData->attachEntity($entity);
     $partyData->save();
   }
-  
+
   // Redirect to the set piece.
   $form_state['redirect'] = 'party/' . $party->pid . '/' . $partyData->getDataInfo('path element');
 }

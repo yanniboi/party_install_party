@@ -67,8 +67,8 @@ class PartyDefaultDataSet {
     }
 
     $this->party = $party;
-    
-    if (!empty($this->party->pid)) {    
+
+    if (!empty($this->party->pid)) {
       // This is useless without knowing what is attached so let's load the
       // stubs.
       $query = db_select('party_attached_entity', 'ae');
@@ -140,7 +140,7 @@ class PartyDefaultDataSet {
     $entity_id = $entity->{$this->getDataInfo('id key')};
     return isset($deltas[$entity_id]) ? $deltas[$entity_id]: FALSE;
   }
-  
+
   /**
    * Load the full entities
    *
@@ -312,7 +312,7 @@ class PartyDefaultDataSet {
         $this->entities[$delta] = $entity;
       }
     }
-    
+
     // Only attach if it wasn't already and hasn't been detached.
     if ($delta === FALSE) {
       switch ($method) {
@@ -381,10 +381,10 @@ class PartyDefaultDataSet {
   final public function detachEntity($entity) {
     // Figure out our delta
     $delta = $this->getEntityDelta($entity);
-    
+
     // Pass this onto the detachEntityByDelta method to actually detach
     $this->detachEntityByDelta($delta);
-    
+
     return $this;
   }
 
@@ -437,7 +437,7 @@ class PartyDefaultDataSet {
       return $this;
     }
   }
-  
+
   /**
    * Overload any pre detach logic
    *
@@ -499,7 +499,7 @@ class PartyDefaultDataSet {
 
       // Check if our entity is an object or int
       $eid = is_object($entity) ? $entity->{$this->getDataInfo('id key')} : $entity;
-      
+
       // Add our record
       $query->values(array(
         'pid' => $this->party->pid,

@@ -946,17 +946,17 @@ function party_get_data_set($party, $data_set_name, $create = FALSE) {
     drupal_set_message(t('Party not set, unable to load attached entities.'), 'error');
     return array();
   }
-  
+
   $partyData = party_get_crm_controller($data_set_name, $party);
-  
+
   $entityIds = $partyData->getEntityIds();
   if ($create && empty($entityIds)) {
     $entity = $partyData->createEntity();
     $partyData->attach($entity);
   }
-  
+
   return $partyData;
-} 
+}
 
 /**
  * Return all attached entities of a particular set.
@@ -1386,9 +1386,9 @@ function party_attached_entity_attach_form_submit(&$form, &$form_state) {
  */
 function party_default_attached_entity_form($form, &$form_state, &$attached_entity, $party) {
   $attached_entity_form = array();
-  
+
   $data_set_info = party_get_data_set_info($attached_entity->data_set_name);
-  
+
   field_attach_form($data_set_info['entity type'], $attached_entity, $attached_entity_form, $form_state);
 
   return $attached_entity_form;
