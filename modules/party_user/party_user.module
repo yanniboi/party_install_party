@@ -426,13 +426,11 @@ function party_user_user_view($account, $view_mode, $langcode) {
   if ($view_mode == 'party') {
     $party = party_user_get_party($account);
 
-    $attached_entity = party_get_crm_controller('user');
-    $attached_entity->setParty($party);
-    $attached_entity->setAttachedEntity($account);
+    $attached_entity = party_get_crm_controller('user', $party);
 
     $account->content['party_actions'] = array(
       '#theme' => 'links',
-      '#links' => $attached_entity->actions(),
+      '#links' => array(),//$attached_entity->actions(),
       '#attributes' => array(
         'class' => array('links inline crm-set-action-links'),
       ),

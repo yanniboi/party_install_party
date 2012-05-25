@@ -255,11 +255,12 @@ function party_page_view_piece_views($party, $view_name, $view_display_id) {
  *   load would be weird too.
  * @param $eid
  *    The id of the entity
+ *
+ * @todo: Reimplement actions and edit overlay stuff
  */
 function party_attached_entity_edit_form($form, &$form_state, $party, $data_set, $eid = NULL) {
-  $attached_entity = party_get_crm_controller($data_set['set_name']);
-  $attached_entity->setParty($party->pid);
-
+  $partyData = party_get_crm_controller($data_set['set_name'], $party);
+  
   if ($eid !== NULL) {
     $attached_entity->setAttachedEntity($eid);
     $form_title = "Edit " . $data_set['label'] . " (" . entity_label($data_set['entity type'], $attached_entity->entity) . ")";
@@ -267,7 +268,7 @@ function party_attached_entity_edit_form($form, &$form_state, $party, $data_set,
   }
   else {
     drupal_set_title("Add {$attached_entity->definition['label']} Data Set to {$party->label}");
-    $attached_entity->createAttachedEntity();
+    $entity = $partyData->createEntity();
   }
 
   //Build form

@@ -928,6 +928,37 @@ function party_get_party_types() {
 }
 
 /**
+ * Return a Data Set object containing all the attached entities in a given
+ * data set for a particular party.
+ *
+ * @param $party
+ *  The party object of the party we're concerned with.
+ * @param $set_name
+ *  The set type as defined in hook_party_data_set_info().
+ * @param $create
+ *  Choose to create an entity if there isn't already at least one.
+ *
+ * @return
+ *  A party data set object with attached entities available
+ */
+function party_get_data_set($party, $data_set_name, $create = FALSE) {
+  if (!$party) {
+    drupal_set_message(t('Party not set, unable to load attached entities.'), 'error');
+    return array();
+  }
+  
+  $partyData = party_get_crm_controller($data_set_name, $party);
+  
+  $entityIds = $partyData->getEntityIds();
+  if ($create && empty($entityIds)) {
+    $entity = $partyData->createEntity();
+    $partyData->attach($entity);
+  }
+  
+  return $partyData;
+} 
+
+/**
  * Return all attached entities of a particular set.
  *
  * @param $party
@@ -939,44 +970,12 @@ function party_get_party_types() {
  *
  * @return
  *  An array of the attached entity controllers for the entities attached to the
- *  party in the given data set, keyed by entity id.
- *  Each entity additionally has the property 'party_main' set according
- *  to the 'main' flag in the data set.
- *  @todo fix the hash this is indexed by!
+ *  party in the given data set, keyed by attached entity delta.
  */
 function party_get_attached_entities($party, $data_set_name, $create = FALSE) {
-  if (!$party) {
-    drupal_set_message(t('Party not set, unable to load attached entities.'), 'error');
-    return array();
-  }
+  $partyData = party_get_data_set($party, $data_set_name, $create);
 
-  $sets = party_get_data_set_info();
-
-  $items = db_select('party_attached_entity', 'ds')
-    ->fields('ds')
-    ->condition('pid', $party->pid,'=')
-    ->condition('data_set', $data_set_name,'=')
-    ->orderBy('delta', 'ASC')
-    ->execute()
-    ->fetchAllAssoc('eid', PDO::FETCH_ASSOC);
-
-  $attached_entities = array();
-
-  foreach ($items as $eid => $instance) {
-    $attached_entity = party_get_crm_controller($data_set_name);
-    $attached_entity->setParty($party);
-    $attached_entity->setAttachedEntity($eid);
-    $attached_entities[$attached_entity->hash()] = $attached_entity;
-  }
-
-  if (empty($attached_entities)  && $create) {
-    $attached_entity = party_get_crm_controller($data_set_name);
-    $attached_entity->setParty($party);
-    $attached_entity->createAttachedEntity();
-    $attached_entities[$attached_entity->hash()] = $attached_entity;
-  }
-
-  return $attached_entities;
+  return $partyData->getEntities();
 }
 
 /**
@@ -1116,7 +1115,7 @@ function party_preprocess_entity(&$variables) {
     // @todo: clean this up -- having to load up the controller all over
     // again when we probably had it at some earlier point is just messy.
     $data_set_name = party_get_entity_data_set($entity_type, $entity);
-    $controller = abtest_get_party_controller($data_set_name, party_load($party_id));
+    $controller = party_get_crm_controller($data_set_name, party_load($party_id));
     //$attached_entity->setAttachedEntity($eid);
 
     // Add the attached entity actions to the build content.

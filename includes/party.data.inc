@@ -473,6 +473,7 @@ class PartyDefaultDataSet {
    * @see PartyDefaultDataSet::postSave()
    */
   final public function save($save_entities = FALSE) {
+    dpm(debug_backtrace());
     // Fire any pre attach logic
     $this->preSave($save_entities);
 
@@ -491,10 +492,13 @@ class PartyDefaultDataSet {
         entity_save($this->getDataInfo('entity type'), $entity);
       }
 
+      // Check if our entity is an object or int
+      $eid = is_object($entity) ? $entity->{$this->getDataInfo('id key')} : $entity;
+      
       // Add our record
       $query->values(array(
         'pid' => $this->party->pid,
-        'eid' => $entity->{$this->getDataInfo('id key')},
+        'eid' => $eid,
         'delta' => $delta,
         'data_set' => $this->data_set,
         'entity_type' => $this->getDataInfo('entity type'),
