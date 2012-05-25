@@ -32,7 +32,9 @@ class PartyUIController extends EntityDefaultUIController {
    */
   public function overviewForm($form, &$form_state) {
     // Show an overview for all entities.
-    $form['actions'] = $this->actionsForm();
+
+    // Actions form is commented out for now as it doesn't do anything yet!
+    //$form['actions'] = $this->actionsForm();
     $form['table'] = $this->overviewTable();
     $form['pager'] = array('#theme' => 'pager');
     return $form;
