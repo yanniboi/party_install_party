@@ -108,6 +108,12 @@ class PartyDefaultDataSet {
       case 'name':
         return $this->data_set;
       break;
+      case 'path element':
+        return $party_data_info['path element'];
+      break;
+      case 'label':
+        return $party_data_info['label'];
+      break;
       case 'entity type':
         return $party_data_info['entity type'];
       break;
@@ -473,7 +479,6 @@ class PartyDefaultDataSet {
    * @see PartyDefaultDataSet::postSave()
    */
   final public function save($save_entities = FALSE) {
-    dpm(debug_backtrace());
     // Fire any pre attach logic
     $this->preSave($save_entities);
 

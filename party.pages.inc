@@ -85,13 +85,13 @@ function party_form($form, &$form_state, $party, $op = 'edit') {
   $form_state['#party'] = $party;
   $form_state['#party_unchanged'] = $party; // So that other modules can react to changes. Must be a better way
   $form_state['#data_set_controllers'] =
-    $form_state['#attached_entities'] = array();
+  $form_state['#attached_entities'] = array();
 
   $data_sets = party_get_party_data_sets($party);
 
   foreach ($data_sets as $data_set) {
     // Get our controller
-    $controller = party_get_crm_controller($data_set, $party);
+    $partyData = party_get_crm_controller($data_set, $party);
     $attached_entities = array();
     
     // See if we can load any entities
@@ -261,26 +261,30 @@ function party_page_view_piece_views($party, $view_name, $view_display_id) {
 function party_attached_entity_edit_form($form, &$form_state, $party, $data_set, $eid = NULL) {
   $partyData = party_get_crm_controller($data_set['set_name'], $party);
   
+  
   if ($eid !== NULL) {
-    $attached_entity->setAttachedEntity($eid);
-    $form_title = "Edit " . $data_set['label'] . " (" . entity_label($data_set['entity type'], $attached_entity->entity) . ")";
+    $entity = reset(entity_load($partyData->getDataInfo('entity type'), array($eid)));
+    $form_title = "Edit " . $data_set['label'] . " (" . entity_label($data_set['entity type'], $entity) . ")";
     drupal_set_title($form_title);
   }
   else {
-    drupal_set_title("Add {$attached_entity->definition['label']} Data Set to {$party->label}");
+    drupal_set_title("Add {$partyData->getDataInfo('label')} Data Set to {$party->label}");
     $entity = $partyData->createEntity();
   }
 
-  //Build form
-  if (!isset($form_state['#attached_entities'][$attached_entity->hash()])) {
-    $form_state['#attached_entities'][$attached_entity->hash()] = $attached_entity;
+  // Save the data set object in the form state
+  $form_state['#partyData'] = $partyData;
+  
+  // Build form
+  if (!isset($form_state['#attached_entities'][$partyData->getDataInfo('entity type') . ':' . $eid])) {
+    $form_state['#attached_entities'][$partyData->getDataInfo('entity type') . ':' . $eid] = $entity;
   }
 
-  $form['#submit'][] = 'party_attached_entity_edit_form_submit';
-  $form_state['#party'] = $attached_entity->party;
+  $form_state['#party'] = $party;
 
   party_attached_entity_attach_form($form, $form_state);
-
+  $form['#submit'][] = 'party_attached_entity_edit_form_submit';
+  
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
@@ -300,10 +304,17 @@ function party_attached_entity_edit_form_validate($form, &$form_state) {
  * Submit handler for the data set edit form.
  */
 function party_attached_entity_edit_form_submit($form, &$form_state) {
-  $attached_entity_controller = reset($form_state['#attached_entities']);
-
+  $entity = reset($form_state['#attached_entities']);
+  $party = $form_state['#party'];
+  $partyData = $form_state['#partyData'];
+  
+  if (!in_array($entity->{$partyData->getDataInfo('id key')}, $partyData->getEntityIds())) {
+    $partyData->attachEntity($entity);
+    $partyData->save();
+  }
+  
   // Redirect to the set piece.
-  $form_state['redirect'] = 'party/' . $attached_entity_controller->pid . '/' . $attached_entity_controller->definition['path element'];
+  $form_state['redirect'] = 'party/' . $party->pid . '/' . $partyData->getDataInfo('path element');
 }
 
 /**
@@ -343,6 +354,8 @@ function party_attached_entity_remove_confirm_submit($form, &$form_state) {
  *    A loaded party object.
  * @param $data_set_name
  *   A data set name.
+ *
+ * @todo: remove
  */
 function party_view_data_set($party, $data_set_name) {
   $data_set = party_get_data_set_info($data_set_name);
