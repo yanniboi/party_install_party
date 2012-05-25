@@ -229,7 +229,10 @@ function party_hat_party_access($op, $party = NULL, $data_set = NULL, $account =
   }
 
   switch ($op) {
+    // View and attach ops are the same: you can't view a party's data set if
+    // if can't have it attached either.
     case 'attach':
+    case 'view':
       $data_set_name = $data_set['set_name'];
 
       $party_hats = party_hat_get_hats($party);
@@ -243,10 +246,6 @@ function party_hat_party_access($op, $party = NULL, $data_set = NULL, $account =
         }
       }
       return FALSE;
-    case 'view':
-      // @todo: This needs to be written! Just say yes for now.
-      return TRUE;
-
   }
 }
 
