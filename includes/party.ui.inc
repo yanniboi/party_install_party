@@ -9,6 +9,23 @@
  * Controller for providing Party UI.
  */
 class PartyUIController extends EntityDefaultUIController {
+  /**
+   * Provides definitions for implementing hook_menu().
+   */
+  public function hook_menu() {
+    $items = parent::hook_menu();
+
+    // Set the main path title and description as it's our general admin hub.
+    $items[$this->path]['title'] = t('Community');
+    $items[$this->path]['description'] = t('Manage the community');
+
+    // Remove the entity add callback for now, as we provide our own.
+    // @todo: use htis one instead!
+    unset($items[$this->path . '/add']);
+
+    return $items;
+  }
+
 
   /**
    * Builds the entity overview form.
@@ -52,6 +69,30 @@ class PartyUIController extends EntityDefaultUIController {
     );
 
     return $form;
+  }
+
+  /**
+   * Generates the render array for a overview table for arbitrary entities
+   * matching the given conditions.
+   *
+   * @param $conditions
+   *   An array of conditions as needed by entity_load().
+
+   * @return Array
+   *   A renderable array.
+   */
+  public function overviewTable($conditions = array()) {
+    $render_table = parent::overviewTable($conditions);
+
+    // Turn the table into a tableselect.
+    $render = array(
+      '#type' => 'tableselect',
+      '#header' => $render_table['#header'],
+      '#options' => $render_table['#rows'],
+      '#empty' => t('No parties available.'),
+    );
+
+    return $render;
   }
 
   /**
