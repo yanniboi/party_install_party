@@ -21,7 +21,9 @@ function party_hat_entity_info() {
     'fieldable' => TRUE,
     'module' => 'party_hat',
     'entity keys' => array(
-      'id' => 'hid'
+      'id' => 'hid',
+      'label' => 'label',
+      'name' => 'name',
     ),
     'exportable' => TRUE,
     'access callback' => 'party_hat_access',
