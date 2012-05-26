@@ -259,25 +259,25 @@ function party_page_view_piece_views($party, $view_name, $view_display_id) {
  * @todo: Reimplement actions and edit overlay stuff
  */
 function party_attached_entity_edit_form($form, &$form_state, $party, $data_set, $eid = NULL) {
-  $partyData = party_get_crm_controller($data_set['set_name'], $party);
-
+  $data_set_controller = party_get_crm_controller($data_set['set_name'], $party);
+  $attached_entities = $data_set_controller->getEntities();
 
   if ($eid !== NULL) {
-    $entity = reset(entity_load($partyData->getDataInfo('entity type'), array($eid)));
+    $entity = reset(entity_load($data_set_controller->getDataInfo('entity type'), array($eid)));
     $form_title = "Edit " . $data_set['label'] . " (" . entity_label($data_set['entity type'], $entity) . ")";
     drupal_set_title($form_title);
   }
   else {
-    drupal_set_title("Add {$partyData->getDataInfo('label')} Data Set to {$party->label}");
-    $entity = $partyData->createEntity();
+    drupal_set_title("Add {$data_set_controller->getDataInfo('label')} Data Set to {$party->label}");
+    $entity = $data_set_controller->createEntity();
   }
 
   // Save the data set object in the form state
-  $form_state['#partyData'] = $partyData;
+  $form_state['#partyData'] = $data_set_controller;
 
   // Build form
-  if (!isset($form_state['#attached_entities'][$partyData->getDataInfo('entity type') . ':' . $eid])) {
-    $form_state['#attached_entities'][$partyData->getDataInfo('entity type') . ':' . $eid] = $entity;
+  if (!isset($form_state['#attached_entities'][$data_set_controller->getDataInfo('entity type') . ':' . $eid])) {
+    $form_state['#attached_entities'][$data_set_controller->getDataInfo('entity type') . ':' . $eid] = $entity;
   }
 
   $form_state['#party'] = $party;
