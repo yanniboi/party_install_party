@@ -242,6 +242,7 @@ function party_menu() {
     'file' => 'party.pages.inc',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'access callback' => TRUE,
+    'weight' => -10,
   );
 
   $items['party/%party/party/edit'] = array(
@@ -253,6 +254,7 @@ function party_menu() {
     'file' => 'party.pages.inc',
     'access callback' => TRUE,
     'type' => MENU_LOCAL_TASK,
+    'weight' => -5,
   );
   // End temporary.
 
@@ -265,6 +267,7 @@ function party_menu() {
     'file' => 'party.pages.inc',
     'access callback' => TRUE,
     'type' => MENU_LOCAL_TASK,
+    'weight' => 10,
   );
 
   // Attached entity menu items
