@@ -739,7 +739,7 @@ function party_party_party_pieces() {
  *  The name of a data set.
  *
  * @return
- *  The controller class with the attached entities loaded.
+ *  The controller class, without attached entities loaded yet.
  */
 function party_get_crm_controller($data_set_name, $party) {
   $sets = party_get_data_set_info();
@@ -747,7 +747,6 @@ function party_get_crm_controller($data_set_name, $party) {
   // @todo: error handling
   $class = $sets[$data_set_name]['class'];
   $controller = new $class($data_set_name, $party);
-  $controller->loadEntities();
   return $controller;
 }
 
@@ -1124,6 +1123,8 @@ function party_preprocess_entity(&$variables) {
     // again when we probably had it at some earlier point is just messy.
     $data_set_name = party_get_entity_data_set($entity_type, $entity);
     $controller = party_get_crm_controller($data_set_name, party_load($party_id));
+    // Load the entities.
+    $controller->getEntities();
     //$attached_entity->setAttachedEntity($eid);
 
     // Add the attached entity actions to the build content.
