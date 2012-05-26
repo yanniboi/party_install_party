@@ -44,16 +44,16 @@ function party_hat_manage() {
  */
 function party_hat_add() {
   $hat = new stdClass();
-  return drupal_get_form('party_hat_edit_form', $hat);
+  return drupal_get_form('party_hat_form', $hat, 'add');
 }
 
 /**
- * Form to add/edit a hat.
+ * Entity form for party hats.
  *
  * @param $hat
  *  A hat object.
  */
-function party_hat_edit_form($form, &$form_state, $hat) {
+function party_hat_form($form, &$form_state, $hat, $op = 'edit') {
   $form['#hat'] = $hat;
 
   if (isset($hat->hid)) {
@@ -216,7 +216,7 @@ function theme_crm_hat_data_set_rules_form($variables) {
 /**
  * Form validation for the hat edit form.
  */
-function party_hat_edit_form_validate($form, &$form_state) {
+function party_hat_form_validate($form, &$form_state) {
   $submission = (object) $form_state['values'];
   field_attach_form_validate('party_hat', $submission, $form, $form_state);
 }
@@ -224,7 +224,7 @@ function party_hat_edit_form_validate($form, &$form_state) {
 /**
  * Form submission for the hat edit form.
  */
-function party_hat_edit_form_submit($form, &$form_state) {
+function party_hat_form_submit($form, &$form_state) {
   $hat = new PartyHat();
   $hat->name = $form_state['values']['name'];
   $hat->label = $form_state['values']['label'];
