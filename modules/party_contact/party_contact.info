@@ -1,6 +1,0 @@
-name = Party Contact
-description = [Place Holder Module] Creates a standard contact entity and allows them to sync with Party
-core = 7.x
-package = CRM
-
-dependencies[] = party
