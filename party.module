@@ -1125,7 +1125,6 @@ function party_preprocess_entity(&$variables) {
 
     // Add the attached entity actions to the build content.
     // @todo: change these to contextual links?
-    /*
     // Links broken: http://drupal.org/node/1600816
     $variables['content']['party_actions'] = array(
       '#theme' => 'links',
@@ -1135,7 +1134,6 @@ function party_preprocess_entity(&$variables) {
       ),
       '#weight' => 100,
     );
-    */
 
     // @todo This would be better off as a new feature in Entity API
     $variables['theme_hook_suggestions'][] = 'entity__all__party';
