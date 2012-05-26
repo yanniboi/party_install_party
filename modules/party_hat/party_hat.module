@@ -19,7 +19,7 @@ function party_hat_entity_info() {
     'views controller class' => 'EntityDefaultViewsController',
     'base table' => 'party_hat',
     'fieldable' => TRUE,
-    'module' => 'party',
+    'module' => 'party_hat',
     'entity keys' => array(
       'id' => 'hid'
     ),
