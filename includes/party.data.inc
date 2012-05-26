@@ -18,19 +18,19 @@ class PartyDefaultDataSet {
    * var string $data_set
    *   The data set name (array key in hook_data_set_info)
    */
-  protected $data_set;
+  public $data_set;
 
   /**
    * var array $entities
    *   An array of attatched entities, keyed by delta
    */
-  protected $entities = array();
+  public $entities = array();
 
   /**
    * var party $party
    *   The party object we're connected to.
    */
-  protected $party;
+  public $party;
 
   /**
    * Alters entity info for entities requesting CRM integration.
