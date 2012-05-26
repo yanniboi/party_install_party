@@ -24,6 +24,8 @@ function party_hat_entity_info() {
       'id' => 'hid'
     ),
     'exportable' => TRUE,
+    'access callback' => 'party_hat_access',
+    'uri callback' => 'party_hat_uri',
     'bundles' => array(
       'hat' => array(
         'label' => t('Hat'),
@@ -41,6 +43,32 @@ function party_hat_entity_info() {
     )
   );
   return $entity_info;
+}
+
+/**
+ * Entity access callback.
+ *
+ * @param $op
+ *   The operation being performed.
+ * @param $party
+ *   A party to check access for.
+ * @param $account
+ *   (optional) The user to check access for. Omit to check for the global user.
+ *
+ * @return
+ *   Boolean; TRUE to grant access, FALSE to deny it.
+ *
+ * @see party_access
+ */
+function party_hat_access($op, $party = NULL, $account = NULL) {
+  return user_access('administer hats');
+}
+
+/**
+ * URI callback for hats.
+ */
+function party_hat_uri($party_hat) {
+  return array('path' => 'admin/community/hats/$party_hat->hid/edit');
 }
 
 /**
