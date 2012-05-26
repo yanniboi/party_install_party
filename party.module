@@ -734,13 +734,18 @@ function party_party_party_pieces() {
  *
  * @param $data_set_name
  *  The name of a data set.
+ *
+ * @return
+ *  The controller class with the attached entities loaded.
  */
 function party_get_crm_controller($data_set_name, $party) {
   $sets = party_get_data_set_info();
 
   // @todo: error handling
   $class = $sets[$data_set_name]['class'];
-  return new $class($data_set_name, $party);
+  $controller = new $class($data_set_name, $party);
+  $controller->loadEntities();
+  return $controller;
 }
 
 /**
