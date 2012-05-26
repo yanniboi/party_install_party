@@ -251,7 +251,6 @@ class PartyDefaultDataSet {
    */
   public function getActions($party_id, $entity_id) {
     $party_data_info = party_get_data_set_info($this->data_set);
-    dsm($party_data_info);
 
     $actions = array();
 
