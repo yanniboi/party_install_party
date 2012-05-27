@@ -183,23 +183,10 @@ function party_hat_form_validate($form, &$form_state) {
  * Form submission for the hat edit form.
  */
 function party_hat_form_submit($form, &$form_state) {
-  $hat = new PartyHat();
-  $hat->name = $form_state['values']['name'];
-  $hat->label = $form_state['values']['label'];
-  if (isset($form_state['values']['hid'])) {
-    $hat->hid = $form_state['values']['hid'];
-  }
-  $hat->required = $form_state['values']['required'];
-
-  // Put values into the serialized data array.
-  $hat->data = array();
-  foreach (array('party_types') as $key) {
-    $hat->data[$key] = $form_state['values'][$key];
-  }
-  // Party types requires babysitting :(
-  $hat->data['party_types'] = array_filter($hat->data['party_types']);
-
+  // Build the entity and save it.
+  $hat = entity_ui_form_submit_build_entity($form, $form_state);
   party_hat_save($hat);
+
   field_attach_submit('party_hat', $hat, $form, $form_state);
 
   drupal_set_message(t("Party hat has been saved."));
