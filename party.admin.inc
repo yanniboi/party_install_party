@@ -176,11 +176,9 @@ function party_settings_label_plugins_form($form, &$form_state) {
 }
 
 /**
- * This routine gets the available party label plugins from ctools and then
- * adds a 'weight' property based on weight values previously saved in a
- * persistent variable.
+ * Gets the available party label plugins and adds their weight from config.
  *
- * Weights can be set at: admin/config/party/labels.
+ * Weights are set at admin/config/party/labels.
  *
  * @return
  *  An array of party label plugins sorted by weight.
