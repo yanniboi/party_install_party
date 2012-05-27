@@ -80,7 +80,7 @@ function party_hat_form($form, &$form_state, $hat, $op = 'edit') {
     if (isset($hat->name)) {
       $default = party_hat_get_data_set_rule($hat->name, $type);
       foreach($default as $key => $var) {
-        if($var == 1) {
+        if ($var == 1) {
           $default[$key] = $key;
         }
       }
