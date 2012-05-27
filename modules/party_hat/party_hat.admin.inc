@@ -18,8 +18,9 @@ function party_hat_form($form, &$form_state, $hat, $op = 'edit') {
       '#type' => 'hidden',
       '#value' => $hat->hid,
     );
-    // @todo missing t().
-    drupal_set_title('Edit hat: ' . $hat->label);
+    drupal_set_title(t('Edit hat: @label', array(
+      '@label' => $hat->label,
+    )));
   }
 
   $form['label'] = array(
