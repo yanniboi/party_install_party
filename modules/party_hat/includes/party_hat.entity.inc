@@ -22,10 +22,6 @@ class PartyHat extends Entity {
   protected function defaultLabel() {
     return $this->label;
   }
-
-  protected function defaultUri() {
-    return array('path' => 'party-hat/' . $this->id);
-  }
 }
 
 /**
