@@ -7,7 +7,7 @@
 /**
  * The API controller class for the Party Hat entity.
  */
-class PartyHatController extends EntityAPIController {
+class PartyHatController extends EntityAPIControllerExportable {
 
 }
 
@@ -25,5 +25,20 @@ class PartyHat extends Entity {
 
   protected function defaultUri() {
     return array('path' => 'party-hat/' . $this->id);
+  }
+}
+
+/**
+ * UI controller.
+ */
+class PartyHatUIController extends EntityDefaultUIController {
+
+  /**
+   * Overrides hook_menu() defaults.
+   */
+  public function hook_menu() {
+    $items = parent::hook_menu();
+    $items[$this->path]['title'] = 'Manage hats';
+    return $items;
   }
 }

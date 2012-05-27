@@ -19,11 +19,20 @@ function party_hat_entity_info() {
     'views controller class' => 'EntityDefaultViewsController',
     'base table' => 'party_hat',
     'fieldable' => TRUE,
-    'module' => 'party',
+    'module' => 'party_hat',
     'entity keys' => array(
-      'id' => 'hid'
+      'id' => 'hid',
+      'label' => 'label',
+      'name' => 'name',
     ),
     'exportable' => TRUE,
+    'access callback' => 'party_hat_access',
+    'uri callback' => 'party_hat_uri',
+    'admin ui' => array(
+      'controller class' => 'PartyHatUIController',
+      'path' => 'admin/community/hats',
+      'file' => 'party_hat.admin.inc',
+    ),
     'bundles' => array(
       'hat' => array(
         'label' => t('Hat'),
@@ -44,47 +53,31 @@ function party_hat_entity_info() {
 }
 
 /**
- * Implements hook_menu().
+ * Entity access callback.
+ *
+ * @param $op
+ *   The operation being performed.
+ * @param $party
+ *   A party to check access for.
+ * @param $account
+ *   (optional) The user to check access for. Omit to check for the global user.
+ *
+ * @return
+ *   Boolean; TRUE to grant access, FALSE to deny it.
+ *
+ * @see party_access
  */
-function party_hat_menu() {
-  $items['admin/community/hats'] = array(
-    'title' => 'Manage Hats',
-    'description' => 'Manage hats',
-    'page callback' => 'party_hat_manage',
-    'access arguments' => array('administer hats'),
-    'file' => 'party_hat.admin.inc',
-    'type' => MENU_LOCAL_TASK,
-  );
-  $items['admin/community/hats/add'] = array(
-    'title' => 'Add hat',
-    'description' => 'Manage hats',
-    'page callback' => 'party_hat_add',
-    'access arguments' => array('administer hats'),
-    'file' => 'party_hat.admin.inc',
-    'type' => MENU_LOCAL_ACTION,
-  );
-  $items['admin/community/hats/%party_hat/edit'] = array(
-    'title' => 'Edit party hat',
-    'description' => 'Edit a party hat',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('party_hat_edit_form', 3),
-    'access arguments' => array('administer hats'),
-    'file' => 'party_hat.admin.inc',
-  );
-  $items['admin/community/hats/%party_hat/delete'] = array(
-    'title' => 'Delete Hat',
-    'description' => 'Delete a party hat',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('party_hat_delete_form', 3),
-    'access arguments' => array('administer hats'),
-    'file' => 'party_hat.admin.inc',
-  );
-
-
-
-  return $items;
+function party_hat_access($op, $party = NULL, $account = NULL) {
+  return user_access('administer hats');
 }
 
+/**
+ * URI callback for hats.
+ */
+function party_hat_uri($party_hat) {
+  // Uses the machine name, since these are exportables.
+  return array('path' => 'admin/community/hats/manage' . $party_hat->name);
+}
 
 /**
  * Implements hook_permission().
