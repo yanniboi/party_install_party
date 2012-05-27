@@ -23,6 +23,9 @@ class PartyUIController extends EntityDefaultUIController {
     // @todo: use htis one instead!
     unset($items[$this->path . '/add']);
 
+    // Disambiguate the 'list' tab.
+    $items[$this->path . '/list']['title'] = 'List parties';
+
     return $items;
   }
 

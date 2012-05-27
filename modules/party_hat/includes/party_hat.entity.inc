@@ -39,6 +39,9 @@ class PartyHatUIController extends EntityDefaultUIController {
     // main Community admin area.
     $items[$this->path]['type'] = MENU_LOCAL_TASK;
 
+    // Disambiguate the 'list' tab.
+    $items[$this->path . '/list']['title'] = 'List hats';
+
     return $items;
   }
 }
