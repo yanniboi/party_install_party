@@ -5,49 +5,6 @@
  */
 
 /**
- * Page callback for the hats list page.
- */
-function party_hat_manage() {
-  $result = db_select('party_hat', 'ph')
-    ->fields('ph')
-    ->execute()
-    ->fetchAllAssoc('hid');
-
-  $header = array(t('Hat'), array(
-    'data' => t('Operations'),
-    'colspan' => '2',
-  ));
-  $rows = array();
-  foreach ($result as $hat) {
-    $row = array( t('@label <small>(Machine name: @name)</small>', array(
-      '@label' => $hat->label,
-      '@name' => $hat->name,
-    )));
-    $row[] = array('data' => l(t('edit'), 'admin/community/hats/' . $hat->name . '/edit'));
-    $row[] = array('data' => l(t('delete'), 'admin/community/hats/' . $hat->name . '/delete'));
-
-    $rows[] = $row;
-  }
-
-  $build['hat_table'] = array(
-    '#theme' => 'table',
-    '#header' => $header,
-    '#rows' => $rows,
-    '#empty' => t('No hats have been defined. <a href="@link">Add a hat</a>', array('@link' => url('admin/community/hats/add'))),
-  );
-
-  return $build;
-}
-
-/**
- * Page callback for adding a new hat.
- */
-function party_hat_add() {
-  $hat = new stdClass();
-  return drupal_get_form('party_hat_form', $hat, 'add');
-}
-
-/**
  * Entity form for party hats.
  *
  * @param $hat
@@ -267,43 +224,4 @@ function party_hat_form_submit($form, &$form_state) {
 function party_hat_hat_machine_name_exists($value) {
   $exists = db_query_range('SELECT 1 FROM {party_hat} WHERE `name` = :name', 0, 1, array(':name' => $value))->fetchField();
   return $exists;
-}
-
-/**
- * Confirm deletion form for hat.
- */
-function party_hat_delete_form($form, &$form_state, $hat) {
-  $form['hat_id'] = array(
-    '#type' => 'hidden',
-    '#value' => $hat->hid,
-  );
-
-  $form['description'] = array(
-    '#markup' => 'Are you shure you want to delete ' . $hat->label . '?',
-  );
-
-  $form['actions'] = array(
-    '#type' => 'actions',
-  );
-
-  $form['actions']['submit'] = array(
-    '#type' => 'submit',
-    '#value' => 'Delete',
-  );
-
-  $form['actions']['cancel'] = array(
-    '#type' => 'link',
-    '#title' => 'Cancel',
-    '#href' => 'admin/community/hats',
-  );
-
-  return $form;
-}
-
-/**
- * Submit handler for the delete confirmation form.
- */
-function party_hat_delete_form_submit($form, &$form_state) {
-  entity_delete('party_hat', $form_state['values']['hat_id']);
-  $form_state['redirect'] = 'admin/community/hats';
 }

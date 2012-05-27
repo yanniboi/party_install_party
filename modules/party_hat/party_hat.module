@@ -80,49 +80,6 @@ function party_hat_uri($party_hat) {
 }
 
 /**
- * Implements hook_menu().
- */
-function party_hat_menu() {
-  $items['admin/community/hats'] = array(
-    'title' => 'Manage Hats',
-    'description' => 'Manage hats',
-    'page callback' => 'party_hat_manage',
-    'access arguments' => array('administer hats'),
-    'file' => 'party_hat.admin.inc',
-    'type' => MENU_LOCAL_TASK,
-  );
-  $items['admin/community/hats/add'] = array(
-    'title' => 'Add hat',
-    'description' => 'Manage hats',
-    'page callback' => 'party_hat_add',
-    'access arguments' => array('administer hats'),
-    'file' => 'party_hat.admin.inc',
-    'type' => MENU_LOCAL_ACTION,
-  );
-  $items['admin/community/hats/%party_hat/edit'] = array(
-    'title' => 'Edit party hat',
-    'description' => 'Edit a party hat',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('party_hat_edit_form', 3),
-    'access arguments' => array('administer hats'),
-    'file' => 'party_hat.admin.inc',
-  );
-  $items['admin/community/hats/%party_hat/delete'] = array(
-    'title' => 'Delete Hat',
-    'description' => 'Delete a party hat',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('party_hat_delete_form', 3),
-    'access arguments' => array('administer hats'),
-    'file' => 'party_hat.admin.inc',
-  );
-
-
-
-  return $items;
-}
-
-
-/**
  * Implements hook_permission().
  */
 function party_hat_permission() {
