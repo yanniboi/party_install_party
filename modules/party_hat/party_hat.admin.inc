@@ -215,7 +215,10 @@ function party_hat_form_submit($form, &$form_state) {
     party_hat_set_data_set_rule($hat->name, $type, $values);
   }
 
-  //$form_state['redirect'] = 'admin/community/hats';
+  // If editing an existing hat, redirect to the hat admin page.
+  if ($form_state['build_info']['args'][1] == 'edit') {
+    $form_state['redirect'] = 'admin/community/hats';
+  }
 }
 
 /**
