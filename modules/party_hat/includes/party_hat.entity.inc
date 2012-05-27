@@ -35,6 +35,10 @@ class PartyHatUIController extends EntityDefaultUIController {
   public function hook_menu() {
     $items = parent::hook_menu();
     $items[$this->path]['title'] = 'Manage hats';
+    // Set the main hat admin page as a local task so it appears within the
+    // main Community admin area.
+    $items[$this->path]['type'] = MENU_LOCAL_TASK;
+
     return $items;
   }
 }
