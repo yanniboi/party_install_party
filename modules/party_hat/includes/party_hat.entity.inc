@@ -27,3 +27,18 @@ class PartyHat extends Entity {
     return array('path' => 'party-hat/' . $this->id);
   }
 }
+
+/**
+ * UI controller.
+ */
+class PartyHatUIController extends EntityDefaultUIController {
+
+  /**
+   * Overrides hook_menu() defaults.
+   */
+  public function hook_menu() {
+    $items = parent::hook_menu();
+    $items[$this->path]['title'] = 'Manage hats';
+    return $items;
+  }
+}

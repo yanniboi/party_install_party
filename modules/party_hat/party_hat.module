@@ -29,7 +29,7 @@ function party_hat_entity_info() {
     'access callback' => 'party_hat_access',
     'uri callback' => 'party_hat_uri',
     'admin ui' => array(
-      'controller class' => 'EntityDefaultUIController',
+      'controller class' => 'PartyHatUIController',
       'path' => 'admin/community/hats',
       'file' => 'party_hat.admin.inc',
     ),
