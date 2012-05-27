@@ -7,7 +7,7 @@
 /**
  * The API controller class for the Party Hat entity.
  */
-class PartyHatController extends EntityAPIController {
+class PartyHatController extends EntityAPIControllerExportable {
 
 }
 
