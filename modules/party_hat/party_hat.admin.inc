@@ -175,8 +175,8 @@ function theme_crm_hat_data_set_rules_form($variables) {
  * Form validation for the hat edit form.
  */
 function party_hat_form_validate($form, &$form_state) {
-  $submission = (object) $form_state['values'];
-  field_attach_form_validate('party_hat', $submission, $form, $form_state);
+  $pseudo_entity = (object) $form_state['values'];
+  field_attach_form_validate('party_hat', $pseudo_entity, $form, $form_state);
 }
 
 /**

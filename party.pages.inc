@@ -138,8 +138,8 @@ function party_form($form, &$form_state, $party, $op = 'edit') {
  * @todo: Add validation for all the attached entities
  */
 function party_edit_form_validate($form, &$form_state) {
-  $submission = (object) $form_state['values'];
-  field_attach_form_validate('party', $submission, $form, $form_state);
+  $pseudo_entity = (object) $form_state['values'];
+  field_attach_form_validate('party', $pseudo_entity, $form, $form_state);
 }
 
 /**
