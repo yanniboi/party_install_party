@@ -434,7 +434,7 @@ class PartyDefaultDataSet {
    * @see PartyDefaultDataSet::preDetach()
    * @see PartyDefaultDataSet::postDetach()
    */
-  final public function detachEntityByDetla($delta, $return = FALSE) {
+  final public function detachEntityByDelta($delta, $return = FALSE) {
     // Fire any pre attach logic
     $this->preDetach($delta);
 
