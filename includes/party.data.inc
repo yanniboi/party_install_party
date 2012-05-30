@@ -39,7 +39,7 @@ class PartyDefaultDataSet {
    *  The info array for a single entity.
    *  Apparently, you can pass this in from the original array in an
    *  implementation of hook_entity_info_alter, thus:
-   *    EntityDefaultPartyController::hook_entity_info_alter($entity_info['profile2']);
+   *    PartyDefaultDataSet::hook_entity_info_alter($entity_info['profile2']);
    */
   static function hook_entity_info_alter(&$entity_info) {
     $entity_info['view modes']['party'] = array(
