@@ -76,7 +76,7 @@ function party_hat_access($op, $party = NULL, $account = NULL) {
  */
 function party_hat_uri($party_hat) {
   // Uses the machine name, since these are exportables.
-  return array('path' => 'admin/community/hats/manage' . $party_hat->name);
+  return array('path' => 'admin/community/hats/manage/' . $party_hat->name);
 }
 
 /**
