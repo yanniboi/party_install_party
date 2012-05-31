@@ -239,7 +239,7 @@ function party_user_form_user($form, &$form_state, &$attached_entity, $party) {
   $user_form = array();
 
   // If the user is set we load the edit account form.
-  if ($attached_entity->eid !== NULL && $attached_entity->eid != 0) {
+  if (!empty($attached_entity->eid)) {
     module_load_include('inc', 'user', 'user.pages');
     $user_form['op'] = array(
       '#type' => 'value',
