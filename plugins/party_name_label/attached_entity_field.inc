@@ -38,10 +38,10 @@ function party_attached_entity_field_label($party) {
   $data_set_name = variable_get('party_name_label_data_set', 'party');
   $field_name = variable_get('party_name_label_field', FALSE);
   if ($data_set_name != 'party') {
-    $controller = party_get_crm_controller($data_set_name, $party);
-    $entity = $controller->getEntity();
-    $entity_type = $controller->getDataInfo('entity type');
-    $entity_bundle = $controller->getDataInfo('entity bundle');
+    $data_set_controller = party_get_crm_controller($data_set_name, $party);
+    $entity = $data_set_controller->getEntity();
+    $entity_type = $data_set_controller->getDataInfo('entity type');
+    $entity_bundle = $data_set_controller->getDataInfo('entity bundle');
   }
   else {
     $entity = $party;

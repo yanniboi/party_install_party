@@ -104,17 +104,17 @@ function party_devel_generate_party_add_party(&$results) {
       continue;
     }
 
-    $attached_entity = party_get_crm_controller($name);
-    $attached_entity->createAttachedEntity();
+    $data_set_controller = party_get_crm_controller($name);
+    $data_set_controller->createAttachedEntity();
 
     // Devel generate requires that a language be set.
-    if (!isset($attached_entity->entity->language)) {
-      $attached_entity->entity->language = LANGUAGE_NONE;
+    if (!isset($data_set_controller->entity->language)) {
+      $data_set_controller->entity->language = LANGUAGE_NONE;
     }
 
     module_load_include('inc', 'devel_generate', 'devel_generate.fields');
-    devel_generate_fields($attached_entity->entity, $attached_entity->getEntityType(), $attached_entity->getEntityBundle());
-    $attached_entity->saveAttachedEntity();
-    $attached_entity->attach($party);
+    devel_generate_fields($data_set_controller->entity, $data_set_controller->getEntityType(), $data_set_controller->getEntityBundle());
+    $data_set_controller->saveAttachedEntity();
+    $data_set_controller->attach($party);
   }
 }

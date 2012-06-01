@@ -894,9 +894,9 @@ function party_get_party_data_sets($party) {
  *  DX WTF: Lots of sniffing now done BUT do we want the $data_set instance made elsewhere. If so where?
  */
 function party_attach_entity($party, $entity, $data_set_name) {
-  $controller = party_get_crm_controller($data_set_name, $party);
-  $controller->attachEntity($entity);
-  $controller->save();
+  $data_set_controller = party_get_crm_controller($data_set_name, $party);
+  $data_set_controller->attachEntity($entity);
+  $data_set_controller->save();
 }
 
 /**
@@ -912,9 +912,9 @@ function party_attach_entity($party, $entity, $data_set_name) {
  */
 function party_detach_entity($party, $entity, $data_set_name) {
   /* To Test */
-  $controller = party_get_crm_controller($data_set_name, $party);
-  $controller->detachEntity($entity);
-  $controller->save();
+  $data_set_controller = party_get_crm_controller($data_set_name, $party);
+  $data_set_controller->detachEntity($entity);
+  $data_set_controller->save();
 }
 
 // -----------------------------------------------------------------------
@@ -955,15 +955,15 @@ function party_get_data_set($party, $data_set_name, $create = FALSE) {
     return array();
   }
 
-  $partyData = party_get_crm_controller($data_set_name, $party);
+  $data_set_controller = party_get_crm_controller($data_set_name, $party);
 
-  $entityIds = $partyData->getEntityIds();
+  $entityIds = $data_set_controller->getEntityIds();
   if ($create && empty($entityIds)) {
-    $entity = $partyData->createEntity();
-    $partyData->attach($entity);
+    $entity = $data_set_controller->createEntity();
+    $data_set_controller->attach($entity);
   }
 
-  return $partyData;
+  return $data_set_controller;
 }
 
 /**
@@ -1123,9 +1123,9 @@ function party_preprocess_entity(&$variables) {
     // @todo: clean this up -- having to load up the controller all over
     // again when we probably had it at some earlier point is just messy.
     $data_set_name = party_get_entity_data_set($entity_type, $entity);
-    $controller = party_get_crm_controller($data_set_name, party_load($party_id));
+    $data_set_controller = party_get_crm_controller($data_set_name, party_load($party_id));
     // Load the entities.
-    $controller->getEntities();
+    $data_set_controller->getEntities();
     //$attached_entity->setAttachedEntity($eid);
 
     // Add the attached entity actions to the build content.
@@ -1133,7 +1133,7 @@ function party_preprocess_entity(&$variables) {
     // Links broken: http://drupal.org/node/1600816
     $variables['content']['party_actions'] = array(
       '#theme' => 'links',
-      '#links' => $controller->getActions($party_id, $eid),
+      '#links' => $data_set_controller->getActions($party_id, $eid),
       '#attributes' => array(
         'class' => array('links inline crm-set-action-links'),
       ),

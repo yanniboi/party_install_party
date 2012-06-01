@@ -91,22 +91,22 @@ function party_form($form, &$form_state, $party, $op = 'edit') {
 
   foreach ($data_sets as $data_set) {
     // Get our controller
-    $controller = party_get_crm_controller($data_set, $party);
+    $data_set_controller = party_get_crm_controller($data_set, $party);
     $attached_entities = array();
 
     // See if we can load any entities
     if (isset($party->pid)) {
-      $attached_entities = $controller->getEntities();
+      $attached_entities = $data_set_controller->getEntities();
 
       // If not, let's create one
       if (count($attached_entities) == 0) {
-        $attached_entities[] = $controller->getEntity(0, TRUE);
+        $attached_entities[] = $data_set_controller->getEntity(0, TRUE);
       }
     }
     else {
       // No party so this has to be a little different, we'll attach
       // after the party is saved.
-      $attached_entities[] = $controller->createEntity();
+      $attached_entities[] = $data_set_controller->createEntity();
     }
 
     foreach ($attached_entities as $delta => $entity) {
@@ -179,16 +179,16 @@ function party_edit_form_save($form, &$form_state) {
 
   foreach ($data_sets as $data_set) {
     if (!empty($party->data_sets[$data_set])) {
-      $controller = party_get_crm_controller($data_set, $party);
+      $data_set_controller = party_get_crm_controller($data_set, $party);
       foreach ($party->data_sets[$data_set] as $entity) {
-        $controller->attachEntity($entity);
+        $data_set_controller->attachEntity($entity);
       }
-      $controller->save();
+      $data_set_controller->save();
     }
   }
 
   // Now new entities have been attached (if necessary) set the party label.
-  entity_get_controller('party')->setLabel($party);
+  entity_get_data_set_controller('party')->setLabel($party);
 
   $form_state['redirect'] = 'party/' . $party->pid;
 }
@@ -323,16 +323,16 @@ function party_attached_entity_edit_form_submit($form, &$form_state) {
  * Form to confirm removing a data set from a party.
  */
 function party_attached_entity_remove_confirm($form, &$form_state, $party, $data_set, $eid) {
-  $attached_entity = party_get_crm_controller($data_set['set_name']);
-  $attached_entity->setAttachedEntity($eid);
-  $attached_entity->setParty($party->pid);
+  $data_set_controller = party_get_crm_controller($data_set['set_name']);
+  $data_set_controller->setAttachedEntity($eid);
+  $data_set_controller->setParty($party->pid);
 
-  $form_state['#attached_entity'] = $attached_entity;
+  $form_state['#attached_entity'] = $data_set_controller;
 
   return confirm_form($form,
     t('Are you sure you want to remove %attached from %party?', array(
-      '%attached' => $attached_entity->getLabel(),
-      '%party' =>  $attached_entity->party->label,
+      '%attached' => $data_set_controller->getLabel(),
+      '%party' =>  $data_set_controller->party->label,
     )),
     'party/' . $party->pid, // @todo: go back to the dataset page.
     t('Are you sure you want to remove this data set from this party?') . ' ' . t('This action cannot be undone.'),

@@ -598,22 +598,22 @@ abstract class EntityDefaultPartyController {
    *   A controller instance.
    */
   public static function getInstance($data_set_name, $info, $how = self::FROM_PARTY_AND_ENTITY) {
-    $attached_entity = party_get_crm_controller($data_set_name);
+    $data_set_controller = party_get_crm_controller($data_set_name);
     switch ($how) {
       case self::FROM_PARTY :
-        $attached_entity->setParty($info);
-        $attached_entity->createAttachedEntity();
+        $data_set_controller->setParty($info);
+        $data_set_controller->createAttachedEntity();
         break;
       case self::FROM_ENTITY :
-        $attached_entity->setAttachedEntity($info);
+        $data_set_controller->setAttachedEntity($info);
         break;
       case self::FROM_PARTY_AND_ENTITY :
-        $attached_entity->setParty($info['party']);
-        $attached_entity->setAttachedEntity($info['entity']);
+        $data_set_controller->setParty($info['party']);
+        $data_set_controller->setAttachedEntity($info['entity']);
         break;
     }
 
-    return $attached_entity;
+    return $data_set_controller;
   }
 
   /**

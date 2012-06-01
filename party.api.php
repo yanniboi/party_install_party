@@ -243,9 +243,9 @@ function hook_party_admin_columns_info() {
  *  DX WTF: can we sniff this out given the entity type and the entity object? Yes, but we need to be able to get the entity type from the object.
  */
 function party_attach_entity($party, $entity, $data_set_name) {
-  $attached_entity = party_get_crm_controller($data_set_name);
-  $attached_entity->setAttachedEntity($entity);
-  $attached_entity->attach($party);
+  $data_set_controller = party_get_crm_controller($data_set_name);
+  $data_set_controller->setAttachedEntity($entity);
+  $data_set_controller->attach($party);
 }
 
 /**
@@ -261,10 +261,10 @@ function party_attach_entity($party, $entity, $data_set_name) {
  */
 function party_detach_entity($party, $entity, $data_set_name) {
   /* To Test */
-  $attached_entity = party_get_crm_controller($data_set_name);
-  $attached_entity->setParty($party);
-  $attached_entity->setAttachedEntity($entity);
-  $attached_entity->detach();
+  $data_set_controller = party_get_crm_controller($data_set_name);
+  $data_set_controller->setParty($party);
+  $data_set_controller->setAttachedEntity($entity);
+  $data_set_controller->detach();
 }
 
 
