@@ -160,7 +160,8 @@ class PartyDefaultDataSet {
     foreach ($deltas as $delta) {
       if (isset($this->entities[$delta]) && !is_object($this->entities[$delta])) {
         // This entity needs loading
-        $this->entities[$delta] = reset(entity_load($this->getDataInfo('entity type'), array($this->entities[$delta])));
+        $entities_loaded = entity_load($this->getDataInfo('entity type'), array($this->entities[$delta]));
+        $this->entities[$delta] = reset($entities_loaded);
         $this->entities[$delta]->data_set_name = $this->data_set;
       }
     }
