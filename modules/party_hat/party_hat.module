@@ -122,7 +122,8 @@ function party_hat_load($hat_name) {
   if (count($ids) < 1 && is_numeric($hat_name)) {
     $ids = array($hat_name);
   }
-  return reset(party_hat_load_multiple($ids));
+  $party_hats = party_hat_load_multiple($ids);
+  return reset($party_hats);
 }
 
 /**
