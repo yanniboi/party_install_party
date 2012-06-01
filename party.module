@@ -39,7 +39,6 @@ function party_entity_info() {
     'module' => 'party',
     'entity keys' => array(
       'id' => 'pid',
-      'bundle' => 'type',
       'label' => 'label',
     ),
     'access callback' => 'party_entity_access',
@@ -54,25 +53,13 @@ function party_entity_info() {
     ),
     //'static cache' => TRUE,
     'bundles' => array(
-      'individual' => array(
-        'label' => t('Individual Party'),
-        'description' => 'Parties representing individual people',
+      'party' => array(
+        'label' => t('Party'),
         'admin' => array(
-          'path' => 'admin/community/party/individual',
+          'path' => 'admin/community/party',
           'access arguments' => array('administer parties'),
         ),
       ),
-      'organisation' => array(
-        'label' => t('Organisation Party'),
-        'description' => 'Parties representing organisations or groups of people',
-        'admin' => array(
-          'path' => 'admin/community/party/organisation',
-          'access arguments' => array('administer parties'),
-        ),
-      ),
-    ),
-    'bundle keys' => array(
-      'bundle' => 'type',
     ),
     'view modes' => array(
       'full' => array(
@@ -157,33 +144,6 @@ function party_menu() {
     'title' => 'Manage parties',
     'description' => 'Manage contact information',
     'page callback' => 'party_info',
-    'access arguments' => array('administer parties'),
-    'file' => 'party.admin.inc',
-    'type' => MENU_LOCAL_TASK,
-  );
-  $items['admin/community/party/overview'] = array(
-    'title' => 'Overview',
-    'description' => 'Manage contact information',
-    'page callback' => 'party_info',
-    'access arguments' => array('administer parties'),
-    'file' => 'party.admin.inc',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -10,
-  );
-  $items['admin/community/party/individual'] = array(
-    'title' => 'Manage individuals',
-    'description' => 'Manage contact information',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('party_type_form', 'individual'),
-    'access arguments' => array('administer parties'),
-    'file' => 'party.admin.inc',
-    'type' => MENU_LOCAL_TASK,
-  );
-  $items['admin/community/party/organisation'] = array(
-    'title' => 'Manage organisations',
-    'description' => 'Manage contact information',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('party_type_form', 'organisation'),
     'access arguments' => array('administer parties'),
     'file' => 'party.admin.inc',
     'type' => MENU_LOCAL_TASK,
@@ -300,20 +260,6 @@ function party_menu() {
   $items['party/add'] = array(
     'title' => 'Add party',
     'page callback' => 'party_add',
-    'file' => 'party.pages.inc',
-    'access arguments' => array('create parties'),
-  );
-  $items['party/add/individual'] = array(
-    'title' => 'Add individual',
-    'page callback' => 'party_add',
-    'page arguments' => array('individual'),
-    'file' => 'party.pages.inc',
-    'access arguments' => array('create parties'),
-  );
-  $items['party/add/organisation'] = array(
-    'title' => 'Add organisation',
-    'page callback' => 'party_add',
-    'page arguments' => array('organisation'),
     'file' => 'party.pages.inc',
     'access arguments' => array('create parties'),
   );
@@ -921,21 +867,6 @@ function party_detach_entity($party, $entity, $data_set_name) {
 // API for loading data about a party.
 
 /**
- * Get all the Party Types
- *
- * Party only comes with two types but it would be possible for a module to
- * add other bundles programatically so its important we allow for this to happen
- * by not hardcoding organisation and individual everywhere.
- *
- * @return array()
- *   The bundles key of the entity info array.
- */
-function party_get_party_types() {
-  $party_info = entity_get_info('party');
-  return $party_info['bundles'];
-}
-
-/**
  * Return a Data Set object containing all the attached entities in a given
  * data set for a particular party.
  *
@@ -1228,14 +1159,7 @@ function party_save(&$party) {
  *  A party object that can be passed to party_save(), or FALSE if the array
  *  was not suitable for creating a party.
  */
-function party_create($info) {
-  if (!is_array($info)) {
-    return FALSE;
-  }
-  if (!isset($info['type'])) {
-    return FALSE;
-  }
-
+function party_create($info = array()) {
   return entity_create('party', $info);
 }
 

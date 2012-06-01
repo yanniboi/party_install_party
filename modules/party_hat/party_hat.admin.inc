@@ -42,20 +42,6 @@ function party_hat_form($form, &$form_state, $hat, $op = 'edit') {
     '#disabled' => isset($hat->name),
   );
 
-  $party_types = party_get_party_types();
-  $options = array();
-  foreach ($party_types as $name => $type) {
-    $options[$name] = $type['label'];
-  }
-  $form['party_types'] = array(
-    '#type' => 'checkboxes',
-    '#title' => t('Party types'),
-    '#description' => 'The party types this hat may apply to.',
-    '#options' => $options,
-    '#default_value' => (isset($hat->data['party_types'])) ? $hat->data['party_types'] : array(),
-    '#required' => TRUE,
-  );
-
   field_attach_form('party_hat', $hat, $form, $form_state);
 
   $form['required'] = array(

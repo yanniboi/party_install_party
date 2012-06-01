@@ -46,28 +46,7 @@ function party_hat_install() {
     $instance = array(
       'field_name' => 'party_hat',
       'entity_type' => 'party',
-      'bundle' => 'individual',
-      'label' => t('Hats'),
-      'required' => FALSE,
-      'description' => t("This party's hats"),
-      'default_value_function' => 'party_hat_field_get_default',
-      'widget' => array(
-        'type' => 'options_buttons',
-        'settings' => array(),
-      ),
-      'display' => array(
-        'default' => array(
-          'type' => 'hat_reference_default',
-          'label' => 'inline',
-        ),
-      ),
-    );
-    field_create_instance($instance);
-
-    $instance = array(
-      'field_name' => 'party_hat',
-      'entity_type' => 'party',
-      'bundle' => 'organisation',
+      'bundle' => 'party',
       'label' => t('Hats'),
       'required' => FALSE,
       'description' => t("This party's hats"),
@@ -116,7 +95,7 @@ function party_hat_schema() {
       'data' => array(
         'type' => 'blob',
         'size' => 'big',
-        'not null' => TRUE,
+        'not null' => FALSE,
         'serialize' => TRUE,
         'description' => 'Serialized data containing the field properties that do not warrant a dedicated column.',
       ),
@@ -193,3 +172,73 @@ function party_hat_field_schema() {
   );
 }
 
+/**
+ * Drop Party Bundles - migrate hat fields.
+ */
+function party_hat_update_7001() {
+  if (!field_info_instance('party', 'party_hat', 'party')) {
+    $instance = array(
+      'field_name' => 'party_hat',
+      'entity_type' => 'party',
+      'bundle' => 'party',
+      'label' => t('Hats'),
+      'required' => FALSE,
+      'description' => t("This party's hats"),
+      'default_value_function' => 'party_hat_field_get_default',
+      'widget' => array(
+        'type' => 'options_buttons',
+        'settings' => array(),
+      ),
+      'display' => array(
+        'default' => array(
+          'type' => 'hat_reference_default',
+          'label' => 'inline',
+        ),
+      ),
+    );
+    field_create_instance($instance);
+  }
+
+  // Update Existing field data
+  db_update('field_data_party_hat')
+    ->fields(array(
+      'bundle' => 'party',
+    ))
+    ->execute();
+
+  db_update('field_revision_party_hat')
+    ->fields(array(
+      'bundle' => 'party',
+    ))
+    ->execute();
+
+  // Remove old instances
+  $instance = array(
+    'field_name' => 'party_hat',
+    'entity_type' => 'party',
+    'bundle' => 'organisation',
+  );
+  field_delete_instance($instance);
+
+  $instance = array(
+    'field_name' => 'party_hat',
+    'entity_type' => 'party',
+    'bundle' => 'individual',
+  );
+  field_delete_instance($instance);
+}
+
+/**
+ * Make party_hat data field not 'not null'.
+ */
+function party_hat_update_7002() {
+  $spec = array(
+    'type' => 'blob',
+    'size' => 'big',
+    'not null' => FALSE,
+    'serialize' => TRUE,
+    'description' => 'Serialized data containing the field properties that do not warrant a dedicated column.',
+  );
+
+  db_change_field('party_hat', 'data', 'data', $spec);
+}

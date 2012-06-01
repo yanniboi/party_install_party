@@ -278,7 +278,6 @@ function party_hat_get_hats($party) {
     //Get all the "required"/"default" hats for this party type.
     $options = array(
       'required' => TRUE,
-      'party_type' => $party->type,
     );
     return party_hat_get_all_hats($options);
   }
@@ -326,15 +325,6 @@ function party_hat_get_all_hats($options = array()) {
   }
   unset($tempHats);
 
-  if (!isset($options['party_type'])) {
-    return $hats;
-  }
-
-  foreach ($hats as $id => $hat) {
-    if (!in_array($options['party_type'], $hat->data['party_types'])) {
-      unset($hats[$id]);
-    }
-  }
   return $hats;
 }
 
@@ -558,7 +548,6 @@ function party_hat_field_get_default($entity_type, $entity, $field, $instance, $
   //Get required hats.
   $options = array(
     'required' => TRUE,
-    'party_type' => $entity->type,
   );
   $hats = party_hat_get_all_hats($options);
 

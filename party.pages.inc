@@ -40,22 +40,8 @@ function party_edit_page_title($party) {
 /**
  * Page callback for adding a party.
  */
-function party_add($type = '') {
-  if ($type == '') {
-    $build['add_list'] = array(
-      '#theme' => 'item_list',
-      '#type' => 'item_list',
-      '#items' => array(
-        l(t('Add Individual'), 'party/add/individual')."<div class=\"description\">Add an individual party</div>",
-        l(t('Add Organisation'), 'party/add/organisation')."<div class=\"description\">Add an organisation party</div>",
-      ),
-    );
-
-    return $build;
-  }
-
+function party_add() {
   $party = entity_create('party', array(
-    'type' => $type,
     'label' => '',
   ));
 

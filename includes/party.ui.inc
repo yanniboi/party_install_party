@@ -130,8 +130,7 @@ class PartyUIController extends EntityDefaultUIController {
 
     array_unshift($row,
       $id,
-      $label,
-      $this->entityInfo['bundles'][$party->type]['label']
+      $label
     );
 
     return $row;
