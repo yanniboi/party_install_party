@@ -63,11 +63,6 @@ function party_form($form, &$form_state, $party, $op = 'edit') {
     drupal_set_title("Edit " . $party->label);
   }
 
-  $form['type'] = array(
-    '#type' => 'hidden',
-    '#value' => $party->type,
-  );
-
   $form_state['#party'] = $party;
   $form_state['#party_unchanged'] = $party; // So that other modules can react to changes. Must be a better way
   $form_state['#data_set_controllers'] =
