@@ -171,6 +171,8 @@ function party_edit_form_save($form, &$form_state) {
   // Now new entities have been attached (if necessary) set the party label.
   entity_get_controller('party')->setLabel($party);
 
+  drupal_set_message(t("@party saved successfully.", array('@party' => $party->label)));
+
   $form_state['redirect'] = 'party/' . $party->pid;
 }
 
