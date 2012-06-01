@@ -99,7 +99,7 @@ function party_entity_info_alter(&$entity_info) {
   foreach ($sets as $set) {
     $entity_info[$set['entity type']]['crm controller class'] = $set['class'];
     // Pass this onto the class to make changes.
-    call_user_func(array($set['class'], 'hook_entity_info_alter'), $entity_info[$set['entity type']]);
+    call_user_func_array(array($set['class'], 'hook_entity_info_alter'), array(&$entity_info[$set['entity type']]));
   }
 }
 
