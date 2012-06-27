@@ -141,7 +141,7 @@ function theme_crm_hat_data_set_rules_form($variables) {
   $rows = array();
   foreach (element_children($form) as $data_set) {
     $row = array();
-    $row[] = $data_set;
+    $row[] = $form[$data_set]['#title'];
     foreach (array_keys($form[$data_set]['#options']) as $radio_key) {
       // Remove the checkbox label; it's shown in the table header.
       unset($form[$data_set][$radio_key]['#title']);
