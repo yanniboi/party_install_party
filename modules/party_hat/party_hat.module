@@ -108,6 +108,9 @@ function party_hat_save(&$hat) {
  *
  * @param $hat_name
  *   The machine name of the hat to load.
+ *
+ * @return
+ *  A hat entity object.
  */
 function party_hat_load($hat_name) {
   $query = db_select('party_hat', 'ph');
