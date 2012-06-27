@@ -249,7 +249,7 @@ abstract class EntityDefaultPartyController {
       if ($options['method'] == 'prepend') {
         $this->delta = 0;
       }
-      else if ($option['method'] == 'append') {
+      else if ($options['method'] == 'append') {
         $this->delta = $this->getNextDelta();
       }
     }
