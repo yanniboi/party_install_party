@@ -13,6 +13,17 @@ class PartyHatController extends EntityAPIControllerExportable {
 
 /**
  * The class used for hat entities.
+ *
+ * Properties:
+ *  - hid
+ *  - name
+ *  - label
+ *  - data: An array of various data for the hat:
+ *    - party_types: OBSOLETE, to be removed.
+ *    - data_sets: TODO.
+ *  - required
+ *  - status
+ *  - module
  */
 class PartyHat extends Entity {
   public function __construct($values = array()) {
