@@ -137,7 +137,7 @@ function party_hat_load_multiple($hids = array(), $conditions = array(), $reset 
  * Save a hat data set rule.
  *
  * @param $hat
- *  The hat name
+ *  The hat entity.
  * @param $set
  *  The set type
  *  @todo: does this mean the data set name? if so, rename.
@@ -152,7 +152,7 @@ function party_hat_set_data_set_rule($hat, $set, $values = array()) {
   //try updating the table
   $num_affected = db_update('party_hat_data_set_rules')
     ->fields($values)
-    ->condition('hat', $hat, '=')
+    ->condition('hat', $hat->name, '=')
     ->condition('data_set', $set, '=')
     ->execute();
 
@@ -161,14 +161,14 @@ function party_hat_set_data_set_rule($hat, $set, $values = array()) {
     // @todo: refactor this so that we don't do 3 queries
     $count = db_select('party_hat_data_set_rules', 'c')
       ->fields('c')
-      ->condition('hat', $hat, '=')
+      ->condition('hat', $hat->name, '=')
       ->condition('data_set', $set, '=')
       ->execute()
       ->rowCount();
 
     if ($count < 1) {
       $data = array(
-        'hat' => $hat,
+        'hat' => $hat->name,
         'data_set' => $set,
       ) + $values;
       drupal_write_record('party_hat_data_set_rules',  $data);

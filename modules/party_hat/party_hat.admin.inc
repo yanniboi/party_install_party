@@ -186,7 +186,7 @@ function party_hat_form_submit($form, &$form_state) {
         $values[$key] = 1;
       }
     }
-    party_hat_set_data_set_rule($hat->name, $type, $values);
+    party_hat_set_data_set_rule($hat, $type, $values);
   }
 
   // If editing an existing hat, redirect to the hat admin page.
