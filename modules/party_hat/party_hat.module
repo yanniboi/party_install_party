@@ -249,11 +249,10 @@ function party_hat_party_access($op, $party = NULL, $data_set = NULL, $account =
  *
  * @todo write params and return.
  */
-function party_hat_get_hat_data_sets($hat, $rule = 'has') {
+function party_hat_get_hat_data_sets($hat) {
   $results = db_select('party_hat_data_set_rules', 'c')
     ->fields('c')
     ->condition('hat', $hat->name, '=')
-    ->condition($rule, 1, '=')
     ->execute()
     ->fetchAllAssoc('data_set');
 
