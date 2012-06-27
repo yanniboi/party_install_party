@@ -73,7 +73,7 @@ function party_hat_assign_hats($party, $hats) {
   $party->party_hat[LANGUAGE_NONE] = $hat_items;
   party_save($party);
 
-  if (module_exists('rules') {
+  if (module_exists('rules')) {
     rules_invoke_all('party_hat_assign_hats', $party, $assigned_hats);
   }
   else {
