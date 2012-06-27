@@ -284,5 +284,9 @@ function party_devel_info_page() {
   $output = kprint_r($info, TRUE, t('Data set info'));
   $info = party_get_party_piece_info();
   $output .= kprint_r($info, TRUE, t('Party piece info'));
+  if (module_exists('party_hat')) {
+    $hats = party_hat_get_all_hats();
+    $output .= kprint_r($hats, TRUE, t('Hats'));
+  }
   return $output;
 }
