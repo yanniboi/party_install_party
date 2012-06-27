@@ -138,9 +138,8 @@ function party_hat_load_multiple($hids = array(), $conditions = array(), $reset 
  *
  * @param $hat
  *  The hat entity.
- * @param $set
- *  The set type
- *  @todo: does this mean the data set name? if so, rename.
+ * @param $data_set_name
+ *  The data set name.
  * @param $value
  *  The value
  *
@@ -148,12 +147,12 @@ function party_hat_load_multiple($hids = array(), $conditions = array(), $reset 
  *       At the moment we do 3 queries when we add a rule and 1 when we update it and 2 when we keep it the same..
  *       Is this better than 2 queries for both?
  */
-function party_hat_set_data_set_rule($hat, $set, $values = array()) {
+function party_hat_set_data_set_rule($hat, $data_set_name, $values = array()) {
   //try updating the table
   $num_affected = db_update('party_hat_data_set_rules')
     ->fields($values)
     ->condition('hat', $hat->name, '=')
-    ->condition('data_set', $set, '=')
+    ->condition('data_set', $data_set_name, '=')
     ->execute();
 
   if ($num_affected < 1) {
@@ -162,14 +161,14 @@ function party_hat_set_data_set_rule($hat, $set, $values = array()) {
     $count = db_select('party_hat_data_set_rules', 'c')
       ->fields('c')
       ->condition('hat', $hat->name, '=')
-      ->condition('data_set', $set, '=')
+      ->condition('data_set', $data_set_name, '=')
       ->execute()
       ->rowCount();
 
     if ($count < 1) {
       $data = array(
         'hat' => $hat->name,
-        'data_set' => $set,
+        'data_set' => $data_set_name,
       ) + $values;
       drupal_write_record('party_hat_data_set_rules',  $data);
     }
