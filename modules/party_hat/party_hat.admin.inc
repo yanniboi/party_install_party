@@ -179,14 +179,14 @@ function party_hat_form_submit($form, &$form_state) {
 
   // @todo: fix this with the new values.
 
-  foreach ($form_state['values']['data_set_rules'] as $type => $values) {
+  foreach ($form_state['values']['data_set_rules'] as $data_set_name => $values) {
     // convert to a 1/0 column. There must be a better way! It probably involves having two different checkboxes
     foreach ($values as $key => $var) {
       if ($key === $var) {
         $values[$key] = 1;
       }
     }
-    party_hat_set_data_set_rule($hat, $type, $values);
+    party_hat_set_data_set_rule($hat, $data_set_name, $values);
   }
 
   // If editing an existing hat, redirect to the hat admin page.
