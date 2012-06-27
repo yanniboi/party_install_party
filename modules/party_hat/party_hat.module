@@ -480,21 +480,11 @@ function party_hat_widget_info_alter(&$info) {
 /**
  * Implements hook_options_list().
  */
-function party_hat_options_list($field, $instance = NULL) {
+function party_hat_options_list($field, $instance, $entity_type, $entity) {
   $hats = party_hat_get_all_hats();
   $options = array();
-  if (isset($instance)) {
-    $party_type = $instance['bundle'];
-    foreach ($hats as $hat) {
-      if (in_array($party_type, array_filter($hat->data['party_types']))) {
-        $options[$hat->name] = $hat->label;
-      }
-    }
-  }
-  else {
-    foreach ($hats as $hat) {
-      $options[$hat->name] = $hat->label;
-    }
+  foreach ($hats as $hat) {
+    $options[$hat->name] = $hat->label;
   }
 
   return $options;
