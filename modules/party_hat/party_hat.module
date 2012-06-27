@@ -181,19 +181,18 @@ function party_hat_set_data_set_rule($hat, $set, $values = array()) {
  *
  * @param $hat
  *  The hat name
- * @param $set
- *  The set type
- *  @todo: does this mean the data set name? if so, rename.
+ * @param $data_set_name
+ *  The data set name to get the rule for.
  *
  * @return
  *  @todo write me.
  */
-function party_hat_get_data_set_rule($hat, $set) {
+function party_hat_get_data_set_rule($hat, $data_set_name) {
   //select from the table where the hat and data set are right
   $results = db_select('party_hat_data_set_rules', 'c')
     ->fields('c')
     ->condition('hat', $hat, '=')
-    ->condition('data_set', $set, '=')
+    ->condition('data_set', $data_set_name, '=')
     ->execute()
     ->fetchAllAssoc('phdsid');
 
