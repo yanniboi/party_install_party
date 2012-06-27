@@ -242,3 +242,14 @@ function party_hat_update_7002() {
 
   db_change_field('party_hat', 'data', 'data', $spec);
 }
+
+/**
+ * Remove party types data from hats.
+ */
+function party_hat_update_7003() {
+  $party_hats = party_hat_get_all_hats($party);
+  foreach ($party_hats as $hat) {
+    unset($hat->data['party_types']);
+    party_hat_save($hat);
+  }
+}
