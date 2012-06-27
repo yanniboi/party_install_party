@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * THIS FILE IS OBSOLETE. NEEDS CLEANING UP. SEE http://drupal.org/node/1661888.
+ */
+
+/**
  * The standard data set class
  */
 abstract class EntityDefaultPartyController {
