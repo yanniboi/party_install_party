@@ -61,11 +61,11 @@ function party_hat_form($form, &$form_state, $hat, $op = 'edit') {
     '#theme' => 'crm_hat_data_set_rules_form',
   );
 
-  foreach (party_get_data_set_info() as $type => $set) {
+  foreach (party_get_data_set_info() as $data_set_name => $data_set) {
     // Get the rule.
     if (isset($hat->name)) {
-      $default = party_hat_get_data_set_rule($hat->name, $type);
-      foreach($default as $key => $var) {
+      $default = party_hat_get_data_set_rule($hat->name, $data_set_name);
+      foreach ($default as $key => $var) {
         if ($var == 1) {
           $default[$key] = $key;
         }
@@ -75,9 +75,9 @@ function party_hat_form($form, &$form_state, $hat, $op = 'edit') {
       $default = array('has' => 0, 'multiple' => 0);
     }
 
-    $form['data_set_rules'][$type] = array(
+    $form['data_set_rules'][$data_set_name] = array(
       '#type' => 'checkboxes',
-      '#title' => t($set['label']),
+      '#title' => $data_set['label'],
       '#default_value' => $default,
       '#options' => array(
         // We have to use different keys to what the access hook expects for
