@@ -150,39 +150,17 @@ function party_hat_load_multiple($hids = array(), $conditions = array(), $reset 
  *       At the moment we do 3 queries when we add a rule and 1 when we update it and 2 when we keep it the same..
  *       Is this better than 2 queries for both?
  */
-function party_hat_set_data_set_rule($hat, $data_set_name, $values = array()) {
-  //try updating the table
-  $num_affected = db_update('party_hat_data_set_rules')
-    ->fields($values)
-    ->condition('hat', $hat->name, '=')
-    ->condition('data_set', $data_set_name, '=')
-    ->execute();
-
-  if ($num_affected < 1) {
-    // We have to check that we haven't kept the row the same.
-    // @todo: refactor this so that we don't do 3 queries
-    $count = db_select('party_hat_data_set_rules', 'c')
-      ->fields('c')
-      ->condition('hat', $hat->name, '=')
-      ->condition('data_set', $data_set_name, '=')
-      ->execute()
-      ->rowCount();
-
-    if ($count < 1) {
-      $data = array(
-        'hat' => $hat->name,
-        'data_set' => $data_set_name,
-      ) + $values;
-      drupal_write_record('party_hat_data_set_rules',  $data);
-    }
-  }
+function party_hat_set_data_set_rule(&$hat, $data_set_name, $values = array()) {
+  // Very sily now.
+  // @todo: remove this function, obviously.
+  $hat->data['data_sets'][$data_set_name] = $values;
 }
 
 /**
  * Get a hat data set rule.
  *
  * @param $hat
- *  The hat name
+ *  The hat entity.
  * @param $data_set_name
  *  The data set name to get the rule for.
  *
@@ -190,28 +168,18 @@ function party_hat_set_data_set_rule($hat, $data_set_name, $values = array()) {
  *  @todo write me.
  */
 function party_hat_get_data_set_rule($hat, $data_set_name) {
-  //select from the table where the hat and data set are right
-  $results = db_select('party_hat_data_set_rules', 'c')
-    ->fields('c')
-    ->condition('hat', $hat, '=')
-    ->condition('data_set', $data_set_name, '=')
-    ->execute()
-    ->fetchAllAssoc('phdsid');
-
-  //if the rule doesn't exist yet return a default.
-  if (count($results) < 1) {
+  if (isset($hat->data['data_sets'][$data_set_name])) {
+    return $hat->data['data_sets'][$data_set_name];
+  }
+  else {
+    // Return defaults.
+    // @todo: needed here? These will get saved in the DB next time the hat is
+    // saved anyway, so should go in the entity constructor rather than here.
     return array(
       'has' => 0,
       'multiple' => 0,
     );
   }
-
-  //get the first $result (there should only ever be one)
-  $result = reset($results);
-  return array(
-    'has' => $result->has,
-    'multiple' => $result->multiple,
-  );
 }
 
 /**
@@ -252,13 +220,9 @@ function party_hat_party_access($op, $party = NULL, $data_set = NULL, $account =
  * @todo write params and return.
  */
 function party_hat_get_hat_data_sets($hat) {
-  $results = db_select('party_hat_data_set_rules', 'c')
-    ->fields('c')
-    ->condition('hat', $hat->name, '=')
-    ->execute()
-    ->fetchAllAssoc('data_set');
-
-  return array_keys($results);
+  // @todo: this is flawed anyway, as it will simply return ALL data sets.
+  // @see http://drupal.org/node/1663370.
+  return array_keys($hat->data['data_sets']);
 }
 
 /**

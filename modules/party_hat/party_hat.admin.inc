@@ -64,7 +64,7 @@ function party_hat_form($form, &$form_state, $hat, $op = 'edit') {
   foreach (party_get_data_set_info() as $data_set_name => $data_set) {
     // Get the rule.
     if (isset($hat->name)) {
-      $default = party_hat_get_data_set_rule($hat->name, $data_set_name);
+      $default = party_hat_get_data_set_rule($hat, $data_set_name);
       foreach ($default as $key => $var) {
         if ($var == 1) {
           $default[$key] = $key;
@@ -171,14 +171,9 @@ function party_hat_form_validate($form, &$form_state) {
 function party_hat_form_submit($form, &$form_state) {
   // Build the entity and save it.
   $hat = entity_ui_form_submit_build_entity($form, $form_state);
-  party_hat_save($hat);
 
-  field_attach_submit('party_hat', $hat, $form, $form_state);
-
-  drupal_set_message(t("Party hat has been saved."));
-
-  // @todo: fix this with the new values.
-
+  // @todo. if we're going to have a helper function to set this, it should
+  // actually help and do all this messy stuff.
   foreach ($form_state['values']['data_set_rules'] as $data_set_name => $values) {
     // convert to a 1/0 column. There must be a better way! It probably involves having two different checkboxes
     foreach ($values as $key => $var) {
@@ -188,6 +183,12 @@ function party_hat_form_submit($form, &$form_state) {
     }
     party_hat_set_data_set_rule($hat, $data_set_name, $values);
   }
+
+  party_hat_save($hat);
+
+  field_attach_submit('party_hat', $hat, $form, $form_state);
+
+  drupal_set_message(t("Party hat has been saved."));
 
   // If editing an existing hat, redirect to the hat admin page.
   if ($form_state['build_info']['args'][1] == 'edit') {
