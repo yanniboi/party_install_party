@@ -283,6 +283,11 @@ function party_menu() {
 
 /**
  * Implements hook_menu_local_tasks_alter().
+ *
+ * Adds local tasks in the following places:
+ *  - to add a party from the party list admin page
+ *  - to add/import a new data set (ie entity bundle) from the data sets admin page
+ *  - to add new entities on a party piece that's based on a data set
  */
 function party_menu_local_tasks_alter(&$data, $router_item, $root_path) {
   // Add action link to 'party/add' on 'admin/community/list' page.
