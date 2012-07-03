@@ -1378,13 +1378,7 @@ function party_default_attached_entity_form_submit($form, &$form_state, $hash, &
  * @param $second the second party
  */
 function party_merge($first, $second) {
-  $attached_entities = party_get_attached_entities($second);
-
   // @todo: Clever logic to work out which data sets to delete and which to keep
-  foreach ($attached_entities as $attached_entity) {
-    $attached_entity->detach();
-    $attached_entity->attach($first);
-  }
 
   // @todo: Transfer hats.
 
