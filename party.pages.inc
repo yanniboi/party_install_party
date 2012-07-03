@@ -274,7 +274,8 @@ function party_attached_entity_edit_form($form, &$form_state, $party, $data_set,
 
   $form_state['#party'] = $party;
 
-  party_attached_entity_attach_form($form, $form_state);
+  // Get the attached entity form as a standalone, as we have just the one.
+  party_attached_entity_attach_form($form, $form_state, TRUE);
   $form['#submit'][] = 'party_attached_entity_edit_form_submit';
 
   $form['submit'] = array(

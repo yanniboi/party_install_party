@@ -1255,8 +1255,12 @@ function party_attached_entity_form_callback($data_set_name) {
  *
  * This takes all attached entities in the $form_state['#attached_entity'] array, runs
  * their form callback and puts it in $form[$attached_entity->hash()]
+ *
+ * @param $standalone
+ *  Whether this is being used as a form to edit just the one attached entity.
+ *  If true, the fieldset is not shown around the entity form.
  */
-function party_attached_entity_attach_form(&$form, &$form_state) {
+function party_attached_entity_attach_form(&$form, &$form_state, $standalone = FALSE) {
   // Get all attached entities from $form_state.
   $attached_entities = $form_state['#attached_entities'];
 
@@ -1266,8 +1270,10 @@ function party_attached_entity_attach_form(&$form, &$form_state) {
     $data_set_info = party_get_data_set_info($attached_entity->data_set_name);
     // Execute the form callback.
     $form[$hash] =  $callback($form, $form_state, $attached_entity, $form_state['#party']);
-    $form[$hash]['#type'] = 'fieldset';
-    $form[$hash]['#title'] = entity_label($data_set_info['entity type'], $attached_entity);
+    if (!$standalone) {
+      $form[$hash]['#type'] = 'fieldset';
+      $form[$hash]['#title'] = entity_label($data_set_info['entity type'], $attached_entity);
+    }
     $form[$hash]['#tree'] = TRUE;
     $form[$hash]['#parents'] = array($hash);
   }
