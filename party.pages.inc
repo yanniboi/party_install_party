@@ -229,7 +229,7 @@ function party_page_view_piece_views($party, $view_name, $view_display_id) {
 }
 
 /**
- * The attached entity edit form.
+ * Form to edit or create an attached entity.
  *
  * @param $party
  *    A loaded party object.
@@ -239,23 +239,30 @@ function party_page_view_piece_views($party, $view_name, $view_display_id) {
  *   the path-style string to the machine name, and a menu loader that doesn't
  *   load would be weird too.
  * @param $eid
- *    The id of the entity
+ *    The id of the entity, if editing.
  *
  * @todo: Reimplement actions and edit overlay stuff
  */
 function party_attached_entity_edit_form($form, &$form_state, $party, $data_set, $eid = NULL) {
   $data_set_controller = party_get_crm_controller($data_set['set_name'], $party);
-  $attached_entities = $data_set_controller->getEntities();
+  // Load up the entities into the controller.
+  $data_set_controller->loadEntities();
 
-  if ($eid !== NULL) {
+  if (isset($eid)) {
     $entity = reset(entity_load($data_set_controller->getDataInfo('entity type'), array($eid)));
-    $form_title = "Edit " . $data_set['label'] . " (" . entity_label($data_set['entity type'], $entity) . ")";
-    drupal_set_title($form_title);
+    $form_title = t("Edit @data-set-label (@entity-label)", array(
+      '@data-set-label' => $data_set['label'],
+      '@entity-label' => entity_label($data_set['entity type'], $entity),
+    ));
   }
   else {
-    drupal_set_title("Add {$data_set_controller->getDataInfo('label')} Data Set to {$party->label}");
     $entity = $data_set_controller->createEntity();
+    $form_title = t("Add @data-set-label to @party-label", array(
+      '@data-set-label' => $data_set_controller->getDataInfo('label'),
+      '@party-label' => $party->label,
+    ));
   }
+  drupal_set_title($form_title);
 
   // Save the data set object in the form state
   $form_state['#partyData'] = $data_set_controller;
