@@ -346,6 +346,7 @@ function party_view_data_set($party, $data_set_name) {
   $data_set = party_get_data_set_info($data_set_name);
   $attached_entity_controllers = party_get_attached_entities($party, $data_set_name);
 
+  $build = array();
   foreach ($attached_entity_controllers as $crm_controller) {
     $entity = $crm_controller->entity;
     $build[$data_set_name . '_' . $crm_controller->delta] = array(
@@ -356,20 +357,6 @@ function party_view_data_set($party, $data_set_name) {
 
     $view_mode = $data_set['view mode'];
     $build[$data_set_name . '_' . $crm_controller->delta]['view'] = $crm_controller->display($view_mode);
-  }
-
-  if (!isset($data_set['max cardinality']) || count($attached_entity_controllers) < $data_set['max cardinality']) {
-    $build[$data_set_name . '_links'] = array(
-      '#theme' => 'links',
-      '#links' => array(
-        'add' => array(
-          'title' => "Add " . $data_set['label'],
-          'href'  => 'party/' . $party->pid . '/add/' . $data_set['path element'],
-        ),
-      ),
-      '#attributes' => array('class' => array('crm-profile-links')),
-      '#weight' => 1,
-    );
   }
 
   return $build;
