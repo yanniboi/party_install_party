@@ -227,7 +227,7 @@ function party_user_party_view_user($party) {
 }
 
 /**
- * Build the User Data Set form.
+ * Form to edit or create an attached user.
  */
 function party_user_form_user($form, &$form_state, &$attached_entity, $party) {
   $user_form = array();
@@ -289,9 +289,10 @@ function party_user_form_user_submit($form, &$form_state, $hash, &$attached_enti
     // Attempt to load a user from the given input.
     $account = user_load_by_name($form_state['values'][$hash]['user']);
     if ($account->uid != 0) {
-      $controller = party_get_crm_controller('user', $party);
-      $controller->attachEntity($account);
-      $controller->save();
+      // Place the loaded user object into the form state attached entities,
+      // where party_attached_entity_edit_form_submit() will take care of
+      // saving it.
+      $form_state['#attached_entities'][$hash] = $account;
     }
     return FALSE;
   }
