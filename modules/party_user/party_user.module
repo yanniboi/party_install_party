@@ -282,23 +282,21 @@ function party_user_form_user_validate($form, &$form_state, &$attached_entity, $
 /**
  * Submit the user data set form
  */
-function party_user_form_user_submit($form, &$form_state, &$attached_entity, $party) {
-  $hash = $attached_entity->hash();
-
+function party_user_form_user_submit($form, &$form_state, $hash, &$attached_entity, $party) {
   $op = $form_state['values'][$hash]['op'];
 
   if ($op == 'select') {
     // Attempt to load a user from the given input.
     $account = user_load_by_name($form_state['values'][$hash]['user']);
-    $attached_entity->detach();
     if ($account->uid != 0) {
-      $attached_entity->setAttachedEntity($account);
-      $attached_entity->attach($party);
+      $controller = party_get_crm_controller('user', $party);
+      $controller->attachEntity($account);
+      $controller->save();
     }
     return FALSE;
   }
   else if ($op == 'edit') {
-    $account = $attached_entity->entity;
+    $account = $attached_entity;
     $account_unchanged = clone $account;
     $category = $form[$hash]['#user_category'];
 
@@ -385,17 +383,24 @@ function party_user_register_submit($form, &$form_state) {
   $party = $form_state['#party'];
   $party = party_save($party);
 
-  // Attach all the various entities
-  foreach ($party->data_sets as $attached_entities) {
-    foreach ($attached_entities as $attached_entity) {
-      $attached_entity->attach($party);
+  // Load our attached data sets
+  $data_sets = party_get_party_data_sets($party);
+  $data_set_info = party_get_data_set_info();
+
+  foreach ($data_sets as $data_set) {
+    if (!empty($party->data_sets[$data_set])) {
+      $data_set_controller = party_get_crm_controller($data_set, $party);
+      foreach ($party->data_sets[$data_set] as $entity) {
+        $data_set_controller->attachEntity($entity);
+      }
+      $data_set_controller->save();
     }
   }
 
   // Attach the user what we just made
-  $data_set_controller = party_get_crm_controller('user');
-  $data_set_controller->setAttachedEntity($form_state['user']);
-  $data_set_controller->attach($party);
+  $data_set_controller = party_get_crm_controller('user', $party);
+  $data_set_controller->attachEntity($form_state['user']);
+  $data_set_controller->save($party);
 }
 
 /**
@@ -448,14 +453,12 @@ function party_user_user_view($account, $view_mode, $langcode) {
  */
 function party_user_create_party_for_user($user, $options = array()) {
   $party = party_create($options);
-  $data_set_controller = party_get_crm_controller('user');
-  $data_set_controller->setAttachedEntity($user);
+  $data_set_controller = party_get_crm_controller('user', $party);
+  $data_set_controller->attachEntity($user);
   $party->data_sets['user'][] = $data_set_controller;
 
   // This will fail if a plugin that relies on anything other than user is used
   $party = party_save($party);
-
-  $data_set_controller->attach($party);
 }
 
 /**
