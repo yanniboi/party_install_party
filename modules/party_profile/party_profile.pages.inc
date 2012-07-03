@@ -11,7 +11,13 @@ function party_profile_party_view_profile_set($party, $profile_type) {
   $build = array();
 
   // Load the profiles in this data set.
-  $sets = EntityDefaultPartyController::getInstances("profile2_" . $profile_type, $party);
+  $data_set_name = 'profile2_' . $profile_type;
+  $attached_entities = party_get_attached_entities($party, $data_set_name);
+  dsm($attached_entities);
+
+  return 'This is currently broken but you should at least see the loaded data set.';
+
+  // @todo: $sets was the array of old controllers, one per attached entity.
 
   // Output each profile provided the user has view access.
   foreach ($sets as $set) {
