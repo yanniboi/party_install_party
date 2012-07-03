@@ -11,6 +11,9 @@
  * This class manages the attachement of entities to a party, including
  * loading, ordering, attaching and detaching entities. It also provides
  * a helper for creating new attached entities.
+ *
+ * @see party_get_crm_controller().
+ * @see party_get_data_set().
  */
 class PartyDefaultDataSet {
 
