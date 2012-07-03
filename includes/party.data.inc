@@ -274,6 +274,37 @@ class PartyDefaultDataSet {
   }
 
   /**
+   *  Return the renderable array for one of our attached entities.
+   *
+   * @param int $delta
+   *  The delta of the entity to render.
+   * @param $view_mode
+   *  The view mode to use.
+   *
+   * @return
+   *  A renderable array.
+   */
+  public function display($delta, $view_mode = '') {
+    $entity = $this->getEntity($delta);
+    return entity_view($this->getDataInfo('entity type'), array($entity), $view_mode);
+  }
+
+  /**
+   * Get the label of one of our attached entities.
+   *
+   * @param int $delta
+   *  The delta of the entity to render.
+   *
+   * @return
+   *  The text of the label.
+   */
+  public function getLabel($delta) {
+    $entity = $this->getEntity($delta);
+    $label = entity_label($this->getDataInfo('entity type'), $entity);
+    return $label;
+  }
+
+  /**
    * Create a new entity
    *
    * This method provides a helper to create a new attached entity for the data
