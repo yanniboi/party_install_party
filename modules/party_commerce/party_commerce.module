@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Support for configurable user profiles which are not attached to users.
+ * Support for Drupal Commerce customer profiles.
  */
 
 /**
