@@ -893,8 +893,8 @@ function party_get_data_set($party, $data_set_name, $create = FALSE) {
 
   $data_set_controller = party_get_crm_controller($data_set_name, $party);
 
-  $entityIds = $data_set_controller->getEntityIds();
-  if ($create && empty($entityIds)) {
+  $entity_ids = $data_set_controller->getEntityIds();
+  if ($create && empty($entity_ids)) {
     $entity = $data_set_controller->createEntity();
     $data_set_controller->attach($entity);
   }
