@@ -10,19 +10,11 @@
 class PartyUserDataSet extends PartyDefaultDataSet {
 
   /**
-   * Display a user data set.
-   *
-   * This is needed because user doesn't use the entity API.
+   * Get the user label.
    */
-  public function display($mode) {
-    return ($this->entity->uid != 0) ? user_view($this->entity, $mode) : FALSE;
-  }
-
-  /**
-   * Get the entity label.
-   */
-  public function getLabel() {
-    return format_username($this->entity);
+  public function getLabel($delta) {
+    $entity = $this->getEntity($delta);
+    return format_username($entity);
   }
 
 }
