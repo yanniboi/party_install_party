@@ -1369,7 +1369,10 @@ function party_default_attached_entity_form_submit($form, &$form_state, $hash, &
 // Party Actions & Processes
 
 /**
- * Merge two parties
+ * Merge two parties.
+ *
+ * @TODO: this is not at all functional!
+ * @see http://drupal.org/node/1669708.
  *
  * When running this function, the first party gets all of the second party's attached entities and the second party
  * becomes a 'ghost' party that points to the first.
