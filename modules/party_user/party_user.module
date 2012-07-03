@@ -21,6 +21,18 @@ function party_user_party_data_set_info() {
       'manage fields' => 'admin/config/people/accounts/fields',
       'manage display' => 'admin/config/people/accounts/display',
     ),
+    // Provide a piece corresponding to the data set.
+    'piece' => array(
+      'path' => 'user',
+      'maker' => 'core',
+      // @todo: this needs to tell the access arguments for party_access()
+      // about the argument for loading our attached entities.
+      // In other words, some sort of %wildcard_to_arg() function maybe?
+      'access arguments' => array('todo argh I have no idea'),
+      // @todo: these don't have any effect yet.
+      // @see http://drupal.org/node/1669774.
+      'weight' => -8,
+    ),
     'form callback' => "party_user_form_user",
   );
   return $sets;
@@ -191,24 +203,6 @@ function party_user_ctools_plugin_directory($owner, $plugin_type) {
   if ($owner == 'party' || ($owner == 'ctools' && $plugin_type == 'relationships')) {
     return "plugins/$plugin_type";
   }
-}
-
-/**
- * Implements hook_party_party_pieces().
- */
-function party_user_party_party_pieces() {
-  return array(
-    'user' => array(
-      'maker' => 'view',
-      'title' => 'Account Details',
-      'page callback' => 'party_view_data_set',
-      'page arguments' => array(1, 'user'),
-      'file' => 'party.pages.inc',
-      'access callback' => TRUE,
-      'access arguments' => array(1),
-      'weight' => -8,
-    ),
-  );
 }
 
 /**
