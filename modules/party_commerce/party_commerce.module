@@ -15,7 +15,7 @@ function party_commerce_party_data_set_info() {
       'label' => $label,
       'entity type' => 'commerce_customer_profile',
       'entity bundle' => $type,
-      'class' => 'CustomerProfilePartyController',
+      'class' => 'PartyCustomerProfileDataSet',
       // Provide details of admin interfaces
       'admin' => array(
         'manage fields' => 'admin/commerce/customer-profiles/types/' . $type . '/fields',
@@ -45,5 +45,5 @@ function party_commerce_party_data_set_info() {
  *
  * @todo: move this to an inc file for autoloading.
  */
-class CustomerProfilePartyController extends EntityDefaultPartyController {
+class PartyCustomerProfileDataSet extends PartyDefaultDataSet {
 }
