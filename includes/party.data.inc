@@ -272,13 +272,20 @@ class PartyDefaultDataSet {
    * @param int $delta
    *  The delta of the entity to render.
    * @param $view_mode
-   *  The view mode to use.
+   *  (optional) The view mode to use. Defaults to that set in the data set
+   *  definition.
    *
    * @return
    *  A renderable array.
    */
-  public function display($delta, $view_mode = '') {
+  public function display($delta, $view_mode = NULL) {
     $entity = $this->getEntity($delta);
+
+    if (!isset($view_mode)) {
+      $party_data_info = party_get_data_set_info($this->data_set);
+      $view_mode = $party_data_info['view mode'];
+    }
+
     return entity_view($this->getDataInfo('entity type'), array($entity), $view_mode);
   }
 

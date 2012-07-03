@@ -343,28 +343,30 @@ function party_attached_entity_remove_confirm_submit($form, &$form_state) {
 /**
  * Page callback to view a data set.
  *
+ * Used for display of data sets that don't use Views or provide their own
+ * page callback.
+ *
+ * @see party_party_party_pieces().
+ *
  * @param $party
  *    A loaded party object.
  * @param $data_set_name
  *   A data set name.
- *
- * @todo: remove
  */
 function party_view_data_set($party, $data_set_name) {
-  $data_set = party_get_data_set_info($data_set_name);
-  $attached_entity_controllers = party_get_attached_entities($party, $data_set_name);
+  // TODO: some of these calls are redundant!
+  $data_set_controller = party_get_crm_controller('user', $party);
+  $attached_entities = party_get_attached_entities($party, $data_set_name);
 
   $build = array();
-  foreach ($attached_entity_controllers as $crm_controller) {
-    $entity = $crm_controller->entity;
-    $build[$data_set_name . '_' . $crm_controller->delta] = array(
-        // @todo: this is sort of an abuse of what fieldsets are meant for... :/
-        '#type' => 'fieldset',
-        '#title' => $crm_controller->getLabel(),
-      );
+  foreach ($attached_entities as $delta => $entity) {
+    $build[$data_set_name . '_' . $delta] = array(
+      // @todo: this is sort of an abuse of what fieldsets are meant for... :/
+      '#type' => 'fieldset',
+      '#title' => $data_set_controller->getLabel($delta),
+    );
 
-    $view_mode = $data_set['view mode'];
-    $build[$data_set_name . '_' . $crm_controller->delta]['view'] = $crm_controller->display($view_mode);
+    $build[$data_set_name . '_' . $delta]['view'] = $data_set_controller->display($delta);
   }
 
   return $build;
