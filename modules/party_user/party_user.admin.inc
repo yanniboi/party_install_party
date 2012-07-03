@@ -13,18 +13,6 @@ function party_user_settings_form($form, &$form_state) {
     '#default_value' => variable_get('party_user_create_on_register', FALSE),
   );
 
-  $option = array();
-  foreach (party_get_party_types() as $type => $def) {
-    $options[$type] = $def['label'];
-  }
-
-  $form['register_party_type'] = array(
-    '#type' => 'select',
-    '#title' => 'Type of party to create when a user registers',
-    '#options' => $options,
-    '#default_value' => variable_get('party_user_register_party_type', 'individual'),
-  );
-
   $options = array();
   foreach (party_get_data_set_info() as $data_set_name => $def) {
     if ($data_set_name != 'user') {
@@ -50,7 +38,6 @@ function party_user_settings_form($form, &$form_state) {
 
 function party_user_settings_form_submit($form, &$form_state) {
   variable_set('party_user_create_on_register', ($form_state['values']['create_on_register'] == 1));
-  variable_set('party_user_register_party_type', $form_state['values']['register_party_type']);
 
   $registration_data_sets = $form_state['values']['registration_data_sets'];
   foreach ($registration_data_sets as $key => $var) {
@@ -97,7 +84,7 @@ function party_user_sync_form_submit($form, &$form_state) {
   );
 
   foreach ($users as $user) {
-    $batch['operations'][] = array('party_user_batch_user_sync', array($user, array('type' => 'individual')));
+    $batch['operations'][] = array('party_user_batch_user_sync', array($user, array()));
   }
 
   batch_set($batch);

@@ -339,8 +339,7 @@ function party_user_form_user_register_form_alter(&$form, &$form_state) {
     form_load_include($form_state, 'inc', 'party', 'party.pages');
 
     // Create an empty party
-    $party_type = variable_get('party_user_register_party_type', 'individual');
-    $party = party_create(array('type' => $party_type));
+    $party = party_create();
 
     $form_state['#party'] = $party;
     $form_state['#party_unchanged'] = $party;
@@ -448,12 +447,6 @@ function party_user_user_view($account, $view_mode, $langcode) {
  * @see party_create
  */
 function party_user_create_party_for_user($user, $options = array()) {
-  $default_options = array(
-    'type' => variable_get('party_user_register_party_type', 'individual'),
-  );
-
-  $options += $default_options;
-
   $party = party_create($options);
   $data_set_controller = party_get_crm_controller('user');
   $data_set_controller->setAttachedEntity($user);
