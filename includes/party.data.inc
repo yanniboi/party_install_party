@@ -110,27 +110,20 @@ class PartyDefaultDataSet {
       // Data Set Info
       case 'name':
         return $this->data_set;
-      break;
       case 'path element':
         return $party_data_info['path element'];
-      break;
       case 'label':
         return $party_data_info['label'];
-      break;
       case 'entity type':
         return $party_data_info['entity type'];
-      break;
       case 'entity bundle':
         return $party_data_info['entity bundle'];
-      break;
 
       // entity Info
       case 'id key':
         return $entity_info['entity keys']['id'];
-      break;
       case 'bundle key':
         return $entity_info['entity keys']['bundle'];
-      break;
     }
   }
 
