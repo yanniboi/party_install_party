@@ -96,7 +96,7 @@ function hook_party_access($op, $party, $data_set, $account) {
  *        and defining it here rather than in hook_party_party_piece_info()
  *        is mostly just a convenience (though it does produce local action
  *        links too).
- *    - 'path': The menu path for the provided piece.
+ *    - 'path': The menu path component for the provided piece.
  *    - 'view name': (optional) @todo! write the code for this! ;)
  *      The machine name of the view to define in hook_views_default_views().
  *      This allows multiple default views to exist. Defaults to
@@ -132,7 +132,8 @@ function hook_party_data_set_info_alter(&$data_sets) {
  *
  * @return
  *  An array of display pieces (similar to hook_menu) where each key is the
- *  unique Id of the display.
+ *  path component beneath the 'party/%' path. In addition to normal hook_menu()
+ *  items, each array may also have the following properties:
  *   - 'label': The human readable name of the party piece.
  *   - 'page callback': The name of the display function. This should return a
  *     renderable array.
