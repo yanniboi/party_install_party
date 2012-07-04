@@ -144,11 +144,7 @@ function party_hat_load_multiple($hids = array(), $conditions = array(), $reset 
  * @param $data_set_name
  *  The data set name.
  * @param $value
- *  The value
- *
- * @todo Refactor so that we don't do 3 queries to update one rule.
- *       At the moment we do 3 queries when we add a rule and 1 when we update it and 2 when we keep it the same..
- *       Is this better than 2 queries for both?
+ *  An array of rules for this data set.
  */
 function party_hat_set_data_set_rule(&$hat, $data_set_name, $values = array()) {
   // Very sily now.
