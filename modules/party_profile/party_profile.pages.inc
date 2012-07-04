@@ -7,11 +7,12 @@
 /**
  * Page callback for our data set-based party pieces.
  */
-function party_profile_party_view_profile_set($party, $profile_type) {
-  $build = array();
+function party_profile_party_view_profile_set($party, $data_set_url_string) {
+  $data_set = party_data_set_load($data_set_url_string);
+  $data_set_name = $data_set['set_name'];
+  $profile_type = $data_set['entity bundle'];
 
   // Load the profiles in this data set.
-  $data_set_name = 'profile2_' . $profile_type;
   $attached_entities = party_get_attached_entities($party, $data_set_name);
   dsm($attached_entities);
 
