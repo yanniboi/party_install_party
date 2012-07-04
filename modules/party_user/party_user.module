@@ -25,10 +25,6 @@ function party_user_party_data_set_info() {
     'piece' => array(
       'path' => 'user',
       'maker' => 'core',
-      // @todo: this needs to tell the access arguments for party_access()
-      // about the argument for loading our attached entities.
-      // In other words, some sort of %wildcard_to_arg() function maybe?
-      'access arguments' => array('todo argh I have no idea'),
       // @todo: these don't have any effect yet.
       // @see http://drupal.org/node/1669774.
       'weight' => -8,

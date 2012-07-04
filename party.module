@@ -175,11 +175,8 @@ function party_menu() {
     $piece += array(
       'type' => MENU_LOCAL_TASK,
       // Make this explicit so it overrides the parent.
-      'access callback' => 'user_access',
-      'access arguments' => array('view contacts'),
-      // @todo: change this to use party_access().
-      // we'll need a dataset loader. @see @todo in party_profile_party_data_set_info().
-      //'access arguments' => array('view', 1),
+      'access callback' => 'party_access',
+      'access arguments' => array('view', 1, 2),
     );
     $items["party/%party/$path"] = $piece;
   }
