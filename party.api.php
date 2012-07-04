@@ -134,11 +134,9 @@ function hook_party_data_set_info_alter(&$data_sets) {
  *  An array of display pieces (similar to hook_menu) where each key is the
  *  unique Id of the display.
  *   - 'label': The human readable name of the party piece.
- *   - 'display callback': The name of the display function. This is always
- *     given $party, $instance, $title, $arguments. This should return a
+ *   - 'page callback': The name of the display function. This should return a
  *     renderable array.
- *   - 'display callback arguments': Any extra arguments to supply to the
- *     display callback.
+ *   - 'page arguments': Any extra arguments to supply to the page callback.
  *   - 'data set': (optional) The data set this is associated with. (If this is
  *     set, edit and add links will appear around the piece linking to the forms
  *     laid out in data_set_info);
@@ -148,8 +146,8 @@ function hook_party_party_piece_info() {
   $pieces = array();
   $pieces['user_username'] = array(
     'label' => "Username only",
-    'display callback' => "party_user_display_user",
-    'display arguments' => array('username'),
+    'page callback' => "party_user_display_user",
+    'page arguments' => array('username'),
     'data set' => 'user',
   );
   $pieces['user_fullaccount'] = array(
