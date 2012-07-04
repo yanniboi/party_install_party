@@ -391,8 +391,7 @@ function party_data_set_load($data_set_url_string) {
 }
 
 /**
- * Wrap around the party_access function for the entity api 'access callback'
- * setting.
+ * Wrap around party_access() for the entity api 'access callback'.
  *
  * @param $op
  *   The operation being performed.
@@ -411,8 +410,7 @@ function party_entity_access($op, $party = NULL, $account = NULL) {
 }
 
 /**
- * Determines whether operations are permissable on a Party and it's
- * attached entities.
+ * Determines whether operations are allowed on a Party and attached entities.
  *
  * @param $op
  *   The operation being performed.
