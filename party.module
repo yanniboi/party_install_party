@@ -680,10 +680,12 @@ function party_party_party_pieces() {
 // API for getting and changing data sets.
 
 /**
- * Get the attached entity controller.
+ * Get the attached entity controller for a party.
  *
  * @param $data_set_name
  *  The name of a data set.
+ * @param $party
+ *  The party to get the data set for.
  *
  * @return
  *  The controller class, without attached entities loaded yet.
