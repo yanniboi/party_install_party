@@ -63,5 +63,3 @@ class PartyUserDataSetUIAttach extends PartyDefaultDataSetUIAttach {
   }
 
 }
-
-
