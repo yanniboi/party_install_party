@@ -262,6 +262,16 @@ function party_page_view_piece_views($party, $view_name, $view_display_id) {
   }
 }
 
+// =================================== Forms for controller-based actions.
+
+/**
+ *
+ */
+function party_attached_entity_action_form($form, &$form_state, $party, $data_set, $action, $eid = NULL) {
+  dsm("your action is: $action");
+  return $form;
+}
+
 // =================================== Attached entity action forms.
 
 /**
