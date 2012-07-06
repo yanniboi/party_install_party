@@ -959,9 +959,9 @@ function party_get_data_set($party, $data_set_name, $create = FALSE) {
  *  party in the given data set, keyed by attached entity delta.
  */
 function party_get_attached_entities($party, $data_set_name, $create = FALSE) {
-  $partyData = party_get_data_set($party, $data_set_name, $create);
+  $data_set_controller = party_get_data_set($party, $data_set_name, $create);
 
-  return $partyData->getEntities();
+  return $data_set_controller->getEntities();
 }
 
 /**
