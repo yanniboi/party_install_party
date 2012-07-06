@@ -25,7 +25,20 @@ class PartyUserDataSetUIAttach extends PartyDefaultDataSetUIAttach {
   function action_form($form, &$form_state, $party, $data_set, $eid = NULL) {
     $form = array();
 
-    dsm("This doesn't work for general entities yet!");
+    $form['user'] = array(
+      '#type' => 'textfield',
+      '#title' => t('User'),
+      '#maxlength' => 60,
+      '#autocomplete_path' => 'user/autocomplete',
+      // TODO: surely this is superfluous?
+      '#description' => t('Leave blank for %anonymous.', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
+    );
+
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Attach user'),
+      '#weight' => 99,
+    );
 
     return $form;
   }
@@ -35,7 +48,17 @@ class PartyUserDataSetUIAttach extends PartyDefaultDataSetUIAttach {
   }
 
   function action_form_submit($form, &$form_state) {
+    // Get the original form parameters.
+    list ($party, $data_set, $action, $eid) = $form_state['build_info']['args'];
 
+    // Attempt to load a user from the given input.
+    $account = user_load_by_name($form_state['values']['user']);
+    if ($account->uid != 0) {
+      // Attach the user entity to the party.
+      $data_set_controller = party_get_crm_controller($data_set['set_name'], $party);
+      $data_set_controller->attachEntity($account);
+      $data_set_controller->save();
+    }
   }
 
 }
