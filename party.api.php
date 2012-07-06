@@ -64,6 +64,8 @@ function hook_party_access($op, $party, $data_set, $account) {
  *    to. May be omitted to allow any bundle.
  *  - 'singleton': (optional) Whether this set's relationships only have one
  *    entity relating to a party. Default: FALSE.
+ *  - 'max cardinality': (optional) The maximum number of entities that may be
+ *    attached within this data set. This is set to 1 if 'singleton' is TRUE.
  *  - 'view mode': (optional) The name of one of the entity's view modes, to use
  *    for displaying entities attached to a party. If omitted, defaults to
  *    'party', a view mode which is added to data set-enabled entities in

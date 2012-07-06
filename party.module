@@ -792,6 +792,12 @@ function party_get_data_set_info($data_set_name = NULL) {
               'entity bundle' => $set['entity type'],
               'path element' => $path_element,
           );
+          // Translate 'singleton' to max cardinality of 1.
+          // TODO: remove the singleton property? remove the cardinality
+          // property? Which one actually gets used?
+          if ($set['singleton']) {
+            $set['max cardinality'] = 1;
+          }
           $sets[$set_name] = $set;
         }
       }
