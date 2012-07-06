@@ -4,7 +4,7 @@
  */
 
 /**
- * User Integration settings Form
+ * User integration settings form.
  */
 function party_user_settings_form($form, &$form_state) {
   $form['create_on_register'] = array(
@@ -36,6 +36,9 @@ function party_user_settings_form($form, &$form_state) {
   return $form;
 }
 
+/**
+ * Submit handler for the user integration settings form.
+ */
 function party_user_settings_form_submit($form, &$form_state) {
   variable_set('party_user_create_on_register', ($form_state['values']['create_on_register'] == 1));
 
@@ -47,6 +50,8 @@ function party_user_settings_form_submit($form, &$form_state) {
   }
   $registration_data_sets = array_keys($registration_data_sets);
   variable_set('party_user_registration_data_sets', $registration_data_sets);
+
+  drupal_set_message(t('The configuration options have been saved.'));
 }
 
 /**
