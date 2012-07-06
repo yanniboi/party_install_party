@@ -229,45 +229,19 @@ function party_user_party_view_user($party) {
 }
 
 /**
- * Form to edit or create an attached user.
+ * Form to edit an attached user.
  */
 function party_user_form_user($form, &$form_state, &$attached_entity, $party) {
   $user_form = array();
 
-  // If the user is set we load the edit account form.
-  if (!empty($attached_entity->eid)) {
-    module_load_include('inc', 'user', 'user.pages');
-    $user_form['op'] = array(
-      '#type' => 'value',
-      '#value' => 'edit',
-    );
+  module_load_include('inc', 'user', 'user.pages');
+  $user_form['op'] = array(
+    '#type' => 'value',
+    '#value' => 'edit',
+  );
 
-    $user_form = user_profile_form($user_form, $form_state, $attached_entity->entity);
-    unset($user_form['actions']);
-  }
-  else {
-    // Mark down that we're selecting which user to connect.
-    $user_form['op'] = array(
-      '#type' => 'value',
-      '#value' => 'select',
-    );
-
-    // Store the account uid so we can check if it changes on submit.
-    $user_form['party_user_uid'] = array(
-      '#type' => 'value',
-      '#value' => isset($attached_entity->entity->uid) ? $attached_entity->entity->uid : NULL,
-    );
-
-    $user_form['user'] = array(
-      '#type' => 'textfield',
-      '#title' => t('User'),
-      '#maxlength' => 60,
-      '#autocomplete_path' => 'user/autocomplete',
-      '#default_value' => isset($attached_entity->entity->name) ? $attached_entity->entity->name : '',
-      '#weight' => -1,
-      '#description' => t('Leave blank for %anonymous.', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
-    );
-  }
+  $user_form = user_profile_form($user_form, $form_state, $attached_entity->entity);
+  unset($user_form['actions']);
 
   return $user_form;
 }
@@ -287,45 +261,32 @@ function party_user_form_user_validate($form, &$form_state, &$attached_entity, $
 function party_user_form_user_submit($form, &$form_state, $hash, &$attached_entity, $party) {
   $op = $form_state['values'][$hash]['op'];
 
-  if ($op == 'select') {
-    // Attempt to load a user from the given input.
-    $account = user_load_by_name($form_state['values'][$hash]['user']);
-    if ($account->uid != 0) {
-      // Place the loaded user object into the form state attached entities,
-      // where party_attached_entity_edit_form_submit() will take care of
-      // saving it.
-      $form_state['#attached_entities'][$hash] = $account;
-    }
-    return FALSE;
+  $account = $attached_entity;
+  $account_unchanged = clone $account;
+  $category = $form[$hash]['#user_category'];
+
+  // This code is taken out of entity_form_submit_build_entity
+  // Flatten the $form_state values for the user.
+  $account_values = array();
+  $account_values += isset($form_state['values'][$hash]['account']) ? $form_state['values'][$hash]['account'] : array();
+  $account_values += isset($form_state['values'][$hash]['signature_settings']) ? $form_state['values'][$hash]['signature_settings'] : array();
+  $account_values += isset($form_state['values'][$hash]['picture']) ? $form_state['values'][$hash]['picture'] : array();
+
+  $values_excluding_fields = array_diff_key($account_values, field_info_instances('user', 'user'));
+  foreach ($values_excluding_fields as $key => $value) {
+    $account->$key = $value;
   }
-  else if ($op == 'edit') {
-    $account = $attached_entity;
-    $account_unchanged = clone $account;
-    $category = $form[$hash]['#user_category'];
 
-    // This code is taken out of entity_form_submit_build_entity
-    // Flatten the $form_state values for the user.
-    $account_values = array();
-    $account_values += isset($form_state['values'][$hash]['account']) ? $form_state['values'][$hash]['account'] : array();
-    $account_values += isset($form_state['values'][$hash]['signature_settings']) ? $form_state['values'][$hash]['signature_settings'] : array();
-    $account_values += isset($form_state['values'][$hash]['picture']) ? $form_state['values'][$hash]['picture'] : array();
+  field_attach_submit('user', $account, $form[$hash], $form_state);
 
-    $values_excluding_fields = array_diff_key($account_values, field_info_instances('user', 'user'));
-    foreach ($values_excluding_fields as $key => $value) {
-      $account->$key = $value;
-    }
+  $edit = array_intersect_key((array) $account, $account_values);
+  user_save($account_unchanged, $edit, $category);
 
-    field_attach_submit('user', $account, $form[$hash], $form_state);
-
-    $edit = array_intersect_key((array) $account, $account_values);
-    user_save($account_unchanged, $edit, $category);
-
-    if ($category == 'account' && !empty($edit['pass'])) {
-      // Remove the password reset tag since a new password was saved.
-      unset($_SESSION['pass_reset_' . $account->uid]);
-    }
-    cache_clear_all();
+  if ($category == 'account' && !empty($edit['pass'])) {
+    // Remove the password reset tag since a new password was saved.
+    unset($_SESSION['pass_reset_' . $account->uid]);
   }
+  cache_clear_all();
 }
 
 /**
