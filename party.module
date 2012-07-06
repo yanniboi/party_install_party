@@ -356,17 +356,18 @@ function party_menu_local_tasks_alter(&$data, $router_item, $root_path) {
 
       if (isset($piece['data_set'])) {
         $data_set_base_path = implode('/', $router_item['original_map']);
-        $item = menu_get_item($data_set_base_path . '/add');
-        if ($item['access']) {
-          $data_sets = party_get_data_set_info();
-          $data_set = $data_sets[$piece['data_set']];
-          $data['actions']['output'][] = array(
-            '#theme' => 'menu_local_action',
-            '#link' => array(
-              'title' => t('Attach new @data-set', array('@data-set' => $data_set['label'])),
-              'href' => $data_set_base_path . '/add',
-            ),
-          );
+        $data_set = party_get_data_set_info($piece['data_set']);
+        foreach ($data_set['actions'] as $action => $action_info) {
+          $item = menu_get_item($data_set_base_path . '/' . $action);
+          if ($item['access']) {
+            $data['actions']['output'][] = array(
+              '#theme' => 'menu_local_action',
+              '#link' => array(
+                'title' => t('@TODO AGH! need label! Attach new @data-set', array('@data-set' => $data_set['label'])),
+                'href' => $data_set_base_path . '/' . $action,
+              ),
+            );
+          }
         }
       }
     }
