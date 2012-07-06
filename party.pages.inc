@@ -298,7 +298,17 @@ function party_attached_entity_action_form($form, &$form_state, $party, $data_se
  * Validate handler for the general action form.
  */
 function party_attached_entity_action_form_validate($form, &$form_state) {
-  // TODO: write me: call the validate handler in the action controller.
+  // Retrieve the original form parameters from the build info.
+  // Minor WTF: because $eid is optional, it doesn't show in the array. Shove it
+  // in there as NULL if missing, so controller handlers can rely on it.
+  if (!isset($form_state['build_info']['args'][3])) {
+    $form_state['build_info']['args'][3] = NULL;
+  }
+  list ($party, $data_set, $action, $eid) = $form_state['build_info']['args'];
+
+  // Call the validate handler in the action controller.
+  $action_controller = new $data_set['actions'][$action]['controller'];
+  $action_controller->action_form_validate($form, $form_state, $party, $data_set, $eid);
 }
 
 /**
