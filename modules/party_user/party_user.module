@@ -377,7 +377,9 @@ function party_user_form_profile2_type_form_alter(&$form, &$form_state) {
 }
 
 /**
- * Implements hook_user_view
+ * Implements hook_user_view().
+ *
+ * Add party action links to the user.
  */
 function party_user_user_view($account, $view_mode, $langcode) {
   if ($view_mode == 'party') {
@@ -387,7 +389,7 @@ function party_user_user_view($account, $view_mode, $langcode) {
 
     $account->content['party_actions'] = array(
       '#theme' => 'links',
-      '#links' => array(),//$data_set_controller->actions(),
+      '#links' => $data_set_controller->getActions($party->pid, $account->uid),
       '#attributes' => array(
         'class' => array('links inline crm-set-action-links'),
       ),
