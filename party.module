@@ -360,6 +360,8 @@ function party_menu_local_tasks_alter(&$data, $router_item, $root_path) {
         $data_set = party_get_data_set_info($piece['data_set']);
         foreach ($data_set['actions'] as $action => $action_info) {
           $item = menu_get_item($data_set_base_path . '/' . $action);
+          // Menu access checks party_access(), which checks whether actions are
+          // allowed by the data set definition.
           if ($item['access']) {
             $data['actions']['output'][] = array(
               '#theme' => 'menu_local_action',
@@ -480,7 +482,9 @@ function party_access($op, $party = NULL, $data_set = NULL, $account = NULL) {
 /**
  * Implements hook_party_access().
  *
- * Handles basic access to parties.
+ * Handles basic access to parties:
+ *  - user permissions
+ *  - data set cardinality settings
  */
 function party_party_access($op, $party = NULL, $data_set = NULL, $account = NULL) {
   // Set the data_set_name
@@ -512,6 +516,29 @@ function party_party_access($op, $party = NULL, $data_set = NULL, $account = NUL
         // Reject anything else
         $permission_access = FALSE;
     }
+
+    // Determine what data set info has to say about this.
+    if ($op == 'view') {
+      // Data sets have nothing to say about viewing.
+      $data_access = NULL;
+    }
+    else {
+      if ($op == 'add' || $op == 'attach') {
+        // Operations 'add' and 'attach' need to check data set cardinality.
+        // TODO: store the information about which ops need this elsewhere?
+        if (isset($data_set['max cardinality'])) {
+          $data_set_controller = party_get_crm_controller($data_set_name, $party);
+          $ids = $data_set_controller->getEntityIds();
+          if ($ids >= $data_set['max cardinality']) {
+            $data_access = FALSE;
+          }
+        }
+        else {
+          $data_access = TRUE;
+        }
+      }
+      // TODO: Other ops depend on the data set defining the action.
+    }
   }
   else {
     // If we're not being asked about attachments, just use plain permissions.
@@ -528,7 +555,13 @@ function party_party_access($op, $party = NULL, $data_set = NULL, $account = NUL
     }
   }
 
-  return $permission_access;
+  // Combine access results if applicable.
+  if (isset($data_access)) {
+    return $permission_access && $data_access;
+  }
+  else {
+    return $permission_access;
+  }
 }
 
 /**
