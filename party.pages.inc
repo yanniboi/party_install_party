@@ -201,6 +201,40 @@ function party_delete_form_submit($form, &$form_state) {
   $form_state['party']->delete();
 }
 
+// =================================== Party piece display.
+
+/**
+ * Page callback to view a data set.
+ *
+ * Used for display of data sets that don't use Views or provide their own
+ * page callback.
+ *
+ * @see party_party_party_pieces().
+ *
+ * @param $party
+ *    A loaded party object.
+ * @param $data_set_name
+ *   A data set name.
+ */
+function party_view_data_set($party, $data_set_name) {
+  // TODO: some of these calls are redundant!
+  $data_set_controller = party_get_crm_controller('user', $party);
+  $attached_entities = party_get_attached_entities($party, $data_set_name);
+
+  $build = array();
+  foreach ($attached_entities as $delta => $entity) {
+    $build[$data_set_name . '_' . $delta] = array(
+      // @todo: this is sort of an abuse of what fieldsets are meant for... :/
+      '#type' => 'fieldset',
+      '#title' => $data_set_controller->getLabel($delta),
+    );
+
+    $build[$data_set_name . '_' . $delta]['view'] = $data_set_controller->display($delta);
+  }
+
+  return $build;
+}
+
 /**
  * Show a View display plugin as a party piece.
  *
@@ -227,6 +261,8 @@ function party_page_view_piece_views($party, $view_name, $view_display_id) {
     $view->destroy();
   }
 }
+
+// =================================== Attached entity action forms.
 
 /**
  * Form to edit or create an attached entity.
@@ -338,36 +374,4 @@ function party_attached_entity_remove_confirm($form, &$form_state, $party, $data
 function party_attached_entity_remove_confirm_submit($form, &$form_state) {
   $form_state['#attached_entity']->detach();
   $form_state['redirect'] = 'party/' . $form_state['#attached_entity']->party->pid;
-}
-
-/**
- * Page callback to view a data set.
- *
- * Used for display of data sets that don't use Views or provide their own
- * page callback.
- *
- * @see party_party_party_pieces().
- *
- * @param $party
- *    A loaded party object.
- * @param $data_set_name
- *   A data set name.
- */
-function party_view_data_set($party, $data_set_name) {
-  // TODO: some of these calls are redundant!
-  $data_set_controller = party_get_crm_controller('user', $party);
-  $attached_entities = party_get_attached_entities($party, $data_set_name);
-
-  $build = array();
-  foreach ($attached_entities as $delta => $entity) {
-    $build[$data_set_name . '_' . $delta] = array(
-      // @todo: this is sort of an abuse of what fieldsets are meant for... :/
-      '#type' => 'fieldset',
-      '#title' => $data_set_controller->getLabel($delta),
-    );
-
-    $build[$data_set_name . '_' . $delta]['view'] = $data_set_controller->display($delta);
-  }
-
-  return $build;
 }
