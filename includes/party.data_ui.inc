@@ -25,7 +25,7 @@ interface PartyDataSetActionInterface {
    * @return
    *  A localized string.
    */
-  public function getPageTitle($name, $var);
+  public function get_page_title($name, $var);
 
   /**
    * Provides the action form for adding a new entity.
@@ -67,7 +67,7 @@ class PartyDefaultDataSetUIAdd implements PartyDataSetActionInterface {
   /**
    * The page title for the action form.
    */
-  function getPageTitle($party, $data_set, $eid = NULL) {
+  function get_page_title($party, $data_set, $eid = NULL) {
     $data_set_controller = party_get_crm_controller($data_set['set_name'], $party);
     return t("Add new @data-set-label to @party-label", array(
       '@data-set-label' => $data_set_controller->getDataInfo('label'),
@@ -114,7 +114,7 @@ class PartyDefaultDataSetUIAttach implements PartyDataSetActionInterface {
   /**
    * The page title for the action form.
    */
-  function getPageTitle($party, $data_set, $eid = NULL) {
+  function get_page_title($party, $data_set, $eid = NULL) {
     $data_set_controller = party_get_crm_controller($data_set['set_name'], $party);
     return t("Attach existing @data-set-label to @party-label", array(
       '@data-set-label' => $data_set_controller->getDataInfo('label'),

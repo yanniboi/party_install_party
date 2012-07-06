@@ -286,7 +286,7 @@ function party_attached_entity_action_form($form, &$form_state, $party, $data_se
   $action_controller = new $data_set['actions'][$action]['controller'];
 
   // Get the page title from the controller.
-  $page_title = $action_controller->getPageTitle($party, $data_set, $eid);
+  $page_title = $action_controller->get_page_title($party, $data_set, $eid);
   drupal_set_title($page_title);
 
   $form += $action_controller->action_form($form, $form_state, $party, $data_set, $eid);
