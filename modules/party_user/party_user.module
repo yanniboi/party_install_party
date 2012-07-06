@@ -20,6 +20,7 @@ function party_user_party_data_set_info() {
       'manage fields' => 'admin/config/people/accounts/fields',
       'manage display' => 'admin/config/people/accounts/display',
     ),
+    'form callback' => 'party_user_form_user',
     // Provide a piece corresponding to the data set.
     'piece' => array(
       'path' => 'user',
@@ -235,12 +236,8 @@ function party_user_form_user($form, &$form_state, &$attached_entity, $party) {
   $user_form = array();
 
   module_load_include('inc', 'user', 'user.pages');
-  $user_form['op'] = array(
-    '#type' => 'value',
-    '#value' => 'edit',
-  );
 
-  $user_form = user_profile_form($user_form, $form_state, $attached_entity->entity);
+  $user_form = user_profile_form($user_form, $form_state, $attached_entity);
   unset($user_form['actions']);
 
   return $user_form;
@@ -259,8 +256,6 @@ function party_user_form_user_validate($form, &$form_state, &$attached_entity, $
  * Submit the user data set form
  */
 function party_user_form_user_submit($form, &$form_state, $hash, &$attached_entity, $party) {
-  $op = $form_state['values'][$hash]['op'];
-
   $account = $attached_entity;
   $account_unchanged = clone $account;
   $category = $form[$hash]['#user_category'];
