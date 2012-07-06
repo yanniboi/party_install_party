@@ -44,8 +44,11 @@ class PartyUserDataSetUIAttach extends PartyDefaultDataSetUIAttach {
   }
 
   function action_form_validate($form, &$form_state) {
-    // TODO: this should handle attempting to load the user and show and
-    // error if no user found for the given username.
+    // Validate the user name.
+    $account = user_load_by_name($form_state['values']['user']);
+    if (!$account) {
+      form_set_error('user', t('The username %name does not exist.', array('%name' => $form_state['values']['user'])));
+    }
   }
 
   function action_form_submit($form, &$form_state) {
