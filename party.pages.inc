@@ -316,6 +316,9 @@ function party_attached_entity_action_form_submit($form, &$form_state) {
   // Call the submit handler in the action controller.
   $action_controller = new $data_set['actions'][$action]['controller'];
   $action_controller->action_form_submit($form, $form_state, $party, $data_set, $eid);
+
+  // Redirect to the set piece.
+  $form_state['redirect'] = 'party/' . $party->pid . '/' . $data_set['path element'];
 }
 
 // =================================== Attached entity action forms.
