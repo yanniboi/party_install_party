@@ -54,6 +54,7 @@ function party_user_menu() {
     'access arguments' => array('administer crm settings'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'file' => 'party_user.admin.inc',
+    'weight' => -10,
   );
 
   $items['admin/config/party/user/sync'] = array(
