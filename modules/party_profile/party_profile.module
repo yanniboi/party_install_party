@@ -49,6 +49,7 @@ function party_profile_party_data_set_info() {
           // @TODO: this controller is not yet in use; the action menu item
           // is a dedicated form for now.
           'controller' => 'PartyDefaultDataSetUIAdd',
+          'action label' => 'Add @data-set',
         ),
       ),
     );

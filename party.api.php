@@ -92,6 +92,10 @@ function hook_party_access($op, $party, $data_set, $account) {
  *          to the party.
  *        - PartyDefaultDataSetUIAttach: attaches an existing entity to the
  *          party.
+ *      - 'action label': The text to use for the menu local action on the data
+ *        set piece. This should not be localized, as it is run through t() by
+ *        the system, with the following replacements:
+ *        - '@data-set': The data set label.
  *    Note that the 'add' action is currently a special case which doesn't use
  *    the controller, though defining the action here determines access to it.
  *  - piece: (optional) Each set may define one party piece, which will be
