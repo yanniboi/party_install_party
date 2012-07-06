@@ -31,7 +31,7 @@ function party_user_party_data_set_info() {
     ),
     'actions' => array(
       'attach' => array(
-        'controller' => 'PartyDefaultDataSetUIAttach', // 'party_user_form_user',
+        'controller' => 'PartyUserDataSetUIAttach',
       ),
     ),
   );
