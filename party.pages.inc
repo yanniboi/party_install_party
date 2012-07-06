@@ -262,6 +262,75 @@ function party_page_view_piece_views($party, $view_name, $view_display_id) {
   }
 }
 
+// =================================== Forms for controller-based actions.
+
+/**
+ * Form builder for a generalized attached entity action.
+ *
+ * @todo: let this handle built-in actions: 'edit', 'delete', 'detach'.
+ *
+ * @param $party
+ *   A loaded party object.
+ * @param $data_set
+ *   A loaded data set.
+ *   We don't actually need this loaded, but we need a menu loader to convert
+ *   the path-style string to the machine name, and a menu loader that doesn't
+ *   load would be weird too.
+ * @param $action
+ *   The machine name of a data set action, as defined by the data set in
+ *   hook_party_data_set_info().
+ * @param $eid
+ *   The id of the entity, if editing.
+ */
+function party_attached_entity_action_form($form, &$form_state, $party, $data_set, $action, $eid = NULL) {
+  $action_controller = new $data_set['actions'][$action]['controller'];
+
+  // Get the page title from the controller.
+  $page_title = $action_controller->get_page_title($party, $data_set, $eid);
+  drupal_set_title($page_title);
+
+  $form += $action_controller->action_form($form, $form_state, $party, $data_set, $eid);
+
+  return $form;
+}
+
+/**
+ * Validate handler for the general action form.
+ */
+function party_attached_entity_action_form_validate($form, &$form_state) {
+  // Retrieve the original form parameters from the build info.
+  // Minor WTF: because $eid is optional, it doesn't show in the array. Shove it
+  // in there as NULL if missing, so controller handlers can rely on it.
+  if (!isset($form_state['build_info']['args'][3])) {
+    $form_state['build_info']['args'][3] = NULL;
+  }
+  list ($party, $data_set, $action, $eid) = $form_state['build_info']['args'];
+
+  // Call the validate handler in the action controller.
+  $action_controller = new $data_set['actions'][$action]['controller'];
+  $action_controller->action_form_validate($form, $form_state, $party, $data_set, $eid);
+}
+
+/**
+ * Submit handler for the general action form.
+ */
+function party_attached_entity_action_form_submit($form, &$form_state) {
+  // Retrieve the original form parameters from the build info.
+  // Minor WTF: because $eid is optional, it doesn't show in the array. Shove it
+  // in there as NULL if missing, so controller handlers can rely on it.
+  if (!isset($form_state['build_info']['args'][3])) {
+    $form_state['build_info']['args'][3] = NULL;
+  }
+  list ($party, $data_set, $action, $eid) = $form_state['build_info']['args'];
+
+  // Call the submit handler in the action controller.
+  $action_controller = new $data_set['actions'][$action]['controller'];
+  $action_controller->action_form_submit($form, $form_state, $party, $data_set, $eid);
+
+  // Redirect to the set piece.
+  $form_state['redirect'] = 'party/' . $party->pid . '/' . $data_set['path element'];
+}
+
 // =================================== Attached entity action forms.
 
 /**

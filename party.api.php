@@ -82,6 +82,22 @@ function hook_party_access($op, $party, $data_set, $account) {
  *    - 'import'
  *    - 'clone'
  *    - 'export'
+ *  - 'actions': An array defining actions that allow users to do things with the
+ *    attached entities within this data set. The keys of this array are the
+ *    action names, which are used as path components below the party.
+ *    Each action array may contain the following properties:
+ *      - 'controller': The name of an action UI controller class. Party core
+ *        provides the following:
+ *        - PartyDefaultDataSetUIAdd: creates a new entity that is attached
+ *          to the party.
+ *        - PartyDefaultDataSetUIAttach: attaches an existing entity to the
+ *          party.
+ *      - 'action label': The text to use for the menu local action on the data
+ *        set piece. This should not be localized, as it is run through t() by
+ *        the system, with the following replacements:
+ *        - '@data-set': The data set label.
+ *    Note that the 'add' action is currently a special case which doesn't use
+ *    the controller, though defining the action here determines access to it.
  *  - piece: (optional) Each set may define one party piece, which will be
  *    returned by party_party_party_pieces(). The contents of this array should
  *    be the same as those returned by hook_party_party_piece_info(), with the

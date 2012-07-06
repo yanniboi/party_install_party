@@ -247,9 +247,18 @@ function party_menu() {
     'file' => 'party.pages.inc',
   );
   // Add an attached entity
+  // @TODO: convert this to use party_attached_entity_action_form().
   $items['party/%party/%party_data_set/add'] = array(
     'page callback' => 'drupal_get_form',
     'page arguments' => array('party_attached_entity_edit_form', 1, 2),
+    'access callback' => 'party_access',
+    'access arguments' => array('attach', 1, 2),
+    'file' => 'party.pages.inc',
+  );
+  // Attach an existing entity.
+  $items['party/%party/%party_data_set/attach'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('party_attached_entity_action_form', 1, 2, 'attach'),
     'access callback' => 'party_access',
     'access arguments' => array('attach', 1, 2),
     'file' => 'party.pages.inc',
@@ -348,17 +357,18 @@ function party_menu_local_tasks_alter(&$data, $router_item, $root_path) {
 
       if (isset($piece['data_set'])) {
         $data_set_base_path = implode('/', $router_item['original_map']);
-        $item = menu_get_item($data_set_base_path . '/add');
-        if ($item['access']) {
-          $data_sets = party_get_data_set_info();
-          $data_set = $data_sets[$piece['data_set']];
-          $data['actions']['output'][] = array(
-            '#theme' => 'menu_local_action',
-            '#link' => array(
-              'title' => t('Attach new @data-set', array('@data-set' => $data_set['label'])),
-              'href' => $data_set_base_path . '/add',
-            ),
-          );
+        $data_set = party_get_data_set_info($piece['data_set']);
+        foreach ($data_set['actions'] as $action => $action_info) {
+          $item = menu_get_item($data_set_base_path . '/' . $action);
+          if ($item['access']) {
+            $data['actions']['output'][] = array(
+              '#theme' => 'menu_local_action',
+              '#link' => array(
+                'title' => t($action_info['action label'], array('@data-set' => $data_set['label'])),
+                'href' => $data_set_base_path . '/' . $action,
+              ),
+            );
+          }
         }
       }
     }
