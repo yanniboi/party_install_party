@@ -12,6 +12,9 @@ interface PartyDataSetActionInterface {
   /**
    * Get the page title for the action form.
    *
+   * @todo: consider moving this to the data set action definition, where the
+   * local action label is already defined.
+   *
    * @param $party
    *   A loaded party object.
    * @param $data_set
