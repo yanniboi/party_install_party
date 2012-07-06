@@ -47,7 +47,7 @@ class PartyDefaultDataSet {
   static function hook_entity_info_alter(&$entity_info) {
     $entity_info['view modes']['party'] = array(
       'label' => t('Party display'),
-      'custom settings' => FALSE,
+      'custom settings' => TRUE,
     );
   }
 
