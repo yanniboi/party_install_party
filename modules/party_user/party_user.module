@@ -15,7 +15,6 @@ function party_user_party_data_set_info() {
     'class' => 'PartyUserDataSet',
     'singleton' => TRUE,
     'max cardinality' => 1,
-    'view mode' => 'full',
     'admin' => array(
       'edit' => 'admin/config/people/accounts',
       'manage fields' => 'admin/config/people/accounts/fields',
