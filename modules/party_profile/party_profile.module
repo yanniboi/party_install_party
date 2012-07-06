@@ -43,6 +43,13 @@ function party_profile_party_data_set_info() {
         // In other words, some sort of %wildcard_to_arg() function maybe?
         'access arguments' => array("view any $type profile"),
       ),
+      // Define actions for the data set.
+      'actions' => array(
+        // An empty array suffices if we have no further settings for the action.
+        'add' => array(
+          'controller' => 'PartyDefaultDataSetUIAttach',
+        ),
+      ),
     );
   }
   return $sets;
