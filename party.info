@@ -8,6 +8,7 @@ files[] = party.pages.inc
 files[] = party.admin.inc
 files[] = party.rules.inc
 files[] = includes/party.data.inc
+files[] = includes/party.data_ui.inc
 files[] = includes/party.entity.inc
 files[] = includes/party.ui.inc
 files[] = includes/party_type.entity.inc
