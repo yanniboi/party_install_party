@@ -11,7 +11,7 @@ function party_help($path, $arg) {
   switch ($path) {
     case 'admin/help#party':
       return t("TODO: Create admin help text.");
-    case 'admin/config/crm/labels':
+    case 'admin/config/party/labels':
       return t("Party name label generators save a label whenever a party is created or updated. This lets you form the party's label or name in a variety of methods.");
     case 'admin/config/party/piece-order':
       return t("The tabs that display below each party can be dragged into the desired order below.");
