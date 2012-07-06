@@ -527,7 +527,9 @@ function party_party_access($op, $party = NULL, $data_set = NULL, $account = NUL
       // Data sets have nothing to say about viewing.
       $data_access = NULL;
     }
-    else {
+    // TEMPORARY until we handle all actions here.
+    // see http://drupal.org/node/1673608, http://drupal.org/node/1673606
+    elseif ($op == 'add' || $op == 'attach') {
       // Other ops depend on the data set defining the action.
       if (isset($data_set['actions'][$op])) {
         $data_access = TRUE;
