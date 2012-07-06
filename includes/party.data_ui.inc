@@ -38,7 +38,11 @@ class PartyDefaultDataSetUIAdd {
    *   The id of the entity, if relevant to this action.
    */
   function action_form($form, &$form_state, $party, $data_set, $eid = NULL) {
+    $form = array();
 
+    // @todo: this is not in use yet.
+
+    return $form;
   }
 
   function action_form_validate($form, &$form_state) {
