@@ -247,6 +247,7 @@ function party_menu() {
     'file' => 'party.pages.inc',
   );
   // Add an attached entity
+  // @TODO: convert this to use party_attached_entity_action_form().
   $items['party/%party/%party_data_set/add'] = array(
     'page callback' => 'drupal_get_form',
     'page arguments' => array('party_attached_entity_edit_form', 1, 2),

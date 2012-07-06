@@ -6,6 +6,8 @@
 
 /**
  * The 'add' action: attach a new entity.
+ *
+ * @todo: not yet in use. See todo in party_menu().
  */
 class PartyDefaultDataSetUIAdd {
 
@@ -55,7 +57,11 @@ class PartyDefaultDataSetUIAttach {
    *   The id of the entity, if relevant to this action.
    */
   function action_form($form, &$form_state, $party, $data_set, $eid = NULL) {
+    $form = array();
 
+    dsm("This doesn't work for general entities yet!");
+
+    return $form;
   }
 
   function action_form_validate($form, &$form_state) {

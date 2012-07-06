@@ -45,9 +45,10 @@ function party_profile_party_data_set_info() {
       ),
       // Define actions for the data set.
       'actions' => array(
-        // An empty array suffices if we have no further settings for the action.
         'add' => array(
-          'controller' => 'PartyDefaultDataSetUIAttach',
+          // @TODO: this controller is not yet in use; the action menu item
+          // is a dedicated form for now.
+          'controller' => 'PartyDefaultDataSetUIAdd',
         ),
       ),
     );
