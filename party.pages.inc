@@ -265,10 +265,32 @@ function party_page_view_piece_views($party, $view_name, $view_display_id) {
 // =================================== Forms for controller-based actions.
 
 /**
+ * Form builder for a generalized attached entity action.
  *
+ * @todo: let this handle built-in actions: 'edit', 'delete', 'detach'.
+ *
+ * @param $party
+ *   A loaded party object.
+ * @param $data_set
+ *   A loaded data set.
+ *   We don't actually need this loaded, but we need a menu loader to convert
+ *   the path-style string to the machine name, and a menu loader that doesn't
+ *   load would be weird too.
+ * @param $action
+ *   The machine name of a data set action, as defined by the data set in
+ *   hook_party_data_set_info().
+ * @param $eid
+ *   The id of the entity, if editing.
  */
 function party_attached_entity_action_form($form, &$form_state, $party, $data_set, $action, $eid = NULL) {
-  dsm("your action is: $action");
+  $action_controller = new $data_set['actions'][$action]['controller'];
+
+  // Get the page title from the controller.
+  $page_title = $action_controller->getPageTitle($party, $data_set, $eid);
+  drupal_set_title($page_title);
+
+  $form += $action_controller->action_form($form, $form_state, $party, $data_set, $eid);
+
   return $form;
 }
 
