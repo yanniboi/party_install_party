@@ -254,6 +254,14 @@ function party_menu() {
     'access arguments' => array('attach', 1, 2),
     'file' => 'party.pages.inc',
   );
+  // Attach an existing entity.
+  $items['party/%party/%party_data_set/attach'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('party_attached_entity_action_form', 1, 2, 'attach'),
+    'access callback' => 'party_access',
+    'access arguments' => array('attach', 1, 2),
+    'file' => 'party.pages.inc',
+  );
 
   $items['party/add'] = array(
     'title' => 'Add party',
