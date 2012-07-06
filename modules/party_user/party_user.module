@@ -165,6 +165,7 @@ function party_user_party_access($op, $party, $data_set, $account) {
         $permission_access = user_access($permission_string, $account);
         break;
       case 'attach':
+      case 'add':
         $permission_string = 'attach own party ' . $data_set_name;
         $permission_access = user_access($permission_string, $account);
         break;

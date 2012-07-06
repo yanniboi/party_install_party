@@ -252,7 +252,7 @@ function party_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('party_attached_entity_edit_form', 1, 2),
     'access callback' => 'party_access',
-    'access arguments' => array('attach', 1, 2),
+    'access arguments' => array('add', 1, 2),
     'file' => 'party.pages.inc',
   );
   // Attach an existing entity.
@@ -427,8 +427,10 @@ function party_entity_access($op, $party = NULL, $account = NULL) {
  *   Currently one of:
  *    - 'view': Whether the user may view the given party or data set.
  *    - 'edit': Whether the user may edit the given party or data set.
- *    - 'attach': Whether the user may attach the given data set to the
- *      party.
+ *    - 'add': Whether the user may create a new entity the given data set to
+ *      the party.
+ *    - 'attach': Whether the user may attach an existing entity in the given
+ *      data set to the party.
  *    - 'detach': Whether the user may detach the given data set from the
  *      party.
  *    - 'create': Whether the user may create a party of the type given by
@@ -509,6 +511,7 @@ function party_party_access($op, $party = NULL, $data_set = NULL, $account = NUL
         $permission_access = user_access($permission_string, $account);
         break;
       case 'attach':
+      case 'add':
         $permission_string = 'attach party ' . $data_set_name;
         $permission_access = user_access($permission_string, $account);
         break;
@@ -518,26 +521,33 @@ function party_party_access($op, $party = NULL, $data_set = NULL, $account = NUL
     }
 
     // Determine what data set info has to say about this.
+    // Data set actions in hook_party_data_set_info() are defined to match with
+    // values of $op here.
     if ($op == 'view') {
       // Data sets have nothing to say about viewing.
       $data_access = NULL;
     }
     else {
-      if ($op == 'add' || $op == 'attach') {
-        // Operations 'add' and 'attach' need to check data set cardinality.
-        // TODO: store the information about which ops need this elsewhere?
-        if (isset($data_set['max cardinality'])) {
-          $data_set_controller = party_get_crm_controller($data_set_name, $party);
-          $ids = $data_set_controller->getEntityIds();
-          if ($ids >= $data_set['max cardinality']) {
-            $data_access = FALSE;
+      // Other ops depend on the data set defining the action.
+      if (isset($data_set['actions'][$op])) {
+        $data_access = TRUE;
+
+        if ($op == 'add' || $op == 'attach') {
+          // Operations 'add' and 'attach' additionally need a check on data set
+          // cardinality.
+          // TODO: store the information about which ops need this elsewhere?
+          if (isset($data_set['max cardinality'])) {
+            $data_set_controller = party_get_crm_controller($data_set_name, $party);
+            $ids = $data_set_controller->getEntityIds();
+            if (count($ids) >= $data_set['max cardinality']) {
+              $data_access = FALSE;
+            }
           }
         }
-        else {
-          $data_access = TRUE;
-        }
       }
-      // TODO: Other ops depend on the data set defining the action.
+      else {
+        $data_access = FALSE;
+      }
     }
   }
   else {

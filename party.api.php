@@ -21,8 +21,10 @@
  *   Currently one of:
  *    - 'view': Whether the user may view the given party or data set.
  *    - 'edit': Whether the user may edit the given party or data set.
- *    - 'attach': Whether the user may attach the given data set to the
- *      party.
+ *    - 'add': Whether the user may create a new entity the given data set to
+ *      the party.
+ *    - 'attach': Whether the user may attach an existing entity in the given
+ *      data set to the party.
  *    - 'detach': Whether the user may detach the given data set from the
  *      party.
  *    - 'create': Whether the user may create a party of the type given by
@@ -86,7 +88,8 @@ function hook_party_access($op, $party, $data_set, $account) {
  *    - 'export'
  *  - 'actions': An array defining actions that allow users to do things with the
  *    attached entities within this data set. The keys of this array are the
- *    action names, which are used as path components below the party.
+ *    action names, which are used as path components below the party and also
+ *    correspond to values of $op to party_access().
  *    Each action array may contain the following properties:
  *      - 'controller': The name of an action UI controller class. Party core
  *        provides the following:
