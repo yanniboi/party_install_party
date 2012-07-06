@@ -4,6 +4,8 @@
  * Provides default classes for UI actions on data sets.
  */
 
+// @todo: define an interface here.
+
 /**
  * The 'add' action: attach a new entity.
  *
