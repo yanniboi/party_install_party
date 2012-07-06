@@ -29,7 +29,11 @@ function party_user_party_data_set_info() {
       // @see http://drupal.org/node/1669774.
       'weight' => -8,
     ),
-    'form callback' => "party_user_form_user",
+    'actions' => array(
+      'attach' => array(
+        'controller' => 'PartyDefaultDataSetUIAttach', // 'party_user_form_user',
+      ),
+    ),
   );
   return $sets;
 }
