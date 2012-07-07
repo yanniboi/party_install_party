@@ -78,6 +78,23 @@ class party_plugin_display_party_piece extends views_plugin_display {
     }
   }
 
+  function options_validate(&$form, &$form_state) {
+    // It is very important to call the parent function here:
+    parent::options_validate($form, $form_state);
+
+    // Only allow word characters and hyphens.
+    // TODO: make this match accented characters.
+    if (preg_match('/[^\w-]/', $form_state['values']['party_piece_path'])) {
+      form_error($form['party_piece_path'], t('The path may only contain letters, numbers, underscores, and hyphens.'));
+    }
+
+    // Check for duplicate paths.
+    $pieces = party_get_party_piece_info();
+    if (isset($pieces[$form_state['values']['party_piece_path']])) {
+      form_error($form['party_piece_path'], t('The path already exists.'));
+    }
+  }
+
   function options_submit(&$form, &$form_state) {
     // It is very important to call the parent function here:
     parent::options_submit($form, $form_state);
