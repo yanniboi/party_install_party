@@ -1009,10 +1009,6 @@ function party_permission() {
       'title' => t('Administer CRM settings'),
       'restrict access' => TRUE,
     ),
-    'administer party types' => array(
-      'title' => t('Administer party types'),
-      'restrict access' => TRUE,
-    ),
     'administer parties' =>  array(
       'title' => t('Administer parties'),
       'restrict access' => TRUE,
