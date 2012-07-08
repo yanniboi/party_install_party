@@ -35,6 +35,17 @@ function party_user_party_data_set_info() {
         'action label' => 'Attach existing user',
       ),
     ),
+    // Some of our permissions require a warning.
+    'permissions' => array(
+      // Attaching a user account to a party potentially grants a new user
+      // access to data on that party.
+      'attach' => array(
+        'restrict access' => TRUE,
+      ),
+      'edit' => array(
+        'restrict access' => TRUE,
+      ),
+    ),
   );
   return $sets;
 }

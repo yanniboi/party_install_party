@@ -103,6 +103,12 @@ function hook_party_access($op, $party, $data_set, $account) {
  *        - '@data-set': The data set label.
  *    Note that the 'add' action is currently a special case which doesn't use
  *    the controller, though defining the action here determines access to it.
+ *  - 'permissions': (optional) An array containing extra properties to pass to
+ *    hook_permission() for each of the permissions party module provides for
+ *    this data set. Each array may have a key for each of the actions party
+ *    module provides a permission for ('view', 'attach', 'edit', 'detach'),
+ *    and for any of these, the value should be an array of hook_permission()
+ *    properties to set for the permission for this action on this data set.
  *  - piece: (optional) Each set may define one party piece, which will be
  *    returned by party_party_party_pieces(). The contents of this array should
  *    be the same as those returned by hook_party_party_piece_info(), with the

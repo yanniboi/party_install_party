@@ -1029,25 +1029,32 @@ function party_permission() {
 
   // Add permissions for each data set.
   foreach (party_get_data_set_info() as $data_set_name => $data_set) {
-    $permissions['view party attached ' . $data_set_name] = array(
+    // Build an array of default overrides.
+    $overrides = array_fill_keys(array('view', 'attach', 'edit', 'detach'), array());
+    // Get the overrides from the data set if applicable.
+    if (isset($data_set['permissions'])) {
+      $overrides = array_merge_recursive($overrides, $data_set['permissions']);
+    }
+
+    $permissions['view party attached ' . $data_set_name] = $overrides['view'] + array(
       'title' => t('View party attached %name', array(
         '%name' => $data_set['label'],
       )),
     );
 
-    $permissions['attach party ' . $data_set_name] = array(
+    $permissions['attach party ' . $data_set_name] = $overrides['attach'] + array(
       'title' => t('Add party attached %name', array(
         '%name' => $data_set['label'],
       )),
     );
 
-    $permissions['edit party attached ' . $data_set_name] = array(
+    $permissions['edit party attached ' . $data_set_name] = $overrides['edit'] + array(
       'title' => t('Edit party attached %name', array(
         '%name' => $data_set['label'],
       )),
     );
 
-    $permissions['detach party attached ' . $data_set_name] = array(
+    $permissions['detach party attached ' . $data_set_name] = $overrides['detach'] + array(
       'title' => t('Remove party attached %name', array(
         '%name' => $data_set['label'],
       )),
