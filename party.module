@@ -1017,11 +1017,11 @@ function party_permission() {
       'title' => t('Administer parties'),
       'restrict access' => TRUE,
     ),
-    'create parties' => array(
-      'title' => t('Create parties'),
-    ),
     'view parties' => array(
       'title' => t('View parties'),
+    ),
+    'create parties' => array(
+      'title' => t('Create parties'),
     ),
     'edit parties' => array(
       'title' => t('Edit parties'),
@@ -1039,6 +1039,12 @@ function party_permission() {
       )),
     );
 
+    $permissions['attach party ' . $data_set_name] = array(
+      'title' => t('Add party attached %name', array(
+        '%name' => $data_set['label'],
+      )),
+    );
+
     $permissions['edit party attached ' . $data_set_name] = array(
       'title' => t('Edit party attached %name', array(
         '%name' => $data_set['label'],
@@ -1047,12 +1053,6 @@ function party_permission() {
 
     $permissions['detach party attached ' . $data_set_name] = array(
       'title' => t('Remove party attached %name', array(
-        '%name' => $data_set['label'],
-      )),
-    );
-
-    $permissions['attach party ' . $data_set_name] = array(
-      'title' => t('Add party attached %name', array(
         '%name' => $data_set['label'],
       )),
     );
