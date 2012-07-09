@@ -110,10 +110,10 @@ class PartyUIController extends EntityDefaultUIController {
       $header[] = t('Status');
     }
 
-    $header[] = t('Type');
-
     // Add operations with the right colspan.
-    $header[] = array('data' => t('Operations'), 'colspan' => $this->operationCount());
+    // $this->operationCount() returns 3 which is wrong: TODO: figure out why
+    // it's wrong.
+    $header[] = array('data' => t('Operations'), 'colspan' => 1);
     return $header;
   }
 
