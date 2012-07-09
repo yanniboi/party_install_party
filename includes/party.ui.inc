@@ -86,6 +86,11 @@ class PartyUIController extends EntityDefaultUIController {
    * @return Array
    *   A renderable array.
    */
+  /*
+  // TODO. This is currently commented out as the conversion to a tableselect
+  // causes the rows to be truncated due to this core bug: http://drupal.org/node/365554
+  // Since we don't actually need the tableselect right now, simplest to
+  // remove it temporarily.
   public function overviewTable($conditions = array()) {
     $render_table = parent::overviewTable($conditions);
 
@@ -99,6 +104,7 @@ class PartyUIController extends EntityDefaultUIController {
 
     return $render;
   }
+  */
 
   /**
    * Generates the table headers for the overview table.
