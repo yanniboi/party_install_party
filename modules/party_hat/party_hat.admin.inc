@@ -48,7 +48,7 @@ function party_hat_form($form, &$form_state, $hat, $op = 'edit') {
     '#type' => 'checkbox',
     '#title' => t('Required'),
     '#default_value' => (isset($hat->required)) ? $hat->required : 0,
-    '#description' => 'Whether (individual) parties require this hat.',
+    '#description' => 'If enabled, all parties require this hat.',
     '#weight' => 1,
   );
 
