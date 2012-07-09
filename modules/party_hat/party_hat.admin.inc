@@ -82,8 +82,8 @@ function party_hat_form($form, &$form_state, $hat, $op = 'edit') {
       '#options' => array(
         // We have to use different keys to what the access hook expects for
         // FormAPI radio values to work.
-        'has'   => t('Has'),
-        'multiple'  => t('Can have Multiple'),
+        'has'   => t('Allowed'),
+        'multiple'  => t('Multiple'),
       ),
     );
   }
