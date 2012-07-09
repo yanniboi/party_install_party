@@ -56,3 +56,43 @@ class PartyHatUIController extends EntityDefaultUIController {
     return $items;
   }
 }
+
+/**
+ * Extends the Party UI controller to show a party's hats in the admin list.
+ */
+class PartyHatPartyUIController extends PartyUIController {
+
+  /**
+   * Generates the table headers for the overview table.
+   */
+  protected function overviewTableHeaders($conditions, $rows, $additional_header = array()) {
+    // Get the basic row from the parent class.
+    $header = parent::overviewTableHeaders($conditions, $rows, $additional_header);
+
+    array_splice($header, 2, 0, t('Hats'));
+
+    return $header;
+  }
+
+  protected function overviewTableRow($conditions, $id, $party, $additional_cols = array()) {
+    // Get the basic row from the parent class.
+    $row = parent::overviewTableRow($conditions, $id, $party, $additional_cols);
+
+    $hats_labels = array();
+    $hats = party_hat_get_hats($party);
+    foreach ($hats as $hat) {
+      $hats_labels[] = $hat->label;
+    }
+    if (count($hats_labels)) {
+      $hats_text = check_plain(implode(', ', $hats_labels));
+    }
+    else {
+      $hats_text = t('None');
+    }
+
+    array_splice($row, 2, 0, $hats_text);
+
+    return $row;
+  }
+
+}

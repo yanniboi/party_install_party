@@ -53,6 +53,14 @@ function party_hat_entity_info() {
 }
 
 /**
+ * Implements hook_entity_info_alter().
+ */
+function party_hat_entity_info_alter(&$entity_info) {
+  // Set the UI controller class for parties to our own to add hats into the UI.
+  $entity_info['party']['admin ui']['controller class'] = 'PartyHatPartyUIController';
+}
+
+/**
  * Entity access callback.
  *
  * @param $op
