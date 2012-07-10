@@ -72,7 +72,7 @@ function party_form($form, &$form_state, $party, $op = 'edit') {
 
   foreach ($data_sets as $data_set) {
     // Get our controller
-    $data_set_controller = party_get_crm_controller($data_set, $party);
+    $data_set_controller = party_get_crm_controller($party, $data_set);
     $attached_entities = array();
 
     // See if we can load any entities
@@ -160,7 +160,7 @@ function party_edit_form_save($form, &$form_state) {
 
   foreach ($data_sets as $data_set) {
     if (!empty($party->data_sets[$data_set])) {
-      $data_set_controller = party_get_crm_controller($data_set, $party);
+      $data_set_controller = party_get_crm_controller($party, $data_set);
       foreach ($party->data_sets[$data_set] as $entity) {
         $data_set_controller->attachEntity($entity);
       }
@@ -218,7 +218,7 @@ function party_delete_form_submit($form, &$form_state) {
  */
 function party_view_data_set($party, $data_set_name) {
   // TODO: some of these calls are redundant!
-  $data_set_controller = party_get_crm_controller('user', $party);
+  $data_set_controller = party_get_crm_controller($party, $data_set_name);
   $attached_entities = party_get_attached_entities($party, $data_set_name);
 
   $build = array();
@@ -349,7 +349,7 @@ function party_attached_entity_action_form_submit($form, &$form_state) {
  * @todo: Reimplement actions and edit overlay stuff
  */
 function party_attached_entity_edit_form($form, &$form_state, $party, $data_set, $eid = NULL) {
-  $data_set_controller = party_get_crm_controller($data_set['set_name'], $party);
+  $data_set_controller = party_get_crm_controller($party, $data_set['set_name']);
   // Load up the entities into the controller.
   $data_set_controller->loadEntities();
 
@@ -419,7 +419,7 @@ function party_attached_entity_edit_form_submit($form, &$form_state) {
  * Form to confirm removing a data set from a party.
  */
 function party_attached_entity_remove_confirm($form, &$form_state, $party, $data_set, $eid) {
-  $data_set_controller = party_get_crm_controller($data_set['set_name']);
+  $data_set_controller = party_get_crm_controller($party, $data_set['set_name']);
   $data_set_controller->setAttachedEntity($eid);
   $data_set_controller->setParty($party->pid);
 

@@ -332,7 +332,7 @@ function party_user_form_user_register_form_alter(&$form, &$form_state) {
       }
 
       if (count($attached_entities) < 1) {
-        $data_set_controller = party_get_crm_controller($data_set);
+        $data_set_controller = party_get_crm_controller($party, $data_set);
         $data_set_controller->createAttachedEntity();
         $data_set_controller->setParty($party);
         $attached_entities[$data_set_controller->hash()] = $data_set_controller;
@@ -359,7 +359,7 @@ function party_user_register_submit($form, &$form_state) {
 
   foreach ($data_sets as $data_set) {
     if (!empty($party->data_sets[$data_set])) {
-      $data_set_controller = party_get_crm_controller($data_set, $party);
+      $data_set_controller = party_get_crm_controller($party, $data_set);
       foreach ($party->data_sets[$data_set] as $entity) {
         $data_set_controller->attachEntity($entity);
       }
@@ -368,7 +368,7 @@ function party_user_register_submit($form, &$form_state) {
   }
 
   // Attach the user what we just made
-  $data_set_controller = party_get_crm_controller('user', $party);
+  $data_set_controller = party_get_crm_controller($party, 'user');
   $data_set_controller->attachEntity($form_state['user']);
   $data_set_controller->save($party);
 }
@@ -396,7 +396,7 @@ function party_user_user_view($account, $view_mode, $langcode) {
   if ($view_mode == 'party') {
     $party = party_user_get_party($account);
 
-    $data_set_controller = party_get_crm_controller('user', $party);
+    $data_set_controller = party_get_crm_controller($party, 'user');
 
     $account->content['party_actions'] = array(
       '#theme' => 'links',
@@ -425,7 +425,7 @@ function party_user_user_view($account, $view_mode, $langcode) {
  */
 function party_user_create_party_for_user($user, $options = array()) {
   $party = party_create($options);
-  $data_set_controller = party_get_crm_controller('user', $party);
+  $data_set_controller = party_get_crm_controller($party, 'user');
   $data_set_controller->attachEntity($user);
   $party->data_sets['user'][] = $data_set_controller;
 

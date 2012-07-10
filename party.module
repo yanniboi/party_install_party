@@ -539,7 +539,7 @@ function party_party_access($op, $party = NULL, $data_set = NULL, $account = NUL
           // cardinality.
           // TODO: store the information about which ops need this elsewhere?
           if (isset($data_set['max cardinality'])) {
-            $data_set_controller = party_get_crm_controller($data_set_name, $party);
+            $data_set_controller = party_get_crm_controller($party, $data_set_name);
             $ids = $data_set_controller->getEntityIds();
             if (count($ids) >= $data_set['max cardinality']) {
               $data_access = FALSE;
@@ -723,15 +723,15 @@ function party_party_party_pieces() {
 /**
  * Get the attached entity controller for a party.
  *
- * @param $data_set_name
- *  The name of a data set.
  * @param $party
  *  The party to get the data set for.
+ * @param $data_set_name
+ *  The name of a data set.
  *
  * @return
  *  The controller class, without attached entities loaded yet.
  */
-function party_get_crm_controller($data_set_name, $party) {
+function party_get_crm_controller($party, $data_set_name) {
   $sets = party_get_data_set_info();
 
   // @todo: error handling
@@ -889,7 +889,7 @@ function party_get_party_data_sets($party) {
  *  DX WTF: Lots of sniffing now done BUT do we want the $data_set instance made elsewhere. If so where?
  */
 function party_attach_entity($party, $entity, $data_set_name) {
-  $data_set_controller = party_get_crm_controller($data_set_name, $party);
+  $data_set_controller = party_get_crm_controller($party, $data_set_name);
   $data_set_controller->attachEntity($entity);
   $data_set_controller->save();
 }
@@ -907,7 +907,7 @@ function party_attach_entity($party, $entity, $data_set_name) {
  */
 function party_detach_entity($party, $entity, $data_set_name) {
   /* To Test */
-  $data_set_controller = party_get_crm_controller($data_set_name, $party);
+  $data_set_controller = party_get_crm_controller($party, $data_set_name);
   $data_set_controller->detachEntity($entity);
   $data_set_controller->save();
 }
@@ -935,7 +935,7 @@ function party_get_data_set($party, $data_set_name, $create = FALSE) {
     return array();
   }
 
-  $data_set_controller = party_get_crm_controller($data_set_name, $party);
+  $data_set_controller = party_get_crm_controller($party, $data_set_name);
 
   $entity_ids = $data_set_controller->getEntityIds();
   if ($create && empty($entity_ids)) {
@@ -1106,7 +1106,7 @@ function party_preprocess_entity(&$variables) {
     // @todo: clean this up -- having to load up the controller all over
     // again when we probably had it at some earlier point is just messy.
     $data_set_name = party_get_entity_data_set($entity_type, $entity);
-    $data_set_controller = party_get_crm_controller($data_set_name, party_load($party_id));
+    $data_set_controller = party_get_crm_controller(party_load($party_id), $data_set_name);
     // Load the entities.
     $data_set_controller->getEntities();
     //$attached_entity->setAttachedEntity($eid);

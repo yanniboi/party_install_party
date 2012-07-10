@@ -59,7 +59,7 @@ class PartyUserDataSetUIAttach extends PartyDefaultDataSetUIAttach {
     $account = user_load_by_name($form_state['values']['user']);
     if ($account->uid != 0) {
       // Attach the user entity to the party.
-      $data_set_controller = party_get_crm_controller($data_set['set_name'], $party);
+      $data_set_controller = party_get_crm_controller($party, $data_set['set_name']);
       $data_set_controller->attachEntity($account);
       $data_set_controller->save();
     }

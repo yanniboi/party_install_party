@@ -71,7 +71,7 @@ class PartyDefaultDataSetUIAdd implements PartyDataSetActionInterface {
    * The page title for the action form.
    */
   function get_page_title($party, $data_set, $eid = NULL) {
-    $data_set_controller = party_get_crm_controller($data_set['set_name'], $party);
+    $data_set_controller = party_get_crm_controller($party, $data_set['set_name']);
     return t("Add new @data-set-label to @party-label", array(
       '@data-set-label' => $data_set_controller->getDataInfo('label'),
       '@party-label' => $party->label,
@@ -118,7 +118,7 @@ class PartyDefaultDataSetUIAttach implements PartyDataSetActionInterface {
    * The page title for the action form.
    */
   function get_page_title($party, $data_set, $eid = NULL) {
-    $data_set_controller = party_get_crm_controller($data_set['set_name'], $party);
+    $data_set_controller = party_get_crm_controller($party, $data_set['set_name']);
     return t("Attach existing @data-set-label to @party-label", array(
       '@data-set-label' => $data_set_controller->getDataInfo('label'),
       '@party-label' => $party->label,

@@ -104,7 +104,7 @@ function party_devel_generate_party_add_party(&$results) {
       continue;
     }
 
-    $data_set_controller = party_get_crm_controller($name);
+    $data_set_controller = party_get_crm_controller($party, $name);
     $data_set_controller->createAttachedEntity();
 
     // Devel generate requires that a language be set.
