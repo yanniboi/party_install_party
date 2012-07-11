@@ -1,70 +1,8 @@
 <?php
 /**
  * @file party_hat.install
- * TODO: Enter file description here.
+ * Contains install hooks for the party hat module..
  */
-
-/**
- * Exportable schema fields
- */
-function party_hat_exportable_schema_fields() {
-  return array(
-    'status' => array(
-      'type' => 'int',
-      'not null' => TRUE,
-      // Set the default to ENTITY_CUSTOM without using the constant as it is
-      // not safe to use it at this point.
-      'default' => 0x01,
-      'size' => 'tiny',
-      'description' => 'The exportable status of the entity.',
-    ),
-    'module' => array(
-      'description' => 'The name of the providing module if the entity has been defined in code.',
-      'type' => 'varchar',
-      'length' => 255,
-      'not null' => FALSE,
-    ),
-  );
-}
-
-/**
- * Implements hook_install().
- */
-function party_hat_install() {
-  field_info_cache_clear();
-
-  if (!field_info_field('party_hat')) {
-    $field = array(
-      'field_name' => 'party_hat',
-      'type' => 'hat_reference',
-      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
-      'settings' => array(
-      ),
-    );
-    field_create_field($field);
-
-    $instance = array(
-      'field_name' => 'party_hat',
-      'entity_type' => 'party',
-      'bundle' => 'party',
-      'label' => t('Hats'),
-      'required' => FALSE,
-      'description' => t("This party's hats"),
-      'default_value_function' => 'party_hat_field_get_default',
-      'widget' => array(
-        'type' => 'options_buttons',
-        'settings' => array(),
-      ),
-      'display' => array(
-        'default' => array(
-          'type' => 'hat_reference_default',
-          'label' => 'inline',
-        ),
-      ),
-    );
-    field_create_instance($instance);
-  }
-}
 
 /**
  * Implements hook_schema().
@@ -113,6 +51,29 @@ function party_hat_schema() {
 }
 
 /**
+ * Exportable schema fields.
+ */
+function party_hat_exportable_schema_fields() {
+  return array(
+    'status' => array(
+      'type' => 'int',
+      'not null' => TRUE,
+      // Set the default to ENTITY_CUSTOM without using the constant as it is
+      // not safe to use it at this point.
+      'default' => 0x01,
+      'size' => 'tiny',
+      'description' => 'The exportable status of the entity.',
+    ),
+    'module' => array(
+      'description' => 'The name of the providing module if the entity has been defined in code.',
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => FALSE,
+    ),
+  );
+}
+
+/**
  * Implements hook_field_schema()
  */
 function party_hat_field_schema() {
@@ -130,6 +91,45 @@ function party_hat_field_schema() {
     'columns' => $columns,
     'indexes' => $indexes,
   );
+}
+
+/**
+ * Implements hook_install().
+ */
+function party_hat_install() {
+  field_info_cache_clear();
+
+  if (!field_info_field('party_hat')) {
+    $field = array(
+      'field_name' => 'party_hat',
+      'type' => 'hat_reference',
+      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+      'settings' => array(
+      ),
+    );
+    field_create_field($field);
+
+    $instance = array(
+      'field_name' => 'party_hat',
+      'entity_type' => 'party',
+      'bundle' => 'party',
+      'label' => t('Hats'),
+      'required' => FALSE,
+      'description' => t("This party's hats"),
+      'default_value_function' => 'party_hat_field_get_default',
+      'widget' => array(
+        'type' => 'options_buttons',
+        'settings' => array(),
+      ),
+      'display' => array(
+        'default' => array(
+          'type' => 'hat_reference_default',
+          'label' => 'inline',
+        ),
+      ),
+    );
+    field_create_instance($instance);
+  }
 }
 
 /**
