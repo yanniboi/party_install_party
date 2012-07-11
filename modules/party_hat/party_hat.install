@@ -237,3 +237,15 @@ function party_hat_update_7004() {
 
   db_delete('party_hat_data_set_rules');
 }
+
+/**
+ * Filter out unused data sets in hat entity data.
+ */
+function party_hat_update_7005() {
+  $party_hats = party_hat_get_all_hats();
+  foreach ($party_hats as $hat) {
+    $values = $hat->data['data_sets'];
+    party_hat_set_data_set_rules($hat, $values);
+    party_hat_save($hat);
+  }
+}

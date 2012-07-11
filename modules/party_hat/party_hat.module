@@ -145,19 +145,39 @@ function party_hat_load_multiple($hids = array(), $conditions = array(), $reset 
 }
 
 /**
- * Save a hat data set rule.
+ * Set hat data set rules into a hat.
+ *
+ * This should be used rather than stuffing the data set rules directly into
+ * the hat, as it removes any data sets the hat doesn't grant from the array, so
+ * the hat has no superflous items.
+ *
+ * Note the hat will still require saving.
+ *
+ * @todo: add a parameter to specify which data sets are being updated, if
+ * needed??
  *
  * @param $hat
  *  The hat entity.
- * @param $data_set_name
- *  The data set name.
- * @param $value
- *  An array of rules for this data set.
+ * @param $values
+ *  An array of data set rules, keyed by data set name. These are cleaned up
+ *  prior to being set into the hat, to allow form values to be passed in here.
  */
-function party_hat_set_data_set_rule(&$hat, $data_set_name, $values = array()) {
-  // Very sily now.
-  // @todo: remove this function, obviously.
-  $hat->data['data_sets'][$data_set_name] = $values;
+function party_hat_set_data_set_rules(&$hat, $values) {
+  $save_values = array();
+  foreach ($values as $data_set_name => $data_set_values) {
+    // Values are allowed to come in as 'key' => 'key', as saved by FormAPI
+    // checkboxes. Clean these up.
+    foreach ($data_set_values as $key => $value) {
+      $data_set_values[$key] = (bool) $value;
+    }
+
+    // Only take data sets which are needed.
+    if ($data_set_values['has']) {
+      $save_values[$data_set_name] = $data_set_values;
+    }
+  }
+
+  $hat->data['data_sets'] = $save_values;
 }
 
 /**

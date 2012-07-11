@@ -172,17 +172,8 @@ function party_hat_form_submit($form, &$form_state) {
   // Build the entity and save it.
   $hat = entity_ui_form_submit_build_entity($form, $form_state);
 
-  // @todo. if we're going to have a helper function to set this, it should
-  // actually help and do all this messy stuff.
-  foreach ($form_state['values']['data_set_rules'] as $data_set_name => $values) {
-    // convert to a 1/0 column. There must be a better way! It probably involves having two different checkboxes
-    foreach ($values as $key => $var) {
-      if ($key === $var) {
-        $values[$key] = 1;
-      }
-    }
-    party_hat_set_data_set_rule($hat, $data_set_name, $values);
-  }
+  // Set the data set rules in the hat.
+  party_hat_set_data_set_rules($hat, $form_state['values']['data_set_rules']);
 
   party_hat_save($hat);
 
