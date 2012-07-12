@@ -43,9 +43,8 @@ function party_hat_form($form, &$form_state, $hat, $op = 'edit') {
   );
 
   $form['description'] = array(
-    '#type' => 'textfield',
+    '#type' => 'textarea',
     '#title' => t('Description'),
-    '#maxlength' => '255',
     '#default_value' => isset($hat->description) ? $hat->description : '',
   );
 

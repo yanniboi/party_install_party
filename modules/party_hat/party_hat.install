@@ -32,9 +32,10 @@ function party_hat_schema() {
       ),
       'description' => array(
         'description' => 'Some text describing the purpose of the hat',
-        'type' => 'varchar',
-        'length' => '255',
+        'type' => 'text',
         'not null' => TRUE,
+        'size' => 'medium',
+        'translatable' => TRUE,
         'default' => '',
       ),
       'data' => array(
@@ -264,10 +265,12 @@ function party_hat_update_7005() {
 function party_hat_update_7006() {
   $field = array (
     'description' => 'Some text describing the purpose of the hat',
-    'type' => 'varchar',
-    'length' => '255',
+    'type' => 'text',
     'not null' => TRUE,
+    'size' => 'medium',
+    'translatable' => TRUE,
     'default' => '',
   );
+
   db_add_field('party_hat', 'description', $field);
 }
