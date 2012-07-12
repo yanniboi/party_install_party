@@ -64,7 +64,7 @@ function party_simplenews_party_data_set_info() {
   $sets['subscription_settings'] = array(
     'label' => t("Subscription Settings"),
     'entity type' => 'party_subscription_settings',
-    'class' => 'PartySubscriptionSettingsPartyController',
+    'class' => 'PartySubscriptionSettingsDataSet',
     'singleton' => TRUE,
     'max cardinality' => 1,
     'view mode' => 'party',
@@ -421,18 +421,19 @@ function party_get_all_emails($party) {
   $emails = array();
   
   foreach ($fields as $data_set_name => $fields) {
-    $attached_entities = party_get_attached_entities($party, $data_set_name);
-    $data_set_def = party_get_data_set_info($data_set_name);
+    $data_set_controller = party_get_data_set($party, $data_set_name);
+    $data_set_def = party_get_data_set_info($data_set_name);    
+    $entity_ids = $data_set_controller->getEntityIds();
     
-    foreach ($attached_entities as $attached_entity) {
+    foreach ($data_set_controller->getEntities() as $data_set_delta => $entity) {
       foreach ($fields as $field_name) {
-        $items = field_get_items($data_set_def['entity type'], $attached_entity->entity, $field_name);
+        $items = field_get_items($data_set_def['entity type'], $entity, $field_name);
         if (!$items) {
           continue;
         }
 
         foreach ($items as $delta => $item) {
-           $field_ref = $data_set_name . '__' . $attached_entity->getEntityId() . '__' . $field_name . '__' . $delta;
+           $field_ref = $data_set_name . '__' . $entity_ids[$data_set_delta] . '__' . $field_name . '__' . $delta;
            $emails[$field_ref] = $item['email'];
         }
       }
@@ -511,18 +512,9 @@ function party_simplenews_party_subscription_settings_view($entity) {
   }
 }
 
-class PartySubscriptionSettingsPartyController extends EntityDefaultPartyController {
-  public function label() {
+class PartySubscriptionSettingsDataSet extends PartyDefaultDataSet {
+  public function getLabel() {
     return 'Newsletters';
-  }
-  
-  public function actions() {
-    $actions = parent::actions();
-    if (isset($actions['edit'])) {
-      $actions['edit']['title'] = 'Manage Subscriptions';
-    }
-    
-    return $actions;
   }
 }
 

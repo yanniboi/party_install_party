@@ -101,13 +101,7 @@ function party_subscription_settings_get_party(PartySubscriptionSettings $party_
  * Add a subscription settings attached entity
  */
 function party_simplenews_add_subsciption_settings_attached_entity($party) {
-  $attached_entity = reset(party_get_attached_entities($party, 'subscription_settings', TRUE));
-  if ($attached_entity->attached) {
-    return;
-  }
-
-  $attached_entity->saveAttachedEntity();
-  $attached_entity->attach($party);
+  party_get_data_set($party, 'subscription_settings', TRUE);
 }
 
 /**
@@ -127,9 +121,9 @@ function party_subscription_settings_edit_form($form, &$form_state, &$attached_e
     break;
   }
 
-  $hash = $attached_entity->hash();
+  $hash = 'party_subscription_settings:' . $attached_entity->subscription_settings_id;
   $current_ref = !empty($form_state['values'][$hash]['field_ref']) ? $form_state['values'][$hash]['field_ref'] : reset(array_keys($emails));
-  if (!empty($form_state['triggering_element']) && $form_state['triggering_element']['#name'] == $attached_entity->hash() . '[field_ref]') {
+  if (!empty($form_state['triggering_element']) && $form_state['triggering_element']['#name'] == $hash . '[field_ref]') {
     unset($form_state['values'][$hash]);
     unset($form_state['input'][$hash]);
   }
@@ -190,7 +184,7 @@ function party_subscription_settings_edit_form_ajax($form, $form_state) {
  * Submit party subscription settings form
  */
 function party_subscription_settings_edit_form_submit($form, &$form_state, &$attached_entity, $party) {
-  $hash = $attached_entity->hash();
+  $hash = 'party_subscription_settings:' . $attached_entity->subscription_settings_id;
   $emails = party_get_all_emails($party);
   $values = &$form_state['values'][$hash];
 

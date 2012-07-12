@@ -3,6 +3,7 @@ description = Integration with the SimpleNews module. Hopefully most of the code
 core = 7.x
 
 files[] = party_subscription_settings.entity.inc
+files[] = includes/party_simplenews.data.inc
 files[] = includes/views/party_simplenews.views.inc
 files[] = includes/views/party_simplenews_handler_field_primary_email.inc
 
