@@ -260,7 +260,7 @@ function party_hat_update_7005() {
 
 
 /**
- * Update for Party Hat Description Field
+ * Add a description field to party hats.
  */
 function party_hat_update_7006() {
   $field = array (
