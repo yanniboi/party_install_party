@@ -795,7 +795,7 @@ function party_get_entity_data_set($entity_type, $entity) {
  */
 function party_get_data_set_info($data_set_name = NULL, $reset = FALSE) {
   $sets = &drupal_static(__FUNCTION__);
-  if (!isset($sets) && !$reset) {
+  if (!isset($sets) || $reset) {
     if (($cache = cache_get('party:data_set_info', 'cache')) && !$reset) {
       $sets = $cache->data;
     }
