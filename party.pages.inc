@@ -91,7 +91,9 @@ function party_form($form, &$form_state, $party, $op = 'edit') {
     }
 
     foreach ($attached_entities as $delta => $entity) {
-      $form_state['#attached_entities'][$data_set . ':' . $delta] = $entity;
+      // Generate a unique array key for use in the $form array.
+      $array_key = $data_set_controller->getDataInfo('entity type') . ':' . $entity->{$data_set_controller->getDataInfo('id key')};
+      $form_state['#attached_entities'][$array_key] = $entity;
     }
   }
   // Everything between the last @todo and here needs to be in a hook so that other modules can change it.
