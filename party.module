@@ -780,7 +780,11 @@ function party_get_entity_data_set($entity_type, $entity) {
  * @todo: cache this, either in the DB or using DrupalCacheArray.
  *
  * @param $data_set_name
- *  (optional) The name of the data set to return. If omitted, all are returned.
+ *  (optional) The name of the data set to return. If
+ *  omitted, all are returned.
+ * @param $reset
+ *  (optional) If set to true this will rebuild the data
+ *  info, ignoring any cached version.
  *
  * @return
  *  Either a single data set, or an array of data sets keyed by set name.
@@ -789,10 +793,10 @@ function party_get_entity_data_set($entity_type, $entity) {
  *  - 'module': The module defining this set.
  *  - 'table': The table in which this set's data is stored.
  */
-function party_get_data_set_info($data_set_name = NULL) {
+function party_get_data_set_info($data_set_name = NULL, $reset = FALSE) {
   $sets = &drupal_static(__FUNCTION__);
-  if (!isset($sets)) {
-    if ($cache = cache_get('party:data_set_info', 'cache')) {
+  if (!isset($sets) && !$reset) {
+    if ($cache = cache_get('party:data_set_info', 'cache') && !$reset) {
       $sets = $cache->data;
     }
     else {
