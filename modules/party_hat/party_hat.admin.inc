@@ -42,6 +42,13 @@ function party_hat_form($form, &$form_state, $hat, $op = 'edit') {
     '#disabled' => isset($hat->name),
   );
 
+  $form['description'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Description'),
+    '#maxlength' => '255',
+    '#default_value' => isset($hat->description) ? $hat->description : '',
+  );
+
   field_attach_form('party_hat', $hat, $form, $form_state);
 
   $form['required'] = array(
