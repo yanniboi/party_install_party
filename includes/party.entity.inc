@@ -16,6 +16,11 @@ class PartyController extends EntityAPIController {
    * After the Party is saved we try and generate a label for it.
    */
   public function save($party) {
+    // Make sure there's something to save so that drupal_write_record runs.
+    if (empty($party->label)) {
+      $party->label = "Not yet labelled";
+    }
+
     if (isset($party->pid)) {
       drupal_write_record('party', $party, 'pid');
       field_attach_update('party', $party);
