@@ -1,14 +1,14 @@
-Overview
+Introduction
 --------
 
 The Party module provides an extremely flexible CRM solution for Drupal,
 utilizing a generic entity (the Party entity) to which other entities
 (Drupal Users, Profile2 profiles, eCommerce customers, Facebook profiles, etc.)
-are attached.
+can be attached.
 
-A Party entity does not have bundles and normally has no fields.  It is simply
+A Party entity does not have bundles and normally has no fields. It is simply
 a wrapper around other entities representing whatever, e.g. a Drupal User,
-CiviCRM Constituant, Facebook account, eCommerce Customer, Employee profile,
+CiviCRM Constituent, Facebook account, eCommerce Customer, Employee profile,
 etc. A Party may wrap one or more such entities.
 
 
@@ -19,14 +19,14 @@ PHP 5.3
 Drupal greater than 7.14
 Dependencies:
  - Entity API
- - cTools
+ - CTools
  - Views
 
 
 Installation
 ------------
 
-Install and enable the Party module (and dependencies Entity API, Ctools,
+Install and enable the Party module (and dependencies Entity API, CTools,
 Views) using the usual Drupal module download/enable process. Typically the
 following Party sub-modules should be enabled: Party Hat, Party Profile, Party
 User.
@@ -40,22 +40,22 @@ Data Sets
 
 Data Sets define how data about Parties is stored. For example, a Party
 installation for a library might have Data Sets created for the Profile2, User,
-and LibraryCard entities.  A Data Set registers an entity type with the Party
+and LibraryCard entities. A Data Set registers an entity type with the Party
 module, by saving a set of configurations settings, which define a method
-available to store data about a Party.  Is is also possible for Data Sets to
+available to store data about a Party. Is is also possible for Data Sets to
 represent different configurations of the same Party plugin, for example,
 different Profile2 profiles. An instance of a Data Set applied to a specific
 Party is called an Attached Entity.
 
 At the moment, the Party modules expose User Accounts, Profile2s and Customer
 Profiles (Commerce Module) as Data Sets. In the future, support is planned for
-Nodes, and other entity types yet to be determined.  You can also create your
+Nodes, and other entity types yet to be determined. You can also create your
 own modules to allow other entities to be used as data sets (see below).
 
-To manage your CRM’s Data Sets click “Community” on the admin toolbar and then
-click “Manage Data Sets”. You will see a list of all the Data Sets that Party
-Module can interact with. From here you can add new Data Sets (by clicking “Add
-Profile data set”) or manage the fields and settings of existing Data Sets.
+To manage your CRM's Data Sets click Ã¬CommunityÃ® on the admin toolbar and then
+click Ã¬Manage Data SetsÃ®. You will see a list of all the Data Sets that Party
+Module can interact with. From here you can add new Data Sets (by clicking Ã¬Add
+Profile data setÃ®) or manage the fields and settings of existing Data Sets.
 
 
 Hats
@@ -67,8 +67,8 @@ For example, a Party with a Teacher Hat can edit the data of a Party having a
 Student Hat, but not visa-versa.
 
 A Party can have multiple Hats, and the Hats assigned to a Party can change over
-time.  Hats are organized in hierarchies, with the root level of the hierarchy
-normally being occupied by either the “Group” Hat or “Individual” Hat. Hats can
+time. Hats are organized in hierarchies, with the root level of the hierarchy
+normally being occupied by either the Ã¬GroupÃ® Hat or Ã¬IndividualÃ® Hat. Hats can
 be created in code or through the Party UI.
 
 A hat hierarchy for a library might look like:
@@ -115,38 +115,37 @@ Party Labels
 
 When a party is created in the system, whether manually or programmatically, a
 label is generated for it. It is possible to specify how this label is generated
-by configuring any number of ‘Party Name Label’ plugins.  Under ‘Label Plugins’
+by configuring any number of 'Party Name Label' plugins. Under 'Label Plugins'
 in the Party configuration menu, you can sort and modify settings for these
-plugins.  For example, the ‘attached entity field’ label plugin will allow you
-to use a field from a data set to use for the label - thus a ‘Name’ field on an
-attached profile2 entity could be used.  The sorting allows you to choose in
+plugins. For example, the 'attached entity field' label plugin will allow you
+to use a field from a data set to use for the label - thus a 'Name' field on an
+attached profile2 entity could be used. The sorting allows you to choose in
 which order these labels are applied - thus, for parties that do not have
 attached users, username will not work, but the pid example will.
 
-To create your own Party Label plugins, refer to <Developer Documentation Section>
-
+To create your own Party Label plugins, refer to the Developer Documentation Section.
 
 Drupal User Integration
 -----------------------
-Stand alone operation is possible using the Profile2 module. Optionally, a Drupal
-user may be attached to a Party. This may be helpful when you desire your parties
-to self-manage their data, be assigned roles, or be granted access to various
-parts of your site.
+Stand alone operation is possible using the Profile2 module. Optionally, a
+Drupal user may be attached to a Party. This may be helpful when you desire your
+parties to self-manage their data, be assigned roles, or be granted access to
+various parts of your site.
 
 The creation of a user or a user registration can trigger the creation of an
-associated party.  You can enable this option by first ensuring that you have
-Party User enabled.  Once the module is enabled, you can toggle the option
-available at ‘User Integration’ in the Party configuration menu.
+associated party. You can enable this option by first ensuring that you have
+Party User enabled. Once the module is enabled, you can toggle the option
+available at 'User Integration' in the Party configuration menu.
 
-Lastly, you can manually attach existing users when editing a party.  (UI for
-this is still being built, programatically it ‘works’)
+Lastly, you can manually attach existing users when editing a party. (UI for
+this is still being built, programatically it 'works')
 
 
 Panels Integration
 ------------------
 
 Party provides a number of plug-ins for integrating with panels. With a party
-entity in the panel’s contexts it is possible to use a relationship to add any
+entity in the panel's contexts it is possible to use a relationship to add any
 attached entities to the context stack. There is also and attached entity
 content type plug-in that will display any attached entity in a pane.
 
@@ -252,11 +251,11 @@ first form callback returns a portion of the final form array to be put in
 $form[$attached_entity->hash()]. All form callbacks take the following four
 arguments:
 
-$form – the full form array
-$form_state – the form state
-$attached_entity – the attached entity wrapper. The entity itself is in
+$form Ã± the full form array
+$form_state Ã± the form state
+$attached_entity Ã± the attached entity wrapper. The entity itself is in
                    $attached_entity->entity.
-$party – the party object
+$party Ã± the party object
 
 For a more detailed example of overriding the default form callbacks see the
 Party User module.
