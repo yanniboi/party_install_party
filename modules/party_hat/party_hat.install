@@ -257,7 +257,6 @@ function party_hat_update_7005() {
   }
 }
 
-
 /**
  * Add a description field to party hats.
  */
