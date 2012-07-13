@@ -38,24 +38,13 @@ User.
 Data Sets
 ---------
 
-Data Sets define how data about Parties is stored. For example, a Party
-installation for a library might have Data Sets created for the Profile2, User,
-and LibraryCard entities. A Data Set registers an entity type with the Party
-module, by saving a set of configurations settings, which define a method
-available to store data about a Party. Is is also possible for Data Sets to
-represent different configurations of the same Party plugin, for example,
-different Profile2 profiles. An instance of a Data Set applied to a specific
-Party is called an Attached Entity.
+Data sets define where a Party's data is stored. A data set specifies a particular entity type which may be connected to a party. This may be an entity type provided by another module, or one defined along with the data set.
 
-At the moment, the Party modules expose User Accounts, Profile2s and Customer
-Profiles (Commerce Module) as Data Sets. In the future, support is planned for
-Nodes, and other entity types yet to be determined. You can also create your
-own modules to allow other entities to be used as data sets (see below).
+Party provides submodules that define data sets for:
 
-To manage your CRM's Data Sets click ìCommunityî on the admin toolbar and then
-click ìManage Data Setsî. You will see a list of all the Data Sets that Party
-Module can interact with. From here you can add new Data Sets (by clicking ìAdd
-Profile data setî) or manage the fields and settings of existing Data Sets.
+- profile2, one data set per type
+- user accounts
+- commerce module customer profiles
 
 
 Hats
