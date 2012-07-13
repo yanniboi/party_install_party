@@ -159,6 +159,7 @@ class PartyDefaultDataSet {
         $entities_loaded = entity_load($this->getDataInfo('entity type'), array($this->entities[$delta]));
         $this->entities[$delta] = reset($entities_loaded);
         $this->entities[$delta]->data_set_name = $this->data_set;
+        $this->entities[$delta]->party_attaching_party = $this->party->pid;
       }
     }
 

@@ -1105,7 +1105,7 @@ function party_preprocess_entity(&$variables) {
     $entity       = $variables['elements']['#entity'];
     list($eid, ) = entity_extract_ids($entity_type, $entity);
 
-    $party_id = $entity->crm_attaching_party;
+    $party_id = $entity->party_attaching_party;
 
     // @todo: clean this up -- having to load up the controller all over
     // again when we probably had it at some earlier point is just messy.

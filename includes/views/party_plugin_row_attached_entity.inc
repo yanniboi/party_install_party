@@ -64,7 +64,7 @@ class party_plugin_row_attached_entity extends views_plugin_row {
     // Dose up the entity with the attaching party id, for our preprocess hook
     // party_preprocess_entity() to find.
     $party_id = $result->{$this->field_alias_pid};
-    $entity->crm_attaching_party = $party_id;
+    $entity->party_attaching_party = $party_id;
 
     $content = entity_view($entity_type, array($id => $entity), 'party');
     return drupal_render($content);
