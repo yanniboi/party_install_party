@@ -36,7 +36,6 @@ function party_hat_schema() {
         'not null' => TRUE,
         'size' => 'medium',
         'translatable' => TRUE,
-        'default' => '',
       ),
       'data' => array(
         'type' => 'blob',
@@ -269,7 +268,6 @@ function party_hat_update_7006() {
     'not null' => TRUE,
     'size' => 'medium',
     'translatable' => TRUE,
-    'default' => '',
   );
 
   db_add_field('party_hat', 'description', $field);
