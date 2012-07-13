@@ -50,14 +50,11 @@ Party provides submodules that define data sets for:
 Hats
 ----
 
-A Hat defines a Party type, specifying a subset of available Data Sets, if the
-Hat is required, access rules and (eventually) the associated Drupal user roles.
-For example, a Party with a Teacher Hat can edit the data of a Party having a
-Student Hat, but not visa-versa.
+Instead of having bundles, a party can have multiple hats, which can be changed
+over time. Each hat allows the party to use one of more data sets.
 
-A Party can have multiple Hats, and the Hats assigned to a Party can change over
-time. Hats are organized in hierarchies, with the root level of the hierarchy
-normally being occupied by either the ìGroupî Hat or ìIndividualî Hat. Hats can
+Hats are organized in hierarchies, with the root level of the hierarchy
+normally being occupied by either the 'Group' Hat or 'Individual' Hat. Hats can
 be created in code or through the Party UI.
 
 A hat hierarchy for a library might look like:
