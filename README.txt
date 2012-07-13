@@ -26,10 +26,9 @@ Dependencies:
 Installation
 ------------
 
-Install and enable the Party module (and dependencies Entity API, CTools,
-Views) using the usual Drupal module download/enable process. Typically the
-following Party sub-modules should be enabled: Party Hat, Party Profile, Party
-User.
+Install and enable the Party module as usual.
+For a typical installation, the following Party sub-modules should be enabled:
+Party Hat, Party Profile, Party User.
 
 ///////////////////////////////////////////////////////////////////////////////
 // Overview
