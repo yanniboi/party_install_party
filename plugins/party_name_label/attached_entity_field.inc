@@ -65,15 +65,6 @@ function party_attached_entity_field_label($party) {
     $return = html_entity_decode(strip_tags($return));
   }
   
-  if (empty($return)) {
-    if (!empty($party->pid)) {
-      $return = t('Party !pid', array('!pid' => $party->pid));
-    }
-    else {
-      $return = t('New Party');
-    }
-  }
-  
   return $return;
 }
 
