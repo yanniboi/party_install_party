@@ -59,7 +59,7 @@ class PartyDefaultDataSet {
    * @param party $party
    *   The party object.
    */
-  public function __construct($data_set, party $party) {
+  public function __construct($data_set, Party $party) {
     // Check that this is a valid data set
     if (party_get_data_set_info($data_set)) {
       $this->data_set = $data_set;
