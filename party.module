@@ -723,7 +723,7 @@ function party_party_party_pieces() {
 /**
  * Get the attached entity controller for a party.
  *
- * @param $party
+ * @param Party $party
  *  The party to get the data set for.
  * @param $data_set_name
  *  The name of a data set.
@@ -731,7 +731,7 @@ function party_party_party_pieces() {
  * @return
  *  The controller class, without attached entities loaded yet.
  */
-function party_get_crm_controller($party, $data_set_name) {
+function party_get_crm_controller(Party $party, $data_set_name) {
   $sets = party_get_data_set_info();
 
   // @todo: error handling
