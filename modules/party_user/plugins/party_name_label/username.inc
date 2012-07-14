@@ -29,8 +29,12 @@ $plugin = array(
  * Generate the label for a party.
  */
 function party_user_username_label($party) {
-  $attached_entity = reset($party->data_sets['user']);
-  $user = $attached_entity->entity;
+  $data_set_controller = party_get_crm_controller($party, 'user');
+  $user = $data_set_controller->getEntity();
+
+  if (!$user) {
+   return;
+  }
 
   return $user->name;
 }
