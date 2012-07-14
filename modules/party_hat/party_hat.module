@@ -296,23 +296,16 @@ function party_hat_get_all_hats($options = array()) {
     $query->propertyCondition('required', 1, '=');
   }
   $result = $query->execute();
-  $hids = array();
 
   if (!isset($result['party_hat']) || !is_array($result['party_hat'])) {
     return array();
   }
 
-  foreach ($result['party_hat'] as $record) {
-    $hids[] = $record->hid;
-  }
-
-  // Get the array keayed by hat name.
-  $tempHats = entity_load('party_hat', $hids);
+  // Get the array keyed by hat name.
   $hats = array();
-  foreach ($tempHats as $hat) {
+  foreach (entity_load('party_hat', array_keys($result['party_hat'])) as $hat) {
     $hats[$hat->name] = $hat;
   }
-  unset($tempHats);
 
   return $hats;
 }
