@@ -37,8 +37,7 @@ function party_attached_entity_from_party_context($context, $conf) {
   $attached_entity = array_shift($attached_entities);
 
   if ($attached_entity !== NULL) {
-    $entity = $attached_entity->entity;
-    return ctools_context_create('entity:'.$entity_type, $entity);
+    return ctools_context_create('entity:'.$entity_type, $attached_entity);
   }
 }
 
