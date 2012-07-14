@@ -31,6 +31,9 @@ Party Hat, Party Profile, Party User.
 Overview
 ========
 
+What follows is a brief overview of some of the concepts used in Party. For
+more detail, see the Party documentation at http://drupal.org/node/1600330.
+
 Data Sets
 ---------
 
