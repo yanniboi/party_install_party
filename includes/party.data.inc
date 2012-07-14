@@ -574,6 +574,9 @@ class PartyDefaultDataSet {
     }
     $query->execute();
 
+    // Update the label whenever attached entities are changed.
+    entity_get_controller('party')->setLabel($this->party);
+
     // Fire any post attach logic
     $this->postSave($save_entities);
 
