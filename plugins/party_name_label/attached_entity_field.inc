@@ -46,7 +46,7 @@ function party_attached_entity_field_label($party) {
   else {
     $entity = $party;
     $entity_type = 'party';
-    $entity_bundle = $party->type;
+    $entity_bundle = 'party';
   }
 
   if ($entity) {
