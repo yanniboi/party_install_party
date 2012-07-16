@@ -8,3 +8,4 @@ files[] = party_hat.admin.inc
 files[] = party_hat.devel_generate.inc
 files[] = includes/party_hat.entity.inc
 files[] = party_hat.rules.inc
+files[] = tests/party_hat.test

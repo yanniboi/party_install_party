@@ -22,8 +22,8 @@ files[] = includes/views/party_handler_filter_party_attached_entity_type.inc
 files[] = includes/views/party_handler_filter_party_attached_entity_bundle.inc
 files[] = includes/views/party_handler_field_delete_link.inc
 files[] = includes/views/party_handler_relationship_party_attached_eid.inc
+files[] = tests/party.test
 
 dependencies[] = entity
 dependencies[] = ctools
 dependencies[] = views
-

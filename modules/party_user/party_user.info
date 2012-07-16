@@ -9,3 +9,4 @@ files[] = party_user.admin.inc
 files[] = party_user.batch.inc
 files[] = includes/party_user.data.inc
 files[] = includes/party_user.data_ui.inc
+files[] = tests/party_user.test
