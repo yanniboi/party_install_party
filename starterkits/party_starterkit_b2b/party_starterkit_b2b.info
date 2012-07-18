@@ -7,5 +7,9 @@ dependencies[] = party
 dependencies[] = party_profile
 dependencies[] = party_user
 dependencies[] = field_helper
+dependencies[] = link
+dependencies[] = email
+dependencies[] = phone
+dependencies[] = addressfield
 
 files[] = party_starterkit_b2b.install
