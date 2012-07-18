@@ -1,5 +1,6 @@
 name = Party Simplenews Integration
 description = Integration with the SimpleNews module. Hopefully most of the code in here will eventually be generalised into a Party Mail module.
+package = "CRM"
 core = 7.x
 
 files[] = party_subscription_settings.entity.inc
