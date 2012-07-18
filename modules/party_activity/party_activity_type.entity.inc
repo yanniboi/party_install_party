@@ -9,7 +9,7 @@
 class PartyActivityType extends Entity {
   public $type;
   public $label;
-  
+
   public function __construct($values = array()) {
     parent::__construct($values, 'party_activity_type');
   }

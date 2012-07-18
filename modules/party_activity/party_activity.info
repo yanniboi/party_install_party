@@ -1,6 +1,5 @@
 name = Party Activities
 description = Party Activity/Task Management System
-package = "CRM"
 core = 7.x
 
 dependencies[] = party

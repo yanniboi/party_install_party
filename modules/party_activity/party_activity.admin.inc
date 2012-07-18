@@ -148,7 +148,6 @@ function party_activity_form_wrapper($activity) {
   return drupal_get_form('party_activity_edit_form', $activity);
 }
 
-
 /**
  * Form callback wrapper: delete a party activity.
  *
@@ -222,7 +221,6 @@ function party_activity_edit_form($form, &$form_state, $activity) {
   return $form;
 }
 
-
 /**
  * Form API validate callback for the party_activity form
  */
@@ -232,7 +230,6 @@ function party_activity_edit_form_validate(&$form, &$form_state) {
   // Notify field widgets to validate their data.
   field_attach_form_validate('party_activity', $activity, $form, $form_state);
 }
-
 
 /**
  * Form API submit callback for the activity form.
@@ -263,7 +260,6 @@ function party_activity_edit_form_submit(&$form, &$form_state) {
 function party_activity_form_submit_delete(&$form, &$form_state) {
   $form_state['redirect'] = 'admin/community/activitiess/activity/' . $form_state['activity']->party_activity_id . '/delete';
 }
-
 
 /**
  * Form callback: confirmation form for deleting a activity.
@@ -304,8 +300,6 @@ function party_activity_delete_form_submit($form, &$form_state) {
   $form_state['redirect'] = 'admin/community/activities';
 }
 
-
-
 /**
  * Page to add activity Entities.
  *
@@ -315,7 +309,6 @@ function party_activity_add_page() {
   $controller = entity_ui_controller('party_activity');
   return $controller->addPage();
 }
-
 
 /**
  * Displays the list of available activity types for activity creation.
@@ -345,10 +338,6 @@ function theme_party_activity_add_list($variables) {
   return $output;
 }
 
-
-
-
-
 /**
  * Sets the breadcrumb for administrative activity pages.
  */
@@ -362,4 +351,3 @@ function party_activity_set_breadcrumb() {
 
   drupal_set_breadcrumb($breadcrumb);
 }
-

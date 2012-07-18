@@ -30,7 +30,7 @@ function party_activity_views_data_alter(&$data) {
       'handler' => 'party_activity_handler_delete_link_field',
     ),
   );
-  
+
   $data['party_activity']['operations'] = array(
     'field' => array(
       'title' => t('Operations links'),

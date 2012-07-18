@@ -7,26 +7,26 @@
  * The class used for Party Activity Entities
  */
 class PartyActivity extends Entity {
-  
+
   public function __construct($values = array()) {
     parent::__construct($values, 'party_activity');
   }
-  
+
   protected function defaultLabel() {
     return $this->title;
   }
-  
+
   protected function defaultUri() {
     return array('path' => 'activity/' . $this->party_activity_id);
   }
-  
+
 }
 
 /**
  * The controller class for Party Activities
  */
 class PartyActivityController extends EntityAPIController {
-  
+
   /**
    * Create a PartyActivity - we first set up the values that are specific to
    * our party_activity schema
@@ -39,7 +39,7 @@ class PartyActivityController extends EntityAPIController {
       'created' => mktime(),
       'modified' => mktime(),
     );
-    
+
     $activity = parent::create($values);
     return $activity;
   }

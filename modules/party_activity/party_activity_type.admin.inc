@@ -4,7 +4,7 @@
  * @file
  * Party Activity Type editing UI
  */
- 
+
 /**
  * UI Controller
  */

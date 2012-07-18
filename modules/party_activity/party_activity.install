@@ -41,7 +41,7 @@ function party_activity_schema() {
       'type' => array('type'),
     ),
   );
-  
+
   $schema['party_activity'] = array(
     'description' => 'Stores information about Party Activities',
     'fields' => array(
@@ -88,6 +88,6 @@ function party_activity_schema() {
       'type' => array('type'),
     ),
   );
-  
+
   return $schema;
 }
