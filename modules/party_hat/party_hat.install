@@ -24,6 +24,13 @@ function party_hat_schema() {
         'not null' => TRUE,
         'default' => '',
       ),
+      'parent' => array(
+        'description' => "The machine readable name of the hat's parent.",
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+      ),
       'label' => array(
         'description' => 'A human readable name for the hat',
         'type' => 'varchar',
@@ -313,4 +320,19 @@ function party_hat_update_7006() {
   );
 
   db_add_field('party_hat', 'description', $field);
+}
+
+/**
+ * Add a parent field to the party hat table
+ */
+function party_hat_update_7007() {
+  $spec = array(
+    'description' => "The machine readable name of the hat's parent",
+    'type' => 'varchar',
+    'length' => '255',
+    'not null' => TRUE,
+    'default' => '',
+  );
+
+  db_add_field('party_hat', 'parent', $spec);
 }

@@ -48,6 +48,33 @@ function party_hat_form($form, &$form_state, $hat, $op = 'edit') {
     '#default_value' => isset($hat->description) ? $hat->description : '',
   );
 
+  $parents = party_hat_get_tree();
+  $descendants = isset($hat->name) ? party_hat_get_tree($hat->name) : array();
+  $options = array(
+    '' => t('--No Parent--'),
+  );
+  foreach ($parents as $parent) {
+    // Don't include this hat in the options.
+    if (isset($hat->name) && $parent->name == $hat->name) {
+      continue;
+    }
+
+    // Don't include hats that are descendents of this hat in the options.
+    if (isset($descendants[$parent->name])) {
+      continue;
+    }
+
+    $options[$parent->name] = str_repeat('-', $parent->depth) . $parent->label;
+  }
+
+  $form['parent'] = array(
+    '#type' => 'select',
+    '#title' => t('Parent'),
+    '#options' => $options,
+    '#default_value' => isset($hat->parent) ? $hat->parent : NULL,
+    '#description' => t('The parent hat for this hat.'),
+  );
+
   field_attach_form('party_hat', $hat, $form, $form_state);
 
   $form['required'] = array(

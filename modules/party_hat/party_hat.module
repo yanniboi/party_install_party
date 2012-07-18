@@ -311,6 +311,104 @@ function party_hat_get_all_hats($options = array()) {
 }
 
 /**
+ * Build a hierarchical representation of hats.
+ *
+ * @param $parent
+ *   (optional) A $hat entity. If set, the subtree of this hat is returned.
+ *
+ * @return
+ *   An array of PartyHat entities that are children of $parent, in depth-first
+ *   order. The hat objects are augmented with the following properties:
+ *    - 'depth': the depth relative to the $parent
+ *    - 'parents': an array of the hat's parents.
+ */
+function party_hat_get_tree($parent = '', $max_depth = NULL) {
+  $children = &drupal_static(__FUNCTION__, array());
+  $parents = &drupal_static(__FUNCTION__ . ':parents', array());
+  $hats = &drupal_static(__FUNCTION__ . ':hats', array());
+
+  // We cache trees, so it's not CPU-intensive to call get_tree() on a term
+  // and its children, too.
+  if (empty($children)) {
+    $children = array();
+    $parents = array();
+    $hats = array();
+
+    $hats = party_hat_get_all_hats();
+    foreach ($hats as $hat) {
+      // If the parent is empty, fill it with an empty string. This helps us
+      // search from the very top of the tree and gets removed later.
+      if (empty($hat->parent)) {
+        $hat->parent = '';
+      }
+
+      $children[$hat->parent][] = $hat->name;
+      $parents[$hat->name][] = $hat->parent;
+    }
+  }
+
+  $max_depth = (!isset($max_depth)) ? count($children) : $max_depth;
+  $tree = array();
+
+  // Keeps track of the parents we have to process, the last entry is used
+  // for the next processing step.
+  $process_parents = array();
+  $process_parents[] = (is_object($parent)) ? $parent->name : $parent;
+
+  // Loops over the parent terms and adds its children to the tree array.
+  // Uses a loop instead of a recursion, because it's more efficient.
+  while (count($process_parents)) {
+    $parent = array_pop($process_parents);
+    // The number of parents determines the current depth.
+    $depth = count($process_parents);
+    if ($max_depth > $depth && !empty($children[$parent])) {
+      $has_children = FALSE;
+      $child = current($children[$parent]);
+      do {
+        if (empty($child)) {
+          break;
+        }
+        $hat = $hats[$child];
+        if (isset($parents[$hat->name])) {
+          // Clone the term so that the depth attribute remains correct
+          // in the event of multiple parents.
+          // @todo Remove IF we're not allowing multiple parents.
+          $hat = clone $hat;
+        }
+        $hat->depth = $depth;
+        unset($hat->parent);
+        // Filter out the empty string parents.
+        $hat->parents = array_filter($parents[$hat->name]);
+        $tree[$hat->name] = $hat;
+        if (!empty($children[$hat->name])) {
+          $has_children = TRUE;
+
+          // We have to continue with this parent later.
+          $process_parents[] = $parent;
+          // Use the current hat as parent for the next iteration.
+          $process_parents[] = $hat->name;
+
+          // Reset pointers for child lists because we step in there more often
+          // with multi parents.
+          reset($children[$hat->name]);
+          // Move pointer so that we get the correct hat the next time.
+          next($children[$parent]);
+          break;
+        }
+      } while ($child = next($children[$parent]));
+
+      if (!$has_children) {
+        // We processed all terms in this hierarchy-level, reset pointer
+        // so that this function works the next time it gets called.
+        reset($children[$parent]);
+      }
+    }
+  }
+
+  return $tree;
+}
+
+/**
  * Assign a number of hats to a party
  *
  * @param $party
@@ -463,10 +561,10 @@ function party_hat_widget_info_alter(&$info) {
  * Implements hook_options_list().
  */
 function party_hat_options_list($field, $instance, $entity_type, $entity) {
-  $hats = party_hat_get_all_hats();
+  $hats = party_hat_get_tree();
   $options = array();
   foreach ($hats as $hat) {
-    $options[$hat->name] = $hat->label;
+    $options[$hat->name] = str_repeat('-', $hat->depth) . $hat->label;
   }
 
   return $options;
