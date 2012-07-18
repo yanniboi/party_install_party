@@ -1,0 +1,11 @@
+name = "Party B2B Starterkit"
+description = "A Business to Business install of Party"
+package = "CRM"
+core = 7.x
+
+dependencies[] = party
+dependencies[] = party_profile
+dependencies[] = party_user
+dependencies[] = field_helper
+
+files[] = party_starterkit_b2b.install

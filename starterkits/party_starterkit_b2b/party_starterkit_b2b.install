@@ -1,0 +1,224 @@
+<?php
+/**
+ * @file Party Starterkit B2B install file
+ */
+
+/**
+ * Implements hook_install().
+ */
+function party_starterkit_b2b_install() {
+  field_helper_install_all('party_starterkit_b2b');
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function party_starterkit_b2b_uninstall() {
+  field_helper_uninstall_all('party_starterkit_b2b');
+}
+
+/**
+ * Implements hook_install_fields().
+ *
+ * @see field_helper module
+ */
+function party_starterkit_b2b_install_fields() {
+  $fields = array();
+
+  // Organization name field
+  $fields['party_org_name'] = array(
+    'field_name' => 'party_org_name',
+    'type' => 'text',
+    'cardinality' => 1,
+  );
+
+  // Organization link field
+  $fields['party_org_web'] = array(
+    'field_name' => 'party_org_web',
+    'type' => 'link_field',
+    'cardinality' => 1,
+  );
+
+  // Organization email field
+  $fields['party_org_email'] = array(
+    'field_name' => 'party_org_email',
+    'type' => 'email',
+    'cardinality' => 1,
+  );
+
+  // Organization address
+  $fields['party_org_address'] = array(
+    'field_name' => 'party_org_address',
+    'type' => 'addressfield',
+    'cardinality' => 3,
+  );
+
+  // Organization phone
+  $fields['party_org_phone'] = array(
+    'field_name' => 'party_org_phone',
+    'type' => 'phone',
+    'cardinality' => 3,
+    'settings' => array(
+      'country' => 'ca',
+    ),
+  );
+
+  // Contact name field
+  $fields['party_contact_name'] = array(
+    'field_name' => 'party_contact_name',
+    'type' => 'text',
+    'cardinality' => 1,
+  );
+
+  // Contact link field
+  $fields['party_contact_web'] = array(
+    'field_name' => 'party_contact_web',
+    'type' => 'link_field',
+    'cardinality' => 1,
+  );
+
+  // Contact email field
+  $fields['party_contact_email'] = array(
+    'field_name' => 'party_contact_email',
+    'type' => 'email',
+    'cardinality' => 1,
+  );
+
+  // Contact address
+  $fields['party_contact_address'] = array(
+    'field_name' => 'party_contact_address',
+    'type' => 'addressfield',
+    'cardinality' => 3,
+  );
+
+  // Contact phone
+  $fields['party_contact_phone'] = array(
+    'field_name' => 'party_contact_phone',
+    'type' => 'phone',
+    'cardinality' => 3,
+    'settings' => array(
+            'country' => 'ca',
+    ),
+  );
+
+  return $fields;
+}
+
+/**
+ * Implements hook_install_instances().
+ */
+function party_starterkit_b2b_install_instances() {
+  $t = get_t();
+
+  $instances = array();
+
+  $instances['party_org_name'] = array(
+    'entity_type' => 'profile2',
+    'bundle' => 'party_org',
+    'field_name' => 'party_org_name',
+    'label' => $t('Name'),
+    'description' => $t('The name of this organization.'),
+    'widget' => array(
+       'type' => 'text_textfield',
+     ),
+  );
+
+  $instances['party_org_web'] = array(
+    'entity_type' => 'profile2',
+    'bundle' => 'party_org',
+    'field_name' => 'party_org_web',
+    'label' => $t('Website'),
+    'description' => $t("The organization's website."),
+    'widget' => array(
+      'type' => 'link_field',
+    ),
+  );
+
+  $instances['party_org_email'] = array(
+    'entity_type' => 'profile2',
+    'bundle' => 'party_org',
+    'field_name' => 'party_org_email',
+    'label' => $t('Email'),
+    'description' => $t("The organization's email address."),
+    'widget' => array(
+      'type' => 'email_textfield',
+    ),
+  );
+
+  $instances['party_org_address'] = array(
+    'entity_type' => 'profile2',
+    'bundle' => 'party_org',
+    'field_name' => 'party_org_address',
+    'label' => $t('Address'),
+    'description' => $t("The organization's address."),
+    'widget' => array(
+      'type' => 'addressfield_standard',
+    ),
+  );
+
+  $instances['party_org_phone'] = array(
+    'entity_type' => 'profile2',
+    'bundle' => 'party_org',
+    'field_name' =>'party_org_phone',
+    'label' => $t('Phone Number'),
+    'widget' => array(
+      'type' => 'phone_textfield'
+    ),
+  );
+
+  $instances['party_contact_name'] = array(
+    'entity_type' => 'profile2',
+    'bundle' => 'party_contact',
+    'field_name' => 'party_contact_name',
+    'label' => $t('Name'),
+    'description' => $t('The name of this contact.'),
+    'widget' => array(
+      'type' => 'text_textfield',
+    ),
+  );
+
+  $instances['party_contact_web'] = array(
+    'entity_type' => 'profile2',
+    'bundle' => 'party_contact',
+    'field_name' => 'party_contact_web',
+    'label' => $t('Website'),
+    'description' => $t("The contact's website."),
+    'widget' => array(
+      'type' => 'link_field',
+    ),
+  );
+
+  $instances['party_contact_email'] = array(
+    'entity_type' => 'profile2',
+    'bundle' => 'party_contact',
+    'field_name' => 'party_contact_email',
+    'label' => $t('Email'),
+    'description' => $t("The contact's email address."),
+    'widget' => array(
+      'type' => 'email_textfield',
+    ),
+  );
+
+  $instances['party_contact_address'] = array(
+    'entity_type' => 'profile2',
+    'bundle' => 'party_contact',
+    'field_name' => 'party_contact_address',
+    'label' => $t('Address'),
+    'description' => $t("The contact's address."),
+    'widget' => array(
+      'type' => 'addressfield_standard',
+    ),
+  );
+
+  $instances['party_contact_phone'] = array(
+    'entity_type' => 'profile2',
+    'bundle' => 'party_contact',
+    'field_name' =>'party_contact_phone',
+    'label' => $t('Phone Number'),
+    'widget' => array(
+      'type' => 'phone_textfield'
+    ),
+  );
+
+  return $instances;
+}

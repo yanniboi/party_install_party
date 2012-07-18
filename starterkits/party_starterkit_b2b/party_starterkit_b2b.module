@@ -1,0 +1,27 @@
+<?php
+/**
+ * @file Main file for the Party Kickstart
+ */
+
+/**
+ * Implements hook_default_profile2_type();
+ */
+function party_starterkit_b2b_default_profile2_type() {
+  $type = array();
+
+  // Organisation type
+  $types['party_org'] = new ProfileType(array(
+    'type' => 'party_org',
+    'label' => 'Organisation',
+    'weight' => 0,
+  ));
+
+  // Individual type
+  $types['party_contact'] = new ProfileType(array(
+    'type' => 'party_contact',
+    'label' => 'Contact',
+    'weight' => 1,
+  ));
+
+  return $types;
+}
