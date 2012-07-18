@@ -214,10 +214,24 @@ function party_hat_update_7002() {
  * Remove party types data from hats.
  */
 function party_hat_update_7003() {
-  $party_hats = party_hat_get_all_hats();
-  foreach ($party_hats as $hat) {
+  // Get all the hats.
+  $party_hats = db_select('party_hat', 'ph')
+    ->fields('ph', array('hid', 'data'))
+    ->execute()
+    ->fetchAllAssoc('hid');
+
+  foreach ($party_hats as $hid => $hat) {
+    $hat->data = unserialize($hat->data);
     unset($hat->data['party_types']);
-    party_hat_save($hat);
+    $hat->data = serialize($hat->data);
+
+    // Update the record.
+    db_update('party_hat')
+      ->fields(array(
+        'data' => $hat->data,
+      ))
+      ->condition('hid', $hid)
+      ->execute();
   }
 }
 
@@ -225,8 +239,15 @@ function party_hat_update_7003() {
  * Migrate data from {party_hat_data_set_rules} table to hat entity data.
  */
 function party_hat_update_7004() {
-  $party_hats = party_hat_get_all_hats();
-  foreach ($party_hats as $hat) {
+  $party_hats = db_select('party_hat', 'ph')
+    ->fields('ph', array('hid', 'name', 'data'))
+    ->execute()
+    ->fetchAllAssoc('hid');
+
+  foreach ($party_hats as $hid => $hat) {
+    // Prepare the hat data to be worked with.
+    $hat->data = unserialize($hat->data);
+
     $results = db_select('party_hat_data_set_rules', 'c')
       ->fields('c', array('data_set', 'has', 'multiple'))
       ->condition('hat', $hat->name, '=')
@@ -239,7 +260,15 @@ function party_hat_update_7004() {
       $hat->data['data_sets'][$data_set_name] = $data;
     }
 
-    party_hat_save($hat);
+    // Re-serialize the hat data ready to be saved.
+    $hat->data = serialize($hat->data);
+
+    db_update('party_hat', 'ph')
+      ->fields(array(
+        'data' => $hat->data,
+      ))
+      ->condition('hid', $hid)
+      ->execute();
   }
 
   db_delete('party_hat_data_set_rules');
@@ -249,11 +278,25 @@ function party_hat_update_7004() {
  * Filter out unused data sets in hat entity data.
  */
 function party_hat_update_7005() {
-  $party_hats = party_hat_get_all_hats();
-  foreach ($party_hats as $hat) {
+  $party_hats = db_select('party_hat', 'ph')
+    ->fields('ph', array('hid', 'data'))
+    ->execute()
+    ->fetchAllAssoc('hid');
+
+  foreach ($party_hats as $hid => $hat) {
+    $hat->data = unserialize($hat->data);
+
     $values = $hat->data['data_sets'];
     party_hat_set_data_set_rules($hat, $values);
-    party_hat_save($hat);
+
+    $hat->data = serialize($hat->data);
+
+    db_update('party_hat', 'ph')
+      ->fields(array(
+        'data' => $hat->data,
+      ))
+      ->condition('hid', $hid)
+      ->execute();
   }
 }
 
