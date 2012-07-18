@@ -1,6 +1,6 @@
 name = "Party B2B Starterkit"
 description = "A Business to Business install of Party"
-package = "CRM"
+package = "Party Starterkits"
 core = 7.x
 
 dependencies[] = party

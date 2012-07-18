@@ -1,6 +1,6 @@
 name = "Party Business to Business Migrate"
 description = "Example of migrating organizations and contacts to Party"
-package = "CRM"
+package = "Party Starterkits"
 core = 7.x
 
 dependencies[] = migrate
