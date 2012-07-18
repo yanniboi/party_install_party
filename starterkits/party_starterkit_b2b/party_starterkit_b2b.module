@@ -16,7 +16,7 @@ function party_starterkit_b2b_default_profile2_type() {
     'weight' => 0,
   ));
 
-  // Individual type
+  // Individual Contact type
   $types['party_contact'] = new ProfileType(array(
     'type' => 'party_contact',
     'label' => 'Contact',

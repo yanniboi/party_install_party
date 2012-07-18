@@ -1,0 +1,10 @@
+name = "Party Business to Business Migrate"
+description = "Example of migrating organizations and contacts to Party"
+package = "CRM"
+core = 7.x
+
+dependencies[] = migrate
+dependencies[] = migrate_extras
+
+files[] = party_starterkit_b2b_migrate_organizations.inc
+files[] = party_starterkit_b2b_migrate_contacts.inc
