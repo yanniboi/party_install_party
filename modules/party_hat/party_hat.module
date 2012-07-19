@@ -1,7 +1,7 @@
 <?php
 /**
  * @file party_hat.module
- * Provides an extensible access system for CRM parties.
+ * Provides an extensible access system for parties.
  */
 
 /**

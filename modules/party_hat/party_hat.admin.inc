@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains admin page callbacks for the CRM party hats module.
+ * Contains admin page callbacks for the party hats module.
  */
 
 /**
