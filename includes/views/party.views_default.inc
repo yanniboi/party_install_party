@@ -14,7 +14,7 @@ function party_views_default_views() {
   $view->description = '';
   $view->tag = 'default';
   $view->base_table = 'party';
-  $view->human_name = 'party_attached_entities';
+  $view->human_name = 'Party attached entities';
   $view->core = 7;
   $view->api_version = '3.0';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
