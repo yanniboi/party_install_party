@@ -13,7 +13,7 @@ function party_info() {
 }
 
 /**
- * Manage Data Sets Page
+ * Page callback for managing data sets.
  *
  * @todo: Get links on this page to always redirect back to this page.
  */
@@ -105,7 +105,6 @@ function party_settings_label_plugins_form($form, &$form_state) {
  *
  * @return
  *  An array of party label plugins sorted by weight.
- *
  */
 function party_settings_get_party_label_plugins() {
   // Get an array of the available label plugins.
@@ -135,13 +134,13 @@ function party_settings_label_plugins_form_submit($form, &$form_state) {
 }
 
 /**
- * Returns HTML for the vocabulary overview form as a sortable list of vocabularies.
+ * Themes the label plugin overview form as a sortable list of plugins.
  *
  * @param $variables
  *   An associative array containing:
  *   - form: A render element representing the form.
  *
- * @see taxonomy_overview_vocabularies()
+ * @see party_settings_label_plugins_form()
  * @ingroup themeable
  */
 function theme_party_settings_label_plugins_form($variables) {
@@ -177,7 +176,7 @@ function theme_party_settings_label_plugins_form($variables) {
 }
 
 /**
- * Get the Plugin settings form
+ * Get the Plugin settings form.
  */
 function party_settings_label_plugin_config_page($plugin_id) {
   // Get the label plugin.
@@ -225,13 +224,13 @@ function party_settings_pieces_order_form($form, &$form_state) {
 }
 
 /**
- * Returns HTML for the vocabulary overview form as a sortable list of vocabularies.
+ * Themes the pieces overview form as a sortable list of pieces.
  *
  * @param $variables
  *   An associative array containing:
  *   - form: A render element representing the form.
  *
- * @see taxonomy_overview_vocabularies()
+ * @see party_settings_pieces_order_form()
  * @ingroup themeable
  */
 function theme_party_settings_pieces_order_form($variables) {

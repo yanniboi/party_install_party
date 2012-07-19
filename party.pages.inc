@@ -4,7 +4,7 @@
  */
 
 /**
- * Page callback; displays a party.
+ * Page callback to display a party.
  *
  * @todo: replace this completely now we have party pieces as 2nd level tabs.
  * this should be... what? basic info about the party like creation date,
@@ -150,7 +150,7 @@ function party_edit_form_submit($form, &$form_state) {
 }
 
 /**
- * Attach entities and save the party
+ * Attach entities and save the party.
  *
  * @see party_edit_form_submit
  */
@@ -180,7 +180,7 @@ function party_edit_form_save($form, &$form_state) {
 }
 
 /**
- * Party delete form
+ * Party delete form.
  */
 function party_delete_form($form, &$form_state, $party) {
   $form_state['party'] = $party;
@@ -198,7 +198,7 @@ function party_delete_form($form, &$form_state, $party) {
 }
 
 /**
- * Submit the party delete form
+ * Submit handler for the party delete form.
  */
 function party_delete_form_submit($form, &$form_state) {
   $form_state['party']->delete();
@@ -215,7 +215,7 @@ function party_delete_form_submit($form, &$form_state) {
  * @see party_party_party_pieces().
  *
  * @param $party
- *    A loaded party object.
+ *   A loaded party object.
  * @param $data_set_name
  *   A data set name.
  */
@@ -441,7 +441,7 @@ function party_attached_entity_remove_confirm($form, &$form_state, $party, $data
 }
 
 /**
- * The data set remove submit
+ * Submit handler for the data set remove form.
  */
 function party_attached_entity_remove_confirm_submit($form, &$form_state) {
   $form_state['#attached_entity']->detach();
