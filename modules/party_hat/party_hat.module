@@ -93,7 +93,7 @@ function party_hat_uri($party_hat) {
 function party_hat_permission() {
   return array(
     'administer hats' => array(
-      'title' => t('Administer CRM party hats'),
+      'title' => t('Administer party hats'),
       'description' => t('TODO write me.'),
     ),
   );

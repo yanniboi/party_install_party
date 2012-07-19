@@ -1010,7 +1010,7 @@ function party_data_set_form($party, $data_set_name, $set_id = FALSE) {
 function party_permission() {
   $permissions = array(
     'administer crm settings' => array(
-      'title' => t('Administer CRM settings'),
+      'title' => t('Administer party settings'),
       'restrict access' => TRUE,
     ),
     'administer parties' =>  array(
