@@ -92,7 +92,7 @@ function party_schema() {
   );
 
 
-  // New, WIP table to connect parties to attached entities.
+  // Connect parties to attached entities.
   $schema['party_attached_entity'] = array(
     'description' => "This links parties to attached entities.",
     'fields' => array(
@@ -158,7 +158,7 @@ function party_schema() {
 }
 
 /**
- * Exportable schema fields
+ * Exportable schema fields.
  */
 function party_exportable_schema_fields() {
   return array(
@@ -181,7 +181,7 @@ function party_exportable_schema_fields() {
 }
 
 /**
- * Add a default value to party labels
+ * Add a default value to party labels.
  */
 function party_update_7021() {
   db_change_field('party', 'label', 'label', array(
