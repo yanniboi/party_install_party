@@ -25,3 +25,44 @@ function party_starterkit_b2b_default_profile2_type() {
 
   return $types;
 }
+
+/**
+ * Implements hook_default_party_hat().
+ */
+function party_starterkit_b2b_default_party_hat() {
+  $hats = array();
+
+  // Contact hat.
+  $hats['contact'] = new PartyHat(array(
+    'name' => 'contact',
+    'label' => 'Contact',
+    'description' => 'An individual contact.',
+    'parent' => '',
+    'weight' => 0,
+    'data' => array(
+      'data_sets' => array(
+        'profile2_party_contact' => array(
+          'has' => TRUE,
+        ),
+      ),
+    ),
+  ));
+
+  // Organization hat.
+  $hats['org'] = new PartyHat(array(
+    'name' => 'org',
+    'label' => 'Organization',
+    'description' => 'An organization contact.',
+    'parent' => '',
+    'weight' => 1,
+    'data' => array(
+      'data_sets' => array(
+        'profile2_party_org' => array(
+          'has' => TRUE,
+        ),
+      ),
+    ),
+  ));
+
+  return $hats;
+}
