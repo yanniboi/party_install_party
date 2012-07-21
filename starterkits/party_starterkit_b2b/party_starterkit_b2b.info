@@ -11,5 +11,6 @@ dependencies[] = link
 dependencies[] = email
 dependencies[] = phone
 dependencies[] = addressfield
+dependencies[] = relation
 
 files[] = views/party_starterkit_b2b.views_default.inc

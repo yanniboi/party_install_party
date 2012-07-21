@@ -9,7 +9,7 @@
 function party_starterkit_b2b_views_default_views() {
   $views = array();
 
-  // Contacts view
+  // Contacts view.
   $view = new view;
   $view->name = 'contacts';
   $view->description = '';
@@ -39,6 +39,12 @@ function party_starterkit_b2b_views_default_views() {
   $handler->display->display_options['relationships']['eid_profile2']['required'] = 0;
   $handler->display->display_options['relationships']['eid_profile2']['data_set'] = 'profile2_party_contact';
   $handler->display->display_options['relationships']['eid_profile2']['main'] = 0;
+  /* Relationship: Party: Relation: Employee of (party <-> party) */
+  $handler->display->display_options['relationships']['relation_employee_party']['id'] = 'relation_employee_party';
+  $handler->display->display_options['relationships']['relation_employee_party']['table'] = 'party';
+  $handler->display->display_options['relationships']['relation_employee_party']['field'] = 'relation_employee_party';
+  $handler->display->display_options['relationships']['relation_employee_party']['required'] = 0;
+  $handler->display->display_options['relationships']['relation_employee_party']['r_index'] = '0';
   /* Field: Party: Party ID */
   $handler->display->display_options['fields']['pid']['id'] = 'pid';
   $handler->display->display_options['fields']['pid']['table'] = 'party';
@@ -89,6 +95,58 @@ function party_starterkit_b2b_views_default_views() {
   $handler->display->display_options['fields']['label']['hide_empty'] = 0;
   $handler->display->display_options['fields']['label']['empty_zero'] = 0;
   $handler->display->display_options['fields']['label']['hide_alter_empty'] = 1;
+  /* Field: Party: Party ID */
+  $handler->display->display_options['fields']['pid_1']['id'] = 'pid_1';
+  $handler->display->display_options['fields']['pid_1']['table'] = 'party';
+  $handler->display->display_options['fields']['pid_1']['field'] = 'pid';
+  $handler->display->display_options['fields']['pid_1']['relationship'] = 'relation_employee_party';
+  $handler->display->display_options['fields']['pid_1']['label'] = '';
+  $handler->display->display_options['fields']['pid_1']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['pid_1']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['pid_1']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['pid_1']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['pid_1']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['pid_1']['alter']['replace_spaces'] = 0;
+  $handler->display->display_options['fields']['pid_1']['alter']['trim_whitespace'] = 0;
+  $handler->display->display_options['fields']['pid_1']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['pid_1']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['pid_1']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['pid_1']['alter']['more_link'] = 0;
+  $handler->display->display_options['fields']['pid_1']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['pid_1']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['pid_1']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['pid_1']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['pid_1']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['pid_1']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['pid_1']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['pid_1']['hide_alter_empty'] = 1;
+  $handler->display->display_options['fields']['pid_1']['separator'] = '';
+  $handler->display->display_options['fields']['pid_1']['format_plural'] = 0;
+  /* Field: Party: Label */
+  $handler->display->display_options['fields']['label_1']['id'] = 'label_1';
+  $handler->display->display_options['fields']['label_1']['table'] = 'party';
+  $handler->display->display_options['fields']['label_1']['field'] = 'label';
+  $handler->display->display_options['fields']['label_1']['relationship'] = 'relation_employee_party';
+  $handler->display->display_options['fields']['label_1']['label'] = 'Organization';
+  $handler->display->display_options['fields']['label_1']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['label_1']['alter']['make_link'] = 1;
+  $handler->display->display_options['fields']['label_1']['alter']['path'] = 'party/[pid_1]';
+  $handler->display->display_options['fields']['label_1']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['label_1']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['label_1']['alter']['replace_spaces'] = 0;
+  $handler->display->display_options['fields']['label_1']['alter']['trim_whitespace'] = 0;
+  $handler->display->display_options['fields']['label_1']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['label_1']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['label_1']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['label_1']['alter']['more_link'] = 0;
+  $handler->display->display_options['fields']['label_1']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['label_1']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['label_1']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['label_1']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['label_1']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['label_1']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['label_1']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['label_1']['hide_alter_empty'] = 1;
   /* Field: Profile: Email */
   $handler->display->display_options['fields']['party_contact_email']['id'] = 'party_contact_email';
   $handler->display->display_options['fields']['party_contact_email']['table'] = 'field_data_party_contact_email';

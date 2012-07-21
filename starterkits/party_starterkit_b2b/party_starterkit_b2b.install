@@ -8,6 +8,17 @@
  */
 function party_starterkit_b2b_install() {
   field_helper_install_all('party_starterkit_b2b');
+  
+  // Create the relation types
+  $employeeRelation = relation_type_create(array(
+    'relation_type' => 'employee',
+    'label' => 'Employee of',
+    'reverse_label' => 'Employs',
+    'directional' => TRUE,
+    'source_bundles' => array('party:party'),
+    'target_bundles' => array('party:party'),
+  ));
+  relation_type_save($employeeRelation);  
 }
 
 /**
@@ -15,6 +26,8 @@ function party_starterkit_b2b_install() {
  */
 function party_starterkit_b2b_uninstall() {
   field_helper_uninstall_all('party_starterkit_b2b');
+  
+  relation_type_delete('employee');
 }
 
 /**
