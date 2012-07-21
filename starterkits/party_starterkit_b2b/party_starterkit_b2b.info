@@ -12,4 +12,4 @@ dependencies[] = email
 dependencies[] = phone
 dependencies[] = addressfield
 
-files[] = party_starterkit_b2b.install
+files[] = views/party_starterkit_b2b.views_default.inc
