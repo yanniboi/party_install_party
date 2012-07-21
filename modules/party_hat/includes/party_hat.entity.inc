@@ -27,6 +27,10 @@ class PartyHatController extends EntityAPIControllerExportable {
  */
 class PartyHat extends Entity {
 
+  public function __construct($values = array()) {
+    parent::__construct($values, 'party_hat');
+  }
+
   protected function defaultLabel() {
     return $this->label;
   }
