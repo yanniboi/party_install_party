@@ -51,6 +51,10 @@ function party_profile_party_data_set_info() {
           'controller' => 'PartyDefaultDataSetUIAdd',
           'action label' => 'Add @data-set',
         ),
+        'attach' => array(
+          'controller' => 'PartyDefaultDataSetUIAttach',
+          'action label' => 'Attach existing @data-set',
+        ),
       ),
     );
   }
