@@ -1,15 +1,9 @@
 Introduction
 ------------
 
-The Party module provides an extremely flexible CRM solution for Drupal,
-utilizing a generic entity (the Party entity) to which other entities
-(Drupal Users, Profile2 profiles, eCommerce customers, Facebook profiles, etc.)
-can be attached.
-
-A Party entity does not have bundles and normally has no fields. It is simply
-a wrapper around other entities representing whatever, e.g. a Drupal User,
-CiviCRM Constituent, Facebook account, eCommerce Customer, Employee profile,
-etc. A Party may wrap one or more such entities.
+The Party module provides an extremely flexible CRM solution for Drupal, utilizing
+a generic entity (the Party entity) to which other entities (Drupal Users, Nodes,
+Profile2 profiles, eCommerce customers, Facebook profiles, etc.) can be attached.
 
 Requirements
 ------------
@@ -34,10 +28,27 @@ Overview
 What follows is a brief overview of some of the concepts used in Party. For
 more detail, see the Party documentation at http://drupal.org/node/1600330.
 
+The Party
+---------
+
+The Party entity is simply a wrapper around other entities representing whatever,
+e.g. a Drupal User, CiviCRM Constituent, Facebook account, eCommerce Customer,
+Employee profile, etc. A Party may wrap one or more such entities.
+
+A Party can represent an individual or an organization (multiple individuals).
+Entity relations are typically used for managing the individual/organization relationship.
+
+A Party entity does not have bundles and normally has no fields, except those used
+by the core Party module for tracking the entity attachments, or special purpose
+custom modules that enhance party core.
+
+
 Data Sets
 ---------
 
-Data sets define where a Party's data is stored. A data set specifies a particular entity type which may be connected to a party. This may be an entity type provided by another module, or one defined along with the data set.
+Data sets define where a Party's data is stored. A data set specifies a particular
+entity type which may be connected to a party. This may be an entity type provided
+by another module, or one defined along with the data set.
 
 Party provides submodules that define data sets for:
 
