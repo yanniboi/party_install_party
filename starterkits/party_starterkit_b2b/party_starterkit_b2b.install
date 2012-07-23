@@ -8,7 +8,7 @@
  */
 function party_starterkit_b2b_install() {
   field_helper_install_all('party_starterkit_b2b');
-  
+
   // Create the relation types
   $employeeRelation = relation_type_create(array(
     'relation_type' => 'employee',
@@ -18,7 +18,7 @@ function party_starterkit_b2b_install() {
     'source_bundles' => array('party:party'),
     'target_bundles' => array('party:party'),
   ));
-  relation_type_save($employeeRelation);  
+  relation_type_save($employeeRelation);
 }
 
 /**
@@ -26,7 +26,7 @@ function party_starterkit_b2b_install() {
  */
 function party_starterkit_b2b_uninstall() {
   field_helper_uninstall_all('party_starterkit_b2b');
-  
+
   relation_type_delete('employee');
 }
 
@@ -79,8 +79,16 @@ function party_starterkit_b2b_install_fields() {
   // Contact name field
   $fields['party_contact_name'] = array(
     'field_name' => 'party_contact_name',
-    'type' => 'text',
+    'type' => 'name',
     'cardinality' => 1,
+    'settings' => array(
+      'components' => array(
+        'generational' => FALSE,
+      ),
+      'labels' => array(
+        'given' => 'First Name',
+      ),
+    ),
   );
 
   // Contact link field
@@ -186,7 +194,7 @@ function party_starterkit_b2b_install_instances() {
     'label' => $t('Name'),
     'description' => $t('The name of this contact.'),
     'widget' => array(
-      'type' => 'text_textfield',
+      'type' => 'name_widget',
     ),
   );
 

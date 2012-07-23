@@ -29,7 +29,10 @@ class PartyB2BContactProfile2Migration extends Migration {
 
     // Field Mappings
     $this->addFieldMapping('uid')->defaultValue(0);
-    $this->addFieldMapping('party_contact_name','contact_last_name');
+    $this->addFieldMapping('party_contact_name','contact_first_name')
+      ->arguments(array(
+        'family' => array('source_field' => 'contact_last_name'),
+      ));
     $this->addFieldMapping('party_contact_email','contact_email');
     $this->addFieldMapping('party_contact_phone','contact_phone');
 
@@ -44,7 +47,6 @@ class PartyB2BContactProfile2Migration extends Migration {
     $this->addFieldMapping('field_address','contact_country')
         ->arguments($address_arguments);
 
-    $this->addUnmigratedSources(array('contact_first_name'));
     $this->addUnmigratedDestinations(array('revision_uid', 'language','path'));
   }
 
@@ -100,7 +102,7 @@ class PartyB2BContactPartyMigration extends Migration {
 
     // Field Mappings
     $this->addFieldMapping('profile2_id', 'contact_id')
-    ->sourceMigration('PartyB2BContactProfile2');
+      ->sourceMigration('PartyB2BContactProfile2');
   }
 
   /**
@@ -117,6 +119,11 @@ class PartyB2BContactPartyMigration extends Migration {
    * Attach profile2 from PartyOrganizationProfile2Migration
    */
   function complete($party, $row) {
+    // Set the contact hat.
+    $wrapper = entity_metadata_wrapper('party', $party);
+    $wrapper->party_hat->set('contact');
+    $wrapper->save();
+
     $profile2 = profile2_load($party->profile2_id);
     party_attach_entity($party, $profile2, 'profile2_party_contact');
   }

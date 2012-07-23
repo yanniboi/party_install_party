@@ -10,6 +10,7 @@ dependencies[] = field_helper
 dependencies[] = link
 dependencies[] = email
 dependencies[] = phone
+dependencies[] = name
 dependencies[] = addressfield
 dependencies[] = relation
 
