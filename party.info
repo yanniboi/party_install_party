@@ -3,7 +3,6 @@ description = An Entity that helps to manage Contacts
 core = 7.x
 package = CRM
 
-files[] = includes/contact.entity.inc
 files[] = party.pages.inc
 files[] = party.admin.inc
 files[] = party.rules.inc
@@ -11,7 +10,6 @@ files[] = includes/party.data.inc
 files[] = includes/party.data_ui.inc
 files[] = includes/party.entity.inc
 files[] = includes/party.ui.inc
-files[] = includes/party_type.entity.inc
 
 ; Views files
 files[] = includes/views/party.views.inc
