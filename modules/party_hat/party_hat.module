@@ -262,21 +262,19 @@ function party_hat_get_hats($party) {
   }
 
   $hats = array();
-  // If this is an unsaved party (one without an ID)...
-  if (!isset($party->pid)) {
-    //Get all the "required"/"default" hats for this party type.
+  $items = field_get_items('party', $party, 'party_hat');
+  
+  // If there are no hats set, lead the required ones.
+  if (empty($items)) {
     $options = array(
       'required' => TRUE,
     );
     return party_hat_get_all_hats($options);
   }
   else {
-    $items = field_get_items('party', $party, 'party_hat');
-    if ($items) {
-      foreach ($items as $item) {
-        $hat = party_hat_load($item['hat_name']);
-        $hats[$hat->name] = $hat;
-      }
+    foreach ($items as $item) {
+      $hat = party_hat_load($item['hat_name']);
+      $hats[$hat->name] = $hat;
     }
   }
 
