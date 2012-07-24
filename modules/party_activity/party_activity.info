@@ -1,6 +1,7 @@
 name = Party Activities
 description = Party Activity/Task Management System
 core = 7.x
+package = Party
 
 dependencies[] = party
 dependencies[] = views

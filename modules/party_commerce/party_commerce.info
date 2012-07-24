@@ -1,6 +1,6 @@
 name = Party Commerce
 description = [Incomplete] Integrates Commerce Customer Profiles with the party module
-package = CRM
+package = Party
 core = 7.x
 
 dependencies[] = commerce_customer

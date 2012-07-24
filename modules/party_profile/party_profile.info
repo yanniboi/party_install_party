@@ -1,6 +1,6 @@
 name = Party Profile
 description = Integrates profile2 with the party module
-package = CRM
+package = Party
 core = 7.x
 
 files[] = party_profile.pages.inc

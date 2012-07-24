@@ -1,7 +1,7 @@
 name = Party
 description = An Entity that helps to manage Contacts
 core = 7.x
-package = CRM
+package = Party
 
 files[] = party.pages.inc
 files[] = party.admin.inc
