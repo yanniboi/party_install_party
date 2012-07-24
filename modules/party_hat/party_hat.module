@@ -417,6 +417,11 @@ function party_hat_assign_hats($party, $hats) {
   // Get the hat items from the party object
   $hat_items = field_get_items('party', $party, 'party_hat');
 
+  // If there are no hats, set an empty array.
+  if (empty($hat_items)) {
+    $hat_items = array();
+  }
+
   foreach ($hats as $hat) {
     $has_hat = FALSE;
     foreach ($hat_items as $item) {
