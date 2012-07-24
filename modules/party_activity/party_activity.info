@@ -3,6 +3,8 @@ description = Party Activity/Task Management System
 core = 7.x
 package = Party
 
+dependencies[] = date
+dependencies[] = entityreference
 dependencies[] = party
 dependencies[] = views
 
