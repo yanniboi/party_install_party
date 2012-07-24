@@ -68,6 +68,33 @@ function party_starterkit_b2b_default_party_hat() {
 }
 
 /**
+ * Implement hook_default_party_activity_type().
+ */
+function party_starterkit_b2b_default_party_activity_type() {
+  $types = array();
+
+  // Meeting activity
+  $types['meeting'] = new PartyActivityType(array(
+    'type' => 'meeting',
+    'label' => 'Meeting',
+  ));
+
+  // Meeting activity
+  $types['task'] = new PartyActivityType(array(
+    'type' => 'task',
+    'label' => 'Task',
+  ));
+
+  // Meeting activity
+  $types['call'] = new PartyActivityType(array(
+    'type' => 'call',
+    'label' => 'Call',
+  ));
+
+  return $types;
+}
+
+/**
  * Implement hook_views_api().
  */
 function party_starterkit_b2b_views_api() {
