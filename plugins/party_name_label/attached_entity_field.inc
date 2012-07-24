@@ -50,23 +50,30 @@ function party_attached_entity_field_label($party) {
   }
 
   $return = FALSE;
-  
+
   if ($entity) {
     // Get our field and instance settings
     $field = field_info_field($field_name);
     $instance = field_info_instance($entity_type, $field_name, $entity_bundle);
     $instance['display']['default']['label'] = 'hidden';
 
-    // Get the field ittems and limit them to one item
-    $items = array(reset(field_get_items($entity_type, $entity, $field_name)));
+    // Get the field items and limit them to one item
+    $items = field_get_items($entity_type, $entity, $field_name);
+
+    // If there are no items return empty.
+    if (!$items) {
+      return;
+    }
+
+    $items = array(reset($items));
 
     // Get our rendered version of it
     $return = drupal_render(field_default_view($entity_type, $entity, $field, $instance, LANGUAGE_NONE, $items, 'default'));
-    
+
     // Convert html entities back into real input
     $return = html_entity_decode(strip_tags($return));
   }
-  
+
   return $return;
 }
 
