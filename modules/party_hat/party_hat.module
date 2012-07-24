@@ -263,7 +263,7 @@ function party_hat_get_hats($party) {
 
   $hats = array();
   $items = field_get_items('party', $party, 'party_hat');
-  
+
   // If there are no hats set, lead the required ones.
   if (empty($items)) {
     $options = array(
@@ -627,6 +627,18 @@ function party_hat_field_get_default($entity_type, $entity, $field, $instance, $
   }
 
   return $values;
+}
+
+// ----------------------------------------------------------------------------
+// Ctools Hooks
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function party_hat_ctools_plugin_directory($owner, $plugin_type) {
+  if ($owner == 'ctools' && $plugin_type == 'access') {
+    return "plugins/$plugin_type";
+  }
 }
 
 // ----------------------------------------------------------------------------
