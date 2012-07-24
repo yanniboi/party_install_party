@@ -49,6 +49,8 @@ function party_attached_entity_field_label($party) {
     $entity_bundle = 'party';
   }
 
+  $return = FALSE;
+  
   if ($entity) {
     // Get our field and instance settings
     $field = field_info_field($field_name);
