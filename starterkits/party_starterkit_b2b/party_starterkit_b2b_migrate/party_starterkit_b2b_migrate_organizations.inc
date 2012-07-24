@@ -163,6 +163,10 @@ class PartyB2BOrganizationPartyMigration extends Migration {
    * Attach profile2 from PartyOrganizationProfile2Migration
    */
   function complete($party, $row) {
+    // Set the contact hat.
+    $hat = party_hat_load('org');
+    party_hat_assign_hats($party, array($hat));
+
     $profile2 = profile2_load($party->profile2_id);
     party_attach_entity($party, $profile2, 'profile2_party_org');
   }

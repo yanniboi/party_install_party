@@ -22,10 +22,10 @@ class PartyB2BContactProfile2Migration extends Migration {
       MigrateDestinationProfile2::getKeySchema()
     );
 
-    $this->source = new MigrateSourceCSV(__DIR__ . '/org.csv', $this->csvcolumns(), array('header_rows'=>1));
+    $this->source = new MigrateSourceCSV(__DIR__ . '/contact.csv', $this->csvcolumns(), array('header_rows'=>1));
 
     // MigrateDestination
-    $this->destination = new MigrateDestinationProfile2('main');
+    $this->destination = new MigrateDestinationProfile2('party_contact');
 
     // Field Mappings
     $this->addFieldMapping('uid')->defaultValue(0);
@@ -44,7 +44,7 @@ class PartyB2BContactProfile2Migration extends Migration {
         'administrative_area' => array('source_field'=>'contact_state'),
         'postal_code' => array('source_field' => 'contact_zip'),
     );
-    $this->addFieldMapping('field_address','contact_country')
+    $this->addFieldMapping('party_contact_address','contact_country')
         ->arguments($address_arguments);
 
     $this->addUnmigratedDestinations(array('revision_uid', 'language','path'));
@@ -77,7 +77,7 @@ class PartyB2BContactPartyMigration extends Migration {
   public function __construct() {
     parent::__construct();
     $this->description = t('Migration of organizations from Profile2 to Party entities.');
-    $this->dependencies = array('PartyB2BContactProfile2');
+    $this->dependencies = array('PartyB2BContactProfile2', 'PartyB2BOrganizationParty');
 
     $this->map = new MigrateSQLMap($this->machineName,
       array(
@@ -92,7 +92,7 @@ class PartyB2BContactPartyMigration extends Migration {
 
     // MigrateSource
     // This should be the same CSV file as the MigrateSource for PartyOrganizationProfile2 migration.
-    $this->source = new MigrateSourceCSV(__DIR__ . '/org.csv', $this->csvcolumns(),array('header_rows'=>1));
+    $this->source = new MigrateSourceCSV(__DIR__ . '/contact.csv', $this->csvcolumns(),array('header_rows'=>1));
 
     // MigrateDestination
     $this->destination = new MigrateDestinationEntityAPI(
@@ -103,6 +103,8 @@ class PartyB2BContactPartyMigration extends Migration {
     // Field Mappings
     $this->addFieldMapping('profile2_id', 'contact_id')
       ->sourceMigration('PartyB2BContactProfile2');
+    $this->addfieldMapping('org_id', 'org_id')
+      ->sourceMigration('PartyB2BOrganizationParty');
   }
 
   /**
@@ -111,6 +113,7 @@ class PartyB2BContactPartyMigration extends Migration {
    * @return multitype:string multitype:string
    */
   function csvcolumns() {
+    $columns[0] = array('org_id', 'Organization ID');
     $columns[11] = array('contact_id', 'Contact ID');
     return $columns;
   }
@@ -120,11 +123,19 @@ class PartyB2BContactPartyMigration extends Migration {
    */
   function complete($party, $row) {
     // Set the contact hat.
-    $wrapper = entity_metadata_wrapper('party', $party);
-    $wrapper->party_hat->set('contact');
-    $wrapper->save();
+    $hat = party_hat_load('contact');
+    party_hat_assign_hats($party, array($hat));
 
+    // Attach the profile 2
     $profile2 = profile2_load($party->profile2_id);
     party_attach_entity($party, $profile2, 'profile2_party_contact');
+
+    // Make a relation
+    $relation = relation_create('employee', array(
+      array('entity_type' => 'party', 'entity_id' => $party->pid),
+      array('entity_type' => 'party', 'entity_id' => $party->org_id),
+    ));
+
+    relation_save($relation);
   }
 }
