@@ -63,14 +63,14 @@ function party_starterkit_b2b_install_fields() {
   $fields['party_org_address'] = array(
     'field_name' => 'party_org_address',
     'type' => 'addressfield',
-    'cardinality' => 3,
+    'cardinality' => FIELD_CARDINALITY_UNLIMITED,
   );
 
   // Organization phone
   $fields['party_org_phone'] = array(
     'field_name' => 'party_org_phone',
     'type' => 'phone',
-    'cardinality' => 3,
+    'cardinality' => FIELD_CARDINALITY_UNLIMITED,
     'settings' => array(
       'country' => 'ca',
     ),
@@ -83,10 +83,20 @@ function party_starterkit_b2b_install_fields() {
     'cardinality' => 1,
     'settings' => array(
       'components' => array(
+        'title' => 'title',
+        'given' => 'given',
+        'middle' => 'middle',
+        'family' => 'family',
         'generational' => FALSE,
+        'credentials' => 'credentials',
       ),
       'labels' => array(
+        'title' => 'Title',
         'given' => 'First Name',
+        'middle' => 'Middle Name(s)',
+        'family' => 'Last Name',
+        'generational' => 'Generational',
+        'credentials' => 'Credentials',
       ),
     ),
   );
@@ -109,16 +119,16 @@ function party_starterkit_b2b_install_fields() {
   $fields['party_contact_address'] = array(
     'field_name' => 'party_contact_address',
     'type' => 'addressfield',
-    'cardinality' => 3,
+    'cardinality' => FIELD_CARDINALITY_UNLIMITED,
   );
 
   // Contact phone
   $fields['party_contact_phone'] = array(
     'field_name' => 'party_contact_phone',
     'type' => 'phone',
-    'cardinality' => 3,
+    'cardinality' => FIELD_CARDINALITY_UNLIMITED,
     'settings' => array(
-            'country' => 'ca',
+      'country' => 'ca',
     ),
   );
 
