@@ -121,19 +121,7 @@ function party_hat_save(&$hat) {
  *  A hat entity object.
  */
 function party_hat_load($hat_name) {
-  $query = db_select('party_hat', 'ph');
-  $query->addField('ph', 'hid');
-  $result = $query->condition('name', $hat_name, '=')
-    ->execute()
-    ->fetchAllAssoc('hid');
-
-  $ids = array_keys($result);
-
-  // @todo WTF? If $hat_name can be a numeric id it needs to be documented.
-  if (count($ids) < 1 && is_numeric($hat_name)) {
-    $ids = array($hat_name);
-  }
-  $party_hats = party_hat_load_multiple($ids);
+  $party_hats = entity_load_multiple_by_name('party_hat', array($hat_name));
   return reset($party_hats);
 }
 
