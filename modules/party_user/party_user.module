@@ -134,6 +134,12 @@ function party_user_permission() {
  * Implements hook_party_access()
  */
 function party_user_party_access($op, $party, $data_set, $account) {
+  // If we haven't been passed a party, it's outside of the scope of these
+  // checks.
+  if (!isset($party)) {
+    return NULL;
+  }
+
   // Set the data_set_name
   if (isset($data_set)) {
     $data_set_name = $data_set['set_name'];
