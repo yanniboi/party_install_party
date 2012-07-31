@@ -944,7 +944,7 @@ function party_get_data_set($party, $data_set_name, $create = FALSE) {
   $entity_ids = $data_set_controller->getEntityIds();
   if ($create && empty($entity_ids)) {
     $entity = $data_set_controller->createEntity();
-    $data_set_controller->attach($entity);
+    $data_set_controller->attachEntity($entity);
   }
 
   return $data_set_controller;
