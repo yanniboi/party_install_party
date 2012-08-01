@@ -500,24 +500,21 @@ function party_party_access($op, $party = NULL, $data_set = NULL, $account = NUL
     switch ($op) {
       case 'view':
         $permission_string = 'view party attached ' . $data_set_name;
-        $permission_access = user_access($permission_string, $account);
         break;
       case 'edit':
         $permission_string = 'edit party attached ' . $data_set_name;
-        $permission_access = user_access($permission_string, $account);
         break;
       case 'detach':
         $permission_string = 'detach party attached ' . $data_set_name;
-        $permission_access = user_access($permission_string, $account);
         break;
       case 'attach':
       case 'add':
         $permission_string = 'attach party ' . $data_set_name;
-        $permission_access = user_access($permission_string, $account);
         break;
-      default:
-        // Reject anything else
-        $permission_access = FALSE;
+    }
+
+    if (isset($permission_string) && user_access($permission_string, $account)) {
+      $permission_access = TRUE;
     }
 
     // Determine what data set info has to say about this.
@@ -568,12 +565,22 @@ function party_party_access($op, $party = NULL, $data_set = NULL, $account = NUL
   }
 
   // Combine access results if applicable.
-  if (isset($data_access)) {
+  // We have two permission variables that may or may not be set.
+  // If they are both set we return FALSE if either is FALSE, and TRUE if both
+  // are TRUE.
+  if (isset($permission_access) && isset($data_access)) {
     return $permission_access && $data_access;
   }
-  else {
+  // If only one is set, we return whatever it's value is.
+  if (isset($data_access)) {
+    return $data_access;
+  }
+  if (isset($permission_access)) {
     return $permission_access;
   }
+
+  // If neither was set, this function has nothing to say, so return NULL
+  return NULL;
 }
 
 /**
