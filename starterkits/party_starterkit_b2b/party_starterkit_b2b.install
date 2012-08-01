@@ -101,13 +101,6 @@ function party_starterkit_b2b_install_fields() {
     ),
   );
 
-  // Contact link field
-  $fields['party_contact_web'] = array(
-    'field_name' => 'party_contact_web',
-    'type' => 'link_field',
-    'cardinality' => 1,
-  );
-
   // Contact email field
   $fields['party_contact_email'] = array(
     'field_name' => 'party_contact_email',
@@ -160,6 +153,9 @@ function party_starterkit_b2b_install_instances() {
     'field_name' => 'party_org_web',
     'label' => $t('Website'),
     'description' => $t("The organization's website."),
+    'settings' => array(
+      'title' => 'none',
+    ),
     'widget' => array(
       'type' => 'link_field',
     ),
@@ -192,6 +188,9 @@ function party_starterkit_b2b_install_instances() {
     'bundle' => 'party_org',
     'field_name' =>'party_org_phone',
     'label' => $t('Phone Number'),
+    'settings' => array(
+      'ca_phone_parentheses' => 0,
+    ),
     'widget' => array(
       'type' => 'phone_textfield'
     ),
@@ -205,17 +204,6 @@ function party_starterkit_b2b_install_instances() {
     'description' => $t('The name of this contact.'),
     'widget' => array(
       'type' => 'name_widget',
-    ),
-  );
-
-  $instances['party_contact_web'] = array(
-    'entity_type' => 'profile2',
-    'bundle' => 'party_contact',
-    'field_name' => 'party_contact_web',
-    'label' => $t('Website'),
-    'description' => $t("The contact's website."),
-    'widget' => array(
-      'type' => 'link_field',
     ),
   );
 
@@ -246,6 +234,9 @@ function party_starterkit_b2b_install_instances() {
     'bundle' => 'party_contact',
     'field_name' =>'party_contact_phone',
     'label' => $t('Phone Number'),
+    'settings' => array(
+      'ca_phone_parentheses' => 0,
+    ),
     'widget' => array(
       'type' => 'phone_textfield'
     ),
