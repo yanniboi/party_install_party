@@ -61,6 +61,7 @@ class PartyHatTestCase extends PartyBaseTestCase {
     $edit = array();
     $edit['label'] = $hat_label;
     $edit['name'] = $hat_machine_name;
+    $edit['description'] = "A test hat.";
     $edit['data_set_rules[profile2_main][has]'] = TRUE;
     $this->drupalPost('admin/community/hats/add', $edit, t('Save'));
     // Assert that the Party Hat form submitted successfully and the Party was
@@ -111,6 +112,7 @@ class PartyHatTestCase extends PartyBaseTestCase {
     $values = array(
             'name' => $hat_machine_name, // machine name
             'label' => $hat_label, // human readable label of the hat
+            'description' => 'A test hat.',
             'data' => array(
                     'profile2_main' => array( //use main profile
                             'has' => 1,
