@@ -6,6 +6,7 @@ package = Party
 files[] = party.pages.inc
 files[] = party.admin.inc
 files[] = party.rules.inc
+files[] = includes/entityreference/party.entityreference.inc
 files[] = includes/party.data.inc
 files[] = includes/party.data_ui.inc
 files[] = includes/party.entity.inc
