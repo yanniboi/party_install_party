@@ -23,6 +23,13 @@ function party_starterkit_b2b_default_profile2_type() {
     'weight' => 1,
   ));
 
+  // Notes Profile
+  $types['party_notes'] = new ProfileType(array(
+    'type' => 'party_notes',
+    'label' => 'Notes',
+    'weight' => 2,
+  ));
+
   return $types;
 }
 
@@ -44,6 +51,9 @@ function party_starterkit_b2b_default_party_hat() {
         'profile2_party_contact' => array(
           'has' => TRUE,
         ),
+        'profile2_party_notes' => array(
+          'has' => TRUE,
+        ),
       ),
     ),
   ));
@@ -58,6 +68,9 @@ function party_starterkit_b2b_default_party_hat() {
     'data' => array(
       'data_sets' => array(
         'profile2_party_org' => array(
+          'has' => TRUE,
+        ),
+        'profile2_party_notes' => array(
           'has' => TRUE,
         ),
       ),

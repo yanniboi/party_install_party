@@ -124,6 +124,13 @@ function party_starterkit_b2b_install_fields() {
       'country' => 'ca',
     ),
   );
+  
+  // Notes notes
+  $fields['party_notes_notes'] = array(
+    'field_name' => 'party_notes_notes',
+    'type' => 'text_long',
+    'cardinality' => 1,    
+  );
 
   return $fields;
 }
@@ -239,6 +246,22 @@ function party_starterkit_b2b_install_instances() {
     ),
     'widget' => array(
       'type' => 'phone_textfield'
+    ),
+  );
+  
+  $instances['party_notes_notes'] = array(
+    'entity_type' => 'profile2',
+    'bundle' => 'party_notes',
+    'field_name' => 'party_notes_notes',
+    'label' => $t('Notes'),
+    'settings' => array(
+      'text_processing' => 0,
+    ),
+    'widget' => array(
+      'type' => 'text_textarea',
+      'settings' => array(
+        'rows' => 5,
+      ),
     ),
   );
 
