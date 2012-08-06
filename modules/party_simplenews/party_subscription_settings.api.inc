@@ -113,7 +113,7 @@ function party_subscription_settings_edit_form($form, &$form_state, &$attached_e
   }
 
   $simplenews_form = array();
-  // Get all the emails on the party
+  // Get all the emails on the party.
   $emails = party_get_all_emails($party);
 
   foreach ($emails as $key => $email) {
@@ -121,7 +121,7 @@ function party_subscription_settings_edit_form($form, &$form_state, &$attached_e
     break;
   }
 
-  $hash = 'party_subscription_settings:' . $attached_entity->subscription_settings_id;
+  $hash = 'subscription_settings:' . $attached_entity->subscription_settings_id;
   $current_ref = !empty($form_state['values'][$hash]['field_ref']) ? $form_state['values'][$hash]['field_ref'] : reset(array_keys($emails));
   if (!empty($form_state['triggering_element']) && $form_state['triggering_element']['#name'] == $hash . '[field_ref]') {
     unset($form_state['values'][$hash]);

@@ -92,8 +92,8 @@ function party_form($form, &$form_state, $party, $op = 'edit') {
 
     foreach ($attached_entities as $delta => $entity) {
       // Generate a unique array key of the form
-      // ENTITY_TYPE:ENTITY_ID for use in the $form array.
-      $array_key = $data_set_controller->getDataInfo('entity type') . ':' . $entity->{$data_set_controller->getDataInfo('id key')};
+      // DATA_SET_NAME:ENTITY_ID for use in the $form array.
+      $array_key = $data_set_controller->getDataInfo('name') . ':' . $entity->{$data_set_controller->getDataInfo('id key')};
       $form_state['#attached_entities'][$array_key] = $entity;
     }
   }
@@ -113,7 +113,7 @@ function party_form($form, &$form_state, $party, $op = 'edit') {
   );
 
  $form['#submit'][] = 'party_edit_form_save';
-  return $form;
+ return $form;
 }
 
 /**
