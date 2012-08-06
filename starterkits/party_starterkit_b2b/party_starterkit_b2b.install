@@ -7,8 +7,17 @@
  * Implements hook_install().
  */
 function party_starterkit_b2b_install() {
-  field_helper_install_all('party_starterkit_b2b');
+  // Create the taxonomy vocabulary
+  $vocab = array(
+    'name' => 'Organization Types',
+    'machine_name' => 'party_org_types',
+    'hierarchy' => 'single',
+    'module' => 'party_starterkit_b2b',
+  );
+  $vocab = taxonomy_vocabulary_save((object) $vocab);
 
+  party_starterkit_b2b_install_terms();
+  
   // Create the relation types
   $employeeRelation = relation_type_create(array(
     'relation_type' => 'employee',
@@ -19,6 +28,8 @@ function party_starterkit_b2b_install() {
     'target_bundles' => array('party:party'),
   ));
   relation_type_save($employeeRelation);
+  
+  field_helper_install_all('party_starterkit_b2b');
 }
 
 /**
@@ -27,6 +38,10 @@ function party_starterkit_b2b_install() {
 function party_starterkit_b2b_uninstall() {
   field_helper_uninstall_all('party_starterkit_b2b');
 
+  party_starterkit_b2b_uninstall_terms();
+  
+  $vocabulary = taxonomy_vocabulary_machine_name_load('party_org_types');
+  taxonomy_vocabulary_delete($vocabulary->vid);
   relation_type_delete('employee');
 }
 
@@ -73,6 +88,21 @@ function party_starterkit_b2b_install_fields() {
     'cardinality' => FIELD_CARDINALITY_UNLIMITED,
     'settings' => array(
       'country' => 'ca',
+    ),
+  );
+  
+  // Organization type
+  $fields['party_org_type'] = array(
+    'field_name' => 'party_org_type',
+    'type' => 'taxonomy_term_reference',
+    'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+    'settings' => array(
+      'allowed_values' => array(
+        0 => array(
+          'vocabulary' => 'party_org_types',
+          'parent' => '0',
+        ),
+      ),
     ),
   );
 
@@ -202,6 +232,16 @@ function party_starterkit_b2b_install_instances() {
       'type' => 'phone_textfield'
     ),
   );
+  
+  $instances['party_org_type'] = array(
+    'entity_type' => 'profile2',
+    'bundle' => 'party_org',
+    'field_name' =>'party_org_type',
+    'label' => $t('Organization Type'),
+    'widget' => array(
+      'type' => 'options_select'
+    ),
+  );
 
   $instances['party_contact_name'] = array(
     'entity_type' => 'profile2',
@@ -266,4 +306,44 @@ function party_starterkit_b2b_install_instances() {
   );
 
   return $instances;
+}
+
+/**
+ * Create some taxonomy terms for the org type vocabulary.
+ */
+function party_starterkit_b2b_install_terms() {
+  $vocabulary = taxonomy_vocabulary_machine_name_load('party_org_types');
+  
+  $term = array(
+    'vid' => $vocabulary->vid,
+    'name' => 'Customer',
+    'vocabulary_machine_name' => $vocabulary->machine_name,
+  );
+  taxonomy_term_save((object) $term);
+  
+  $term = array(
+    'vid' => $vocabulary->vid,
+    'name' => 'Prospect',
+    'vocabulary_machine_name' => $vocabulary->machine_name,
+  );
+  taxonomy_term_save((object) $term);
+  
+  $term = array(
+    'vid' => $vocabulary->vid,
+    'name' => 'Vendor',
+    'vocabulary_machine_name' => $vocabulary->machine_name,
+  );
+  taxonomy_term_save((object) $term);
+}
+
+/**
+ * Uninstall the terms we made on install.
+ */
+function party_starterkit_b2b_uninstall_terms() {
+  $vocabulary = taxonomy_vocabulary_machine_name_load('party_org_types');
+  $terms = taxonomy_term_load_multiple(array(), array('vid' => $vocabulary->vid));
+  
+  foreach($terms as $term) {
+    taxonomy_term_delete($term->tid);
+  }
 }
