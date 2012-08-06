@@ -17,19 +17,18 @@ function party_devel_generate_parties($form_state) {
     party_devel_generate_parties_kill($form_state['values']);
   }
 
-  if (count($form_state['values']['party_types'])) {
-    party_devel_generate_parties_pre_party($form_state['values']);
-    $start = time();
-    for ($i = 1; $i <= $form_state['values']['num_parties']; $i++) {
-      // Get list of users we will use.
-      party_devel_generate_party_add_party($form_state['values']);
-      if (function_exists('drush_log') && $i % drush_get_option('feedback', 1000) == 0) {
-        $now = time();
-        drush_log(dt('Completed !feedback partiess (!rate party/min)', array('!feedback' => drush_get_option('feedback', 1000), '!rate' => (drush_get_option('feedback', 1000)*60)/($now-$start))), 'ok');
-        $start = $now;
-      }
+  party_devel_generate_parties_pre_party($form_state['values']);
+  $start = time();
+  for ($i = 1; $i <= $form_state['values']['num_parties']; $i++) {
+    // Get list of users we will use.
+    party_devel_generate_party_add_party($form_state['values']);
+    if (function_exists('drush_log') && $i % drush_get_option('feedback', 1000) == 0) {
+      $now = time();
+      drush_log(dt('Completed !feedback partiess (!rate party/min)', array('!feedback' => drush_get_option('feedback', 1000), '!rate' => (drush_get_option('feedback', 1000)*60)/($now-$start))), 'ok');
+      $start = $now;
     }
   }
+
 
   devel_generate_set_message(format_plural($form_state['values']['num_parties'], '1 party created.', 'Finished creating @count parties'));
 }
@@ -46,7 +45,6 @@ function party_devel_generate_parties($form_state) {
 function party_devel_generate_parties_kill($values) {
   $results = db_select('party', 'p')
               ->fields('p', array('pid'))
-              ->condition('type', $values['party_types'], 'IN')
               ->execute();
   foreach ($results as $result) {
     $party_ids[] = $result->pid;
@@ -65,25 +63,19 @@ function party_devel_generate_parties_kill($values) {
  *   array of options
  */
 function party_devel_generate_party_add_party(&$results) {
-  $type = array_rand($results['party_types']);
 
-  $party = array(
-    'type' => $type,
-  );
+  $party = array();
 
   $party = party_create($party);
 
   // Insert new data:
-  $party->label = devel_create_greeking(mt_rand(2, $results['label_length']), TRUE);
-
   // Save default parameters back into the $product object.
   $party->merged = 0;
-
   $party->language = LANGUAGE_NONE;
 
   // Save party fields
   module_load_include('inc', 'devel_generate', 'devel_generate.fields');
-  devel_generate_fields($party, 'party', $party->type);
+  devel_generate_fields($party, 'party', 'party');
 
   // save the party
   $party->save();
@@ -105,16 +97,36 @@ function party_devel_generate_party_add_party(&$results) {
     }
 
     $data_set_controller = party_get_crm_controller($party, $name);
-    $data_set_controller->createAttachedEntity();
+    $entity = $data_set_controller->getEntity(0, true);
 
     // Devel generate requires that a language be set.
-    if (!isset($data_set_controller->entity->language)) {
-      $data_set_controller->entity->language = LANGUAGE_NONE;
+    if (!isset($entity->language)) {
+      $entity->language = LANGUAGE_NONE;
     }
 
     module_load_include('inc', 'devel_generate', 'devel_generate.fields');
-    devel_generate_fields($data_set_controller->entity, $data_set_controller->getEntityType(), $data_set_controller->getEntityBundle());
-    $data_set_controller->saveAttachedEntity();
-    $data_set_controller->attach($party);
+    devel_generate_fields($entity, $data_set_controller->getDataInfo('entity type'), $data_set_controller->getDataInfo('entity bundle'));
+
+    if (field_info_instance($data_set_controller->getDataInfo('entity type'), 'field_name', $data_set_controller->getDataInfo('entity bundle'))) {
+      $entity->field_name[LANGUAGE_NONE][0]['value'] = party_generate_label();
+    }
+
+
+    entity_save($data_set_controller->getDataInfo('entity type'), $entity);
+    $party->save();
   }
+}
+
+function party_generate_label() {
+
+ $first_name = array("Addie", "Aida", "Allie", "Amanda", "Anita", "Anne", "Audie", "Augusta", "Barb", "Barry", "Bea", "Ben", "Bess", "Celine", "Chris", "Constance", "Dave", "Eileen", "Frank", "Grace", "Harriet", "Hazel", "Hope", "Hugh", "Isabelle", "Ivana", "Jessica", "John", "Josie", "Liz", "Lois", "Luke", "Lynn", "Manny", "Mark", "Marsha", "Martin", "Maureen", "Minnie", "Missy", "Olive" ,"Paige" ,"Patty", "Peg", "Phillip", "Randy", "Ray", "Reeve", "Rhoda", "Rita", "Suzie", "Teri", "Tex", "Theresa");
+
+  $second_name = array("Anderson", "Andrews", "Brown", "Campbell", "Clark", "Clarke", "Davies", "De Wet", "Du Toit", "Edwards", "Evans", "Garcia", "Green", "Hall", "Harris", "Hughes", "Jackson", "Johnson", "Jones", "Khan", "Kumar", "Lewis", "Macdonald", "Martin", "Martinez", "Miller", "Mitchell", "Moore", "Morrison", "Mumford", "Murray", "Patak", "Patel", "Patel", "Paterson", "Reid", "Roberts", "Robertson", "Robinson", "Rogers", "Ross", "Scott", "Smith", "Stewart", "Taylor", "Thomas", "Thompson", "Walker", "Watson", "White", "Williams", "Wilson", "Wright", "Young");
+
+  $num_first_name = count($first_name);
+  $num_second_name = count ($second_name);
+
+  $name = $first_name[mt_rand(0, $num_first_name - 1)] . ' ' . $second_name[mt_rand(0, $num_second_name - 1)];
+
+  return $name;
 }
