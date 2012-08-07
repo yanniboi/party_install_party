@@ -1468,12 +1468,48 @@ function party_merge($first, $second) {
 }
 
 // --------------------------------------------------------------------------------------------
-// Trigger
+// React to entity changes
 /**
  * Implements hook_entity_update($entity, $type);
+ *
+ * Trigger rules and update party label if an attached entity has been saved.
  */
 function party_entity_update($entity, $type) {
   if($type == "party" && module_exists('rules')) {
     rules_invoke_event('party_update', $entity);
+  }
+
+  // Get necessary entity info.
+  $wrapper = entity_metadata_wrapper($type, $entity);
+
+  // Get data sets.
+  $data_sets = party_get_data_set_info();
+
+  // Is this entity party of a data set?
+  $data_set_name = FALSE;
+  foreach ($data_sets as $name => $def) {
+    if ($def['entity type'] == $type && $def['entity bundle'] == $wrapper->getBundle()) {
+      $data_set_name = $name;
+      break;
+    }
+  }
+
+  // If it's not part of a data set do nothing else
+  if (!$data_set_name) {
+    return;
+  }
+
+  // Find the party or parties this entity is attached to.
+  $party_ids = db_select('party_attached_entity', 'pae')
+    ->fields('pae', array('pid'))
+    ->condition('data_set', $data_set_name)
+    ->condition('eid', $wrapper->getIdentifier())
+    ->execute()
+    ->fetchCol();
+
+  // Update the label
+  foreach ($party_ids as $pid) {
+    $party = party_load($pid);
+    entity_get_controller('party')->setLabel($party);
   }
 }
