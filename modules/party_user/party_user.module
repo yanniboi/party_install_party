@@ -296,6 +296,15 @@ function party_user_form_user_register_form_alter(&$form, &$form_state) {
     // Create an empty party
     $party = party_create();
 
+    // If party_hat is enabled give the party the correct hats.
+    if (module_exists('party_hat')) {
+      $hat_items = array();
+      foreach (variable_get('party_user_registration_hats', array()) as $hat_name) {
+        $hat_items[]['hat_name'] = $hat_name;
+      }
+      $party->party_hat[LANGUAGE_NONE] = $hat_items;
+    }
+
     $form_state['#party'] = $party;
     $form_state['#party_unchanged'] = $party;
     $form_state['#attached_entities'] = array();

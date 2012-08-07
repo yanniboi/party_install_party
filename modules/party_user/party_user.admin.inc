@@ -27,6 +27,20 @@ function party_user_settings_form($form, &$form_state) {
     '#default_value' => variable_get('party_user_registration_data_sets', array()),
   );
 
+  if (module_exists('party_hat')) {
+    $options = array();
+    foreach (party_hat_get_tree() as $hat_name => $hat) {
+      $options[$hat_name] = str_repeat('-', $hat->depth) . $hat->label;
+    }
+
+    $form['registration_hats'] = array(
+      '#type' => 'checkboxes',
+      '#options' => $options,
+      '#title' => "What hat's should users' parties be given on registration?",
+      '#default_value' => variable_get('party_user_registration_hats', array()),
+    );
+  }
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Save configuration',
@@ -50,6 +64,17 @@ function party_user_settings_form_submit($form, &$form_state) {
   }
   $registration_data_sets = array_keys($registration_data_sets);
   variable_set('party_user_registration_data_sets', $registration_data_sets);
+
+  if (module_exists('party_hat')) {
+    $registration_hats = $form_state['values']['registration_hats'];
+    foreach ($registration_hats as $key => $var) {
+      if ($var === 0) {
+        unset($registration_hats[$key]);
+      }
+    }
+    $registration_hats = array_keys($registration_hats);
+    variable_set('party_user_registration_hats', $registration_hats);
+  }
 
   drupal_set_message(t('The configuration options have been saved.'));
 }
