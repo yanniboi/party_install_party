@@ -328,6 +328,30 @@ class PartyDefaultDataSet {
   }
 
   /**
+   * Save an entity.
+   *
+   * This method saves the entity at the position specified by delta. This
+   * allows for other modules to use different logic for saving their entities.
+   *
+   * @param int $delta
+   *   (optional) The delta of the entity to save. Defaults to 0.
+   *
+   * @return object
+   *   The entity that has been saved.
+   */
+  public function saveEntity($delta = 0) {
+    $entity = $this->getEntity($delta);
+
+    // If getting the entity failed, return false.
+    if (!$entity) {
+      return $entity;
+    }
+
+    entity_save($this->getDataInfo('entity type'), $entity);
+    return $entity;
+  }
+
+  /**
    * Attach an entity to the party
    *
    * This method puts the entity in the right place in the $entities array.
@@ -556,7 +580,7 @@ class PartyDefaultDataSet {
     foreach ($this->entities as $delta => &$entity) {
       if ($save_entities) {
         // Save our entities as we go
-        entity_save($this->getDataInfo('entity type'), $entity);
+        $this->saveEntity($delta);
       }
 
       // Check if our entity is an object or int
