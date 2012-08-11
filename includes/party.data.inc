@@ -21,19 +21,21 @@ class PartyDefaultDataSet {
    * var string $data_set
    *   The data set name (array key in hook_data_set_info)
    */
-  public $data_set;
+  protected $data_set;
 
   /**
    * var array $entities
-   *   An array of attatched entities, keyed by delta
+   *   An array of attatched entities, keyed by delta. This can contain a mix
+   *   of stub entities (with the is_stub property set to TRUE), fully loaded
+   *   entities and unsaved entities (with the is_new property set to TRUE).
    */
-  public $entities = array();
+  protected $entities = array();
 
   /**
    * var party $party
    *   The party object we're connected to.
    */
-  public $party;
+  protected $party;
 
   /**
    * Alters entity info for entities requesting CRM integration.
@@ -72,14 +74,25 @@ class PartyDefaultDataSet {
     $this->party = $party;
 
     if (!empty($this->party->pid)) {
-      // This is useless without knowing what is attached so let's load the
-      // stubs.
-      $query = db_select('party_attached_entity', 'ae');
-      $query->fields('ae', array('delta', 'eid'));
-      $query->condition('pid', $this->party->pid, '=');
-      $query->condition('data_set', $this->data_set);
-      $result = $query->execute();
-      $this->entities = $result->fetchAllKeyed();
+      // Without attached entities, this controller is pretty useless, so let's
+      // assume anyone wants them loaded, but we'll do so using stubs to save a
+      // full entity load.
+      $query = db_select('party_attached_entity', 'ae')
+        ->fields('ae', array('delta', 'eid'))
+        ->condition('pid', $this->party->pid, '=')
+        ->condition('data_set', $this->data_set);
+      $result = $query->execute()
+        ->fetchAllAssoc('delta');
+
+      // Iterate over our results creating stub entities, setting a flag for us
+      // to detect that it is a stub.
+      foreach ($result as $delta => $entity) {
+        $this->entities[$delta] = entity_create_stub_entity($this->getDataInfo('entity type'), array(
+          0 => $entity['eid'],
+          2 => $this->getDataInfo('entity bundle'),
+        ));
+        $this->entities[$delta]->is_stub = TRUE;
+      }
     }
   }
 
@@ -128,17 +141,39 @@ class PartyDefaultDataSet {
   }
 
   /**
-   * Get the delta from an entity object
+   * Get the delta from an entity object.
+   *
+   * @param $entity
+   *   The entity object we want to find the delta for.
+   *
+   * @return int|FALSE
+   *   The delta of $entity, or FALSE if it isn't attached.
    */
   public function getEntityDelta($entity) {
-    // Flip our entity ids array so it's delta keyed by id.
-    $deltas = array_flip($this->getEntityIds());
-    $entity_id = $entity->{$this->getDataInfo('id key')};
-    return isset($deltas[$entity_id]) ? $deltas[$entity_id]: FALSE;
+    // If $entity is saved, we can just compare entity ids.
+    if (!isset($entity->is_new)) {
+      // Flip our entity ids so it's delta keyed by id.
+      $deltas = array_flip($this->getEntityIds());
+      $entity_id = $entity->{$this->getDataInfo('id key')};
+      if (isset($deltas[$entity_id])) {
+        return $deltas[$entity_id];
+      }
+    }
+    // Otherwise, we need to actually compare objects.
+    else {
+      foreach ($this->entities as $delta => $row) {
+        if ($entity === $row) {
+          return $delta;
+        }
+      }
+    }
+
+    // If we've got here, we can't find it.
+    return FALSE;
   }
 
   /**
-   * Load the full entities
+   * Load the full entities.
    *
    * @param array|null $deltas
    *   (optional) An array of delta(s) to load or NULL to load all entities.
@@ -152,12 +187,14 @@ class PartyDefaultDataSet {
       $deltas = array_keys($this->entities);
     }
 
-    // Iterate over our deltas loading our entities if required
+    // Iterate over our deltas loading our entities if required.
     foreach ($deltas as $delta) {
-      if (isset($this->entities[$delta]) && !is_object($this->entities[$delta])) {
-        // This entity needs loading
+      if (isset($this->entities[$delta]) && isset($this->entities[$delta]->is_stub)) {
+        // This entity is a stub so needs loading.
         $entities_loaded = entity_load($this->getDataInfo('entity type'), array($this->entities[$delta]));
         $this->entities[$delta] = reset($entities_loaded);
+
+        // Add the other properties party needs.
         $this->entities[$delta]->data_set_name = $this->data_set;
         $this->entities[$delta]->party_attaching_party = $this->party->pid;
       }
@@ -178,24 +215,22 @@ class PartyDefaultDataSet {
    *   An entity object or one doesn't exist and we're not creating, FALSE.
    */
   public function getEntity($delta = 0, $create = FALSE) {
-    // If this delta exists, check it's loaded and return it
+    // If this delta exists, check it's loaded and return it.
     if (isset($this->entities[$delta])) {
-      if (!is_object($this->entities[$delta])) {
+      if (isset($this->entities[$delta]->is_stub)) {
         $this->loadEntities(array($delta));
       }
     }
     else {
-      // If we're creating an entity, let's do that, including saving and
-      // attaching it. If developers want to be able to create entities
-      // without automatically attaching, they can make use of createEntity()
-      // and attachEntity() manually.
+      // Let's create an entity and attach it, but no saving happens unless
+      // explicitly called. To maintain unsaved entities, this data controller
+      // can be stored against forms etc.
       if ($create) {
         $entity = $this->createEntity();
         $this->attachEntity($entity, $delta);
-        $this->save(TRUE);
       }
       else {
-        // Otherwise we return false
+        // Nothing found and not creating; return false.
         return FALSE;
       }
     }
@@ -219,22 +254,25 @@ class PartyDefaultDataSet {
    * Get entity ids/deltas
    *
    * This allows you to get the entity ids and deltas of all the entities
-   * without having to load them. If they are already loaded, we extract the
-   * entity's id from the object.
+   * without having to load them. There may also be sub entities, in which
+   * case the value for that delta will be an empty string, as to not throw
+   * a warning if the array is flipped.
    *
    * @return array
-   *   Array of entity ids and delta, keyed as specified by $ids.
+   *   Array of entity ids keyed by delta. Unsaved entities return an empty
+   *   string.
    */
   public function getEntityIds() {
     $ids = array();
 
     foreach ($this->entities as $delta => $entity) {
-      if (is_object($entity)) {
+      if (!isset($entity->is_new)) {
         $ids[$delta] = $entity->{$this->getDataInfo('id key')};
       }
       else {
-        // We've not loaded, so pull the id
-        $ids[$delta] = $entity;
+        // This is unsaved, so we use an empty string so warnings don't get
+        // emitted on an array_flip().
+        $ids[$delta] = '';
       }
     }
 
@@ -323,7 +361,11 @@ class PartyDefaultDataSet {
 
     // Create the entity, set our data set and return
     $entity = entity_create($this->getDataInfo('entity type'), $values);
+
+    // Add the other properties party needs.
     $entity->data_set_name = $this->data_set;
+    $entity->party_attaching_party = $this->party->pid;
+
     return $entity;
   }
 
@@ -554,7 +596,8 @@ class PartyDefaultDataSet {
    * PartyDefaultDataSet::postSave() to perform any additional logic required.
    *
    * @param bool $save_entities
-   *   Whether or not to save entities as we go through them.
+   *   Whether or not to save entities as we go through them. If an entity is
+   *   unsaved, we will always save it, as otherwise we can't save the deltas.
    *
    * @return $this
    *
@@ -578,18 +621,15 @@ class PartyDefaultDataSet {
     $query = db_insert('party_attached_entity');
     $query->fields(array('pid', 'eid', 'delta', 'data_set','entity_type','entity_bundle'));
     foreach ($this->entities as $delta => &$entity) {
-      if ($save_entities) {
+      if ($save_entities || isset($entity->is_new)) {
         // Save our entities as we go
         $this->saveEntity($delta);
       }
 
-      // Check if our entity is an object or int
-      $eid = is_object($entity) ? $entity->{$this->getDataInfo('id key')} : $entity;
-
       // Add our record
       $query->values(array(
         'pid' => $this->party->pid,
-        'eid' => $eid,
+        'eid' => $entity->{$this->getDataInfo('id key')},
         'delta' => $delta,
         'data_set' => $this->data_set,
         'entity_type' => $this->getDataInfo('entity type'),
