@@ -250,7 +250,7 @@ function party_menu() {
   // @TODO: convert this to use party_attached_entity_action_form().
   $items['party/%party/%party_data_set/add'] = array(
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('party_attached_entity_edit_form', 1, 2),
+    'page arguments' => array('party_attached_entity_action_form', 1, 2, 'add'),
     'access callback' => 'party_access',
     'access arguments' => array('add', 1, 2),
     'file' => 'party.pages.inc',
