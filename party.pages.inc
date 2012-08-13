@@ -420,18 +420,19 @@ function party_attached_entity_edit_form_submit($form, &$form_state) {
 
 /**
  * Form to confirm removing a data set from a party.
+ *
+ * @todo: pass this the delta rather than the entity id.
  */
 function party_attached_entity_remove_confirm($form, &$form_state, $party, $data_set, $eid) {
   $data_set_controller = party_get_crm_controller($party, $data_set['set_name']);
-  $data_set_controller->setAttachedEntity($eid);
-  $data_set_controller->setParty($party->pid);
 
-  $form_state['#attached_entity'] = $data_set_controller;
+  $form_state['#data_set'] = $data_set_controller;
+  $form_state['#entity'] = reset(entity_load($data_set_controller->getDataInfo('entity type'), array($eid)));
 
   return confirm_form($form,
     t('Are you sure you want to remove %attached from %party?', array(
-      '%attached' => $data_set_controller->getLabel(),
-      '%party' =>  $data_set_controller->party->label,
+      '%attached' => $data_set_controller->getDataInfo('label'),
+      '%party' =>  $party->label,
     )),
     'party/' . $party->pid, // @todo: go back to the dataset page.
     t('Are you sure you want to remove this data set from this party?') . ' ' . t('This action cannot be undone.'),
@@ -444,6 +445,6 @@ function party_attached_entity_remove_confirm($form, &$form_state, $party, $data
  * Submit handler for the data set remove form.
  */
 function party_attached_entity_remove_confirm_submit($form, &$form_state) {
-  $form_state['#attached_entity']->detach();
-  $form_state['redirect'] = 'party/' . $form_state['#attached_entity']->party->pid;
+  $form_state['#data_set']->detachEntity($form_state['#entity']);
+  $form_state['#data_set']->save();
 }
