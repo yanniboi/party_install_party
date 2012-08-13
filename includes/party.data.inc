@@ -578,7 +578,7 @@ class PartyDefaultDataSet {
    *
    * @see PartyData::detachEntity()
    */
-  protected function preDetach($entity, &$method, &$delta) {}
+  protected function preDetach($delta) {}
 
   /**
    * Overload any post detach logic
@@ -587,7 +587,7 @@ class PartyDefaultDataSet {
    *
    * @see PartyData::detachEntity()
    */
-  protected function postDetach($entity, $method, $delta) {}
+  protected function postDetach($delta) {}
 
 
   /**
