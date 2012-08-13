@@ -34,6 +34,10 @@ function party_user_party_data_set_info() {
         'controller' => 'PartyUserDataSetUIAttach',
         'action label' => 'Attach existing user',
       ),
+      'add' => array(
+        'controller' => 'PartyUserDataSetUIAdd',
+        'action label' => 'Add a new user',
+      ),
     ),
     // Some of our permissions require a warning.
     'permissions' => array(

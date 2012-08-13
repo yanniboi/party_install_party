@@ -64,5 +64,49 @@ class PartyUserDataSetUIAttach extends PartyDefaultDataSetUIAttach {
       $data_set_controller->save();
     }
   }
+}
 
+/**
+ * The 'add' action: add a new user.
+ */
+class PartyUserDataSetUIAdd extends PartyDefaultDataSetUIAdd {
+
+  /**
+   * Provides the action form for attaching an existing user.
+   *
+   * @param $party
+   *   A loaded party object.
+   * @param $data_set
+   *   A loaded data set.
+   *   We don't actually need this loaded, but we need a menu loader to convert
+   *   the path-style string to the machine name, and a menu loader that doesn't
+   *   load would be weird too.
+   * @param $eid
+   *   The id of the entity, if relevant to this action.
+   */
+  function action_form($form, &$form_state, $party, $data_set, $eid = NULL) {
+    module_load_include('inc', 'user', 'user.pages');
+
+    $form = user_register_form($form, $form_state);
+
+    return $form;
+  }
+
+  function action_form_validate($form, &$form_state) {
+
+  }
+
+  function action_form_submit($form, &$form_state) {
+    // Get the original form parameters.
+    list ($party, $data_set, $action, $eid) = $form_state['build_info']['args'];
+
+    // Attempt to load a user from the given input.
+    $account = $form_state['user'];
+    if ($account->uid != 0) {
+      // Attach the user entity to the party.
+      $data_set_controller = party_get_crm_controller($party, $data_set['set_name']);
+      $data_set_controller->attachEntity($account);
+      $data_set_controller->save();
+    }
+  }
 }
