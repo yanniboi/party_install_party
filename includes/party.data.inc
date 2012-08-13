@@ -286,6 +286,9 @@ class PartyDefaultDataSet {
    *
    * @return
    *  An array of links suitable for theme_links().
+   *
+   * @todo: Build these off of delta rather than $party_id, $entity_id. It's
+   *  unnecessary to pass the party id here.
    */
   public function getActions($party_id, $entity_id) {
     $party_data_info = party_get_data_set_info($this->data_set);
