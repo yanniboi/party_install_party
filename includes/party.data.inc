@@ -88,7 +88,7 @@ class PartyDefaultDataSet {
       // to detect that it is a stub.
       foreach ($result as $delta => $entity) {
         $this->entities[$delta] = entity_create_stub_entity($this->getDataInfo('entity type'), array(
-          0 => $entity['eid'],
+          0 => $entity->eid,
           2 => $this->getDataInfo('entity bundle'),
         ));
         $this->entities[$delta]->is_stub = TRUE;
@@ -190,8 +190,10 @@ class PartyDefaultDataSet {
     // Iterate over our deltas loading our entities if required.
     foreach ($deltas as $delta) {
       if (isset($this->entities[$delta]) && isset($this->entities[$delta]->is_stub)) {
-        // This entity is a stub so needs loading.
-        $entities_loaded = entity_load($this->getDataInfo('entity type'), array($this->entities[$delta]));
+        // This entity is a stub so needs loading. First get the entity id from
+        // stub entity.
+        $entity_id = $this->entities[$delta]->{$this->getDataInfo('id key')};
+        $entities_loaded = entity_load($this->getDataInfo('entity type'), array($entity_id));
         $this->entities[$delta] = reset($entities_loaded);
 
         // Add the other properties party needs.
