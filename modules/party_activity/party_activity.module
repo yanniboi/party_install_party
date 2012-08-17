@@ -490,6 +490,4 @@ function party_activity_party_activity_type_insert($activity_type) {
     );
     $instance = field_create_instance($instance);
   }
-
-
 }
