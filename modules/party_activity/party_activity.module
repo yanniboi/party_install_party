@@ -356,7 +356,6 @@ function party_activity_party_activity_type_insert($activity_type) {
         'target_type' => 'party',
         'handler' => 'base',
         'handler_settings' => array(
-          'target_bundles' => array('individual'),
           'sort' => array(
             'type' => 'none',
           ),
@@ -415,7 +414,6 @@ function party_activity_party_activity_type_insert($activity_type) {
         'target_type' => 'party',
         'handler' => 'base',
         'handler_settings' => array(
-          'target_bundles' => array('individual'),
           'sort' => array(
             'type' => 'none',
           ),
