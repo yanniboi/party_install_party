@@ -17,7 +17,7 @@ function party_starterkit_b2b_install() {
   $vocab = taxonomy_vocabulary_save((object) $vocab);
 
   party_starterkit_b2b_install_terms();
-  
+
   // Create the relation types
   $employeeRelation = relation_type_create(array(
     'relation_type' => 'employee',
@@ -28,7 +28,7 @@ function party_starterkit_b2b_install() {
     'target_bundles' => array('party:party'),
   ));
   relation_type_save($employeeRelation);
-  
+
   field_helper_install_all('party_starterkit_b2b');
 }
 
@@ -39,7 +39,7 @@ function party_starterkit_b2b_uninstall() {
   field_helper_uninstall_all('party_starterkit_b2b');
 
   party_starterkit_b2b_uninstall_terms();
-  
+
   $vocabulary = taxonomy_vocabulary_machine_name_load('party_org_types');
   taxonomy_vocabulary_delete($vocabulary->vid);
   relation_type_delete('employee');
@@ -90,7 +90,7 @@ function party_starterkit_b2b_install_fields() {
       'country' => 'ca',
     ),
   );
-  
+
   // Organization type
   $fields['party_org_type'] = array(
     'field_name' => 'party_org_type',
@@ -154,12 +154,12 @@ function party_starterkit_b2b_install_fields() {
       'country' => 'ca',
     ),
   );
-  
+
   // Notes notes
   $fields['party_notes_notes'] = array(
     'field_name' => 'party_notes_notes',
     'type' => 'text_long',
-    'cardinality' => 1,    
+    'cardinality' => 1,
   );
 
   return $fields;
@@ -217,6 +217,11 @@ function party_starterkit_b2b_install_instances() {
     'description' => $t("The organization's address."),
     'widget' => array(
       'type' => 'addressfield_standard',
+	  'settings' => array(
+	    'format_handlers' => array(
+		  'address_hide_country' => 'address_hide_country',
+		),
+      ),
     ),
   );
 
@@ -232,7 +237,7 @@ function party_starterkit_b2b_install_instances() {
       'type' => 'phone_textfield'
     ),
   );
-  
+
   $instances['party_org_type'] = array(
     'entity_type' => 'profile2',
     'bundle' => 'party_org',
@@ -273,6 +278,11 @@ function party_starterkit_b2b_install_instances() {
     'description' => $t("The contact's address."),
     'widget' => array(
       'type' => 'addressfield_standard',
+	  'settings' => array(
+	    'format_handlers' => array(
+		  'address_hide_country' => 'address_hide_country',
+		),
+      ),
     ),
   );
 
@@ -288,7 +298,7 @@ function party_starterkit_b2b_install_instances() {
       'type' => 'phone_textfield'
     ),
   );
-  
+
   $instances['party_notes_notes'] = array(
     'entity_type' => 'profile2',
     'bundle' => 'party_notes',
@@ -313,21 +323,21 @@ function party_starterkit_b2b_install_instances() {
  */
 function party_starterkit_b2b_install_terms() {
   $vocabulary = taxonomy_vocabulary_machine_name_load('party_org_types');
-  
+
   $term = array(
     'vid' => $vocabulary->vid,
     'name' => 'Customer',
     'vocabulary_machine_name' => $vocabulary->machine_name,
   );
   taxonomy_term_save((object) $term);
-  
+
   $term = array(
     'vid' => $vocabulary->vid,
     'name' => 'Prospect',
     'vocabulary_machine_name' => $vocabulary->machine_name,
   );
   taxonomy_term_save((object) $term);
-  
+
   $term = array(
     'vid' => $vocabulary->vid,
     'name' => 'Vendor',
@@ -342,7 +352,7 @@ function party_starterkit_b2b_install_terms() {
 function party_starterkit_b2b_uninstall_terms() {
   $vocabulary = taxonomy_vocabulary_machine_name_load('party_org_types');
   $terms = taxonomy_term_load_multiple(array(), array('vid' => $vocabulary->vid));
-  
+
   foreach($terms as $term) {
     taxonomy_term_delete($term->tid);
   }
