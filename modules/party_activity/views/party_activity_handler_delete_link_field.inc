@@ -11,7 +11,7 @@ class party_activity_handler_delete_link_field extends party_activity_handler_li
   function construct() {
     parent::construct();
     $this->additional_fields['type'] = 'type';
-	$this->additional_fields['activity_id'] = 'activity_id';
+	$this->additional_fields['party_activity_id'] = 'party_activity_id';
   }
 
 
@@ -25,7 +25,7 @@ class party_activity_handler_delete_link_field extends party_activity_handler_li
     }
 
     $text = !empty($this->options['text']) ? $this->options['text'] : t('delete');
-    $activity_id = $values->{$this->aliases['activity_id']};
+    $activity_id = $values->{$this->aliases['party_activity_id']};
 
    return l($text, 'admin/community/activities/activity/' . $activity_id . '/delete');
   }
