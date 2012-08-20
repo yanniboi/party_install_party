@@ -2,13 +2,13 @@
 /**
  * @file Main module file for Party Simplenews integration
  */
- 
+
 /**
  * Load includes
- */ 
+ */
 module_load_include('inc', 'party_simplenews', 'party_subscription_settings.api');
 module_load_include('inc', 'party_simplenews', 'party_subscription_settings.entity');
- 
+
 /**
  * Implements hook_entity_info()
  */
@@ -39,7 +39,7 @@ function party_simplenews_entity_info() {
       ),
     ),
   );
-  
+
   return $info;
 }
 
@@ -48,13 +48,13 @@ function party_simplenews_entity_info() {
  */
 function party_simplenews_entity_property_info_alter(&$info) {
   $properties = &$info['party']['properties'];
-    
+
   $properties['primary_email'] = array(
     'label' => t('Primary Email Address'),
     'type' => 'text',
     'description' => t('The primary email address of this party'),
     'getter callback' => 'party_simplenews_party_get_properties',
-  );  
+  );
 }
 
 /**
@@ -72,17 +72,17 @@ function party_simplenews_party_data_set_info() {
   );
   return $sets;
 }
- 
+
 /**
  * Implements hook_views_api().
  */
 function party_simplenews_views_api() {
   return array(
-    'api' => 3, 
-    'path' => drupal_get_path('module', 'party_simplenews') . '/includes/views', 
+    'api' => 3,
+    'path' => drupal_get_path('module', 'party_simplenews') . '/includes/views',
   );
 }
- 
+
 /**
  * Implements hook_form_FORM_ID_alter()
  */
@@ -123,17 +123,17 @@ function party_simplenews_subscriber_load_by_pid($party = NULL, $ref = NULL) {
   }
 
   $extras = $query->execute()->fetchAllAssoc('snid');
-  
+
   if (empty($extras)) {
     return FALSE;
   }
-  
+
   $subscribers = simplenews_subscriber_load_multiple(array_keys($extras));
   foreach ($subscribers as $subscriber) {
     $subscriber->party_id = $extras[$subscriber->snid]->party_id;
     $subscriber->party_field_ref = $extras[$subscriber->snid]->party_field_ref;
-  }  
-  
+  }
+
   if (!empty($ref)) {
     return $subscribers ? reset($subscribers) : FALSE;
   }
@@ -177,12 +177,12 @@ function party_simplenews_simplenews_subscriber_insert($subscriber) {
   // subscriptions may cause problems for simplenews
   if (!empty($subscriber->party_id) && !empty($subscriber->party_field_ref)) {
     simplenews_subscriber_save($subscriber);
-    
+
     $party = party_load($subscriber->party_id);
     party_simplenews_add_subsciption_settings_attached_entity($party);
     return;
   }
-  
+
   // Firstly, if the account id is not 0, see if that user has a party and
   // attach it.
   if (module_exists('party_user') && $subscriber->uid != 0) {
@@ -194,7 +194,7 @@ function party_simplenews_simplenews_subscriber_insert($subscriber) {
     simplenews_subscriber_save($subscriber);
 
     party_simplenews_add_subsciption_settings_attached_entity($party);
-    
+
     return;
   }
 
@@ -309,6 +309,10 @@ function party_simplenews_entity_delete($entity, $type) {
   if ($type == 'party') {
     $subscribers = party_simplenews_subscriber_load_by_pid($entity->pid);
 
+	if (!$subscribers) {
+	  return;
+	}
+
     foreach ($subscribers as $subscriber) {
       simplenews_subscriber_delete($subscriber);
     }
@@ -419,12 +423,12 @@ function party_get_email_fields($data_set_name = NULL) {
 function party_get_all_emails($party) {
   $fields = party_get_email_fields();
   $emails = array();
-  
+
   foreach ($fields as $data_set_name => $fields) {
     $data_set_controller = party_get_data_set($party, $data_set_name);
-    $data_set_def = party_get_data_set_info($data_set_name);    
+    $data_set_def = party_get_data_set_info($data_set_name);
     $entity_ids = $data_set_controller->getEntityIds();
-    
+
     foreach ($data_set_controller->getEntities() as $data_set_delta => $entity) {
       foreach ($fields as $field_name) {
         $items = field_get_items($data_set_def['entity type'], $entity, $field_name);
@@ -439,7 +443,7 @@ function party_get_all_emails($party) {
       }
     }
   }
-  
+
   return $emails;
 }
 
@@ -464,21 +468,21 @@ function party_simplenews_field_extra_fields() {
  */
 function party_simplenews_party_subscription_settings_view($entity) {
   $party = party_subscription_settings_get_party($entity);
-  
+
   $entity->content['subscriptions'] = array(
     '#type' => 'fieldset',
     '#title' => t('Newsletters'),
   );
-  
+
   // Collect newsletter to which the current user is subscribed.
   // 'hidden' newsletters are not listed.
   $newsletters = simplenews_category_get_visible();
   $subscribers = party_simplenews_subscriber_load_by_pid($party->pid);
-  
+
   // For each newsletter, ascertain if the party is subscribed to it
   foreach ($newsletters as $newsletter) {
     $subscribed_emails = array();
-    // In theory, a Party could be subscribed to a newsletter multiple times, 
+    // In theory, a Party could be subscribed to a newsletter multiple times,
     // Iterate over all the party's subscribers and check if they're subscribed to
     // the newsletter.
     foreach ($subscribers as $subscriber) {
@@ -486,16 +490,16 @@ function party_simplenews_party_subscription_settings_view($entity) {
         $subscribed_emails[] = $subscriber->mail;
       }
     }
-    
+
     // If atleast one of the party's addresses is subscribed to the newsletter
     // add the newsletter to the list of links with a list of subscribed emails
     // next to it.
     if (!empty($subscribed_emails)) {
-      $emails = ' <small>(' . implode($subscribed_emails, ',') . ')</small>'; 
+      $emails = ' <small>(' . implode($subscribed_emails, ',') . ')</small>';
       $links[] = l(_simplenews_newsletter_name($newsletter), 'taxonomy/term/' . $newsletter->tid) . $emails;
     }
   }
-    
+
   if (empty($links)) {
     $entity->content['subscriptions']['subscriptions'] = array(
       '#title' => t('Subscribed to'),
