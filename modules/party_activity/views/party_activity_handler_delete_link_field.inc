@@ -11,6 +11,7 @@ class party_activity_handler_delete_link_field extends party_activity_handler_li
   function construct() {
     parent::construct();
     $this->additional_fields['type'] = 'type';
+	$this->additional_fields['activity_id'] = 'activity_id';
   }
 
 
