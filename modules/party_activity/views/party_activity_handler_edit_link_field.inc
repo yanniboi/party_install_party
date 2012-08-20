@@ -10,6 +10,7 @@ class party_activity_handler_edit_link_field extends party_activity_handler_link
   function construct() {
     parent::construct();
     $this->additional_fields['type'] = 'type';
+	$this->additional_fields['party_activity_id'] = 'party_activity_id';
   }
 
 
