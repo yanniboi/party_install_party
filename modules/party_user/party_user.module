@@ -425,9 +425,10 @@ function party_user_user_view($account, $view_mode, $langcode) {
  */
 function party_user_create_party_for_user($user, $options = array()) {
   $party = party_create($options);
+  $party = party_save($party);
   $data_set_controller = party_get_crm_controller($party, 'user');
   $data_set_controller->attachEntity($user);
-  $party->data_sets['user'][] = $data_set_controller;
+  $data_set_controller->save();
 
   // This will fail if a plugin that relies on anything other than user is used
   $party = party_save($party);
