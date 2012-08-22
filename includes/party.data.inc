@@ -369,7 +369,9 @@ class PartyDefaultDataSet {
 
     // Add the other properties party needs.
     $entity->data_set_name = $this->data_set;
-    $entity->party_attaching_party = $this->party->pid;
+	  if (isset($this->party->pid)) {
+      $entity->party_attaching_party = $this->party->pid;
+    }
 
     return $entity;
   }
