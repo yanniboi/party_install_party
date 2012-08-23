@@ -110,7 +110,7 @@ function party_hat_form($form, &$form_state, $hat, $op = 'edit') {
 
     $form['data_set_rules'][$data_set_name] = array(
       '#type' => 'checkboxes',
-      '#title' => $data_set['label'],
+      '#title' => check_plain($data_set['label']),
       '#default_value' => $default,
       '#options' => array(
         // We have to use different keys to what the access hook expects for

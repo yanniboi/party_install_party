@@ -60,7 +60,7 @@ function party_form($form, &$form_state, $party, $op = 'edit') {
       '#value' => $party->pid,
     );
 
-    drupal_set_title("Edit " . $party->label);
+    drupal_set_title(check_plain("Edit " . $party->label));
   }
 
   $form_state['#party'] = $party;
@@ -290,7 +290,7 @@ function party_attached_entity_action_form($form, &$form_state, $party, $data_se
 
   // Get the page title from the controller.
   $page_title = $action_controller->get_page_title($party, $data_set, $eid);
-  drupal_set_title($page_title);
+  drupal_set_title(check_plain($page_title));
 
   $form += $action_controller->action_form($form, $form_state, $party, $data_set, $eid);
 
