@@ -295,10 +295,10 @@ function party_attached_entity_action_form($form, &$form_state, $party, $data_se
   $form += $action_controller->action_form($form, $form_state, $party, $data_set, $eid);
 
   // Ensure that our submit and validate handlers are run (and run last).
-  if (!in_array('party_attached_entity_action_form_submit', $form['#submit'])) {
+  if (!isset($form['#submit']) || !in_array('party_attached_entity_action_form_submit', $form['#submit'])) {
     $form['#submit'][] = 'party_attached_entity_action_form_submit';
   }
-  if (!in_array('party_attached_entity_action_form_validate', $form['#validate'])) {
+  if (!isset($form['#validate']) || !in_array('party_attached_entity_action_form_validate', $form['#validate'])) {
     $form['#validate'][] = 'party_attached_entity_action_form_validate';
   }
 
