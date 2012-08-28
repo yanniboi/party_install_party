@@ -1512,3 +1512,32 @@ function party_entity_update($entity, $type) {
     entity_get_controller('party')->setLabel($party);
   }
 }
+
+/**
+ * Implements hook_entity_property_info_alter().
+ *
+ * Register our attached entities as entity properties so that other modules
+ * can build items from it, e.g. Search API.
+ */
+function party_entity_property_info_alter(&$property_info) {
+  $properties =& $property_info['party']['properties'];
+
+  foreach (party_get_data_set_info() as $data_set_name => $set_info) {
+    $properties[$data_set_name] = array(
+      'label' => t('@label (Attached Entities)', array('@label' => $set_info['label'])),
+      'description' => t('The attached entities that are party of the @label data set.', array('@label' => $set_info['label'])),
+      'type' => $set_info['entity type'],
+      'bundle' => $set_info['entity bundle'],
+      'computed' => TRUE,
+      'getter callback' => 'party_property_dataset_get',
+    );
+  }
+}
+
+/**
+ * Callback for getting attached entity property values.
+ */
+function party_property_dataset_get($party, array $options, $data_set_name, $entity_type, $info) {
+  $controller = party_get_crm_controller($party, $data_set_name);
+  return $controller->getEntityIds();
+}
