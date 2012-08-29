@@ -434,6 +434,7 @@ function party_attached_entity_edit_form_submit($form, &$form_state) {
 function party_attached_entity_remove_confirm($form, &$form_state, $party, $data_set, $eid) {
   $data_set_controller = party_get_crm_controller($party, $data_set['set_name']);
 
+  $form['#party'] = $party;
   $form_state['#data_set'] = $data_set_controller;
   $form_state['#entity'] = reset(entity_load($data_set_controller->getDataInfo('entity type'), array($eid)));
 
@@ -453,6 +454,11 @@ function party_attached_entity_remove_confirm($form, &$form_state, $party, $data
  * Submit handler for the data set remove form.
  */
 function party_attached_entity_remove_confirm_submit($form, &$form_state) {
+  $party = $form['#party'];
+
   $form_state['#data_set']->detachEntity($form_state['#entity']);
   $form_state['#data_set']->save();
+
+  // Redirect to the set piece.
+  $form_state['redirect'] = 'party/' . $party->pid . '/' . $form_state['#data_set']->getDataInfo('path element');
 }
