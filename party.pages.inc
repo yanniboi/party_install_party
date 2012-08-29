@@ -435,8 +435,8 @@ function party_attached_entity_remove_confirm($form, &$form_state, $party, $data
   $data_set_controller = party_get_crm_controller($party, $data_set['set_name']);
 
   $form['#party'] = $party;
-  $form_state['#data_set'] = $data_set_controller;
-  $form_state['#entity'] = reset(entity_load($data_set_controller->getDataInfo('entity type'), array($eid)));
+  $form['#data_set'] = $data_set_controller;
+  $form['#entity'] = reset(entity_load($data_set_controller->getDataInfo('entity type'), array($eid)));
 
   return confirm_form($form,
     t('Are you sure you want to remove %attached from %party?', array(
@@ -455,10 +455,11 @@ function party_attached_entity_remove_confirm($form, &$form_state, $party, $data
  */
 function party_attached_entity_remove_confirm_submit($form, &$form_state) {
   $party = $form['#party'];
+  $data_set_controller = $form['#data_set'];
 
-  $form_state['#data_set']->detachEntity($form_state['#entity']);
-  $form_state['#data_set']->save();
+  $data_set_controller->detachEntity($form['#entity']);
+  $data_set_controller->save();
 
   // Redirect to the set piece.
-  $form_state['redirect'] = 'party/' . $party->pid . '/' . $form_state['#data_set']->getDataInfo('path element');
+  $form_state['redirect'] = 'party/' . $party->pid . '/' . $data_set_controller->getDataInfo('path element');
 }
