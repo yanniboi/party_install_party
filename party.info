@@ -1,5 +1,5 @@
 name = Party
-description = An Entity that helps to manage Contacts
+description = The core of the party system.
 core = 7.x
 package = Party
 
