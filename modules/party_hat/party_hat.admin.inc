@@ -121,40 +121,6 @@ function party_hat_form($form, &$form_state, $hat, $op = 'edit') {
     );
   }
 
-  $form['data_set_access'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Data Access'),
-    '#description' => 'Set rules for who can see data of a party with this hat',
-    '#weight' => 5,
-    '#tree' => TRUE,
-  );
-
-  $form['data_set_access']['placeholder'] = array(
-    '#markup' => '<i>This is a placeholder, in future hats will be able to define who can see the data of the party they\'re attached too</i>',
-  );
-
-  $form['party_piece_settings'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Party piece settings'),
-    '#weight' => 10,
-    '#tree' => true,
-  );
-
-  $form['party_piece_settings']['placeholder'] = array(
-    '#markup' => '<i>This is a placeholder, in future hats will be able to define party pieces that can have views & data sets inside them.</i>',
-  );
-
-  $form['associated_roles'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Associated roles'),
-    '#weight' => 20,
-    '#tree' => true,
-  );
-
-  $form['associated_roles']['placeholder'] = array(
-    '#markup' => '<i>This is a placeholder, in future hats will be able to define associated roles that get added to the User when this hat is assigned to the party</i>',
-  );
-
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
