@@ -6,6 +6,8 @@
 
 /**
  * The interface for action UI controllers.
+ *
+ * @see party_attached_entity_action_form()
  */
 interface PartyDataSetActionInterface {
 
