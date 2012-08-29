@@ -96,17 +96,41 @@ class PartyDefaultDataSetUIAdd implements PartyDataSetActionInterface {
   function action_form($form, &$form_state, $party, $data_set, $eid = NULL) {
     $form = array();
 
-    // @todo: this is not in use yet.
+    $controller = party_get_crm_controller($party, $data_set['set_name']);
+    $form_state['#attached_entity'] = $controller->createEntity();
+
+    field_attach_form($data_set['entity type'], $form_state['#attached_entity'], $form, $form_state);
+
+    $form['actions'] = array(
+      '#type' => 'actions',
+      'submit' => array(
+        '#type' => 'submit',
+        '#value' => t('Create new @label', array(
+          '@label' => $data_set['label'],
+        )),
+      ),
+    );
 
     return $form;
   }
 
   function action_form_validate($form, &$form_state) {
+    // Get the original form parameters.
+    list ($party, $data_set, $action, $eid) = $form_state['build_info']['args'];
 
+    field_attach_form_validate($data_set['entity type'], $form_state['#attached_entity'], $form, $form_state);
   }
 
   function action_form_submit($form, &$form_state) {
+    // Get the original form parameters.
+    list ($party, $data_set, $action, $eid) = $form_state['build_info']['args'];
 
+    field_attach_submit($data_set['entity type'], $form_state['#attached_entity'], $form, $form_state);
+
+    // Attach the entity and save the entity and controller.
+    $controller = party_get_crm_controller($party, $data_set['set_name']);
+    $controller->attachEntity($form_state['#attached_entity']);
+    $controller->save(TRUE);
   }
 
 }
@@ -143,7 +167,7 @@ class PartyDefaultDataSetUIAttach implements PartyDataSetActionInterface {
   function action_form($form, &$form_state, $party, $data_set, $eid = NULL) {
     $form = array();
 
-    dsm("This doesn't work for general entities yet!");
+    drupal_set_message("This doesn't work for general entities yet!", 'error');
 
     return $form;
   }
