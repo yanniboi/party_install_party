@@ -30,8 +30,7 @@ class PartyUserDataSetUIAttach extends PartyDefaultDataSetUIAttach {
       '#title' => t('User'),
       '#maxlength' => 60,
       '#autocomplete_path' => 'user/autocomplete',
-      // TODO: surely this is superfluous?
-      '#description' => t('Leave blank for %anonymous.', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
+      '#description' => t('Enter the username of the account to attach.'),
     );
 
     $form['submit'] = array(
