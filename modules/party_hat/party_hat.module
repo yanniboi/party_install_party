@@ -28,6 +28,7 @@ function party_hat_entity_info() {
     'exportable' => TRUE,
     'access callback' => 'party_hat_access',
     'uri callback' => 'party_hat_uri',
+    'label callback' => 'entity_class_label',
     'admin ui' => array(
       'controller class' => 'PartyHatUIController',
       'path' => 'admin/community/hats',
