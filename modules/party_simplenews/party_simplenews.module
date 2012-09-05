@@ -7,7 +7,6 @@
  * Load includes
  */
 module_load_include('inc', 'party_simplenews', 'party_subscription_settings.api');
-module_load_include('inc', 'party_simplenews', 'party_subscription_settings.entity');
 
 /**
  * Implements hook_entity_info()
