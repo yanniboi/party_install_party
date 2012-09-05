@@ -31,13 +31,6 @@ function party_page_view($party, $view_mode = 'full') {
 
 
 /**
- * Page title callback for party edit page.
- */
-function party_edit_page_title($party) {
-  return "Edit " . $party->label;
-}
-
-/**
  * Page callback for adding a party.
  */
 function party_add() {
