@@ -10,6 +10,7 @@ files[] = includes/entityreference/party.entityreference.inc
 files[] = includes/party.data.inc
 files[] = includes/party.data_ui.inc
 files[] = includes/party.entity.inc
+files[] = includes/party.extender.inc
 files[] = includes/party.ui.inc
 
 ; Views files

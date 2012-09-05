@@ -1541,3 +1541,19 @@ function party_property_dataset_get($party, array $options, $data_set_name, $ent
   $controller = party_get_crm_controller($party, $data_set_name);
   return $controller->getEntityIds();
 }
+
+/**
+ * Returns a new SelectQuery extended by PartyQuery for the active database.
+ *
+ * @param $options
+ *   An array of options to control how the query operates.
+ *
+ * @return SelectQuery
+ *   A new SelectQuery object for this connection.
+ *
+ * @see db_select()
+ */
+function party_query($options = array()) {
+  return db_select('party', 'party', $options)
+    ->extend('PartyQuery');
+}
