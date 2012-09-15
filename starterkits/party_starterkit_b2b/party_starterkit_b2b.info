@@ -5,6 +5,7 @@ core = 7.x
 
 dependencies[] = party
 dependencies[] = party_activity
+dependencies[] = party_hat
 dependencies[] = party_profile
 dependencies[] = party_user
 dependencies[] = field_helper
