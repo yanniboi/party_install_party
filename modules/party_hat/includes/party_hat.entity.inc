@@ -13,24 +13,89 @@ class PartyHatController extends EntityAPIControllerExportable {
 
 /**
  * The class used for hat entities.
- *
- * Properties:
- *  - hid
- *  - name
- *  - label
- *  - data: An array of various data for the hat:
- *    - party_types: OBSOLETE, to be removed.
- *    - data_sets: TODO.
- *  - required
- *  - status
- *  - module
  */
 class PartyHat extends Entity {
 
+  /**
+   * The internal numeric id of the hat.
+   *
+   * @var integer
+   */
+  public $hid;
+
+  /**
+   * The machine name of a hat.
+   *
+   * @var string
+   */
+  public $name;
+
+  /**
+   * The machine name of this hat's parent.
+   *
+   * @var string
+   */
+  public $parent;
+
+  /**
+   * The label of the hat.
+   *
+   * @var string
+   */
+  public $label;
+
+  /**
+   * The description for the hat.
+   *
+   * @var string
+   */
+  public $description;
+
+  /**
+   * A serialized array of hat settings.
+   *
+   * This array contains:
+   *   - dat_sets: An array settings keyed by data set name.
+   *     - has: Whether or not this data set is allowed.
+   *     - multiple: Whether or not this data set is allowed multiple.
+   *
+   * @var string
+   */
+  public $data;
+
+  /**
+   * Whether this hat is required by all parties.
+   *
+   * @var integer
+   */
+  public $required;
+
+  /**
+   * The exportable status of the entity.
+   *
+   * @var integer
+   */
+  public $status;
+
+  /**
+   * The name of the providing module if the entity has been defined in code.
+   *
+   * @var string
+   */
+  public $module;
+
+  /**
+   * Constructor for a PartyHat.
+   *
+   * @see Entity::__construct()
+   */
   public function __construct($values = array()) {
     parent::__construct($values, 'party_hat');
   }
 
+  /**
+   * Return the label of the hat.
+   */
   protected function defaultLabel() {
     return $this->label;
   }
