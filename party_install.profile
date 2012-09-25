@@ -63,6 +63,7 @@ function party_install_form_install_configure_form_alter(&$form, $form_state) {
   );
   $filtered_html_format = (object) $filtered_html_format;
   filter_format_save($filtered_html_format);
+  
 
   // Enable default permissions for system roles.
   $filtered_html_permission = filter_permission_name($filtered_html_format);
@@ -82,6 +83,7 @@ function party_install_form_install_configure_form_alter(&$form, $form_state) {
   db_insert('users_roles')
     ->fields(array('uid' => 1, 'rid' => $admin_role->rid))
     ->execute();
+
 
 
   // Create a list of Profile2s to be used as Data Sets
@@ -113,15 +115,8 @@ function party_install_form_install_configure_form_alter(&$form, $form_state) {
     'data' => array('registration' => TRUE, 'use_page' => TRUE),
   ));
   $type->save();
-  $type = entity_create('profile2_type', array(
-    'type' => 'main',
-    'label' => t('Main'),
-    'weight' => 0,
-    'data' => array('registration' => TRUE, 'use_page' => TRUE),
-  ));
-  $type->save();
 
-  // Create Name field for Main profile2
+  // Create Name field for Individual profile2
   $field = array(
     'field_name' => 'field_individual_name',
     'type' => 'text',
@@ -132,7 +127,7 @@ function party_install_form_install_configure_form_alter(&$form, $form_state) {
   $instance = array(
     'field_name' => 'field_individual_name',
     'entity_type' => 'profile2',
-    'bundle' => 'main',
+    'bundle' => 'individual',
     'label' => 'Name',
     'description' => t('Name of the individual'),
     'settings' => array(
@@ -153,7 +148,7 @@ function party_install_form_install_configure_form_alter(&$form, $form_state) {
   );
   $instance = field_create_instance($instance);
 
-  // Create Address field for Main profile2
+  // Create Address field for Individual profile2
   $field = array(
     'field_name' => 'field_individual_address',
     'type' => 'text_long',
@@ -164,7 +159,7 @@ function party_install_form_install_configure_form_alter(&$form, $form_state) {
   $instance = array(
     'field_name' => 'field_individual_address',
     'entity_type' => 'profile2',
-    'bundle' => 'main',
+    'bundle' => 'individual',
     'label' => 'Address',
     'description' => t('Address of the individual'),
     'settings' => array(
@@ -185,7 +180,7 @@ function party_install_form_install_configure_form_alter(&$form, $form_state) {
   );
   $instance = field_create_instance($instance);
 
-  // Create Email field for Main profile2
+  // Create Email field for Individual profile2
   $field = array(
     'field_name' => 'field_individual_email',
     'type' => 'email',
@@ -196,7 +191,7 @@ function party_install_form_install_configure_form_alter(&$form, $form_state) {
   $instance = array(
     'field_name' => 'field_individual_email',
     'entity_type' => 'profile2',
-    'bundle' => 'main',
+    'bundle' => 'individual',
     'label' => 'Email',
     'description' => t('Email of the individual'),
     'widget' => array('type' => 'email_textfield'),
@@ -213,5 +208,69 @@ function party_install_form_install_configure_form_alter(&$form, $form_state) {
     ),
   );
   $instance = field_create_instance($instance);
-}
 
+  // Create some hats
+  $hat = entity_create('party_hat', array(
+    'name' => 'individual', 
+    'label' => 'Individual',
+    'description' => 'The hat for Individuals',
+    'parent' => '',
+    'data' => array(
+      'data_sets' => array(
+        'profile2_individual' => array(
+          'has' => 1,
+          'multiple' => 0,
+        ),
+      ),
+    ),
+  ));
+  $hat->save();
+
+  $hat = entity_create('party_hat', array(
+    'name' => 'organisation',
+    'label' => 'Organisation',
+    'description' => 'The hat for Organisations',
+    'parent' => '',
+    'data' => array(
+      'data_sets' => array(
+        'profile2_organisation' => array(
+          'has' => 1,
+          'multiple' => 0,
+        ),
+      ),
+    ),
+  ));
+  $hat->save();
+
+  $hat = entity_create('party_hat', array(
+    'name' => 'staff',
+    'label' => 'Staff',
+    'description' => 'The hat for Staff members',
+    'parent' => '',
+    'data' => array(
+      'data_sets' => array(
+        'profile2_staff' => array(
+          'has' => 1,
+          'multiple' => 0,
+        ),
+      ),
+    ),
+  ));
+  $hat->save();
+
+  $hat = entity_create('party_hat', array(
+    'name' => 'student',
+    'label' => 'Student',
+    'description' => 'The hat for Students',
+    'parent' => '',
+    'data' => array(
+      'data_sets' => array(
+        'profile2_student' => array(
+          'has' => 1,
+          'multiple' => 0,
+        ),
+      ),
+    ),
+  ));
+  $hat->save();
+}
