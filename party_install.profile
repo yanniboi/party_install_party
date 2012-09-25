@@ -24,4 +24,13 @@ function party_install_form_install_configure_form_alter(&$form, $form_state) {
    $form['server_settings']['site_default_country']['#default_value'] = 'United Kingdom';
    $form['server_settings']['date_default_timezone']['#default_value'] = 'Europe/London'; // The Party happens in the North West though!! 
 
+  // Enable the admin theme.
+  db_update('system')
+    ->fields(array('status' => 1))
+    ->condition('type', 'theme')
+    ->condition('name', 'seven')
+    ->execute();
+  variable_set('admin_theme', 'seven');
+  variable_set('node_admin_theme', '1');
 }
+
