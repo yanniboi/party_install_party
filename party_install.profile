@@ -187,7 +187,7 @@ function party_install_form_install_configure_form_alter(&$form, $form_state) {
   );
   $instance = field_create_instance($instance);
 
-  // Create Email field for Individual profile2
+  // Create Email field for Main profile2
   $field = array(
     'field_name' => 'field_main_email',
     'type' => 'email',
@@ -211,6 +211,122 @@ function party_install_form_install_configure_form_alter(&$form, $form_state) {
       'party' => array(
         'label' => 'hidden',
         'type' => 'email_plain',
+      ),
+    ),
+  );
+  $instance = field_create_instance($instance);
+
+  // Create Gender field for Individual profile2
+  $field = array(
+    'field_name' => 'field_individual_gender',
+    'type' => 'list_text',
+  );
+  $field = field_create_field($field);
+
+  // Attach newly created fields to the Profile2
+  $instance = array(
+    'field_name' => 'field_individual_gender',
+    'entity_type' => 'profile2',
+    'bundle' => 'individual',
+    'label' => 'Gender',
+    'description' => t('Gender of the Individual'),
+    'widget' => array('type' => 'options_select'),
+    'weight' => 11,
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'type' => 'list_default',
+      ),
+      'party' => array(
+        'label' => 'hidden',
+        'type' => 'list_default',
+      ),
+    ),
+  );
+  $instance = field_create_instance($instance);
+
+  // Create Nationality field for Individual profile2
+  $field = array(
+    'field_name' => 'field_individual_nationality',
+    'type' => 'taxonomy_term_reference',
+  );
+  $field = field_create_field($field);
+
+  // Attach newly created fields to the Profile2
+  $instance = array(
+    'field_name' => 'field_individual_nationality',
+    'entity_type' => 'profile2',
+    'bundle' => 'individual',
+    'label' => 'Nationality',
+    'description' => t('Nationality of the Individual'),
+    'widget' => array('type' => 'options_select'),
+    'weight' => 11,
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'type' => 'taxonomy_term_reference_plain',
+      ),
+      'party' => array(
+        'label' => 'hidden',
+        'type' => 'taxonomy_term_reference_link',
+      ),
+    ),
+  );
+  $instance = field_create_instance($instance);
+
+  // Create Photo field for Individual profile2
+  $field = array(
+    'field_name' => 'field_individual_photo',
+    'type' => 'image',
+  );
+  $field = field_create_field($field);
+
+  // Attach newly created fields to the Profile2
+  $instance = array(
+    'field_name' => 'field_individual_photo',
+    'entity_type' => 'profile2',
+    'bundle' => 'individual',
+    'label' => 'Photo',
+    'description' => t('Photo of the Individual'),
+    'widget' => array('type' => 'image_image'),
+    'weight' => 11,
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'type' => 'image',
+      ),
+      'party' => array(
+        'label' => 'hidden',
+        'type' => 'image',
+      ),
+    ),
+  );
+  $instance = field_create_instance($instance);
+
+  // Create Photo field for Individual profile2
+  $field = array(
+    'field_name' => 'field_individual_date_of_birth',
+    'type' => 'datetime',
+  );
+  $field = field_create_field($field);
+
+  // Attach newly created fields to the Profile2
+  $instance = array(
+    'field_name' => 'field_individual_date_of_birth',
+    'entity_type' => 'profile2',
+    'bundle' => 'individual',
+    'label' => 'Date of Birth',
+    'description' => t('DoB of the Individual'),
+    'widget' => array('type' => 'date_select'),
+    'weight' => 11,
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'type' => 'date_plain',
+      ),
+      'party' => array(
+        'label' => 'hidden',
+        'type' => 'date_default',
       ),
     ),
   );
