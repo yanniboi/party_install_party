@@ -115,34 +115,41 @@ function party_install_form_install_configure_form_alter(&$form, $form_state) {
     'data' => array('registration' => TRUE, 'use_page' => TRUE),
   ));
   $type->save();
+  $type = entity_create('profile2_type', array(
+    'type' => 'main',
+    'label' => t('Main'),
+    'weight' => 1,
+    'data' => array('registration' => TRUE, 'use_page' => TRUE),
+  ));
+  $type->save();
 
   // Create Name field for Individual profile2
   $field = array(
-    'field_name' => 'field_individual_name',
-    'type' => 'text',
+    'field_name' => 'field_main_name',
+    'type' => 'name',
   );
   $field = field_create_field($field);
 
   // Attach newly created field to the profile2
   $instance = array(
-    'field_name' => 'field_individual_name',
+    'field_name' => 'field_main_name',
     'entity_type' => 'profile2',
-    'bundle' => 'individual',
+    'bundle' => 'main',
     'label' => 'Name',
-    'description' => t('Name of the individual'),
+    'description' => t('Name of the Party'),
     'settings' => array(
       'text_processing' => 0,
     ),
-    'widget' => array('type' => 'text_textfield'),
+    'widget' => array('type' => 'name_widget'),
     'weight' => 11,
     'display' => array(
       'default' => array(
         'label' => 'hidden',
-        'type' => 'text_plain',
+        'type' => 'name_formatter',
       ),
       'party' => array(
         'label' => 'hidden',
-        'type' => 'text_plain',
+        'type' => 'name_formatter',
       ),
     ),
   );
@@ -150,18 +157,18 @@ function party_install_form_install_configure_form_alter(&$form, $form_state) {
 
   // Create Address field for Individual profile2
   $field = array(
-    'field_name' => 'field_individual_address',
+    'field_name' => 'field_main_address',
     'type' => 'text_long',
   );
   $field = field_create_field($field);
 
   // Attach newly created fields to the Profile2
   $instance = array(
-    'field_name' => 'field_individual_address',
+    'field_name' => 'field_main_address',
     'entity_type' => 'profile2',
-    'bundle' => 'individual',
+    'bundle' => 'main',
     'label' => 'Address',
-    'description' => t('Address of the individual'),
+    'description' => t('Address of the Party'),
     'settings' => array(
       'text_processing' => 0,
     ),
@@ -182,18 +189,18 @@ function party_install_form_install_configure_form_alter(&$form, $form_state) {
 
   // Create Email field for Individual profile2
   $field = array(
-    'field_name' => 'field_individual_email',
+    'field_name' => 'field_main_email',
     'type' => 'email',
   );
   $field = field_create_field($field);
 
   // Attach newly created fields to the Profile2
   $instance = array(
-    'field_name' => 'field_individual_email',
+    'field_name' => 'field_main_email',
     'entity_type' => 'profile2',
-    'bundle' => 'individual',
+    'bundle' => 'main',
     'label' => 'Email',
-    'description' => t('Email of the individual'),
+    'description' => t('Email of the Party'),
     'widget' => array('type' => 'email_textfield'),
     'weight' => 11,
     'display' => array(
