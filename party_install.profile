@@ -123,7 +123,7 @@ function party_install_form_install_configure_form_alter(&$form, $form_state) {
   ));
   $type->save();
 
-  // Create Name field for Individual profile2
+  // Create Name field for Main profile2
   $field = array(
     'field_name' => 'field_main_name',
     'type' => 'name',
@@ -155,7 +155,7 @@ function party_install_form_install_configure_form_alter(&$form, $form_state) {
   );
   $instance = field_create_instance($instance);
 
-  // Create Address field for Individual profile2
+  // Create Address field for Main profile2
   $field = array(
     'field_name' => 'field_main_address',
     'type' => 'text_long',
@@ -327,6 +327,180 @@ function party_install_form_install_configure_form_alter(&$form, $form_state) {
       'party' => array(
         'label' => 'hidden',
         'type' => 'date_default',
+      ),
+    ),
+  );
+  $instance = field_create_instance($instance);
+
+  // Create Department field for Staff profile2
+  $field = array(
+    'field_name' => 'field_staff_department',
+    'type' => 'list_text',
+  );
+  $field = field_create_field($field);
+
+  // Attach newly created fields to the Profile2
+  $instance = array(
+    'field_name' => 'field_staff_department',
+    'entity_type' => 'profile2',
+    'bundle' => 'staff',
+    'label' => 'Department',
+    'description' => t('Department of the Staff member'),
+    'widget' => array('type' => 'options_select'),
+    'weight' => 11,
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'type' => 'list_default',
+      ),
+      'party' => array(
+        'label' => 'hidden',
+        'type' => 'list_default',
+      ),
+    ),
+  );
+  $instance = field_create_instance($instance);
+
+  // Create Salary field for Staff profile2
+  $field = array(
+    'field_name' => 'field_staff_salary',
+    'type' => 'number_integer',
+  );
+  $field = field_create_field($field);
+    
+  // Attach newly created fields to the Profile2
+  $instance = array(
+    'field_name' => 'field_staff_salary',
+    'entity_type' => 'profile2',
+    'bundle' => 'staff',
+    'label' => 'Salary',
+    'description' => t('Salary of the Staff member'),
+    'widget' => array('type' => 'number'),
+    'weight' => 11,
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'type' => 'number_integer',
+      ),
+      'party' => array(
+        'label' => 'hidden',
+        'type' => 'number_integer',
+      ),
+    ),
+  );
+  $instance = field_create_instance($instance);
+
+// Create a Course field for Student profile2
+  $field = array(
+    'field_name' => 'field_student_course',
+    'type' => 'list_text',
+  );
+  $field = field_create_field($field);
+
+  // Attach newly created fields to the Profile2
+  $instance = array(
+    'field_name' => 'field_student_course',
+    'entity_type' => 'profile2',
+    'bundle' => 'student',
+    'label' => 'Course',
+    'description' => t('Course of the Student'),
+    'widget' => array('type' => 'options_select'),
+    'weight' => 11,
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'type' => 'list_default',
+      ),
+      'party' => array(
+        'label' => 'hidden',
+        'type' => 'list_default',
+      ),
+    ),
+  );
+  $instance = field_create_instance($instance);
+
+  // Create an Enrolled field for the Student profile2
+  $field = array(
+    'field_name' => 'field_student_enrolled',
+    'type' => 'datetime',
+  );
+  $field = field_create_field($field);
+
+  // Attach newly created fields to the Profile2
+  $instance = array(
+    'field_name' => 'field_student_enrolled',
+    'entity_type' => 'profile2',
+    'bundle' => 'student',
+    'label' => 'Enrolled',
+    'description' => t('Enrolled Date of the Student'),
+    'widget' => array('type' => 'date_select'),
+    'weight' => 11,
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'type' => 'date_plain',
+      ),
+      'party' => array(
+        'label' => 'hidden',
+        'type' => 'date_default',
+      ),
+    ),
+  );
+  $instance = field_create_instance($instance);
+
+  // Create a Primary Contact field for the Organisation profile2
+  $field = array(
+    'field_name' => 'field_organisation_contact',
+    'type' => 'entityreference',
+  );
+  $field = field_create_field($field);
+
+  // Attach newly created fields to the Profile2
+  $instance = array(
+    'field_name' => 'field_organisation_contact',
+    'entity_type' => 'profile2',
+    'bundle' => 'organisation',
+    'label' => 'Primary Contact',
+    'description' => t('Primary Contact for the Organisation'),
+    'widget' => array('type' => 'entityreference_autocomplete'),
+    'weight' => 11,
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'type' => 'entityreference_label',
+      ),
+      'party' => array(
+        'label' => 'hidden',
+        'type' => 'entityreference_label',
+      ),
+    ),
+  );
+  $instance = field_create_instance($instance);
+
+  // Create a Role field for the Organisation profile2
+  $field = array(
+    'field_name' => 'field_organisation_role',
+    'type' => 'list_text',
+  );
+  $field = field_create_field($field);
+
+  // Attach newly created fields to the Profile2
+  $instance = array(
+    'field_name' => 'field_organisation_role',
+    'entity_type' => 'profile2',
+    'bundle' => 'organisation',
+    'label' => 'Role',
+    'description' => t('Role of the Primary Contact for the Organisation'),
+    'widget' => array('type' => 'options_select'),
+    'weight' => 11,
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'type' => 'list_default',
+      ),
+      'party' => array(
+        'label' => 'hidden',
+        'type' => 'list_default',
       ),
     ),
   );
