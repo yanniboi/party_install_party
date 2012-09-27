@@ -196,6 +196,27 @@ function party_hat_get_data_set_rule($hat, $data_set_name) {
 }
 
 /**
+ * Implements hook_party_data_sets_alter().
+ */
+function party_hat_party_data_sets_alter(&$party_data_sets, $party) {
+  // Get the party_hats off this party.
+  $party_hats = party_hat_get_hats($party);
+
+  $hats_sets = array();
+  // Collect all the data sets this party should have.
+  foreach($party_hats as $hat) {
+    $hats_sets += party_hat_get_hat_data_sets($hat);
+  }
+
+  // Remove data sets from party_data_sets that are not in the hats_sets array.
+  foreach($party_data_sets as $key => $data_set) {
+    if (!in_array($data_set, $hats_sets)) {
+      unset($party_data_sets[$key]);
+    }
+  }
+}
+
+/**
  * Implements hook_party_access().
  */
 function party_hat_party_access($op, $party = NULL, $data_set = NULL, $account = NULL) {
@@ -210,17 +231,11 @@ function party_hat_party_access($op, $party = NULL, $data_set = NULL, $account =
     case 'attach':
     case 'add':
     case 'view':
-      $data_set_name = $data_set['set_name'];
+      $sets = party_get_party_data_sets($party);
 
-      $party_hats = party_hat_get_hats($party);
-      $data_sets = array();
-      foreach ($party_hats as $hat) {
-        // Ugh these are values; would be better as keys.
-        $hat_sets = party_hat_get_hat_data_sets($hat);
-        // If any hat has the data set, grant access.
-        if (in_array($data_set_name, $hat_sets)) {
-          return TRUE;
-        }
+	  // If any hat has the data set, grant access.
+      if (in_array($data_set_name, $sets)) {
+        return TRUE;
       }
       return FALSE;
   }

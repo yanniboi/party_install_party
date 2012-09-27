@@ -868,19 +868,28 @@ function party_get_data_set_info($data_set_name = NULL, $reset = FALSE) {
  *
  * @return
  *  An array of data set names.
+ *
+ * @todo: Consider caching against the set of hats rather than the party id.
  */
 function party_get_party_data_sets($party) {
+  $party_data_sets = &drupal_static(__FUNCTION__);
+
+  // If the sets have already been worked out return the cached list.
+  if (isset($party->pid) && !empty($party_data_sets[$party->pid])) {
+    return $party_data_sets[$party->pid];
+  }
+
   $data_sets = array_keys(party_get_data_set_info());
 
-  $allowed_data_sets = array();
-  // Check attaching access for each data set.
-  foreach ($data_sets as $data_set_name) {
-    $access = party_access('attach', $party, $data_set_name);
-    if ($access) {
-      $allowed_data_sets[$data_set_name] = $data_set_name;
-    }
+  // Allow modules to alter the party data sets.
+  drupal_alter('party_data_sets', $data_sets, $party);
+
+  // If a pid is set cache the result.
+  if (isset($party->pid)) {
+    $party_data_sets[$party->pid] = $data_sets;
   }
-  return $allowed_data_sets;
+
+  return $data_sets;
 }
 
 // -----------------------------------------------------------------------
