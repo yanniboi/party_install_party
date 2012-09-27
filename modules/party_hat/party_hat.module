@@ -231,6 +231,7 @@ function party_hat_party_access($op, $party = NULL, $data_set = NULL, $account =
     case 'attach':
     case 'add':
     case 'view':
+      $data_set_name = $data_set['set_name'];
       $sets = party_get_party_data_sets($party);
 
 	  // If any hat has the data set, grant access.
