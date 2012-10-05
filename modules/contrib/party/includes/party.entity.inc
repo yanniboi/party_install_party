@@ -22,18 +22,21 @@ class PartyController extends EntityAPIController {
     }
 
     if (isset($party->pid)) {
+      // Make sure the label is up to date with any changes and save.
+      $this->setLabel($party, FALSE);
       drupal_write_record('party', $party, 'pid');
       field_attach_update('party', $party);
       module_invoke_all('entity_update', $party, 'party');
     }
     else {
+      // We need to store the party before setting the label in case we fall
+      // back to using the party id.
       drupal_write_record('party', $party);
+      $this->setLabel($party);
       field_attach_insert('party', $party);
       module_invoke_all('entity_insert', $party, 'party');
     }
 
-    // Set the party label
-    $this->setLabel($party);
     return $party;
   }
 
@@ -49,8 +52,10 @@ class PartyController extends EntityAPIController {
    *
    * @param $party
    *  A party object.
+   * @param bool $store
+   *  Whether we should store the new label.
    */
-  public function setLabel($party) {
+  public function setLabel($party, $store = TRUE) {
     module_load_include('inc', 'party', 'party.admin');
 
     // Get the label plugins.
@@ -72,10 +77,12 @@ class PartyController extends EntityAPIController {
       $party->label = $party->id;
     }
 
-    // Save the label to the database.
-    // @todo: if drupal_write_record incurs too much overhead replace with a
-    // simple update query.
-    drupal_write_record('party', $party, 'pid');
+    if ($store) {
+      // Save the label to the database.
+      // @todo: if drupal_write_record incurs too much overhead replace with a
+      // simple update query.
+      drupal_write_record('party', $party, 'pid');
+    }
   }
 
   /**
