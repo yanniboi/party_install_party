@@ -555,10 +555,26 @@ function party_hat_widget_info_alter(&$info) {
  * Implements hook_options_list().
  */
 function party_hat_options_list($field, $instance, $entity_type, $entity) {
+  return party_hat_build_hat_options(NULL, NULL, 'edit');;
+}
+
+/**
+ * Build the options list for hats.
+ *
+ * @return array
+ *   An array of hats.
+ *
+ * @see EntityMetadataWrapper::optionsList
+ */
+function party_hat_build_hat_options($name, $info, $op) {
   $hats = party_hat_get_tree();
+
+  // Add an indent if we're in edit mode to demonstrate heirachy.
+  $indent = ($op == 'edit') ? '-': '';
+
   $options = array();
   foreach ($hats as $hat) {
-    $options[$hat->name] = str_repeat('-', $hat->depth) . $hat->label;
+    $options[$hat->name] = str_repeat($indent, $hat->depth) . $hat->label;
   }
 
   return $options;
