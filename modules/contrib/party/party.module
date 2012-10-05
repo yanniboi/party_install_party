@@ -1562,3 +1562,17 @@ function party_query($options = array()) {
   return db_select('party', 'party', $options)
     ->extend('PartyQuery');
 }
+
+/**
+ * Implements hook_search_api_alter_callback_info().
+ */
+function party_search_api_alter_callback_info() {
+  $callbacks['party_alter_status_filter'] = array(
+    'name' => t('Status filter'),
+    'description' => t('Exclude items from indexing based on their status and merging.'),
+    'class' => 'PartyAlterStatusFilter',
+    // Filters should be executed first.
+    'weight' => -10,
+  );
+  return $callbacks;
+}

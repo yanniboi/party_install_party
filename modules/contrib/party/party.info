@@ -24,6 +24,9 @@ files[] = includes/views/party_handler_field_delete_link.inc
 files[] = includes/views/party_handler_relationship_party_attached_eid.inc
 files[] = tests/party.test
 
+; Search API
+files[] = includes/search_api/callback_status_filter.inc
+
 dependencies[] = entity
 dependencies[] = ctools
 dependencies[] = views
