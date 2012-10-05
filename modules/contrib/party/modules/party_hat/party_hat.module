@@ -507,6 +507,8 @@ function party_hat_field_info() {
       ),
       'instance_settings' => array(),
       'no_ui' => TRUE,
+      'property_type' => 'party_hat',
+      'property_callbacks' => array('party_hat_entity_metadata_field_hat_reference_callback'),
     )
   );
 }
@@ -716,4 +718,15 @@ function party_hat_party_form_hat_submit($form, &$form_state) {
 function party_hat_form_party_edit_form_alter(&$form, &$form_state) {
   $form['#validate'][] = 'party_hat_party_form_hat_validate';
   $form['#submit'][] = 'party_hat_party_form_hat_submit';
+}
+
+/**
+ * Callback to adapt the property info for party hat reference fields.
+ *
+ * @see entity_metadata_field_default_property_callback().
+ * @see party_hat_field_info().
+ */
+function party_hat_entity_metadata_field_hat_reference_callback(&$info, $entity_type, $field, $instance, $field_type) {
+  $property =& $info[$entity_type]['bundles'][$instance['bundle']]['properties'][$field['field_name']];
+  $property['options list'] = 'party_hat_build_hat_options';
 }
